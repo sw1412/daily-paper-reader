@@ -1,0 +1,348 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-25T03:34:57.266600+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 2,
+    "deep_cap": 6,
+    "deep_selected": 2,
+    "quick_candidates": 6,
+    "quick_skim_target": 11,
+    "quick_selected": 6
+  },
+  "deep_dive": [
+    {
+      "id": "2606.21267v1",
+      "source": "arxiv",
+      "title": "Few-Shot Hyperspectral Aphid Detection via FastGAN Synthetic Data Generation, Transformer-Based Classification and Explainable AI",
+      "abstract": "Early detection of aphid infestation in crops is essential for preventing yield loss and reducing unnecessary pesticide use. Hyperspectral imaging combined with Spectral Information Divergence (SID) analysis offers a non-destructive approach for monitoring plant health; however, deep learning methods applied to hyperspectral data are often limited by small dataset sizes. In this study, a data-efficient generative adversarial network (FastGAN) was employed to augment a hyperspectral SID dataset of faba bean leaves containing healthy and aphid-infested samples. The trained generator produced 10,000 synthetic images preserving structural and spectral characteristics of real samples. Image quality was evaluated using Frechet Inception Distance (FID), demonstrating stable convergence and realistic reconstruction of leaf morphology and infestation patterns. The augmented dataset was used to train four classification architectures: VGG16, ResNet-50, EfficientNet, and Vision Transformer (ViT). Results showed that dataset augmentation significantly improved classification robustness, with performance progressively increasing from classical convolutional networks to transformer-based models. The ViT model achieved the highest accuracy and F1-scores, while EfficientNet provided strong balanced performance and ResNet-50 showed moderate improvements over VGG16. Confusion matrix analysis confirmed reduced false negatives and improved disease detection when using advanced architectures. The findings demonstrate that FastGAN-based augmentation effectively enhances hyperspectral plant disease classification and that transformer-based models provide the most reliable discrimination between healthy and infested leaves.",
+      "authors": [
+        "Ali Saeidan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-19T09:45:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.21267v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hyperspectral aphid detection using FastGAN and Transformer",
+      "llm_evidence_cn": "利用FastGAN与Transformer的高光谱蚜虫检测",
+      "llm_evidence": "利用FastGAN与Transformer的高光谱蚜虫检测",
+      "canonical_evidence": "利用FastGAN与Transformer的高光谱蚜虫检测",
+      "llm_tldr_en": "Proposes few-shot hyperspectral aphid detection using FastGAN synthetic data generation and Transformer-based classification, addressing small dataset limitation in hyperspectral imaging for plant health monitoring.",
+      "llm_tldr_cn": "针对高光谱成像中深度学习受限于小样本的问题，提出一种基于FastGAN生成合成数据与Transformer分类的小样本高光谱蚜虫检测方法。实验表明，生成的10,000张合成图像保留了真实样本的光谱与结构特征，提升了分类性能。该方法为高光谱图像中的小样本目标检测提供了有效途径，具有农业病虫害早期检测的应用价值。",
+      "llm_tldr": "针对高光谱成像中深度学习受限于小样本的问题，提出一种基于FastGAN生成合成数据与Transformer分类的小样本高光谱蚜虫检测方法。实验表明，生成的10,000张合成图像保留了真实样本的光谱与结构特征，提升了分类性能。该方法为高光谱图像中的小样本目标检测提供了有效途径，具有农业病虫害早期检测的应用价值。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.17713v1",
+      "source": "arxiv",
+      "title": "Heterogeneous SAR-optical fusion for near-real-time land use and land cover mapping under cloud contamination: A novel framework and global benchmark dataset",
+      "abstract": "Optical remote sensing imagery is frequently degraded by cloud and cloud-shadow contamination, which limits its reliability for near-real-time land use and land cover (LULC) mapping. Although synthetic aperture radar (SAR) can provide cloud-penetrating structural information, existing SAR-optical fusion methods often assume reliable optical observations and insufficiently address the semantic uncertainty introduced by cloud contamination. To address this issue, we propose CloudLULC-Net, an end-to-end heterogeneous SAR-optical fusion framework that directly predicts LULC maps from cloud-contaminated Sentinel-2 imagery and temporally adjacent Sentinel-1 SAR observations. The proposed network incorporates optical reliability modulation to suppress unreliable optical responses, heterogeneous information adaptive aggregation to model high-order spatial-channel interactions between optical and SAR representations, and a unified semantic mapping transformer to organize fused features in a LULC-oriented latent space. A semantic anchor-guided optimization strategy is further introduced to improve the consistency of intermediate semantic representations. To support this task, we construct CloudLULC-Set, a large-scale benchmark dataset containing 40,223 curated SAR-optical-label triplets with pixel-level LULC annotations across diverse geographic regions and cloud conditions. Experimental results show that CloudLULC-Net achieves an OA of 86.60%, an F1-score of 83.29%, and an mIoU of 73.51%, outperforming representative heterogeneous reconstruction-first and end-to-end SAR-optical mapping methods. Comparisons with existing global LULC products and analyses under different cloud-cover levels further demonstrate the robustness and practical value of CloudLULC-Net for target-date LULC mapping in cloud-prone regions.The project is publicly available at: https://github.com/RSIIPAC/CloudLULC",
+      "authors": [
+        "Jiangong Xu",
+        "Weibao Xue",
+        "Xiaoyu Yu",
+        "Jun Pan",
+        "Xinlian Lianga",
+        "Mi Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-16T09:25:10+00:00",
+      "link": "https://arxiv.org/pdf/2606.17713v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "SAR-optical fusion for LULC classification; multimodal remote sensing",
+      "llm_evidence_cn": "SAR与光学融合的土地覆盖分类；多模态遥感",
+      "llm_evidence": "SAR与光学融合的土地覆盖分类；多模态遥感",
+      "canonical_evidence": "SAR与光学融合的土地覆盖分类；多模态遥感",
+      "llm_tldr_en": "A heterogeneous SAR-optical fusion framework (CloudLULC-Net) for near-real-time land use and land cover mapping under cloud contamination, using a novel global benchmark dataset.",
+      "llm_tldr_cn": "该论文针对光学遥感影像受云污染导致无法实时进行土地覆盖分类的问题，提出CloudLULC-Net框架。该框架通过端到端的方式融合云污染的Sentinel-2影像和时序上相邻的Sentinel-1 SAR观测，直接预测土地覆盖图。实验在构建的全球基准数据集上验证了其有效性。该工作为多模态遥感影像分类提供了新思路，尤其适用于云覆盖场景下的近实时制图。",
+      "llm_tldr": "该论文针对光学遥感影像受云污染导致无法实时进行土地覆盖分类的问题，提出CloudLULC-Net框架。该框架通过端到端的方式融合云污染的Sentinel-2影像和时序上相邻的Sentinel-1 SAR观测，直接预测土地覆盖图。实验在构建的全球基准数据集上验证了其有效性。该工作为多模态遥感影像分类提供了新思路，尤其适用于云覆盖场景下的近实时制图。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.20189v1",
+      "source": "arxiv",
+      "title": "HilDA: Hierarchical Distillation with Diffusion for Advancing Self-Supervised LiDAR Pre-trainin",
+      "abstract": "Leveraging Vision Foundation Models (VFMs) for camera-to-LiDAR knowledge distillation offers a promising solution to the scarcity of annotated data needed to represent the immense geometric and kinematic diversity of real-world autonomous driving (AD). However, current approaches typically treat VFMs as black-box teachers, relying exclusively on frame-wise feature similarity. Consequently, they do not fully exploit the teacher's layer-wise semantic structure and global context, as well as the rich spatiotemporal information inherent in LiDAR sequences. We propose HilDA, a self-supervised pretraining framework for LiDAR backbones that better captures the semantic what and geometric where needed for driving tasks. HilDA combines hierarchical distillation comprising multi-layer distillation for progressive semantic alignment and global context distillation for scene-level semantics, with a temporal occupancy diffusion objective promoting spatiotemporal consistency. Models pre-trained with HilDA achieve state-of-the-art results on cross-modal distillation benchmarks and outperform models trained via prior distillation approaches on 3D object detection, scene flow, and semantic occupancy prediction. Code available at: https://maxiuw.github.io/hilda.",
+      "authors": [
+        "Maciej Wozniak",
+        "Jesper Ericsson",
+        "Hariprasath Govindarajan",
+        "Truls Nyberg",
+        "Thomas Gustafsson",
+        "Patric Jensfelt",
+        "Olov Andersson"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.RO"
+      ],
+      "published": "2026-06-18T13:01:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.20189v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "self-supervised pretraining for LiDAR backbones directly supports LiDAR image classification",
+      "llm_evidence_cn": "LiDAR骨干网络的自监督预训练直接支持LiDAR图像分类",
+      "llm_evidence": "LiDAR骨干网络的自监督预训练直接支持LiDAR图像分类",
+      "canonical_evidence": "LiDAR骨干网络的自监督预训练直接支持LiDAR图像分类",
+      "llm_tldr_en": "HilDA proposes a self-supervised pretraining framework for LiDAR backbones using hierarchical distillation with diffusion improving semantic and geometric feature learning for downstream tasks like classification.",
+      "llm_tldr_cn": "针对LiDAR标注数据稀缺问题，提出HilDA自监督预训练框架，通过层级蒸馏结合扩散模型，从视觉基础模型中提取语义和结构知识。该方法充分利用教师网络的层级语义和时空信息，有效提升了LiDAR主干网络在分类等下游任务上的性能，为LiDAR图像分类提供了强助力。",
+      "llm_tldr": "针对LiDAR标注数据稀缺问题，提出HilDA自监督预训练框架，通过层级蒸馏结合扩散模型，从视觉基础模型中提取语义和结构知识。该方法充分利用教师网络的层级语义和时空信息，有效提升了LiDAR主干网络在分类等下游任务上的性能，为LiDAR图像分类提供了强助力。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.18583v1",
+      "source": "arxiv",
+      "title": "Aerial-ground LiDAR place recognition with patch-level self-supervised learning and expanded reciprocal re-ranking",
+      "abstract": "LiDAR place recognition determines one's position on a prior point cloud map. The most studied ground-level LiDAR place recognition suffers from pre-visit requirements, incomplete coverage, and limited perspectives. Using pre-acquired, full-coverage Airborne Laser Scanning (ALS) data as an aerial prior map overcomes these drawbacks, making cross-view place recognition necessary and advantageous. However, aerial-ground LiDAR place recognition faces significant challenges, including the domain gap between aerial and ground point clouds, and false positives during initial retrieval. To address these challenges, we present a novel retrieval and re-ranking framework for aerial-ground LiDAR place recognition. Based on the priors that neighboring point cloud patches share similar semantics with anchor patch, our retrieval network introduces patch-level self-supervised learning modules at multiple scales and integrates with scene-level learning to improve global feature discriminativeness between aerial and ground point clouds. Furthermore, leveraging the structured spatial distribution of ALS point clouds, we introduce an Expanded Reciprocal (ER) re-ranking algorithm to exploit neighborhood information maximally and refine each feature based on neighbor features, which are then used to update the similarity matrix for final ranking. Extensive experiments demonstrate that our retrieval network outperforms existing state-of-the-art (SOTA) methods, achieving a 9.8\\% improvement in average Recall@1 and a 3.2\\% improvement in average Recall@1\\% on the CS-Urban-Scenes, while also showing the best performance on the CS-Campus3D dataset. Additionally, our ER re-ranking algorithm further boosts the average Recall@1 by 4.9\\% on CS-Campus3D and 10.2\\% on CS-Urban-Scenes without additional training.",
+      "authors": [
+        "Yandi Yang",
+        "Xianghong Zou",
+        "Jianping Li",
+        "Haofeng Xie",
+        "Saurav Uprety",
+        "Hongzhou Yang",
+        "Naser El-Sheimy"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-06-17T01:22:27+00:00",
+      "link": "https://arxiv.org/pdf/2606.18583v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LiDAR place recognition with patch-level self-supervised learning",
+      "llm_evidence_cn": "基于块级自监督学习的空地LiDAR地点识别",
+      "llm_evidence": "基于块级自监督学习的空地LiDAR地点识别",
+      "canonical_evidence": "基于块级自监督学习的空地LiDAR地点识别",
+      "llm_tldr_en": "Proposes a retrieval and re-ranking framework for aerial-ground LiDAR place recognition using patch-level self-supervised learning, addressing domain gap between aerial and ground point clouds.",
+      "llm_tldr_cn": "针对空地LiDAR地点识别中空中与地面点云域差异大、初始检索误检多的问题，提出一种结合块级自监督学习和扩展互重排序的检索与重排序框架。方法通过自监督学习提取鲁棒特征，并利用互重排序减少假阳性。在多个数据集上的实验表明，该方法显著提高了跨视角地点识别的准确率，为LiDAR数据在定位中的应用提供了新思路。",
+      "llm_tldr": "针对空地LiDAR地点识别中空中与地面点云域差异大、初始检索误检多的问题，提出一种结合块级自监督学习和扩展互重排序的检索与重排序框架。方法通过自监督学习提取鲁棒特征，并利用互重排序减少假阳性。在多个数据集上的实验表明，该方法显著提高了跨视角地点识别的准确率，为LiDAR数据在定位中的应用提供了新思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.20189v3",
+      "source": "arxiv",
+      "title": "HilDA: Hierarchical Distillation with Diffusion for Advancing Self-Supervised LiDAR Pre-training",
+      "abstract": "Leveraging Vision Foundation Models (VFMs) for camera-to-LiDAR knowledge distillation offers a promising solution to the scarcity of annotated data needed to represent the immense geometric and kinematic diversity of real-world autonomous driving (AD). However, current approaches typically treat VFMs as black-box teachers, relying exclusively on frame-wise feature similarity. Consequently, they do not fully exploit the teacher's layer-wise semantic structure and global context, as well as the rich spatiotemporal information inherent in LiDAR sequences. We propose HilDA, a self-supervised pretraining framework for LiDAR backbones that better captures the semantic what and geometric where needed for driving tasks. HilDA combines hierarchical distillation comprising multi-layer distillation for progressive semantic alignment and global context distillation for scene-level semantics, with a temporal occupancy diffusion objective promoting spatiotemporal consistency. Models pre-trained with HilDA achieve state-of-the-art results on cross-modal distillation benchmarks and outperform models trained via prior distillation approaches on 3D object detection, scene flow, and semantic occupancy prediction. Code available at: https://maxiuw.github.io/hilda.",
+      "authors": [
+        "Maciej Wozniak",
+        "Jesper Ericsson",
+        "Hariprasath Govindarajan",
+        "Truls Nyberg",
+        "Thomas Gustafsson",
+        "Patric Jensfelt",
+        "Olov Andersson"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.RO"
+      ],
+      "published": "2026-06-18T13:01:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.20189v3",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "self-supervised LiDAR pre-training for classification",
+      "llm_evidence_cn": "面向LiDAR分类的自监督预训练方法",
+      "llm_evidence": "面向LiDAR分类的自监督预训练方法",
+      "canonical_evidence": "面向LiDAR分类的自监督预训练方法",
+      "llm_tldr_en": "HilDA proposes a hierarchical distillation with diffusion framework for self-supervised LiDAR pre-training, capturing semantic and geometric features from camera-based vision foundation models to improve downstream LiDAR classification.",
+      "llm_tldr_cn": "针对LiDAR标注数据稀缺问题，HilDA提出分层蒸馏与扩散预训练框架。通过从视觉基础模型逐层提取语义和几何知识，并结合时空信息，有效提升了LiDAR特征表示。实验表明该方法在自动驾驶相关任务上优于传统预训练方法，为LiDAR图像分类提供强大初始化，并缓解了数据不足的瓶颈。",
+      "llm_tldr": "针对LiDAR标注数据稀缺问题，HilDA提出分层蒸馏与扩散预训练框架。通过从视觉基础模型逐层提取语义和几何知识，并结合时空信息，有效提升了LiDAR特征表示。实验表明该方法在自动驾驶相关任务上优于传统预训练方法，为LiDAR图像分类提供强大初始化，并缓解了数据不足的瓶颈。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.20189v2",
+      "source": "arxiv",
+      "title": "HilDA: Hierarchical Distillation with Diffusion for Advancing Self-Supervised LiDAR Pre-training",
+      "abstract": "Leveraging Vision Foundation Models (VFMs) for camera-to-LiDAR knowledge distillation offers a promising solution to the scarcity of annotated data needed to represent the immense geometric and kinematic diversity of real-world autonomous driving (AD). However, current approaches typically treat VFMs as black-box teachers, relying exclusively on frame-wise feature similarity. Consequently, they do not fully exploit the teacher's layer-wise semantic structure and global context, as well as the rich spatiotemporal information inherent in LiDAR sequences. We propose HilDA, a self-supervised pretraining framework for LiDAR backbones that better captures the semantic what and geometric where needed for driving tasks. HilDA combines hierarchical distillation comprising multi-layer distillation for progressive semantic alignment and global context distillation for scene-level semantics, with a temporal occupancy diffusion objective promoting spatiotemporal consistency. Models pre-trained with HilDA achieve state-of-the-art results on cross-modal distillation benchmarks and outperform models trained via prior distillation approaches on 3D object detection, scene flow, and semantic occupancy prediction. Code available at: https://maxiuw.github.io/hilda.",
+      "authors": [
+        "Maciej Wozniak",
+        "Jesper Ericsson",
+        "Hariprasath Govindarajan",
+        "Truls Nyberg",
+        "Thomas Gustafsson",
+        "Patric Jensfelt",
+        "Olov Andersson"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.RO"
+      ],
+      "published": "2026-06-18T13:01:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.20189v2",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LiDAR pre-training for classification",
+      "llm_evidence_cn": "激光雷达预训练用于分类",
+      "llm_evidence": "激光雷达预训练用于分类",
+      "canonical_evidence": "激光雷达预训练用于分类",
+      "llm_tldr_en": "HilDA proposes hierarchical distillation with diffusion for self-supervised LiDAR pre-training, improving feature learning for autonomous driving tasks.",
+      "llm_tldr_cn": "HilDA针对LiDAR预训练中现有方法未能充分利用分层语义和时空信息的问题，提出结合层级蒸馏和扩散的自我监督框架，通过从视觉基础模型中提取层状知识并融入扩散过程，显著提升了LiDAR骨干网的语义和几何特征学习能力，在自动驾驶下游任务中取得更优性能。",
+      "llm_tldr": "HilDA针对LiDAR预训练中现有方法未能充分利用分层语义和时空信息的问题，提出结合层级蒸馏和扩散的自我监督框架，通过从视觉基础模型中提取层状知识并融入扩散过程，显著提升了LiDAR骨干网的语义和几何特征学习能力，在自动驾驶下游任务中取得更优性能。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.20291v1",
+      "source": "arxiv",
+      "title": "Integrating national forest inventory, airborne lidar, and satellite imagery for wall-to-wall mapping of forest structure with computer vision",
+      "abstract": "Remote sensing is increasingly relied upon to deliver actionable science for forest and wildfire risk management across large landscapes. Wall-to-wall, annually updated maps are a persistent need for effective forest management. Many planning systems and data collections combine disparate data sources with different purposes, vintages, and prediction quality, which leads to confounding behavior in operational planning systems. We introduce the VibrantForests framework, developed and applied to map forest attributes and provide a coherent foundation for effective forest and wildfire planning. VibrantForests includes a satellite-based forest structure model trained on lidar-derived samples and applied across the contiguous United States to concurrently generate estimates of canopy cover, canopy height, aboveground live tree biomass, basal area, and quadratic mean diameter at 10-meter resolution. We demonstrate predictive capability spanning the full spectrum of forest conditions ranging from sparse-canopy/low-biomass to dense-canopy/high-biomass. Results show that our model extends the range at which saturation is commonly encountered in comparable passive-sensor models, and reduces regression-to-mean behavior that commonly produces overestimation of forest attributes in small/sparse conditions and underestimation in large/dense conditions. The VibrantForests framework addresses a key limitation in large-area forest and wildfire planning by delivering coherent wall-to-wall estimates of management-relevant attributes at annual cadence and 10m resolution.",
+      "authors": [
+        "Luke J. Zachmann",
+        "David D. Diaz",
+        "Vincent A. Landau",
+        "Chelsey Walden-Schreiner",
+        "Tony Chang",
+        "Nathan E. Rutenbeck",
+        "Katharyn A. Duffy",
+        "Kiarie Ndegwa",
+        "Andreas Gros",
+        "Scott Conway",
+        "Guy Bayes"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-06-18T14:31:43+00:00",
+      "link": "https://arxiv.org/pdf/2606.20291v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Lidar and satellite imagery integration for forest structure mapping; multimodal fusion",
+      "llm_evidence_cn": "激光雷达与卫星影像集成进行森林结构制图；多模态融合",
+      "llm_evidence": "激光雷达与卫星影像集成进行森林结构制图；多模态融合",
+      "canonical_evidence": "激光雷达与卫星影像集成进行森林结构制图；多模态融合",
+      "llm_tldr_en": "A framework (VibrantForests) integrating national forest inventory, airborne lidar, and satellite imagery for wall-to-wall mapping of forest structure using computer vision.",
+      "llm_tldr_cn": "该论文针对森林管理中对大范围、年度更新的森林属性地图的需求，提出VibrantForests框架。该框架融合国家森林清查数据、机载激光雷达和卫星影像，利用计算机视觉方法进行森林结构制图。在应用中，该框架能够产生连贯的森林属性预测，为森林和野火规划提供基础。该工作展示了多源遥感数据融合在生态监测中的潜力。",
+      "llm_tldr": "该论文针对森林管理中对大范围、年度更新的森林属性地图的需求，提出VibrantForests框架。该框架融合国家森林清查数据、机载激光雷达和卫星影像，利用计算机视觉方法进行森林结构制图。在应用中，该框架能够产生连贯的森林属性预测，为森林和野火规划提供基础。该工作展示了多源遥感数据融合在生态监测中的潜力。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.23503v1",
+      "source": "arxiv",
+      "title": "UniverSat: Resolution- and Modality-Agnostic Transformers for Earth Observation",
+      "abstract": "Vision Transformers (ViT) dominate computer vision. However, their reliance on rigid patch projectors hinders transfer to Earth Observation (EO), where input modalities, scales, and resolutions vary widely. We introduce UniverSat, a ViT-style backbone built around a Universal Patch Encoder that maps patches from arbitrary spatial, spectral, and temporal resolutions, and from both optical and non-optical sensors, into a shared embedding space with a shared set of weights. This enables training a single model on heterogeneous multimodal corpora via self-supervision, yielding robust, sensor-agnostic spatial features. We validate this approach with strong results across classification and segmentation on standard EO benchmarks from GeoBench, PANGEABench, and SpectralEarth. Our code and models are available at https://github.com/gastruc/UniverSat.",
+      "authors": [
+        "Yohann Perron",
+        "Guillaume Astruc",
+        "Nicolas Gonthier",
+        "Clement Mallet",
+        "Loic Landrieu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-22T15:49:45+00:00",
+      "link": "https://arxiv.org/pdf/2606.23503v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multimodal remote sensing image classification",
+      "llm_evidence_cn": "多模态遥感图像分类",
+      "llm_evidence": "多模态遥感图像分类",
+      "canonical_evidence": "多模态遥感图像分类",
+      "llm_tldr_en": "UniverSat introduces a resolution- and modality-agnostic Transformer backbone for Earth Observation, enabling single-model training on heterogeneous multimodal data.",
+      "llm_tldr_cn": "UniverSat针对地球观测中数据模态、尺度和分辨率多样性的挑战，提出一种分辨率与模态无关的Vision Transformer骨干，通过通用补丁编码器将任意空间、光谱和时间分辨率的补丁映射到共享嵌入空间，并利用自监督在异质多模态语料库上训练单一模型，在GeoBench等基准的分类和分割任务上取得强结果，为多模态遥感分析提供了灵活的基础架构。",
+      "llm_tldr": "UniverSat针对地球观测中数据模态、尺度和分辨率多样性的挑战，提出一种分辨率与模态无关的Vision Transformer骨干，通过通用补丁编码器将任意空间、光谱和时间分辨率的补丁映射到共享嵌入空间，并利用自监督在异质多模态语料库上训练单一模型，在GeoBench等基准的分类和分割任务上取得强结果，为多模态遥感分析提供了灵活的基础架构。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
