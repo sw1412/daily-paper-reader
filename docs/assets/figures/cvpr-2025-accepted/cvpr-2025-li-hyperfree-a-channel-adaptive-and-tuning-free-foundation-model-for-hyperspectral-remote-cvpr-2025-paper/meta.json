@@ -1,0 +1,69 @@
+{
+  "version": 2,
+  "extractor": "papercropper",
+  "figures": [
+    {
+      "url": "assets/figures/cvpr-2025-accepted/cvpr-2025-li-hyperfree-a-channel-adaptive-and-tuning-free-foundation-model-for-hyperspectral-remote-cvpr-2025-paper/fig-001.webp",
+      "caption": "",
+      "page": 0,
+      "index": 1,
+      "width": 833,
+      "height": 815,
+      "label": "Figure"
+    },
+    {
+      "url": "assets/figures/cvpr-2025-accepted/cvpr-2025-li-hyperfree-a-channel-adaptive-and-tuning-free-foundation-model-for-hyperspectral-remote-cvpr-2025-paper/fig-002.webp",
+      "caption": "",
+      "page": 0,
+      "index": 2,
+      "width": 1268,
+      "height": 566,
+      "label": "Figure"
+    },
+    {
+      "url": "assets/figures/cvpr-2025-accepted/cvpr-2025-li-hyperfree-a-channel-adaptive-and-tuning-free-foundation-model-for-hyperspectral-remote-cvpr-2025-paper/fig-003.webp",
+      "caption": "",
+      "page": 0,
+      "index": 3,
+      "width": 1645,
+      "height": 818,
+      "label": "Figure"
+    },
+    {
+      "url": "assets/figures/cvpr-2025-accepted/cvpr-2025-li-hyperfree-a-channel-adaptive-and-tuning-free-foundation-model-for-hyperspectral-remote-cvpr-2025-paper/fig-004.webp",
+      "caption": "",
+      "page": 0,
+      "index": 4,
+      "width": 771,
+      "height": 943,
+      "label": "Figure"
+    },
+    {
+      "url": "assets/figures/cvpr-2025-accepted/cvpr-2025-li-hyperfree-a-channel-adaptive-and-tuning-free-foundation-model-for-hyperspectral-remote-cvpr-2025-paper/fig-005.webp",
+      "caption": "",
+      "page": 0,
+      "index": 5,
+      "width": 780,
+      "height": 620,
+      "label": "Figure"
+    },
+    {
+      "url": "assets/figures/cvpr-2025-accepted/cvpr-2025-li-hyperfree-a-channel-adaptive-and-tuning-free-foundation-model-for-hyperspectral-remote-cvpr-2025-paper/fig-006.webp",
+      "caption": "",
+      "page": 0,
+      "index": 6,
+      "width": 872,
+      "height": 407,
+      "label": "Figure"
+    },
+    {
+      "url": "assets/figures/cvpr-2025-accepted/cvpr-2025-li-hyperfree-a-channel-adaptive-and-tuning-free-foundation-model-for-hyperspectral-remote-cvpr-2025-paper/fig-007.webp",
+      "caption": "",
+      "page": 0,
+      "index": 7,
+      "width": 779,
+      "height": 604,
+      "label": "Figure"
+    }
+  ]
+}

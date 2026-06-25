@@ -1,0 +1,354 @@
+Title: A Unified Latent Schrodinger Bridge Diffusion Model for Unsupervised Anomaly Detection and Localization
+
+URL Source: https://openaccess.thecvf.com/content/CVPR2025/papers/Akshay_A_Unified_Latent_Schrodinger_Bridge_Diffusion_Model_for_Unsupervised_Anomaly_CVPR_2025_paper.pdf
+
+Published Time: Mon, 02 Jun 2025 13:00:45 GMT
+
+Number of Pages: 11
+
+Markdown Content:
+# A Unified Latent Schr¨ odinger Bridge Diffusion Model for Unsupervised Anomaly Detection and Localization 
+
+## Shilhora Akshay 1,∗ Niveditha Lakshmi Narasimhan 2 Jacob George 2
+
+## Vineeth N Balasubramanian 11Indian Institute of Technology, Hyderabad 2KLA Corporation 
+
+> ∗shilhora.akshay333@gmail.com
+
+## Abstract 
+
+Anomaly detection and localization remain pivotal chal-lenges in computer vision, with applications ranging from industrial inspection to medical diagnostics. While cur-rent supervised methods offer high precision, they are often impractical due to the scarcity of annotated data and the infrequent occurrence of anomalies. Recent advancements in unsupervised approaches, particularly reconstruction-based methods, have addressed these is-sues by training models exclusively on normal data, en-abling them to identify anomalies during inference. How-ever, these methods frequently rely on auxiliary networks or specialized adaptations, which can limit their robust-ness and practicality. This work introduces the Latent 
+
+Anomaly Schr¨ odinger Bridge (LASB), a unified unsuper-vised anomaly detection model that operates entirely in the latent space without requiring additional networks or custom modifications. LASB transforms anomaly images into normal images by preserving structural integrity across varying anomaly classes, lighting, and pose conditions, making it highly robust and versatile. Unlike previous methods, LASB does not focus solely on reconstructing anomaly features, but emphasizes anomaly transforma-tion, achieving smooth anomaly-to-normal image conver-sions. Our method achieves state-of-the-art performance on both the MVTec-AD and VisA datasets, excelling in de-tection and localization tasks. Our code is available at https://github.com/ShilhoraAkshayPatel/LASB. 
+
+## 1. Introduction 
+
+Anomaly detection and localization is a critical task in com-puter vision with several applications in medical [4, 18, 52, 53] and industrial [21, 31, 43, 60], which has attracted sig-nificant attention from the research community. The main goal of anomaly detection is to identify and localize abnor-mal patterns that are unusual from those seen in normal  
+
+> Figure 1. Illustration of the Gaussian and Bridge diffusion pro-cesses, with reverse image trajectory from LASB. LASB learns a direct diffusion bridge between anomaly and normal distributions, enhancing interpretability and anomaly-free transformation.
+
+instances. In the past few years the research community has proposed various supervised anomaly detection meth-ods [15, 24, 30, 44, 50, 59]. The extensive need for annota-tions is expensive and the infrequent presence of anomalous samples makes these methods unsuitable for practical ap-plications due to their limitations in addressing real-world scenarios. Recent research has sought to overcome the limitations of supervised anomaly detection methods by relying solely on normal images during training and localizing abnor-mal patterns at inference time. Among the various cate-gories within the unsupervised paradigm, reconstruction-based methods have garnered significant attention due to their promising results and strong performance in real-world scenarios. The core concept behind these meth-ods is that the model is trained exclusively on normal im-ages and during inference, it reconstructs abnormal sam-ples as normal samples. Thus, doing so benefits in two di-rections, one can interpret how the model’s ability to de-tect and localize anomalies. Second, it aids the model to perform better while reconstructing the anomalies. Re-cent advancements have introduced novel approaches lever-This CVPR paper is the Open Access version, provided by the Computer Vision Foundation. Except for this watermark, it is identical to the accepted version; the final published version of the proceedings is available on IEEE Xplore. 25528 aging AutoEncoder-based (AE) [3, 6, 56–58], Generative Adversarial Networks-based (GANs) [1, 26, 45, 62], and diffusion-based approaches [4, 18, 21, 31, 43, 52, 60]. Our research specifically focuses on various diffusion models tailored for anomaly detection tasks. Existing diffusion-based methods primarily focus on de-veloping novel noise-conditioning techniques, often incor-porating an additional discriminative sub-network [60]. An-other approach utilizes a score-based diffusion model to identify anomalies by evaluating how effectively samples can return to the normal data distribution after perturbation, though it fails to deliver competitive performance [43]. Ad-ditionally, DiAD [21] proposes novel semantic guidance to specifically understand the anomalies and showcase its ro-bustness. However, earlier diffusion-based methods gen-erally depend on auxiliary networks or tailored diffusion processes to extract anomaly features. Moreover, most of these methods prioritize the extraction and reconstruction of anomaly features. In this work, we introduce an intuitive mechanism that neither requires model-specific adaptations to extract anomaly features nor relies on an additional feature ex-tractor for training or inference, to extract discriminative features. By leveraging the capabilities of Schr¨ odinger Bridge [8, 11, 14, 42, 51], we propose the Latent Anomaly Schr¨ odinger Bridge (LASB), which operates entirely in the latent space, transforming anomalous images into normal ones, regardless of anomaly class, and demonstrating ro-bustness to variations in lighting and pose. In the following, we outline the key contributions of our study. • We propose LASB, a unsupervised bridge-based anomaly detection model that operates in latent space. LASB transforms anomaly images into normal images, regard-less of the anomaly class. • Unified Framework: LASB offers a comprehensive framework for both anomaly detection and localization without the need for auxiliary networks. Unlike conven-tional methods that rely on Gaussian diffusion, LASB employs a bridge-based diffusion process that inherently preserves structural integrity, marking the first application of such a process in latent diffusion model for anomaly detection. • Efficient and Scalable: By utilizing the Linear Schr¨ odinger Bridge in latent space, LASB significantly reduces training time, memory consumption, and sam-pling speed, enhancing overall efficiency and scalability. • Our method achieves state-of-the-art performance on the MVTec dataset, with a image-level AUROC cls /AP cls of 
+
+99.2%/99.3% and an pixel-level AUROC seg /AP seg of 
+
+98.6%/78.2% on the test set, establishing a new bench-mark for unsupervised anomaly detection. 
+
+## 2. Related Work 
+
+Reconstruction-based Methods: Reconstruction-based anomaly detection models operate on the premise that net-works trained exclusively on normal images will fail to accurately reconstruct anomalous ones due to their un-familiarity with the abnormal distribution. Notably, au-toencoder [6, 10, 28] and Generative Adversarial Network (GAN) [1, 41] frameworks have been widely utilized for this task, where anomaly scores are computed based on the reconstruction error between the input and its gener-ated counterpart. Nevertheless, such approaches frequently struggle with direct copy issues and elevated false posi-tive rates due to their limited generalization capacity over anomalous regions or due to the overgeneralization capac-ity of reconstructive methods. To mitigate these general-ization challenges, recent innovations have pivoted towards inpainting strategies [35, 57] or integrating supplementary memory modules [17, 47]. Furthermore, the DRAEM [56] model enhances performance by leveraging pseudo-anomalies and coupling autoencoders with a segmentation network, though its effectiveness diminishes when faced with substantial deviations between real and pseudo anoma-lies. 
+
+Diffusion-based Methods: Diffusion models, known for their high-fidelity image synthesis, are increasingly applied to anomaly detection in both medical and industrial do-mains [18, 21, 43, 52, 60]. In the medical field, SANO [18] leverages score-based diffusion models to localize skin con-ditions such as eczema, while AnoDDPM [52] employs the Denoising Diffusion Probabilistic Model (DDPM) [23] to segment tumors, initiating with simplex noise. These meth-ods primarily utilize standard DDPM [23] or Score-based Generative Models (SGMs) [46], yet they often struggle to capture structural features because they rely on starting from pure Gaussian or simplex noise and frequently require external guidance for complex feature integration. In indus-trial applications, DiffAD [60] introduces a noise interpo-lation technique coupled with a discriminative sub-network to enhance detection capabilities. AD-SPR [43] emphasizes the significance of perturbed resilience using SGMs [46] to identify anomalies. Additionally, DiAD [21] presents a novel semantic guidance network that directs a stable dif-fusion model [37] to effectively detect and localize anoma-lies in both industrial and selected medical imaging appli-cations. However, these models often require class-specific training or additional networks to guide the diffusion pro-cess or to perform further segmentation via a discriminative sub-network. 
+
+Unified/Multi-class Methods: Early approaches in the literature developed models on a per-class basis, which lim-ited their generalizability. More recent research has shifted towards unified or multi-class models that are trained on 25529 Figure 2. The LASB model framework consists of two key stages: training and inference . During training, anomaly augmentations are applied to images, introducing distortions that the LASB model learns to remove, ultimately reconstructing a normal image. This iterative process continues until the model effectively filters out the anomalies. In the inference stage, the model processes real anomalous images, reconstructing normal versions. The anomaly detection is achieved by computing the difference ( pB − pA) between the original and reconstructed images, with anomalies visualized via a heatmap. 
+
+entire datasets, demonstrating improved robustness [21, 22, 32, 55]. For instance, UniAD [55] utilizes layer-wise query decoding, neighbor-masked attention, and feature jittering techniques to enhance multi-class anomaly detection. In contrast, HVQ-Trans [32] employs a hierarchical vector quantized prototype-oriented Transformer to improve dis-criminative capacity across multiple classes. Both meth-ods focus on tackling the “identical shortcut” issue. On the other hand, RLR [22] introduces a novel framework us-ing learnable reference representations with locality con-straints to explicitly learn normal patterns and circumvent 
+
+“learning shortcuts” , achieving superior results on standard datasets (MVTec-AD and VisA). Additionally, the DiAD [21] model, designed for multi-class settings and based on diffusion-based reconstruction, outperforms UniAD [55], RLR [22], and HVQ-Trans [32] in terms of localization and detection performance. 
+
+## 3. Proposed Methodology 
+
+3.1. Preliminaries 
+
+Before introducing the full methodology, we begin with a preliminary overview of score-based generative models (SGMs). Next, we explain the Schr¨ odinger Bridge concept and discuss its connection to SGMs. Finally, we present the core methodology, detailing how and why the latent Schr¨ odinger Bridge effectively addresses anomaly detection and localization. 
+
+Notations. Here we introduce some notations and use them throughout the work. Let  Xt(∈ Rd) denote a stochas-tic process, where  t ∈ [0 , 1]  is a continuous time step. The intermediate steps are uniformly distributed in the interval (U(t ∼ [0 , 1]) ). The initial distribution is the corrupted data distribution is denoted as  pA and the terminal distribution is clean data distribution and is denoted as  pB . The Wiener process and its reversed counterpart, adopted from Ander-son et al. [2], are represented as  Wt and  W t, respectively, both in  Rd. I ∈ Rd×d is the identity matrix. 
+
+Score-based Generative Models. Score-based Genera-tive Models (SGMs) perturb the data stochastically across continuous noise scales and then use reverse-time stochas-tic differential equations (SDEs) to learn the reverse-time diffusion process. This reverse-time SDE relies on a score function enabling the reconstruction of any distribution starting from a Gaussian [46]. Given data  X0 ∼ pA, for-ward and backward SDEs are formulated as: 
+
+dX t = ft(Xt) dt + pβt dW t, X0 ∼ pA, (1) 
+
+dX t = [ ft − βt∇ log p(Xt, t )] dt + pβt dW t, (2) where, f (·, t ) : Rn → Rn and the terminal distributions (i.e., at  t = 1 ) approach Gaussian ( X1 ∼ N (0 , I )). To achieve this, diffusion coefficient  βt ∈ R is carefully tuned and ensuring that the base drift  ft is linear in  Xt. Here,  p is the marginal density of equation (2) at time  t, and  ∇ log p
+
+denotes its score [46]. 
+
+SGMs as Schr¨ odinger Bridge. The absence of flexibility in SGM’s to transport data to desired distribution, demands a versatile strategy. The Schr¨ odinger Bridge (SB) is a strat-egy often applied in optimal transport to find the optimal path measure between two marginal densities and it is ex-pressed as, 
+
+min    
+
+> Q∈P(pA,p B)
+
+KL (Q || P), (3) 25530 Here,  Q represents a path measure within  P(pA, p B ),characterized by having marginal densities  pA and  pB at times  t = 0  and  1, respectively. We consider  P as the ref-erence measure, specifically chosen as the path measure in equation (1). We will further elaborate on the conditions that define the optimality of the SB (as shown in equation (3)) with specified boundary conditions. The optimality condition for SB is characterized by solving PDEs [9][8]. Let  Ψ( t, x ) and  bΨ( t, x ) be the solutions to the following PDEs: 
+
+∂Ψ( z, t )
+
+∂t = −∇ ΨT f − 12 β∆Ψ (4) 
+
+∂ bΨ( z, t )
+
+∂t = −∇ · ( bΨf ) + 12 β∆ bΨ (5) 
+
+subject to the conditions, 
+
+Ψ( z, 0) bΨ( z, 0) = pA(z), Ψ( z, 1) bΨ( z, 1) = pB (z).
+
+Then, the solution to optimization (3) can be expressed by the path measure of the following forward equation (6), or equivalently backward equation (7), SDE: 
+
+dX t = [ ft + βt∇ log Ψ( Xt, t )] dt + pβt dW t, (6) 
+
+dX t = [ ft − βt∇ log bΨ( Xt, t )] dt + pβt dW t, (7) where  ∇ log Ψ  and  ∇ log bΨ represent the non-linear op-timal forward and backward drifts for the Schr¨ odinger Bridge. This SB has a non-linear behavior and it gener-alizes the SGMs with variation in prior data. Note that, for-ward and backward equations (6, 7) of Schr¨ odinger Bridge are same as SGMs forward-backward equations (1, 2) ex-cept the forward drift term ( ∇ log Ψ ). Thus, from the Nel-son’s Duality [34] we obtain Ψ( x, t ) bΨ( x, t ) = qSB (x, t ).As the backward drift of Schr¨ odinger Bridge does not act as a score function anymore with two indivisible com-ponents. Thus, from equation (7) and Nelson’s Dual-ity [34] we obtain dX t = [ft − βt(∇ log qSB (Xt, t ) −∇ log Ψ( Xt, t ))] dt + √βt dW t.
+
+Linear-SB. The constraints posed above cause the model to be intractable and to overcome this impediment existing literature suggests various lines of strategies such as Iter-ative Proportional Fitting [11, 25], likelihood-based train-ing of SB [8] etc. These methods help the SGMs to con-struct non-linear diffusion bridges. But, we can make them tractable by posing some linear conditions. A more detailed examination of SB theory with SGM framework reveals that the nonlinear drifts specified in equations (6, 7) correspond to the score functions described in equation (2). Assuming that Ψ( ·, t ) and bΨ( ·, t ) function as probability density func-tions, we reformulate equations (4, 5) to effectively address the solutions of the Fokker-Planck equation [36]. The Schr¨ odinger Bridges in equation (4, 5) are satis-fied, the backward and forward drifts, ∇ log bΨ( Xt, t ) and 
+
+∇ log Ψ( Xt, t ) represent the score functions for the follow-ing linear SDEs, respectively [36][27]: 
+
+dX t = ft(Xt) dt + pβt dW t, X0 ∼ Ψ( ·, 0) , (8) 
+
+dX t = ft(Xt) dt + pβt dW t, X1 ∼ bΨ( ·, 1) . (9) The key characteristic of the linear SDEs presented in equations (8, 9) lies in their differing boundary conditions, resulting in distinct distributions compared to nonlinear SDEs. Sampling is facilitated by parameterizing ∇ log bΨ
+
+using a score network and applying established SGM meth-ods. However, the computational complexity arises due to the intractability of the boundary conditions Ψ( ·, 0) and 
+
+bΨ( ·, 1) . To resolve this, we introduce Dirac delta func-tions as boundary conditions for these previously intractable terms, thus rendering them manageable. Now to address this we impose Dirac delta boundary conditions [36][27]. Assume pA(·) = δκ(·) is Dirac delta distribution that is centered at κ ∈ Rd. Then, the initial distributions of the linear SDEs (equation (8,9)) are: 
+
+pB = Ψ( ·, 1) bΨ( ·, 1) , bΨ( ·, 0) = δκ(·), (10) The above equation (10) suggests that the optimal back-ward drift of the process in equation (8) consistently targets the Dirac delta δκ(·), achieving convergence to κ indepen-dent of pB . This concept is integrated into the loss function, where the score is recalculated as ∇ log p(Xt, t |X0 = κ)
+
+for each instance κ. This approach enhances computational efficiency and establishes a robust mathematical basis for training ∇ log bΨ( ·).
+
+3.2. Linear Schr¨ odinger Bridge in the Latent Space 
+
+We now describe how the above discussion on linear Schr¨ odinger bridges can be used for anomaly detection and localization. 
+
+Overall Pipeline. Figure 2 illustrates the entire pipeline of the proposed method. Initially, anomaly augmentation [56] is applied to a normal image, which is then processed by the Latent Anomaly Schr¨ odinger Bridge (LASB) model. The LASB model learns the anomaly statistics and trans-forms the augmented anomaly image back into a normal image. Crucially, the aim of this step is not to learn the anomalies themselves, but rather to reconstruct the normal image regardless of the anomalies introduced during train-ing. During training, various masks and noise patterns are applied to augment the images. After training, the LASB model is evaluated on anomaly images from the test set, with its weights frozen. During the inference phase, the model is presented with an anomaly image from the test 25531 Algorithm 1 Training Procedure  
+
+> 1:
+
+Input: normal and anomaly latent p(z) 
+
+> A
+
+(·), p(z) 
+
+> B
+
+(·| z0) 
+
+> 2:
+
+repeat  
+
+> 3:
+
+z0 ∼ p(z) 
+
+> A
+
+(z0), z1 ∼ p(z) 
+
+> B
+
+(z1|z0) 
+
+> 4:
+
+zt ∼ q(zt|z0, z 1) according to equation (11)  
+
+> 5:
+
+calculate gradient ∇ ϵ(zt, t ; θ) using equation (12)  
+
+> 6:
+
+until convergence set, which it then reconstructs as a normal image. Both the original anomaly image and its reconstructed normal image are subsequently passed through a difference block. In this step, multi-scale features are extracted using a pre-trained ImageNet model, and the discrepancies between these fea-tures are computed to pinpoint regions of interest (ROI). These differences are then detected and localized, follow-ing a strategy akin to DiAD [21]. 
+
+Latent Anomaly Schr¨ odinger Bridge. The foundational basis of Latent Anomaly Schr¨ odinger Bridge (LASB) is in-spired by linear Schr¨ odinger Bridge’s from equation (10) i.e., the optimal backward drift in equation (8) consistently aims for the Dirac delta δκ(·), ensuring convergence to κ re-gardless of pB . That means, the forward process transforms the noisy anomaly image statistics and learns to reconstruct a normal image irrespective of terminal distribution. Now to elucidate the working mechanism of the LASB diffusion model which will consider a Chang et al. [7] design strategy 
+
+> 1
+
+.SGMs and diffusion models operating in pixel space re-quire significant computational resources and memory. To address this challenge, we introduce the LASB model. Be-fore training the Linear-SB, we first train EV Q and DV Q ,the encoder and decoder of the VQ-VAE model [49], for perceptual compression, following the approach of stable diffusion [37]. During VQ-VAE training, we input either normal or anomaly-augmented images from the training set into EV Q and aim to reconstruct the input using DV Q .Once the model converges, its weights are frozen, and we proceed to train the Linear-SB in the latent space. Un-like Gaussian diffusion models, where noise is progres-sively added at each time step, leading to the deteriora-tion of image structure at later stages, we adopt a semi-degradation strategy similar to Saharia et al. [40]. This ensures that, during the forward pass, the LASB model per-forms a smooth transformation while preserving structural information. Figure 1 illustrates the contrast between the Gaussian diffusion process and the Schr¨ odinger Bridge dif-fusion process when applied to anomaly-free reconstruc-tion. According to Liu et al. [27] for this smooth struc-tural transformation the posterior for the SB (equation 6, 7)   
+
+> 1Chang et al. [7] work focuses on explaining diffusion models by signi-fying the design principles of the training strategy, sampling strategy, and the objective function.
+
+Algorithm 2 Inference/Sampling Procedure  
+
+> 1:
+
+Input: zN ∼ p(z) 
+
+> B
+
+(zN ), trained ϵθ (·, ·) 
+
+> 2:
+
+for n = N to 1 do  
+
+> 3:
+
+Predict zϵ 
+
+> 0
+
+using ϵθ (zn, t n) 
+
+> 4:
+
+zn−1 ∼ p(zn−1|zϵ
+
+> 0
+
+, z n). 
+
+> 5:
+
+end for  
+
+> 6:
+
+return z0
+
+given a boundary pair condition (X0, X 1) reveals an ana-lytic. Now as we inject the image statistics via perceptual compression using VQ-VAE into latent space, the analytical form can be formulated as, 
+
+q(zt|z0, z 1) = N (zt, μ t(z0, z 1), Σt) (11) where μt = ¯σ(z)2  
+
+> t
+> ¯σ(z)2
+> t+σ(z)2
+> t
+
+z0 + σ(z)2  
+
+> t
+> ¯σ(z)2
+> t+σ(z)2
+> t
+
+z1, and 
+
+Σt = ¯σ(z)2   
+
+> tσ(z)2
+> t
+> ¯σ(z)2
+> t+σ(z)2
+> t
+
+I.
+
+The accumulated variances are, σ(z)2  
+
+> t
+
+:= 
+
+R t 
+
+> 0
+
+βτ dτ and σ2 
+
+> t
+
+:= R 1 
+
+> t
+
+βτ dτ .We hence train the proposed LASB using our objective function: 
+
+LLASB := ϵθ (zt, t ) −
+
+
+
+> zt−z0
+> σ(z)
+> t
+
+
+
+(12) where ϵ(·) is the network and θ are the parameters associ-ated with it. The training and the inference procedures are summarized in Algorithms 1 and 2. 
+
+## 4. Experiments and Results 
+
+Datasets. To validate the efficacy of the LASB method, we utilize two challenging datasets in industrial anomaly detection: the MVTec-AD [5] dataset and the VisA [63] dataset. The MVTec-AD dataset comprises 15 categories, including 10 object types and 5 texture types, with a total of 5,354 high-resolution images. Of these, 3,629 anomaly-free images are used for training, while the remaining 1,725 test images include both normal and anomalous samples. The VisA dataset consists of 12 distinct objects organized into 12 subsets, categorized into complex Structures, Mul-tiple Instances, and Single Instance types. It includes 10,821 high-resolution images, with 9,621 normal images and 1,200 anomalous images exhibiting 78 distinct anoma-lies, offering a comprehensive benchmark for anomaly de-tection and localization methods. Both datasets provide pixel-level ground truth annotations to facilitate the eval-uation of anomaly localization performance. 
+
+Evaluation Metrics. For a rigorous quantitative evalua-tion of our experimental results in anomaly detection and localization, we employ AUROC (Area Under the Receiver Operating Characteristic Curve), AP (Average Precision), 25532 Figure 3. Comparison of training time (left), training memory (middle), and sampling time (right) across different image resolutions for SGM, SB, DDPM, and LASB models. The LASB model (green) demonstrates consistently lower training time, memory usage, and sampling time, particularly in contrast to the SB model (red), which exhibits the highest resource consumption. 
+
+and F1max (maximum F1-score) as our primary metrics [21]. Here, cls denotes image-level anomaly detection, while seg pertains to pixel-level anomaly localization. Adetailed class-specific comparison and results for all the aforementioned metrics are provided in Section S2 of sup-plementary material. In Table 1, we present the average performance of each model across the evaluated dataset.                                                                                                 
+
+> Method Venue Adopted Method MvTec ViSA Class-based
+> SimpleNet [29] CVPR 2023 Embedding-based 99.6 / 98.1 96.2 / 98.5 PatchCore [38] CVPR 2022 Embedding-based 99.1 / 98.1 91.0 / 98.1 DSR [58] ECCV 2022 -98.2 / 70.2 -PaDiM [12] ICPR 2021 Memory Bank 97.5 / 92.1 89.1 / 85.9 CS-Flow [39] WACV 2022 Normalization Flow 97.2 / 84.5 -CFLOW-AD [19] WACV 2022 Normalization Flow 96.2 / 97.1 -OCR-GAN [26] TIP 2023 GAN 98.3 / -97.9 / -DRAEM [56] ICCV 2021 AutoEncoder 98.0 / 97.3 88.7/93.5 RD4AD [13] CVPR 2022 Embedding-based 98.5 / 97.8 96.9 / 98.3 ADSPR [43] ICCV 2023 Diffusion 97.67 / 97.36 -DiffAD [60] ICCV 2023 Diffusion 98.72 / 98.26 89.79 / 68.28 D3AD [48] CVPR 2024 Diffusion 97.15 / 97.44 95.51 / 94.27 DDAD [33] Arxiv 2023 Diffusion 99.84 / 98.05 98.9 / 97.58 TransFusion [16] ECCV 2024 Diffusion 99.24 / 94.33 98.53 / 86.26 LASB (Ours) -Diffusion 99.66 / 99.15 98.52 / 99.06
+> Unified (multi-class)
+> DRAEM [56] ICCV 2021 AutoEncoder 88.1 / 87.2 79.1 / 91.3 HVQ-Trans [32] NeurIPS 2023 Non-Diffusion 98.0 / 97.3 93.2 / 98.7 MambaAD [20] NeurIPS 2024 Non-Diffusion 98.6 / 97.7 94.3 / 98.5 OmniAL [61] CVPR 2023 Non-Diffusion 97.2 / 98.3 94.2 / 96.0 GLAD [54] ECCV 2024 Diffusion 97.5 / 97.4 91.8 / 97.8 UniAD [55] NeurIPS 2022 Transformer 96.52 / 96.8 85.5 / 95.925 DIAD [21] AAAI 2024 Diffusion 97.15 / 96.76 86.75 / 96.04 LASB (Ours) -Diffusion 99.14 / 98.66 94.2 / 98.18
+
+Table 1. Comparison of state-of-the-art (SOTA) anomaly detec-tion methods categorized into class-based and unified (multi-class) approaches. The table highlights the adopted methodologies and their class-wise average performance in terms of AUROC cls /AUROC seg metrics on two datasets: MvTec and ViSA respec-tively. An exhaustive list of metrics along with class specific per-formance details is comprehensively illustrated in Section S2 of supplementary material. 
+
+Implementation Details. For all our experiments, we re-sized MVTec-AD images to 256 × 256 resolution. To fine-tune the VQ-VAE (Auto-encoder) utilizing the KL-based method, we initialized the network weights from the Stable Diffusion [37] model, where the image is encoded into a la-tent vector with a size of 64 × 64 × 3. We chose this latent vector size due to its preservation of details and low FID generation capabilities. After training the auto-encoder, we froze the weights and trained the latent denoising network. We used the U-Net model as in [23] as our latent denoising network. During inference, we pass only the anomaly test image as input to the DDPM sampler [23]. Further details on batch size and various other network hyperparameters are in Section S4 of the appendix. 
+
+Baselines. To benchmark LASB, we provide a detailed comparison with state-of-the-art (SOTA) reconstruction methods, as summarized in Table 1. These methods are categorized into two distinct groups: class-based and uni-fied (multi-class) approaches. Class-based methods train models specific to each class, with the number of models increasing linearly with the number of classes, making scal-ability a challenge. In contrast, unified approaches handle multiple classes within a single model, offering a more scal-able solution. By separating the class-based and unified ap-proaches, we ensure a fair and comprehensive comparison. 
+
+Class-based Methods: Performance Analysis. Among the class-based methods, PaDiM [12], with its memory bank-based architecture, achieves 97.5% on MVTec-AD and 89.1% on ViSA. While effective for simpler anomalies, its scalability and ability to model inter-class variations re-main limited. In contrast, DiffAD [60] demonstrates strong competitiveness, achieving 98.72% on MVTec-AD. How-ever, its performance on ViSA drops to 89.79%, indicat-ing its difficulty in adapting to diverse industrial anomalies. DDAD [33] shows highly competitive results, achieving 99.84% on MVTec-AD and 98.9% on ViSA. Its diffusion-based modeling effectively captures structural patterns, making it one of the closest competitors to LASB. However, LASB surpasses DDAD on ViSA by a margin of 0.38% ↑,demonstrating superior adaptability to multi-class industrial scenarios.                                               
+
+> Task Metrics Pixel Space Latent Space DDPM [23] DDAD [33] GLAD [54] LDM [37] DiAD [21] LASB (Ours) Detection
+> AUROC cls 71.9 99.8 97.5 76.6 97.2 99.2 (-0.6%)
+> AP cls 81.6 99.5 99.1 87.6 99.0 99.3 (-0.2%)
+> F1max cls 86.6 97.9 96.6 88.1 96.5 98.5 (+2.0%) Localization
+> AUROC seg 75.6 98.0 97.4 85.1 96.8 98.6 (+0.60%)
+> AP seg 13.3 59.0 60.8 27.6 52.6 78.2 (+17.4%)
+> F1max seg 19.5 59.4 60.7 31.0 55.5 70.7 (+10.0%)
+
+Table 2. Performance comparison of LASB with diffusion-based models on MVTec-AD using AUROC, AP, and F1max. The best results are in bold ; the second-best is underline. Improvements are shown as a percentage over the second-best. 25533 Figure 4. Visual representation of test samples from the MVTec dataset, depicted through heatmaps for various models for differ-ent categories. 
+
+Unified Models: Performance Analysis. For unified ap-proaches, DRAEM [56] emerges as one of the least compet-itive models, with AUROC cls scores of 88.1% on MVTec-AD and 79.1% on ViSA. Its reliance on autoencoder-based reconstruction, combined with limited augmentation strate-gies, hampers its ability to generalize to diverse and com-plex anomaly scenarios, particularly in the multi-class ViSA dataset. Similarly, UniAD [55] performs less competi-tively, achieving 96.52% on MVTec-AD and 85.5% on ViSA. Its transformer-based architecture, while robust for certain tasks, struggles to balance efficiency and accuracy in anomaly detection across diverse classes. Similarly, DIAD [21] achieves 97.15% on MVTec-AD and 86.75% on ViSA but falls short in handling the intricate class varia-tions present in the datasets. Among the competitive unified methods, MambaAD [20] achieves 98.6% on MVTec-AD and 94.3% on ViSA, showcasing its strength in handling multi-class scenarios using state-space models. However, LASB outperforms MambaAD with a score of 99.14% on MVTec-AD and 94.2% on ViSA, highlighting its superior capability to balance computational efficiency with detec-tion accuracy. Furthermore, HVQ-Trans [32], with scores of 98.0% on MVTec-AD and 93.2% on ViSA, demon-strates solid performance but remains slightly behind LASB in scalability and robustness. Detailed class-specific re-sults are available in Section S2 of supplementary material, and Figure 4 provides qualitative heat-map visualizations of anomaly regions, further demonstrating LASB’s efficacy in both class-based and unified settings.                                      
+
+> Task Metrics Non-Diffusion Method Diffusion-based Method DRAEM [23] UniAD [55] DiffAD [60] DiAD [21] LASB (Ours) Detection
+> AUROC cls 79.1 85.5 89.5 86.8 94.2
+> AP cls 81.9 85.5 -88.3 92.2
+> F1max cls 78.9 84.4 -85.1 94.5 Localization
+> AUROC seg 91.3 95.9 71.2 96.0 98.2
+> AP seg 23.5 21.0 -26.1 46.4
+> F1max seg 29.5 27.0 -33.0 52.6
+
+Table 3. Results for multi-class anomaly detection and localization on VisA dataset. The best results are indicated in bold , and the second-best results are denoted with an underline. 
+
+## 5. Ablation Studies and Analysis 
+
+In this section, we first differentiate the proposed LASB method’s performance in latent spaces and explain the ad-vantages of utilizing Linear-SB in the latent space. We then assess the LASB model’s effectiveness when compared with Stable Diffusion [37] and other models for anomaly lo-calization and detection tasks. Finally, we demonstrate the robustness of our proposed method, demonstrating its abil-ity to deliver precise and consistent outcomes during test-time evaluations. 
+
+LASB vs Standard Diffusion Models. In the realm of anomaly detection, standard diffusion models such as DDPM [23] and LDM [37] achieve competitive perfor-mance in anomaly detection tasks but exhibit significant limitations in localization, as evidenced in Table 2. To mitigate these limitations, DiAD [21] integrates a seman-tic guidance network to improve LDM’s localization by incorporating additional contextual information. Despite these improvements, DiAD [21] still falls short of achieving state-of-the-art (SOTA) results, indicating persistent chal-lenges in fully leveraging diffusion models for comprehen-sive anomaly detection tasks. In contrast, our LASB em-ploys a novel approach that leverages Linear-SB within the latent space, avoiding the limitations associated with re-constructing from pure Gaussian noise, a common issue in standard diffusion processes when applied to anomaly-free reconstruction. Moreover, LASB semi-degrades latent space to retain structural integrity, facilitating more effec-tive anomaly detection and localization. This method not only enhances the robustness of the detection process but also significantly improves localization accuracy. Conse-quently, the LASB model surpasses standard diffusion mod-els across multiple metrics, demonstrating superior perfor-mance in multi-class anomaly detection, as evidenced in Ta-ble 2. We compare the performance of our proposed Latent Anomaly Schr¨ odinger Bridge (LASB) method with the DDPM [23], DDAD [33], GLAD [54], LDM [37], and DiAD [21] models to demonstrate the effectiveness and effi-ciency of our approach. First, we evaluate the models on the MVTec-AD dataset for both anomaly detection and local-ization tasks. As shown in Table 2, LASB significantly out-performs all the other models in localization tasks for all the metrics. Specifically, LASB achieves a 0.6% ↑, 17.4% ↑, and 10.0% ↑ improvement in AUROC seg , AP seg , F1max seg re-spectively. Also, it shows 2.0% ↑ enhancement in F1max cls 
+
+for detection, compared to GLAD [54]. These improve-ments highlight the robustness and effectiveness of the la-tent space approach specifically for localization. Further-more, as shown in Figure 3, pixel-space models like DDPM [23], SGM [46], and SB models trained via Iterative Propor-tional Fitting [11, 25] or likelihood-based methods [8] re-25534 NFE-1 NFE-2 NFE-5 NFE-10 NFE-100 NFE-500 NFE-1000 MVTec-AD 97.42 / 96.82 98.16 / 97.84 98.94 / 98.16 99.14 / 98.66 99.14 / 98.66 99.14 / 98.66 99.14 / 98.66 
+
+VisA 92.74 / 96.71 93.21 / 97.15 93.96 / 97.90 94.2 / 98.18 94.2 / 98.18 94.2 / 98.18 94.2 / 98.18 
+
+Inference Time (secs) 0.12 0.25 0.52 0.74 1.5 7.5 15 
+
+Table 4. Performance evaluation across varying numbers of function evaluations (NFEs) on the MVTec-AD and VisA datasets. The tabu-lated metrics, AUROC cls / AUROC seg , provide a comprehensive overview of image-level and pixel-level anomaly detection performance at each NFE. Additionally, the inference time, measured in wall-clock seconds on an NVIDIA V100 GPU, underscores the computational trade-offs associated with increasing NFEs, reflecting the balance between model efficiency and performance.                   
+
+> Method DRÆM [56] PatchCore [38] DiffAD [60] TransFusion [16] DIAD [21] GLAD [54] ADSPR [43] DDAD [33] LASB (ours)
+> Inference Time (secs) 0.15 0.44 2.6 1.2 2.8 1.8 1.6 1.5 0.74
+
+Table 5. Inference times for various methods where the inference time, measured in wall-clock seconds on an NVIDIA V100 GPU. 
+
+quire more training time, memory, and exhibit slower sam-pling. In contrast, latent-space LASB excels in all areas, achieving up to 5× and 2× faster training, 3× and 2× mem-ory reduction, and 4× and 2× faster sampling compared to SB-based models [8, 11, 25] and DDPM [23], respectively.                              
+
+> Task Metrics 1×2×4×8×
+> Detection
+> AUROC cls 99.05 99.01 99.01 98.98 AP cls 99.15 99.14 99.14 99.11 F1max cls 98.59 98.33 99.83 98.32
+> Localization
+> AUROC seg 98.58 98.58 98.59 98.57 AP seg 78.17 78.14 78.14 78.12 F1max seg 70.62 70.59 70.61 70.58
+
+Table 6. Stability analysis of LASB on the MVTec-AD dataset for detection and localization tasks by performing the sampling mul-tiple times. Results reported are mean values across classes and multiple samplings (see Section S1 of appendix for more detailed results). 
+
+Generalization and Sampling Stability. In the field of anomaly detection using diffusion models, achieving con-sistent outcomes during the sampling or inference stage is notably challenging due to the inherent stochastic nature of generative processes. This inconsistency can be particularly problematic in real-world applications where reliable and stable detection is critical. Therefore, assessing the stabil-ity of model outputs across multiple inferences is essential. Our approach involves training the model once and then conducting multiple sampling or inference tests to evalu-ate if the outcomes remain consistent over time. A critical consideration for real-world applicability is achieving fast inference while minimizing computational overhead. The proposed LASB model strikes a balance between perfor-mance and efficiency, ensuring its suitability for deploy-ment in practical scenarios. Our findings, as detailed in Table 6, reveal that the LASB model exhibits remarkable stability across all evaluation metrics, showing negligible variance across numerous in-ferences. This consistency is attributed to the model’s ca-pability to maintain structural integrity and effectively tran-sition from anomalous to normal latent spaces. The LASB model is designed to reconstruct a normal image regard-less of the underlying anomalies, compelling it to disregard anomalous features during reconstruction. This process not only ensures that anomalies of various patterns, sizes, and orientations are effectively handled but also enhances the overall reliability of the model. 
+
+Inference Complexity. As shown in Table 4, LASB demonstrates exceptional efficiency with its rapid sampling capabilities, achieving near-optimal performance with as few as 10 NFEs (Number of Function Evaluations) and an inference time of only 0.74 seconds on an NVIDIA V100 GPU. This highlights LASB’s practicality for real-world ap-plications, where fast and reliable anomaly detection and localization are crucial. To further illustrate its efficiency, we compare LASB’s inference time with existing state-of-the-art (SOTA) models in Table 5. LASB is approximately 
+
+1.6× faster than TransFusion [16], a leading class-based method, while also outperforming it in both anomaly lo-calization and detection tasks. Compared to DiAD [21], LASB achieves 2× faster inference times, delivering sig-nificantly stronger performance in both detection and local-ization metrics. This demonstrates LASB’s clear advantage in balancing computational efficiency and robust anomaly detection. 
+
+## 6. Conclusions and Future Work 
+
+The proposed Latent Anomaly Schr¨ odinger Bridge (LASB) model demonstrates robust performance in anomaly detec-tion and localization tasks. Its unified nature delimitates the need for extra guidance or additional network compo-nents. LASB also excels in producing stable inferential results, requires less computational memory, and benefits from faster training and sampling rates. Given these advan-tages, LASB is well-suited for deployment in real-world in-dustrial applications. Looking ahead, future research could focus on enhancing the robust translation mechanisms spe-cific to anomaly detection and localization tasks. 25535 Acknowlegements. We thank the anonymous reviewers for their valuable feedback that improved the presentation of this paper. 
+
+## References 
+
+[1] Samet Akcay, Amir Atapour-Abarghouei, and Toby PBreckon. Ganomaly: Semi-supervised anomaly detection via adversarial training. In Computer Vision–ACCV 2018 .Springer International Publishing, 2019. 2 [2] Brian DO Anderson. Reverse-time diffusion equation mod-els. Stochastic Processes and their Applications , 12(3):313– 326, 1982. 3 [3] Alexander Bauer, Shinichi Nakajima, and Klaus-Robert M¨ uller. Self-supervised autoencoders for visual anomaly de-tection. Mathematics , 12(24), 2024. 2 [4] Finn Behrendt et al. Patched diffusion models for unsuper-vised anomaly detection in brain mri. In Medical Imaging with Deep Learning , page PMLR, 2024. 1, 2 [5] Paul Bergmann, Michael Fauser, David Sattlegger, and Carsten Steger. Mvtec ad–a comprehensive real-world dataset for unsupervised anomaly detection. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 9592–9600, 2019. 5 [6] Paul Bergmann et al. Improving unsupervised defect seg-mentation by applying structural similarity to autoencoders. 
+
+arXiv preprint arXiv:1807.02011 , 2018. 2 [7] Ziyi Chang, George A Koulieris, and Hubert PH Shum. On the design fundamentals of diffusion models: A survey. 
+
+arXiv preprint arXiv:2306.04542 , 2023. 5 [8] Tianrong Chen, Guan-Horng Liu, and Evangelos Theodorou. Likelihood training of schr¨ odinger bridge using forward-backward SDEs theory. In International Conference on Learning Representations , 2022. 2, 4, 7, 8 [9] Yongxin Chen, Tryphon T Georgiou, and Michele Pavon. Stochastic control liaisons: Richard sinkhorn meets gaspard monge on a schrodinger bridge. Siam Review , 63(2):249– 313, 2021. 4 [10] Anne-Sophie Collin and Christophe De Vleeschouwer. Im-proved anomaly detection by training an autoencoder with skip connections on images corrupted with stain-shaped noise. In 2020 25th International Conference on Pattern Recognition (ICPR) , pages 7915–7922. IEEE, 2021. 2 [11] Valentin De Bortoli, James Thornton, Jeremy Heng, and Ar-naud Doucet. Diffusion schr¨ odinger bridge with applications to score-based generative modeling. Advances in Neural In-formation Processing Systems , 34:17695–17709, 2021. 2, 4, 7, 8 [12] Thomas Defard, Aleksandr Setkov, Angelique Loesch, and Romaric Audigier. Padim: a patch distribution modeling framework for anomaly detection and localization. In Inter-national Conference on Pattern Recognition , pages 475–489. Springer, 2021. 6 [13] Hanqiu Deng and Xingyu Li. Anomaly detection via reverse distillation from one-class embedding. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 9737–9746, 2022. 6 [14] Wei Deng, Weijian Luo, Yixin Tan, Marin Bilos, Yu Chen, Yuriy Nevmyvaka, and Ricky T. Q. Chen. Variational schr¨ odinger diffusion models. In International Conference on Machine Learning (ICML) , 2024. 2 [15] Choubo Ding, Guansong Pang, and Chunhua Shen. Catching both gray and black swans: Open-set supervised anomaly detection. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022. 1 [16] Matic Fuˇ cka, Vitjan Zavrtanik, and Danijel Skoˇ caj. Transfusion–a transparency-based diffusion model for anomaly detection. In European conference on computer vi-sion , pages 91–108. Springer, 2024. 6, 8 [17] Dong Gong, Lingqiao Liu, Vuong Le, Budhaditya Saha, Moussa Reda Mansour, Svetha Venkatesh, and Anton van den Hengel. Memorizing normality to detect anomaly: Memory-augmented deep autoencoder for unsupervised anomaly detection. In Proceedings of the IEEE/CVF inter-national conference on computer vision , pages 1705–1714, 2019. 2 [18] Alvaro Gonzalez-Jimenez et al. Sano: Score-based diffusion model for anomaly localization in dermatology. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023. 1, 2 [19] Denis Gudovskiy, Shun Ishizaka, and Kazuki Kozuka. Cflow-ad: Real-time unsupervised anomaly detection with localization via conditional normalizing flows. In Proceed-ings of the IEEE/CVF winter conference on applications of computer vision , pages 98–107, 2022. 6 [20] Haoyang He, Yuhu Bai, Jiangning Zhang, Qingdong He, Hongxu Chen, Zhenye Gan, Chengjie Wang, Xiangtai Li, Guanzhong Tian, and Lei Xie. MambaAD: Exploring state space models for multi-class unsupervised anomaly detec-tion. In The Thirty-eighth Annual Conference on Neural In-formation Processing Systems , 2024. 6, 7 [21] Haoyang He, Jiangning Zhang, Hongxu Chen, Xuhai Chen, Zhishan Li, Xu Chen, Yabiao Wang, Chengjie Wang, and Lei Xie. A diffusion-based framework for multi-class anomaly detection. In Proceedings of the AAAI Conference on Arti-ficial Intelligence , pages 8472–8480, 2024. 1, 2, 3, 5, 6, 7, 8[22] Liren He, Zhengkai Jiang, Jinlong Peng, Liang Liu, Qian-gang Du, Xiaobin Hu, Wenbing Zhu, Mingmin Chi, Yabiao Wang, and Chengjie Wang. Learning unified reference rep-resentation for unsupervised multi-class anomaly detection. 
+
+arXiv preprint arXiv:2403.11561 , 2024. 3 [23] Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising dif-fusion probabilistic models. Advances in neural information processing systems , 33:6840–6851, 2020. 2, 6, 7, 8 [24] Bozhen Hu et al. A lightweight spatial and temporal multi-feature fusion network for defect detection. IEEE Transac-tions on Image Processing , 30:472–486, 2020. 1 [25] Solomon Kullback. Probability densities with given marginals. The Annals of Mathematical Statistics , 39(4): 1236–1243, 1968. 4, 7, 8 [26] Yufei Liang et al. Omni-frequency channel-selection repre-sentations for unsupervised anomaly detection. IEEE Trans-actions on Image Processing , 2023. 2, 6 25536 [27] Guan-Horng Liu, Arash Vahdat, De-An Huang, Evange-los A. Theodorou, Weili Nie, and Anima Anandkumar. I2sb: Image-to-image schr¨ odinger bridge. In International Con-ference on Machine Learning , 2023. 4, 5 [28] Wenqian Liu, Runze Li, Meng Zheng, Srikrishna Karanam, Ziyan Wu, Bir Bhanu, Richard J Radke, and Octavia Camps. Towards visually explaining variational autoencoders. In 
+
+Proceedings of the IEEE/CVF conference on computer vi-sion and pattern recognition , pages 8642–8651, 2020. 2 [29] Zhikang Liu, Yiming Zhou, Yuansheng Xu, and Zilei Wang. Simplenet: A simple network for image anomaly detection and localization. In Proceedings of the IEEE/CVF Confer-ence on Computer Vision and Pattern Recognition , pages 20402–20411, 2023. 6 [30] Xingming Long et al. Fabric defect detection using tac-tile information. In 2021 IEEE International Conference on Robotics and Automation (ICRA) . IEEE, 2021. 1 [31] Fanbin Lu et al. Removing anomalies as noises for industrial defect localization. In Proceedings of the IEEE/CVF Inter-national Conference on Computer Vision , 2023. 1, 2 [32] Ruiying Lu, YuJie Wu, Long Tian, Dongsheng Wang, Bo Chen, Xiyang Liu, and Ruimin Hu. Hierarchical vector quantized transformer for multi-class unsupervised anomaly detection. Advances in Neural Information Processing Sys-tems , 36:8487–8500, 2023. 3, 6, 7 [33] Arian Mousakhan, Thomas Brox, and Jawad Tayyub. Anomaly detection with conditioned denoising diffusion models. arXiv preprint arXiv:2305.15956 , 2023. 6, 7, 8 [34] Edward Nelson. Dynamical theories of Brownian motion .Princeton university press, 2020. 4 [35] Jonathan Pirnay and Keng Chai. Inpainting transformer for anomaly detection. In International Conference on Image Analysis and Processing , pages 394–406. Springer, 2022. 2 [36] Hannes Risken and Hannes Risken. Fokker-planck equation .Springer, 1996. 4 [37] Robin Rombach, Andreas Blattmann, Dominik Lorenz, Patrick Esser, and Bj¨ orn Ommer. High-resolution image synthesis with latent diffusion models. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 10684–10695, 2022. 2, 5, 6, 7 [38] Karsten Roth, Latha Pemula, Joaquin Zepeda, Bernhard Sch¨ olkopf, Thomas Brox, and Peter Gehler. Towards to-tal recall in industrial anomaly detection. In Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , pages 14318–14328, 2022. 6, 8 [39] Marco Rudolph, Tom Wehrbein, Bodo Rosenhahn, and Bas-tian Wandt. Fully convolutional cross-scale-flows for image-based defect detection. In Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision ,pages 1088–1097, 2022. 6 [40] Chitwan Saharia, William Chan, Huiwen Chang, Chris Lee, Jonathan Ho, Tim Salimans, David Fleet, and Mohammad Norouzi. Palette: Image-to-image diffusion models. In 
+
+ACM SIGGRAPH 2022 conference proceedings , pages 1–10, 2022. 5 [41] Thomas Schlegl, Philipp Seeb¨ ock, Sebastian M Waldstein, Georg Langs, and Ursula Schmidt-Erfurth. f-anogan: Fast unsupervised anomaly detection with generative adversarial networks. Medical image analysis , 54:30–44, 2019. 2 [42] Yuyang Shi, Valentin De Bortoli, Andrew Campbell, and Ar-naud Doucet. Diffusion schr¨ odinger bridge matching. Ad-vances in Neural Information Processing Systems , 36, 2024. 2[43] Woosang Shin, Jonghyeon Lee, Taehan Lee, Sangmoon Lee, and Jong Pil Yun. Anomaly detection using score-based per-turbation resilience. In Proceedings of the IEEE/CVF In-ternational Conference on Computer Vision , pages 23372– 23382, 2023. 1, 2, 6, 8 [44] Kihyuk Sohn et al. Anomaly clustering: Grouping images into coherent clusters of anomaly types. In Proceedings of the IEEE/CVF Winter Conference on Applications of Com-puter Vision , 2023. 1 [45] Jouwon Song et al. Anoseg: anomaly segmentation network using self-supervised learning. arXiv preprint arXiv:2110.03396 , 2021. 2 [46] Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Ab-hishek Kumar, Stefano Ermon, and Ben Poole. Score-based generative modeling through stochastic differential equa-tions. In International Conference on Learning Represen-tations , 2021. 2, 3, 7 [47] Daniel Stanley Tan, Yi-Chun Chen, Trista Pei-Chun Chen, and Wei-Chao Chen. Trustmae: A noise-resilient defect classification framework using memory-augmented auto-encoders with trust regions. In Proceedings of the IEEE/CVF winter conference on applications of computer vision , pages 276–285, 2021. 2 [48] Justin Tebbe and Jawad Tayyub. Dynamic addition of noise in a diffusion model for anomaly detection. In Proceed-ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops , pages 3940–3949, 2024. 6 [49] Aaron Van Den Oord, Oriol Vinyals, et al. Neural discrete representation learning. Advances in neural information pro-cessing systems , 30, 2017. 5 [50] Shashanka Venkataramanan et al. Attention guided anomaly localization in images. In European Conference on Com-puter Vision . Springer International Publishing, 2020. 1 [51] Gefei Wang, Yuling Jiao, Qian Xu, Yang Wang, and Can Yang. Deep generative learning via schr¨ odinger bridge. In 
+
+International conference on machine learning , pages 10794– 10804. PMLR, 2021. 2 [52] Julian Wyatt et al. Anoddpm: Anomaly detection with de-noising diffusion probabilistic models using simplex noise. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2022. 1, 2 [53] Rui Xu, Yunke Wang, and Bo Du. Maediff: Masked autoencoder-enhanced diffusion models for unsupervised anomaly detection in brain images. arXiv preprint arXiv:2401.10561 , 2024. 1 [54] Hang Yao, Ming Liu, Zhicun Yin, Zifei Yan, Xiaopeng Hong, and Wangmeng Zuo. Glad: towards better reconstruc-tion with global and local adaptive diffusion models for un-supervised anomaly detection. In European Conference on Computer Vision , pages 1–17. Springer, 2024. 6, 7, 8 25537 [55] Zhiyuan You, Lei Cui, Yujun Shen, Kai Yang, Xin Lu, Yu Zheng, and Xinyi Le. A unified model for multi-class anomaly detection. Advances in Neural Information Pro-cessing Systems , 35:4571–4584, 2022. 3, 6, 7 [56] Vitjan Zavrtanik, Matej Kristan, and Danijel Skoˇ caj. Draem-a discriminatively trained reconstruction embedding for sur-face anomaly detection. In Proceedings of the IEEE/CVF international conference on computer vision , pages 8330– 8339, 2021. 2, 4, 6, 7, 8 [57] Vitjan Zavrtanik, Matej Kristan, and Danijel Skoˇ caj. Recon-struction by inpainting for visual anomaly detection. Pattern Recognition , 112:107706, 2021. 2 [58] Vitjan Zavrtanik, Matej Kristan, and Danijel Skoˇ caj. Dsr– a dual subspace re-projection network for surface anomaly detection. In European conference on computer vision .Springer Nature Switzerland, 2022. 2, 6 [59] Zhaoyang Zeng et al. Reference-based defect detection net-work. IEEE Transactions on Image Processing , 30:6637– 6647, 2021. 1 [60] Xinyi Zhang, Naiqi Li, Jiawei Li, Tao Dai, Yong Jiang, and Shu-Tao Xia. Unsupervised surface anomaly detection with diffusion probabilistic model. In Proceedings of the IEEE/CVF International Conference on Computer Vision ,pages 6782–6791, 2023. 1, 2, 6, 7, 8 [61] Ying Zhao. Omnial: A unified cnn framework for unsuper-vised anomaly localization. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,pages 3924–3933, 2023. 6 [62] Zhixuan Zhao et al. A surface defect detection method based on positive samples. In PRICAI 2018: Trends in Artificial Intelligence . Springer International Publishing, 2018. 2 [63] Yang Zou, Jongheon Jeong, Latha Pemula, Dongqing Zhang, and Onkar Dabeer. Spot-the-difference self-supervised pre-training for anomaly detection and segmentation. In Eu-ropean Conference on Computer Vision . Springer, Springer Nature Switzerland, 2022. 5 25538

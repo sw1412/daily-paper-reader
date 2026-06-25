@@ -1,0 +1,359 @@
+Title: Hyperspectral Pansharpening via Diffusion Models with Iteratively Zero-Shot Guidance
+
+URL Source: https://openaccess.thecvf.com/content/CVPR2025/papers/Xiao_Hyperspectral_Pansharpening_via_Diffusion_Models_with_Iteratively_Zero-Shot_Guidance_CVPR_2025_paper.pdf
+
+Published Time: Mon, 19 May 2025 12:18:05 GMT
+
+Number of Pages: 10
+
+Markdown Content:
+# Hyperspectral Pansharpening via Diffusion Models with Iteratively Zero-Shot Guidance 
+
+## Jin-Liang Xiao 1,3, Ting-Zhu Huang 1*, Liang-Jian Deng 1, Guang Lin 2,3, Zihan Cao 1, Chao Li 3, Qibin Zhao 3* 
+
+> 1
+
+## University of Electronic Science and Technology of China, Chengdu, China  
+
+> 2
+
+## Tokyo University of Agriculture and Technology, Tokyo, Japan  
+
+> 3
+
+## RIKEN AIP, Tokyo, Japan 
+
+## Abstract 
+
+Hyperspectral pansharpening refers to fusing a panchro-matic image (PAN) and a low-resolution hyperspectral im-age (LR-HSI) to obtain a high-resolution hyperspectral im-age (HR-HSI). Recently, guiding pre-trained diffusion mod-els (DMs) has demonstrated significant potential in this area, leveraging their powerful representational abilities while avoiding complex training processes. However, these DMs are often trained on RGB images, not well-suited for pansharpening tasks, limited in adapting to the hyperspec-tral images. In this work, we propose a novel guided dif-fusion scheme with zero-shot guidance and neural spatial-spectral decomposition (NSSD) to iteratively generate the RGB detail image and map the RGB detail image to tar-get HR-HSI. Specifically, zero-shot guidance employs an auxiliary neural network that trained only with a PAN and LR-HSI to guide pre-trained DMs in generating the RGB detail image, informed by specific prior knowledge. Then, NSSD establishes a spectral mapping from the generated RGB detail image to the final HR-HSI. Extensive exper-iments are conducted on Pavia, Washington DC, Chuku-sei, and FR1 datasets to demonstrate that the proposed method significantly enhances the performance of DMs for hyperspectral pansharpening tasks, outperforming existing methods across multiple metrics and achieving improve-ments in visualization results. The code is available at https://github.com/Jin-liangXiao/DM-zs. 
+
+## 1. Introduction 
+
+Hyperspectral images (HSIs), rich in spatial and spectral in-formation, have been extensively used in a variety of appli-cations [22, 46, 48]. In practice, however, the spatial and spectral information in HSIs are often divided across differ-ent image types: the panchromatic image (PANs) with high spatial resolution and low-resolution hyperspectral images       
+
+> *Corresponding author HIR-Diff
+> (PSNR: 38.51dB)
+> PLRDiff
+> (PSNR: 34.80dB)
+> Proposed
+> (PSNR: 40.50dB)
+> Ground-Truth
+> Pre-trained diffusion models
+> Zero-shot networks
+> •Few parameters
+> •Specific prior knowledge
+> •Training with one-pair inputs
+> •Large parameters
+> •Strong expressive capacity
+> Guide
+> Network
+> RGB detail image
+> Spectral mapping
+> Iterative update
+> Inputs:
+> PAN LR-HSI
+> HR-HSI
+> Output:
+> Guidance of DMs
+> Spectral mapping
+
+Figure 1. The upper row: illustration of the proposed method that includes iterative update of zero-shot guidance for pre-trained diffusion models and spectral mapping from RGB detail im-age to target HR-HSI. The bottom row: error map comparison between state-of-the-art pre-trained diffusion based hyperspectral pansharpening models (i.e., PLRDiff [30], HIR-Diff [29], and the proposed method). 
+
+(LR-HSIs) with abundant spectral information, due to hard-ware constraints. This separation highlights the need for hyperspectral pansharpening, which aims to fuse these im-age types to generate high-resolution hyperspectral images (HR-HSIs) [26]. Methods for hyperspectral pansharpening generally fall into two categories: single-image approaches [10, 14, 16, 41, 47] and deep learning (DL) methods [4, 12, 13, 13, 15, 17, 18]. Single-image approaches require only a single im-age pair instead of an entire dataset for training, which can save significant training costs [36]. While single-image ap-proaches are effective, DL methods can provide stronger This CVPR paper is the Open Access version, provided by the Computer Vision Foundation. Except for this watermark, it is identical to the accepted version; the final published version of the proceedings is available on IEEE Xplore. 12669 representations due to the powerful feature-extraction abil-ity of deep neural networks. However, DL methods come with the trade-off of requiring intensive computational re-sources for training [7, 18, 37] and consistency in the dataset [40]. Specifically, if there is a distribution shift [8] between the training data and testing data, the performance can degrade significantly, which leads to poor generaliza-tion. This issue is particularly serious in hyperspectral pan-sharpening, where hyperspectral data are both more varying and limited than data in general computer vision tasks. Foundation models, particularly diffusion models (DMs) [21, 34], have gained wide attention in computer vision for their capability of generating high-quality im-ages. In the context of hyperspectral pansharpening, DMs have shown improved generalization due to flexibility of the guidance techniques. Recent studies [29, 30] have demon-strated the potential of DMs, extending pre-trained DMs to hyperspectral pansharpening through specialized guidance. These methods utilize the degenerate process of pansharp-ening to guide the DM. Due to the powerful representa-tional capabilities, pre-trained DM as a foundation model can be quickly transferred to hyperspectral pansharpening tasks, which can reduce a significant amount of training costs. However, since existing methods lack the consider-ation of specific prior knowledge of hyperspectral data, the guidance of DMs still needs improvement. The extension from pre-trained DMs to the hyperspectral pansharpening task is non-trivial: We need effective guidance to adapt the pre-trained DMs originally designed with only RGB chan-nels, to manage the complex spectral fidelity while pre-serving high-resolution spatial details . This adaptation be-comes even more challenging when we only have a single (PAN, LR-HSI) image pair. These challenges naturally give rise to two important questions: 1) How can we shift the data distribution of pre-trained DMs to HSIs for hyperspec-tral pansharpening with limited data through effective guid-ance? 2) How to accurately transform the RGB information of the generated images to HR-HSIs? To address the aforementioned challenges, we propose a novel guided diffusion scheme with zero-shot guidance and neural spatial-spectral decomposition (NSSD) to iteratively generate an RGB spatial detail image and map the detail image to the target HR-HSI. As shown in the green box of Figure 1, we utilize the pre-trained DMs as the backbone, with all their parameters being frozen. Then, we introduce the specific prior knowledge of testing data by a trainable zero-shot network to guide the DMs to generate the detail image enriched with expected features, as shown in the blue box. Unlike conventional deep neural networks that require extensive training data and complex training processes, the proposed zero-shot network is a lightweight model with few parameters, can be trained naively on a single testing im-age pair, i.e., a LR-HSI and PAN. This network encodes specific prior knowledge into pre-trained DMs and guides the DMs to generate detail image more effectively (see Fig-ure 3). Additionally, motivated by the tensor decomposition in single-image approaches [44], we recognize that spatial-spectral correlation is critical for the quality of final data and introduce a neural spatial-spectral decomposition (NSSD) to capture the spatial-spectral correlation and map from the RGB detail image to the final HR-HSI. The NSSD and the guidance of pre-trained DMs are updated iteratively, as dis-played in the gray box of Figure 1, making NSSD adaptive to the results of guided DMs. Compared with existing pre-trained DMs methods, the proposed method achieves the state-of-the-art result (refer to the bottom row of Figure 1). The main contributions are summarized as follows: • We propose a zero-shot network to efficiently guide the pre-trained DM to generate a detail image enriched with specific prior knowledge. • We introduce a neural spatial-spectral decomposition (NSSD) to iteratively construct the target HR-HSI from the generated detail image. • Experiments on the Pavia, Washington DC, Chikusei, and FR1 datasets demonstrate that the proposed method achieves the state-of-the-art performance. 
+
+## 2. Preliminaries & Related Works 
+
+In this section, we provide definitions, notations, degener-ate process of pansharpening, a brief introduction to score-based DMs with guidance, and related works. 
+
+2.1. Notations 
+
+Throughout the paper, we denote tensors X ∈ RH×W ×S ,
+
+Y ∈ Rh×w×S , P ∈ RH×W as HR-HSI, LR-HSI, PAN, respectively. For tensor X , X(3) ∈ RS×HW denotes its mode-3 unfolding [24]. Additionally, X × 3 R indicates the mode-3 multiplication between tensor X and matrix R.
+
+x ∼ N (0, I) means the variable x satisfies Gaussian distri-bution with the mean of 0 and variance of matrix I.
+
+2.2. Degenerate Process of Pansharpening 
+
+For the hyperspectral pansharpening task, inputs PAN and LR-HSI are mainly modeled as HR-HSI after the spectral and spatial degradation, respectively [45]. The degenerate process of the hyperspectral pansharpening problem can be mathematically represented as follows: 
+
+Y = τ (X ),
+
+P = X × 3 R, (1) where τ indicates blurring and down-sampling operations, and R ∈ R1×S denotes the spectral response function [43]. The goal of the task is to obtain the HR-HSI X from the LR-HSI Y and PAN P.12670 2.3. Score-based Diffusion Models with Guidance 
+
+Diffusion models (DMs) [21, 33] have proven to be a po-tent class of generative models capable of generating high-quality images. Among them, score-based DMs are a pow-erful family that models the forward process by stochas-tic differential equations (SDEs) and the reverse process by corresponding reverse-time SDEs [34]. Given a input x, we have 
+
+dx = f (x, t )d t + g(t)d w, (2) 
+
+dx = [ f (x, t ) − g2(t)∇x log pt(x)] + g(t)d ¯ w, (3) where t represents timestep, f (·, t ) denotes a vector val-ued function called drift coefficient and g(t) is a scalar val-ued function called diffusion term. w and ¯w represent a Wiener process and a reverse-time Wiener process, respec-tively. Eq. (2), corresponding to the forward SDE, indicates adding noise from t = 0 to T , which diffuses the image to pure Gaussian noise. In the reverse process, the cor-responding reverse-time SDEs, i.e., Eq. (3), we utilize a learned score network sθ (xt, t ) := ∇x log pt(x) to gen-erate denoised sample x0 from a simple Gaussian noise 
+
+xT ∼ N (0, I). To more effectively enable DMs to generate the desired images, Dhariwal et al. and Pang et al. [9, 29] proposed the guided DM, which is a valid path for general specific tasks, leveraging the powerful generative capabili-ties of DMs without the need for complex retraining. The guidance of pre-trained DMs works by introducing gradient in reverse process, which can be represented as 
+
+ˆsθ (xt, t ) = sθ (xt, t ) + s(t) · ∇ xt log p(y|xt), (4) where s(t) is the guidance strength in t step, and p(y|xt)
+
+is the relationship between estimated xt and condition y,which is crucial for the guidance of DMs on specific tasks. 
+
+2.4. Related Works 
+
+Leveraging the powerful generative capabilities of DMs, numerous studies have been conducted on hyperspectral pansharpening [5, 25, 39, 42, 50]. However, the perfor-mance of these models often depends on complex and time-consuming training processes and substantial training data. Recently, efforts have also been made to bridge the connec-tion between inverse problems and pre-trained DMs. Kawar 
+
+et al. [23] employed a pre-trained DM to solve linear in-verse problems for RGB images. Since pre-trained DMs are primarily trained on RGB data, there remains a gap between the generated outputs and the target hyperspectral images. Miao et al. [27] further extended this approach to hyper-spectral image restoration. For the hyperspectral pansharpening task, a nonlinear inverse problem, different loss functions are proposed to guide DMs. Rui et al. [30] proposed a pre-trained diffusion framework that guides the diffusion process to generate an RGB detail image A. This image is then transformed into the final pansharpened hyperspectral image by applying a fixed transformation matrix along the third dimension, as 
+
+X = A × 3 E, where X ∈ RH×W ×S is the target HR-HSI image, A ∈ RH×W ×b is the image generated by a pre-trained DM, and E ∈ RS×b is the fixed transform ma-trix. Pang et al. [29] explore a new choice for estimating the transform matrix E and apply total variation (TV) prior to diffusion guided function. However, this issue remains only partially resolved, as their fixed transformation matrix 
+
+E in the overall algorithm causes the final result to depend heavily on the initial estimate of E. In contrast, our method introduces an auxiliary neural network to provide the spe-cialized guidance for generating an RGB detail image and iteratively employs a neural spatial-spectral decomposition to adaptively construct the mapping from the RGB detail image to HR-HSI. 
+
+## 3. Methodology 
+
+In this section, we elaborate on the proposed guided diffu-sion shcheme. As illustrated in Figure 2, the scheme pri-marily consists of two components: diffusion with zero-shot guidance and neural spatial-spectral decomposition (NSSD). The zero-shot guidance operates on the pre-trained DM to generate an RGB detail image, enabling better preservation of spatial details and adaptation to specific prior knowledge. NSSD establishes the mapping from the detail image to the HR-HSI. 
+
+3.1. Diffusion with Zero-Shot Guidance 
+
+Unlike the existing DM-based hyperspectral pansharpening methods [29, 30], we aim to guide the reverse process of DMs for generating the RGB detail image A by introducing the specific prior knowledge of testing data. To this end, we design a novel diffusion scheme with zero-shot guidance, where the reverse process of A satisfies SDE as follows: 
+
+dAt = g(t)d w + f (A, t )d t
+
+− g2(t)[ sθ (xt, t ) + ∇At log pt( ˜Y|A t)]d t, (5) where pt( ˜Y|A t) is the pansharpening guidance estimated from the condition, defined as 
+
+˜Y = ( Y, P, M, f ψ (Y, P)) , (6) where Y and P are input image pair LR-HSI and PAN, M
+
+is a mapping from RGB detail image to HR-HSI (deferred in next subsection), and fψ (Y, P) is an auxiliary neural net-work that is trained with Y and P. Following [9], we have 
+
+pθ,ψ (At−1|A t, ˜Y) ∝ pθ (At−1|A t) pψ ( ˜Y|A t). (7) 12671 Diffusion with      
+
+> ZS guidance
+> Guidance form: Eq. (10)
+> Inputs:
+> Patching
+> Reduced PAN
+> Reduced LR -HSI
+> Simulated training data ：
+> Training Degradation
+> Reduced LR -HSI
+> Reduced HR -HSI
+> Reduced PAN
+> Reduced HR -HSI
+> Zero -shot network training:
+> C
+> CCCC
+> Conv LeakyRelu Up -sampling Concat Addition
+> PAN
+> LR -HSI
+> NSSD
+> Update
+> HR -HSI
+> NSSD
+> Update
+> Diffusion with
+> ZS guidance
+
+Figure 2. Illustration of the whole process of the proposed hyperspectral pansharpening method that includes diffusion with zero-shot (ZS) guidance and neural spatial-spectral decomposition (NSSD). The part in the dashed box is the proposed zero-shot guided function that is trained with a single testing image pair. NSSD builds the spectral mapping from the detail image generated by DM to HR-HSI. The guidance of the DM and NSSD are iteratively updated. 
+
+Figure 3. The analysis of the proposed zero-shot guidance. The DMs with the proposed guidance can achieve better performance with fewer sampling steps. (The length of the yellow box means the distance of PSNR values between the DM with and without ZS guidance) 
+
+Based on [6], we define the variable ˆA0 := E[A0|A t] = 
+
+EA0∼p(A0|A t)[A0], which means 
+
+ˆA0 ≃ 1
+
+√¯αt
+
+(At + (1 − ¯αt)sθ (At, t )) , (8) 
+
+pψ ( ˜Y|A t) ≃ pψ ( ˜Y| ˆA0), (9) where ¯αt := Qts=1 αs is the noise scale of DMs. We pro-pose the zero-shot guidance as follows, 
+
+log pψ ( ˜Y| ˆA0) = τ (M( ˆA0)) − Y 2
+
+> F
+
++ M( ˆA0) ×3 R − P 2
+
+> F
+
++ λ1 M( ˆA0) − fψ (Y, P) 2
+
+> F
+
+,
+
+(10) where λ1 is a weighting scale. Finally, the reverse process is illustrated as: 
+
+At−1 = 1
+
+√αt
+
+(At − βt
+
+√1 − ¯αt
+
+sθ (At, t )) 
+
+− λ · βt
+
+√1 − ¯αt
+
+√αt
+
+∇At log p ψ ( ˜Y| ˆA0),
+
+(11) where βt, as a hyperparameter, is generally set to linearly interpolate from 0.0001 to 0.02 [28] and αt := 1 − βt. The weighting scale λ can balance the effect of guidance. The rest of this part is how to train the zero-shot net-work fψ (Y, P). The network structure and training pro-cess are shown within the dotted box in Figure 2, which has been verified its effectiveness in [11]. Based on the “invari-ance among scales” assumption, we train the network in the reduced-resolution scale. In specific, we use the input LR-HSI as the training ground-truth. Training PAN and training LR-HSI are simulated by PAN and LR-HSI after spatial and spectral degenerate processes, respectively. This approach allows for efficient training of the zero-shot network using only a single testing input pair. Figure 3 shows the change curve of PSNR values with the increase of iteration number. One can observe that the DM guided by zero-shot guidance can achieve better performance with fewer sampling steps. Besides, this single-image training property provides spe-cific prior knowledge to the pre-trained DM. 
+
+3.2. Neural Spatial-Spectral Decomposition 
+
+This subsection describes neural spatial-spectral decompo-sition (NSSD), i.e., M in Eq. (10). In hyperspectral pan-sharpening, beyond the fidelity term in (1), the spatial-spectral correlation exhibits the low-rank properties char-acteristic of hyperspectral data [44]. The mode-3 decom-12672 Fully connection  Sigmoid 
+
+> Conv
+> BN
+> LeakyRelu
+> Up-sampling
+> Conv
+> BN
+> LeakyRelu
+> Mode-3 multiplication
+> HR-HSI
+> LR-HSI
+
+Figure 4. The structure of neural spatial-spectral decomposition (NSSD) consists of a U-net structure with skip connection and the fully connection structure to extract spatial and spectral information, respectively. 
+
+position format, i.e., X = A × 3 E, has shown to be effec-tive [19, 20, 31], which satisfies the following inequation: rank (X(3) ) ≤ min {rank (A(3) ), rank (E)} ≤ b, (12) where A ∈ RH×W ×b, and E ∈ RS×b. The low value of the size of E limits the expressive ability. Since pre-trained DMs are primarily trained on RGB images, the size of A is typically set to H × W × 3. Additionally, the larger value of r in (12) inevitably increases the time required for the reverse process in the DM. To mitigate the drawbacks, we propose a NSSD to cap-ture the spatial-spectral correlation, as follows: 
+
+X = M(A) := Cθ1 (A) ×3 Dθ2 (Y), (13) where Cθ1 (A) ∈ RH×W ×r and Dθ2 (Y) ∈ RS×r with hy-perparameter r are produced by two neural network with the input A ∈ RH×W ×3 and Y ∈ Rh×w×S , respectively, as illustrated in Figure 4. Specifically, Cθ1 (·) is the spatial-factor network that extracts the spatial information from the RGB detail image. The structure of Cθ1 (·) is the U-net type with skip connection, whose detail-extraction capability has been verified [35]. The spectral-factor network, Dθ2 (·),consists of the fully connection structure and sigmoid to ef-ficiently absorb spectral information from LR-HSI. NSSD does not require pre-training. It produces the final result through iterative steps using the following loss: 
+
+Loss = ∥τ (Cθ1 ×3 Dθ2 ) − Y∥ 2
+
+> F
+
++λ2 ∥(Cθ1 ×3 Dθ2 ) ×3 R − P∥2 
+
+> F
+
+, (14) where λ2 is a balanced parameter. NSSD models the rela-tionship between the generated detail image and the target HR-HSI. Compared with the classic format X = A × 3 E,the proposed form Cθ1 (A)×3 Dθ2 (Y) offers a more flexible representation for HR-HSI, particularly for data with higher rank. Furthermore, the NSSD evolves in the guidance of pre-trained DMs, as shown in Eq. (10). The guidance of the 
+
+Algorithm 1: The Whole Solving Process 
+
+Input: AT sampled from N (0 , I ), DM sθ , noise scales {¯αt}Tt=1 , fψ , LR-HSI Y, PAN P
+
+Output: HR-HSI X
+
+while not converged do for t = T, T − 1, · · · 1 do step 1: estimate ˆA0 by Eq. (8) 
+
+step 2: compute log pψ ( ˜Y|A t) by Eq. (10) 
+
+step 3: sample At−1 by Eq. (11) 
+
+end NSSD Update : update M by minimizing (14) 
+
+end 
+
+X = Cθ1 (A) ×3 Dθ2 (Y)
+
+return X
+
+DMs and the update of NSSD are mutually adaptive. Thus, NSSD provides a more flexible and DM-compatible repre-sentation of the spatial-spectral correlation in HR-HSI. 
+
+Whole Solving Algorithm: Since the guidance of pre-trained DM is related to the mapping M, the generated de-tail image is adaptive to the mapping M. To enhance the flexibility of mapping and the suitability of diffusion guid-ance, we alternatively conduct guidance of pre-trained DM and NSSD update as shown in Figure 2. During each guid-ance step, the parameters of the NSSD are held fixed. The whole solving algorithm is summarized in Algorithm 1. 
+
+## 4. Experiments 
+
+To demonstrate the effectiveness of the proposed method, we compare it with corresponding state-of-the-art methods, including GSA [1], CNMF [47], HySure [32], ZSL [11], PLRDiff [30], and HIR-Diff [29]. It is worth to be remarked that HIR-Diff [29] is a general inverse problem framework. We rewrite the fidelity for the hyperspectral pansharpen-ing task. The parameters of all methods are adjusted ac-cording to the authors’ recommendation. The metrics peak 12673 GSA  CNMF  HySure  ZSL  HIR-Diff PLRDiff  Proposed  Ground-Truth Figure 5. Visual comparisons on Pavia dataset. The first row shows the predicted HR-HSIs of different methods, and the second row displays the error maps between predicted HR-HSIs and ground-truth. 
+
+signal-to-noise ratio (PSNR), the structural similarity index (SSIM) [38], the relative dimensionless global error in syn-thesis (ERGAS) [2], the spectral angle mapper (SAM) [49], and root mean square error (RMSE) are utilized for as-sessment. QNR [3] is employed for evaluating real-world data. We assess the results produced by these methods on Pavia 1, Washington DC (WDC) 2, Chikusei 3, and FR1 datasets 4. The simulated LR-HSI is gained by applying a 
+
+5 × 5 Gaussian blurring kernel and the downsampling fac-tor 4. The simulated PAN image is obtained from ground-truth by multiplying a spectral mean response vector. The downsampling factor of FR1 dataset is 6. The detailed in-formation about these datasets is listed as follows, • Pavia dataset: Pavia dataset are originally obtained with the size of 610 ×340 ×115 . We choose 93 bands by elim-inating the bands associated with water vapor absorption and crop the up-left cube with size 256 × 256 × 93 .• WDC dataset: WDC dataset is obtained from the Hy-perspectral Digital Imagery Collection Experiment (HY-DICE) sensor. We eliminate some unusable bands and choose the area with size 256 × 256 × 191 .• Chikusei dataset: The Headwall Hyperspec-VNIR-C imaging sensor captures the Chikusei dataset with 128 bands and the spectral range is from 363 to 1018 nm. We crop a subimage with size 256 × 256 × 128 .• FR1 real dataset: The FR1 dataset is a real-world data distributed for the PRISMA contest, for pansharpening at the full spatial resolution. We crop a subimage with PAN size 240 × 240 .
+
+4.1. Implementation Details 
+
+All experiments are conducted on the same PC with Py-torch 2.0 and MATLAB (R2022a) on a computer of 64Gb RAM, Intel(R) Core(TM) i9-10900KF CPU @3.70GHz, and NVIDIA GeForce RTX 4070. The update of NSSD              
+
+> 1https://rslab.ut.ac.ir/data
+> 2https : / / engineering . purdue . edu / biehl / MultiSpec / hyperspectral.html
+> 3https://naotoyokoya.com/Download.html
+> 4https ://github .com /liangjiandeng /HyperPanCollection
+
+is optimized by Adam optimizer with 0.001 learning rate (LR). The balanced parameter of guidance λ1 is 0.1, and 
+
+λ2 = 1 . The diffusion reverse process step number is set to 100. The number of the whole iterations is 20000. The training of the zero-shot neural network is with Adam opti-mizer with 2000 iterations, and the LR is 0.001 decayed by 
+
+gamma = 0 .8 each 1000 iterations. The rank of NSSD for Pavia, WDC, and Chikusei datasets are set to 20, 40, and 40, respectively. For FR1 real dataset, λ1 = λ2 = 10 , and the number of the whole iterations is 10000. 
+
+Table 1. Quantitative results for Pavia dataset. (Bold: best; Under-line: second best)                                              
+
+> Method PSNR ↑SSIM ↑ERGAS ↓SAM ↓RMSE ↓
+> GSA [1]07’TGRS 28.304 0.812 5.819 7.753 10.368 CNMF [47] 11’TGRS 28.896 0.859 5.495 5.949 9.558 HySure [32] 14’TGRS 25.847 0.758 7.861 10.059 14.065 ZSL [11]23’TPAMI 32.060 0.905 3.549 5.318 6.819 PLRDiff [30] 24’IF 33.060 0.905 3.291 5.334 6.001 HIR-Diff [29]24’CVPR 31.974 0.875 3.618 4.705 6.742 Proposed 34.227 0.926 2.863 4.463 5.284 Ideal value +∞1000
+
+4.2. Results on Pavia Dataset 
+
+In this part, we evaluate the effectiveness of the proposed method on the Pavia dataset. Figure 5 shows the visual comparison of these methods in the benchmark. Diffusion-based methods, i.e., PLRDiff [30], HIR-Diff [29], and the proposed method, achieve excellent performance for detail extraction. The residual images, i.e., the second row of Fig-ure 5 obviously verify that our method can preserve more details compared to others. The result produced by HySure [32] leads to spatial distortions. Table 1 provides the quanti-tative results for compared approaches. For all metrics, the proposed method achieves the best performance. 
+
+4.3. Results on WDC Dataset 
+
+For the WDC dataset, there exist more challenges to pre-serve the spectral information due to its more spectral 12674 GSA  CNMF  HySure  ZSL  HIR-Diff PLRDiff  Proposed  Ground-Truth Figure 6. Visual comparisons on WDC dataset. The first row shows the predicted HR-HSIs of different methods, and the second row displays the error maps between predicted HR-HSIs and ground-truth. GSA  CNMF  HySure  ZSL  HIR-Diff PLRDiff  Proposed  Ground-Truth 
+
+Figure 7. Visual comparisons on Chikusei dataset. The first row shows the predicted HR-HSIs of different methods, and the second row displays the error maps between predicted HR-HSIs and ground-truth. Table 2. Quantitative results for WDC dataset. (Bold: best; Un-derline: second best)                                              
+
+> Method PSNR ↑SSIM ↑ERGAS ↓SAM ↓RMSE ↓
+> GSA [1]07’TGRS 39.629 0.910 5.924 7.079 7.665 CNMF [47] 11’TGRS 39.703 0.897 5.864 6.448 7.665 HySure [32] 14’TGRS 35.071 0.798 9.926 11.898 12.928 ZSL [11]23’TPAMI 39.685 0.916 6.335 7.825 7.301 PLRDiff [30] 24’IF 34.799 0.833 18.202 9.544 8.667 HIR-Diff [29]24’CVPR 38.506 0.844 7.102 6.686 8.079 Proposed 40.503 0.943 12.254 5.047 4.631 Ideal value +∞1000
+
+Table 3. Quantitative results for Chikusei dataset. (Bold: best; Underline: second best)                                              
+
+> Method PSNR ↑SSIM ↑ERGAS ↓SAM ↓RMSE ↓
+> GSA [1]07’TGRS 32.459 0.887 10.888 6.762 6.662 CNMF [47] 11’TGRS 33.578 0.878 8.592 4.893 5.905 HySure [32] 14’TGRS 30.270 0.752 14.159 9.883 8.417 ZSL [11]23’TPAMI 35.258 0.917 8.367 5.685 4.632 PLRDiff [30] 24’IF 37.176 0.917 6.994 4.838 3.651 HIR-Diff [29]24’CVPR 36.389 0.905 6.333 3.894 4.247 Proposed 38.450 0.939 5.945 4.197 3.192 Ideal value +∞1000
+
+bands. As shown in Table 2, we provide the visual results of different methods. Our approach also performs best on this dataset. Compared with traditional method CNMF [47], diffusion-based methods PLRDiff [30] and HIR-Diff [29] lead to spectral distortions. As demonstrated in Figure 6, PLRDiff [30] also preserves excellent spatial detail. The proposed method has the advantages of both spatial detail preservation and spectral information extraction. 
+
+4.4. Results on Chikusei Dataset 
+
+Figure 7 evaluates the effectiveness of the proposed method on the Chikusei dataset. Our method achieves the best result due to the spatial detail preservation. For the de-tail edge of the image, the proposed method can preserve the spatial detail well. As shown in Table 3, the pro-posed method demonstrates improvements in PSNR by 1.274dB/2.061dB, respectively, compared with diffusion-based methods PLRDiff [30] and HIR-Diff [29]. 
+
+4.5. Ablation Study 
+
+To demonstrate the effectiveness of the proposed zero-shot guidance and NSSD, we conduct the ablation study on the Pavia dataset. Table 4 shows the results produced by Four models. For the model I, we use the fixed transformation in [30] and regular fidelity to substitute the proposed zero-shot guidance and NSSD, respectively. As shown in Table 4, the results produced by the model with both zero-shot guidance and NSSD are best. Besides, we design more detailed ex-periments to explore more properties of the two parts. 
+
+Zero-shot Guidance: The zero-shot guidance achieves 12675 Table 4. Ablation study about the proposed zero-shot (ZS) guid-ance and neural spatial-spectral decoder (NSSD) on Pavia dataset.                                    
+
+> Ablation ZS NSSD PSNR SSIM ERGAS SAM RMSE Model I %%33.060 0.905 3.291 5.334 6.001 Model II "%33.267 0.912 3.219 5.285 5.877 Model III %"33.972 0.921 2.946 4.605 5.460 Proposed ""34.179 0.925 2.877 4.533 5.332
+
+Figure 8. Singular value distributions of results produced by PLRDiff [30], HIR-Diff [29], and the proposed method. Table 5. Performance of proposed zero-shot guidance compared with conventional regularization term.                     
+
+> Guidance PSNR SSIM ERGAS SAM RMSE Fidelity 32.470 0.896 3.455 5.114 6.395 TV 32.770 0.902 3.356 5.156 6.204 Proposed 33.374 0.914 3.174 5.150 5.793
+
+excellent guided performance. To demonstrate the effec-tiveness, we compare it with the conventional total variation regularized term, which is widely used and effective for im-age processing tasks. As shown in Table 5, the regularized term is helpful for the guidance of DMs. The proposed zero-shot guidance offers more specific prior knowledge for the pre-trained DM to achieve the best performance. 
+
+NSSD: NSSD describes the spatial-spectral correlation with the low-rank property. Figure 8 shows the singular value distribution of target HR-HSI produced by different methods. We compare the proposed method with NSSD with two fixed Diffusion transformation estimation meth-ods in PLRDiff [30] and HIR-Diff [29]. One can observe that the proposed NSSD provides a flexible transformation and performs the best approximation with the pre-trained DM guidance. Our method can achieve the closest distance between the singular values of ground-truth. 
+
+4.6. Guided Network 
+
+In this part, we analyze the influence of zero-shot network structure for guided performance. Table 6 shows the fi-nal results with U-Net with skip-connections [35], DSNet [51], and CONet [11]. U-Net contains multi-scale informa-tion, DSNet is a structure used in the supervised method, and CONet is a light convolution-based cascade structure. 
+
+Table 6. Performance of zero-shot guided network with different network structures.                     
+
+> Guided Structure PSNR SSIM ERGAS SAM RMSE U-Net 34.015 0.921 2.953 4.511 5.426 DSNet 33.775 0.917 3.033 4.677 5.609 CONet 34.227 0.926 2.863 4.463 5.284
+
+The proposed method with the above network structures can achieve excellent results. The convolution-based cascade structure achieves the best performance. 
+
+4.7. More Discussions 
+
+Real-data Experiment: Table 7 shows the evaluation on the FR1 real-world dataset, which demonstrates the superior performance of the proposed method on real data. 
+
+Table 7. Real data experiment on FR1 dataset.            
+
+> Method GSA CNMF HySure ZSL PLRDiff HIR-Diff Proposed QNR ↑0.590 0.679 0.668 0.802 0.630 0.625 0.832
+
+More Experimental Comparisons: We provide further discussion on running time, downsampling factor, and ker-nel size, which are shown in the supplementary material. 
+
+Limitations: While the computational cost of DMs with the proposed zero-shot guidance is comparable to that of previous DM-based methods, such as PLRDiff [30], NSSD requires more time to iteratively construct the spectral map-ping from the RGB detail image to the HR-HSI, as detailed in the supplementary material. We will explore the use of pre-trained networks to address this limitation in the future. 
+
+## 5. Conclusion 
+
+In this paper, we introduced a novel guided diffusion scheme for hyperspectral pansharpening, combining the it-erative update of zero-shot guidance and NSSD. The zero-shot guidance is conducted with an auxiliary convolutional network that can be trained just on one-pair inputs, while NSSD acts as a flexible transformation mapping the gen-erated images by pre-trained DMs to the hyperspectral im-ages. Our method demonstrated significant effectiveness on benchmark datasets, including Pavia, WDC, and Chikusei. Through extensive ablation studies, we analyzed the contri-butions of the guidance and NSSD and evaluated the impact by different zero-shot network architectures. 
+
+Acknowledgement This work was supported in part by the NSFC (12171072, 12271083, 62273077), Natural Sci-ence Foundation of Sichuan Province (2024NSFSC0038), and National Key Research and Development Program of China (2020YFA0714001). 12676 References 
+
+[1] B. Aiazzi, S. Baronti, and M. Selva. Improving component substitution pansharpening through multivariate regression of MS + Pan data. IEEE Trans. Geosci. Remote Sens. , 45 (10):3230–3239, 2007. 5, 6, 7 [2] L. Alparone, L. Wald, J. Chanussot, C. Thomas, P. Gamba, and L. M. Bruce. Comparison of pansharpening algorithms: Outcome of the 2006 GRS-S data-fusion contest. IEEE Trans. Geosci. Remote Sens. , 45(10):3012–3021, 2007. 6 [3] L. Alparone, B. Aiazzi, S. Baronti, A. Garzelli, F. Nencini, and M. Selva. Multispectral and panchromatic data fusion assessment without reference. Photogramm. Eng. Remote Sens. , 74(2):193–200, 2008. 6 [4] W. G. C. Bandara, J. M. J. Valanarasu, and V. M. Patel. Hy-perspectral pansharpening based on improved deep image prior and residual reconstruction. EEE Trans. Geosci. Re-mote Sens. , 60:1–16, 2021. 1 [5] Z. Cao, S. Cao, L.-J. Deng, X. Wu, J. Hou, and G. Vivone. Diffusion model with disentangled modulations for sharpen-ing multispectral and hyperspectral images. Inf. Fusion , 104: 102158, 2024. 3 [6] H. Chung, J. Kim, M. T. Mccann, M. L. Klasky, and J. C. Ye. Diffusion posterior sampling for general noisy inverse problems. arXiv preprint arXiv:2209.14687 , 2022. 4 [7] M. Ciotola, G. Guarino, G. Vivone, G. Poggi, J. Chanus-sot, A. Plaza, and G. Scarpa. Hyperspectral pansharpening: Critical review, tools and future perspectives. arXiv preprint arXiv:2407.01355 , 2024. 2 [8] L.-J. Deng, G. Vivone, M. E. Paoletti, G. Scarpa, J. He, Y. Zhang, J. Chanussot, and A. Plaza. Machine learning in pan-sharpening: A benchmark, from shallow to deep networks. 
+
+IEEE Geosci. Remote Sens. Mag. , 10(3):279–315, 2022. 2 [9] P. Dhariwal and A. Nichol. Diffusion models beat gans on image synthesis. Adv. Neural Inf. Process. Syst. (NeurIPS) ,34:8780–8794, 2021. 3 [10] R. Dian, L. Fang, and S. Li. Hyperspectral image super-resolution via non-local sparse tensor factorization. In Proc. IEEE Conf. Comput. Vis. Pattern Recog. , pages 5344–5353, 2017. 1 [11] R. Dian, A. Guo, and S. Li. Zero-shot hyperspectral sharpen-ing. IEEE Trans. Pattern Anal. Mach. Intell. , 45(10):12650– 12666, 2023. 4, 5, 6, 7, 8 [12] W. Dong, T. Zhang, J. Qu, S. Xiao, J. Liang, and Y. Li. Lapla-cian pyramid dense network for hyperspectral pansharpen-ing. IEEE Trans. Geosci. Remote Sens. , 60:1–13, 2021. 1 [13] Y. Duan, X. Wu, H. Deng, and L.-J. Deng. Content-adaptive non-local convolution for remote sensing pansharpening. In 
+
+Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recog. , pages 27738–27747, 2024. 1 [14] X. Fu, Z. Lin, Y. Huang, and X. Ding. A variational pan-sharpening with local gradient constraints. In Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recog. , pages 10265– 10274, 2019. 1 [15] J. Gao, J. Li, X. Su, M. Jiang, and Q. Yuan. Deep image inter-polation: A unified unsupervised framework for pansharpen-ing. In Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recog. ,pages 609–618, 2022. 1 [16] M. Gong, H. Zhang, H. Wang, J. Chen, J. Huang, X. Tian, and J. Ma. Cross-scale domain adaptation with comprehen-sive information for pansharpening. In Int. Joint Conf. Artif. Intell , pages 785–793, 2024. 1 [17] L. He, H. Ye, D. Xi, J. Li, A. Plaza, and M. Zhang. Tree-structured neural network for hyperspectral pansharpening. 
+
+IEEE J. Sel. Top. Appl. Earth Observ. Remote Sens. , 17: 2516–2530, 2023. 1 [18] L. He, Z. Fang, J. Li, J. Chanussot, and A. Plaza. Two spectral-spatial implicit neural representations for arbitrary-resolution hyperspectral pansharpening. IEEE Trans. Geosci. Remote Sens. , 2024. 1, 2 [19] W. He, Q. Yao, C. Li, N. Yokoya, and Q. Zhao. Non-local meets global: An integrated paradigm for hyperspectral de-noising. In Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recog. , pages 6868–6877, 2019. 5 [20] W. He, Q. Yao, C. Li, N. Yokoya, Q. Zhao, H. Zhang, and L. Zhang. Non-local meets global: An iterative paradigm for hyperspectral image restoration. IEEE Trans. Pattern Anal. Mach. Intell. , 44(4):2089–2107, 2020. 5 [21] Jo. Ho, A. Jain, and P. Abbeel. Denoising diffusion prob-abilistic models. In Proc. Adv. Neural Inf. Process. Syst. (NeurIPS) , pages 6840–6851, 2020. 2, 3 [22] S. Huang, M. Ren, Y. Yang, X. Wang, and Y. Wei. MFTN: A multi-scale feature transfer network based on IMatchformer for hyperspectral image super-resolution. In Forty-first Int. Conf. Mach. Learn. , 2024. 1 [23] B. Kawar, M. Elad, S. Ermon, and J. Song. Denoising dif-fusion restoration models. Proc. Adv. Neural Inf. Process. Syst. , 35:23593–23606, 2022. 3 [24] Tamara G Kolda and Brett W Bader. Tensor decompositions and applications. SIAM Rev. , 51(3):455–500, 2009. 2 [25] S. Li, S. Li, and L. Zhang. Hyperspectral and panchromatic images fusion based on the dual conditional diffusion mod-els. IEEE Trans. Geosci. Remote Sens. , 2023. 3 [26] L. Loncan, L. B. De Almeida, J. M. Bioucas-Dias, X. Briot-tet, J. Chanussot, N. Dobigeon, S. Fabre, W. Liao, G. A. Lic-ciardi, M. Simoes, et al. Hyperspectral pansharpening: A review. IEEE Geosci. Remote Sens. Mag. , 3(3):27–46, 2015. 1[27] Y. Miao, L. Zhang, L. Zhang, and D. Tao. DDS2M: Self-supervised denoising diffusion spatio-spectral model for hy-perspectral image restoration. In Proc. IEEE/CVF Int. Conf. Comput. Vis. , pages 12086–12096, 2023. 3 [28] A. Quinn Nichol, P. Dhariwal, A. Ramesh, P. Shyam, P. Mishkin, B. Mcgrew, I. Sutskever, and M. Chen. GLIDE: To-wards photorealistic image generation and editing with text-guided diffusion models. In Int. Conf. Mach. Learn. , pages 16784–16804. PMLR, 2022. 4 [29] L. Pang, X. Rui, L. Cui, H. Wang, D. Meng, and X. Cao. HIR-Diff: Unsupervised hyperspectral image restoration via improved diffusion models. In Proc. IEEE/CVF Conf. Com-put. Vis. Pattern Recog. , pages 3005–3014, 2024. 1, 2, 3, 5, 6, 7, 8 [30] X. Rui, X. Cao, L. Pang, Z. Zhu, Z. Yue, and D. Meng. Unsu-pervised hyperspectral pansharpening via low-rank diffusion model. Inf. Fusion , 107:102325, 2024. 1, 2, 3, 5, 6, 7, 8 12677 [31] K. Shi, J. Peng, J. Gao, Y. Luo, and S. Xu. Hyperspectral im-age denoising via double subspace deep prior. IEEE Trans. Geosci. Remote Sens. , 62:1–15, 2024. 5 [32] M. Simoes, J. Bioucas-Dias, L. B. Almeida, and J. Chanus-sot. A convex formulation for hyperspectral image super-resolution via subspace-based regularization. IEEE Trans. Geosci. Remote Sens. , 53(6):3373–3388, 2014. 5, 6, 7 [33] Y. Song and S. Ermon. Generative modeling by estimating gradients of the data distribution. In Proc. Adv. Neural Inf. Process. Syst. (NeurIPS) , pages 11895–11907, 2019. 3 [34] Y. Song, J. Sohl-Dickstein, D. P. Kingma, A. Kumar, S. Ermon, and B. Poole. Score-based generative modeling through stochastic differential equations. In Int. Conf. Learn. Representations , 2021. 2, 3 [35] D. Ulyanov, A. Vedaldi, and V. Lempitsky. Deep image prior. In Proc. IEEE Conf. Comput. Vis. Pattern Recog. ,pages 9446–9454, 2018. 5, 8 [36] G. Vivone, M. Dalla Mura, A. Garzelli, R. Restaino, G. Scarpa, M. O. Ulfarsson, L. Alparone, and J. Chanussot. A new benchmark based on recent advances in multispec-tral pansharpening: Revisiting pansharpening with classical and emerging pansharpening methods. IEEE Geosci. Remote Sens. Mag. , 9(1):53–81, 2020. 1 [37] W. Wang, L.-J. Deng, R. Ran, and G. Vivone. A general paradigm with detail-preserving conditional invertible net-work for image fusion. Int. J. Comput. Vis. , 132(4):1029– 1054, 2024. 2 [38] Z. Wang, A. C. Bovik, H. R. Sheikh, and E. P. Simon-celli. Image quality assessment: from error visibility to struc-tural similarity. IEEE Trans. Image Process. , 13(4):600–612, 2004. 6 [39] C. Wu, D. Wang, Y. Bai, H. Mao, Y. Li, and Q. Shen. HSR-Diff: Hyperspectral image super-resolution via conditional diffusion models. In Proc. IEEE/CVF Int. Conf. Comput. Vis. , pages 7083–7093, 2023. 3 [40] J.-L. Xiao, T.-Z. Huang, L.-J. Deng, Z.-C. Wu, X. Wu, and G. Vivone. Variational pansharpening based on coefficient estimation with nonlocal regression. IEEE Trans. Geosci. Remote. Sens. , 61:1–15, 2023. 2 [41] W. Xie, J. Lei, Y. Cui, Y. Li, and Q. Du. Hyperspectral pansharpening with deep priors. IEEE Trans. Neural Netw. Learn. Syst. , 31(5):1529–1543, 2019. 1 [42] Y. Xing, L. Qu, S. Zhang, K. Zhang, Y. Zhang, and L. Bruz-zone. Crossdiff: Exploring self-supervised representation of pansharpening via cross-predictive diffusion model. IEEE Trans. Image Process. , 33:5496–5509, 2024. 3 [43] T. Xu, T.-Z. Huang, L.-J. Deng, and N. Yokoya. An iterative regularization method based on tensor subspace representa-tion for hyperspectral image super-resolution. IEEE Trans. Geosci. Remote Sens. , 60:1–16, 2022. 2 [44] T. Xu, T.-Z. Huang, L.-J. Deng, J.-L. Xiao, C. Broni-Bediako, J. Xia, and N. Yokoya. A coupled tensor double-factor method for hyperspectral and multispectral image fu-sion. IEEE Trans. Geosci. Remote Sens. , 62:1–17, 2024. 2, 4[45] J. Xue, Y.-Q. Zhao, Y. Bu, W. Liao, J. C.-W. Chan, and W. Philips. Spatial-spectral structured sparse low-rank represen-tation for hyperspectral image super-resolution. IEEE Trans. Image Process. , 30:3084–3097, 2021. 2 [46] J. Yao, D. Hong, J. Chanussot, D. Meng, X. Zhu, and Z. Xu. Cross-attention in coupled unmixing nets for unsupervised hyperspectral super-resolution. In Proc. Eur. Conf. Comput. Vis. , pages 208–224. Springer, 2020. 1 [47] N. Yokoya, T. Yairi, and A. Iwasaki. Coupled nonnegative matrix factorization unmixing for hyperspectral and multi-spectral data fusion. IEEE Trans. Geosci. Remote Sens. , 50 (2):528–537, 2011. 1, 5, 6, 7 [48] Y. Yu, E. Pan, X. Wang, Y. Wu, X. Mei, and J. Ma. Unmix-ing before fusion: A generalized paradigm for multi-source-based hyperspectral image synthesis. In Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recog. , pages 9297–9306, 2024. 1[49] R. H. Yuhas, A. F. H. Goetz, and J. W. Boardman. Discrim-ination among semi-arid landscape endmembers using the spectral angle mapper (SAM) algorithm. In Proc. Summaries 3rd Annu. JPL Airborne Geosci. Workshop , pages 147–149, 1992. 6 [50] Y. Zhong, X. Wu, L.-J. Deng, and Z. Cao. SSDiff: Spatial-spectral integrated diffusion model for remote sensing pan-sharpening. arXiv preprint arXiv:2404.11537 , 2024. 3 [51] Y.-W. Zhuo, T.-J. Zhang, J.-F. Hu, H.-X. Dou, T.-Z. Huang, and L.-J. Deng. A deep-shallow fusion network with multi-detail extractor and spectral attention for hyperspectral pan-sharpening. IEEE J. Sel. Top. Appl. Earth Observ. Remote Sens. , 15:7539–7555, 2022. 8 12678
