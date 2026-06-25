@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pymupdf-images",
+  "figures": [
+    {
+      "url": "assets/figures/openreview/openreview-iclr-2025-o4mvfewbsp/fig-001.webp",
+      "caption": "",
+      "page": 19,
+      "index": 1,
+      "width": 856,
+      "height": 496
+    },
+    {
+      "url": "assets/figures/openreview/openreview-iclr-2025-o4mvfewbsp/fig-002.webp",
+      "caption": "",
+      "page": 20,
+      "index": 2,
+      "width": 922,
+      "height": 610
+    }
+  ]
+}
