@@ -1,0 +1,478 @@
+Title: PhySpec: Physically Consistent Spectral Reconstruction via Orthogonal Subspace Decomposition and Self-Supervised Meta-Auxiliary Learning
+
+URL Source: https://openreview.net/pdf?id=WISfJyOA6M
+
+Number of Pages: 11
+
+Markdown Content:
+# PhySpec: Physically Consistent Spectral Reconstruction via Orthogonal Subspace Decomposition and Self-Supervised Meta-Auxiliary Learning 
+
+Xingxing Yang 1 Jie Chen 1 Zaifeng Yang 2
+
+## Abstract 
+
+This paper presents a novel approach to hyper-spectral image (HSI) reconstruction from RGB images, addressing fundamental limitations in ex-isting learning-based methods from a physical perspective. We discuss and aim to address the “colorimetric dilemma ”: failure to consistently reproduce ground-truth RGB from predicted HSI, thereby compromising physical integrity and reli-ability in practical applications. To tackle this issue, we propose PhySpec , a physically con-sistent framework for robust HSI reconstruction. Our approach fundamentally exploits the intrin-sic physical relationship between HSIs and cor-responding RGBs by employing orthogonal sub-space decomposition, which enables explicit esti-mation of camera spectral sensitivity (CSS). This ensures that our reconstructed spectra align with well-established physical principles, enhancing their reliability and fidelity. Moreover, to effi-ciently use internal information from test sam-ples, we propose a self-supervised meta-auxiliary learning (MAXL) strategy that rapidly adapts the trained parameters to unseen samples using only a few gradient descent steps at test time, while simultaneously constraining the generated HSIs to accurately recover ground-truth RGB values. Thus, MAXL reinforces the physical integrity of the reconstruction process. Extensive qualitative and quantitative evaluations validate the efficacy of our proposed framework, showing superior per-formance compared to SOTA methods. 
+
+> 1
+
+Department of Computer Science, Hong Kong Baptist Univer-sity, Hong Kong, China 2Institute of High Performance Computing, Agency for Science Technology and Research, Singapore. Corre-spondence to: Jie Chen <chenjie@comp.hkbu.edu.hk >.
+
+Proceedings of the 42 nd International Conference on Machine Learning , Vancouver, Canada. PMLR 267, 2025. Copyright 2025 by the author(s). B       
+
+> Input RGB
+> Reproduced RGB
+> G
+> R𝜆 1
+> 𝜆 2
+> 𝜆 3
+> 𝜆 4𝜆 5
+> 𝜆 𝑛
+> 𝑦 (𝜆 )
+> Physically inconsistent mapping
+> B
+> G
+> R𝜆 1
+> 𝜆 2
+> 𝜆 3𝜆 4𝜆 5
+> 𝜆 𝑛
+> 𝑦 (𝜆 )
+> Physically consistent mapping
+> Inaccurate color reproduction
+> Accurate color reproduction
+> Input/Reproduced RGB
+> CSS priors
+> Meta -Auxiliary Learning
+> RGB manifold Spectral manifold
+
+Figure 1. Physically inconsistent reconstruction (top, i.e. , most existing methods) and physically consistent reconstruction with physical constraints (camera spectral sensitivity (CSS)) and meta-auxiliary learning (bottom, i.e. , our method). 
+
+## 1. Introduction 
+
+“We need to build in priors about the structure of the world, about physics, about causality, about the fact that the world is three-dimensional. —— Yann LeCun, 2018. ”Hyperspectral images (HSIs) encode detailed radiance spec-tra for each pixel, offering significantly richer spectral in-formation compared to traditional RGB images, which are limited to three bands including red, green, and blue. The spectral reflectance captured by HSIs reveals the intrinsic material properties of objects and remains unaffected by varying lighting conditions, which has been widely used in remote sensing (Borengasser et al., 2007; Yuan et al., 2017), medical imaging (Johnson et al., 2007; Lu & Fei, 2014), and scene relighting (Lam & Sato, 2013). In computer vision, rapid developments in deep learning have paved an alternative way for hyperspectral image ac-quisition from RGB images in a data-driven learning man-ner (Shi et al., 2018; Huang et al., 2024; Yang et al., 2024). However, it is a challenging inverse problem to expect RGB images of just three channels to recover more than three de-grees of freedom in spectral data ( e.g. , 31 or even more than 100). Fortunately, a substantial portion of spectral variation 1PhySpec: Physically Consistent Spectral Reconstruction Nikon D700  Nikon D40  Nikon D200  Pentax Q  Olympus E -PL2  
+
+> Figure 2. Gallery of our estimated camera spectral sensitivity compared with the ground-truth data.
+
+is encapsulated in color appearance in natural scenes ( i.e. ,the RGB values), which allows learning-based methods to produce relatively accurate spectral approximations. A straightforward question arises: Can existing methods really generate high-fidelity and reliable spectra? 
+
+Our analysis reveals two core limitations in current learning-based approaches: i, Physical Consistency Failure. Recon-structed spectra must reproduce ground-truth RGB colors via CSS (camera spectral sensitivity) matching, mirroring the forward process of RGB capture. Yet, most state-of-the-art methods suffer from a colormetric dillema : their predicted spectra fail to accurately reconstruct RGB val-ues, exposing fundamental physical inconsistencies that undermine reliability (Fig. 1). ii, Illumination-Dependent Generalization. While spectral reflectance is illumination-invariant, RGB values are not. Models trained on fixed illumination conditions struggle with unseen data due to varying lighting, as they apply static parameters equally to all test samples (Yang et al., 2025). Zero-shot learning (Liu et al., 2018; Socher et al., 2013) partially addresses this by leveraging internal patterns within individual test images. However, single-image optimization often lacks robustness, limiting reconstruction accuracy. To address these issues, we propose PhySpec , a physically consistent spectral reconstruction framework that bridges data-driven learning and imaging physics. Firstly, to address the first limitation, we estimate CSS explicitly and apply orthogonal subspace decomposition, which is a well-studied method in inverse problems (Lin & Finlayson, 2020; Wang et al., 2023), to integrate physical constraints between spec-tra and RGB values, instead of relying on black-box learning. Unlike prior work ( e.g. , Lin et al. (Lin & Finlayson, 2020)), which studies synthetic data with known CSS and enforces RGB reproduction within a single network (causing training instability), we further introduce meta-auxiliary learning (MAXL) , which assigns reconstruction as the primary task and reproduction as an auxiliary task in a self-supervised manner. Specifically, we first train both tasks simultaneously utilizing paired data ( i.e. , external information). Second, we fine-tune the pre-trained parameters using each testing sam-ple (internal information) while focusing on the auxiliary task in a self-supervised manner, which also addresses the second limitation of existing methods. In addition, we de-sign a dynamic illumination estimation module (DIEM) 
+
+to implicitly estimate an image-specific illumination de-scriptor without requiring prior knowledge of illumination conditions, which further addresses the second limitation of the existing methods and enhances generalization. The main contributions are summarized as follows: • We explicitly estimate the camera spectral sensitivity (CSS) and introduce orthogonal subspace decomposi-tion to integrate intrinsic physical constraints between spectra and RGB values, formulating a physically con-sistent framework to alleviate the colormetric dillema 
+
+that challenges existing models; • We present the first framework that introduces self-supervised meta-auxiliary learning (MAXL) for spec-tral reconstruction, which enforces generated HSIs to accurately recover ground-truth RGBs, thereby ensur-ing physical integrity for the inverse problem; • We design a dynamic illumination estimation mod-ule (DIEM) to estimate image-specific illumination descriptors implicitly with unknown illuminations, en-hancing the generalization to practical applications; • Extensive experiments demonstrate that PhySpec sig-nificantly outperforms SOTA methods for HSI recon-struction based on RGB inputs. 
+
+## 2. Related Works 
+
+Spectral Reconstruction. Early attempts relied on model-based frameworks that combined fidelity terms and phys-ical priors to constrain solutions. For instance, Robles et al. (Robles-Kelly, 2015) incorporated color and texture prior to refine reconstruction. Building on this work, Arad et al. (Arad & Ben-Shahar, 2016) proposed the use of spec-tral priors to develop sparse dictionaries linking HSIs with their RGB counterparts. Nonetheless, these model-based methods rely on a fixed formulation based on several strong assumptions, which restricts their ability to adapt to the diverse and complex imaging conditions in various real-2PhySpec: Physically Consistent Spectral Reconstruction 𝑦 ⊥ = 𝐼 − Φ†Φ 𝑦                                
+
+> 𝑦 ∥=Φ†Φ𝑦
+> 𝜊
+> 𝑦 =𝑦 ∥+𝑦 ⊥
+> Spectral manifold
+> 𝜊
+> 𝑌 (𝜆 )
+> 𝑋
+> Φ:𝑌 →𝑋
+> RGB manifold
+> Forward RGB Sampling
+> 𝑦 ′⊥=𝐼 −Φ′†Φ′Δ𝑦 ′
+> 𝑦 ′∥
+> 𝜊
+> 𝑦 ′=𝑦 ′∥+𝑦 ′⊥
+> Spectral manifold
+> 𝜊
+> 𝑌 (𝜆 )
+> 𝑋
+> RGB manifold
+> Inverse Spectral Reconstruction
+> Φ†:𝑋 →𝑌
+> 𝑥 𝑥 Δ𝑦 ′𝑥 ,Φ′
+> Range of y (or x) Mapping Neural network Spectral manifold RGB manifold Φ′: Estimated CSS
+
+Figure 3. The schematic diagram of Orthogonal Subspace Decomposition. According to the forward RGB sampling process x = Φy, the spectra y can be uniquely decomposed into orthogonal subspaces: the range-space component y∥ and null-space y⊥. In the reconstruction phase, the object of the range-space component y′∥ can be directly accessed using the pseudo-inverse matrix Φ† corresponding to Φ.While the other object of the null-space component y′⊥ is to first generate a raw prediction of spectral signal ∆y′
+
+satisfying the physical constraints of explicitly estimated camera spectral sensitivities, and then obtained by the null-space projection operator I − Φ†Φ.
+
+world scenarios. In contrast, learning-based methods (Cai et al., 2022b; Yang et al., 2024; Zhu et al., 2021; Li et al., 2023a) have adopted data-driven strategies to infer implicit mappings from RGB to hyperspectral domains through spe-cialized neural architectures. A breakthrough was achieved with the HSCNN (Xiong et al., 2017) model, which em-ployed convolutional layers and deep residual blocks to transform RGB inputs into enriched HSI feature spaces. Further advancements were introduced by MST++ (Cai et al., 2022b), which leveraged a transformer-based frame-work with channel-wise self-attention to capture long-range spectral correlations and thus significantly improved the performance. However, these data-driven learning methods often overlook the physical consistency, leading to unreli-able spectral predictions. 
+
+Meta-auxiliary Learning. MAXL (Liu et al., 2019) was initially proposed to enhance the generalization of classifi-cation models using meta-learning (Hospedales et al., 2021) to identify optimal labels for auxiliary tasks without re-quiring manually labeled auxiliary data. Chi et al. (Chi et al., 2021) applied MAXL to low-level vision tasks by integrating external and internal learning, designing a self-supervised auxiliary reconstruction task that partially shares the network with the primary deblurring task. This approach enables fast adaptation at test time, addressing distribution shifts identified by Sun et al. (Sun et al., 2020). Cheng et al. (Cheng et al., 2024) proposed a meta-transfer learning framework that incorporated multiple HSI datasets to ad-dress the data shortage dilemma for HSI super-resolution. Zhang et al. (Zhang et al., 2024) proposed an unsupervised test-time adaptation learning (UTAL) framework that jointly estimates unknown degradation and adapts a pre-trained deep image prior to specific hyperspectral images at test time, enabling effective super-resolution under complex real-world conditions. Huo et al. (Huo et al., 2024) em-ploy MAXL for spectral reflectance recovery trained on synthetic RGB images. Their real RGB-HSI pairs combine different cameras that are aligned manually, but separate capture precludes pixel-wise pairing, risking inaccuracies and constrained generalization across device variations. In this work, we adopt the strategy of incorporating a self-supervised RGB recovery from predicted spectra as the auxiliary task to enforce the generated HSI to accurately reconstruct the corresponding ground-truth RGBs, preserv-ing physical consistency and ensuring the integrity of the inverse problem. 
+
+## 3. Method 
+
+3.1. Preliminaries: Orthogonal Subspace Decomposition 
+
+Given a non-zero linear matrix H ∈ Rn×m, a pseudo-inverse H† ∈ Rm×n usually holds that satisfies HH †H =
+
+H. Singular value decomposition (SVD) (Klema & Laub, 1980) can be used to compute the analytical solution by: 
+
+H = UΣV ⊤, H† = VΣ †U⊤, (1) where U and V are orthogonal matrices and Σ is a diagonal matrix with eigenvalues as its diagonal elements. Suppose Φ = H†H is a mapping between a linear space that can be seen as the operator that projects samples to the range-space of H since HH †H ≡ H . While Φ† = ( I − Φ
+
+can be seen as the orthogonal operator that projects samples to the null-space of H, since HΦ† = H(I − H †H) ≡ 0,where I is a unit matrix. Any sample vector x ∈ Rm can be expressed as the sum of two components: one that resides in the range space of H
+
+3PhySpec: Physically Consistent Spectral Reconstruction 
+
+and another that lies in the null space of H:
+
+x ≡ Φx + Φ †x. (2) 
+
+3.2. Problem Definition 
+
+The forward RGB rendering process can be simulated by cal-culating the inner products between the measured radiance spectra Y ∈ Rλ×H×W , illumination spectrum L ∈ Rλ, and the spectral sensitivities S ∈ R3×λ of a given RGB camera: 
+
+Xk(u, v ) = 
+
+Z
+
+> λ
+
+Sk(λ)L(λ)Y(u, v, λ )dλ, (3) where X ∈ R3×H×W denotes the RGB image, k = 1 , 2, 3
+
+denote the red, green, and blue channels of the RGB image, 
+
+(u, v, λ ) denote spatial coordinate and wavelength dimen-sion, (H, W ) denote spatial dimension, respectively. 
+
+Vectorization. Let vec( ·) denote matrix vectorization, which concatenates all the columns of a matrix as a sin-gle vector. Then, x = vec( X) ∈ R3×n, where n = H × W
+
+denote spatial dimension, the original 3D spectral cube can be defined as 
+
+y = vec   y1, y2, . . . , yNλ
+
+ ∈ RNλ×n. (4) Thus, Eq. 3 can be discretized as 
+
+x = sly , (5) where l = vec[ L] ∈ R1×Nλ denotes the vectorized illumi-nation spectrum, s = vec[ S] ∈ R3×Nλ denotes the CSS, 
+
+Nλ denotes the number of sampled spectral bands, respec-tively. Our goal is to learn a mapping G(·) from x → y
+
+with both unknown illuminations and CSSs, as 
+
+ˆy = G (x) . (6) Different from most existing learning-based methods that naively learn an end-to-end mapping between x and y, we take both s and l into consideration, thus ensuring physical integrity. Lin et al. (Lin & Finlayson, 2020) proposed reconstructing spectra via orthogonal subspace decomposition with known CSS while ignoring the illumination, where they demon-strate all possible solutions of ˆy can be decomposed into range-space components and null-space components: 
+
+ˆy = ˆ y∥ + ˆ y⊥. (7) Since ˆy∥ is fixed that can be directly calculated from s and 
+
+x, thereby their goal is to estimate the null-space component 
+
+ˆy⊥. Their framework shows the following limitations: 1) It requires known CSSs when calculating the range-space component ˆy∥, which is impractical in most real-world applications; 2) Although intensity-scaling has been applied to training data to simulate illumination variance across different samples, the real intensity of illumination depends on the exposure settings of different captures, one preset scaling factor is obviously insufficient across different samples; 3) Directly estimating the null-space component ˆy⊥ and recovering ground-truth RGBs in the same network is hard to train and may lead to suboptimal results due to trade-off between two tasks. 
+
+Remark. Note that the range-space component ˆy∥ plays a vital role in ensuring that the reconstruction results align with the physical degradation process. In fact, for Eq. 7, the solution ˆy∥ relies on a fixed projection matrix solely dependent on camera spectral sensitivities, which is clearly inadequate considering the variation of capture conditions (including capture devices, settings, and illumination con-ditions, and compression artefacts etc.), leading to a poorly constructed null-space ˆy⊥ that contains both physical er-rors and measurement/reconstruction noise, which is both difficult to model. 
+
+Orthogonal Subspace Decomposition for Spectral Re-construction. Suppose we have the estimation of s and l,then we can define a linear operator Φ = sl that represents the spectral downsampling process while its pseudo-inverse 
+
+Φ† represents the spectral upsampling procedure. As such, Eq. 5 can be reformulated as: 
+
+x = Φy. (8) We find that orthogonal subspace decomposition is an ideal choice for ensuring the physical consistency of spectra re-construction. By applying orthogonal subspace decomposi-tion to Eq. 8: 
+
+Φy = ΦΦ †Φy + Φ(I − Φ†Φ)y = Φy + 0 = x. (9) It shows that after spectral-wise downsampling, the range-space component, Φ†Φy, accurately reflects the RGB im-age x. Conversely, the null-space component, (I − Φ†Φ)y,does not influence the output of the downsampler Φ.According to the observation, we can reformulate Eq. 7 into two parts: a range-space component, Φ†Φy, i.e., Φ†x; and a null-space component, (I − Φ†Φ)∆ˆ y:
+
+ˆy = Φ†x + ( I − Φ†Φ)∆ˆ y, (10) where ∆ˆ y ∈ RNλ×n denotes the raw prediction of spectra signal by neural networks. 
+
+Remark. By re-parameterizing the range-space component 
+
+ˆy∥ as a learnable projection via a new transform matrix 
+
+Φ, we integrate CSS and illumination estimation as ma-trix coefficients. This is a much more accurate compared 4PhySpec: Physically Consistent Spectral Reconstruction Sample 
+
+> mini -batch
+> 𝑥 𝑛
+> …
+> External
+> RGB -HSI pairs
+
+Meta -Auxiliary Training                     
+
+> 𝑠 ′
+> DIEM 𝑙 ′
+> pooling
+> Φ′
+> 𝑥 𝑛
+> 𝑦 ′
+> Δ𝑦 4
+> ′Δ𝑦 3
+> ′Δ𝑦 2
+> ′
+> 𝜃 𝑠
+> Δ𝑦 1
+> ′𝜃 𝑃𝑟𝑖
+> Resnet
+> 𝜃 𝐴𝑢𝑥
+> 𝑥 𝑛
+> ′
+> Inner update
+> 𝜃 𝑛
+> ′=𝜃 −𝛼 ∇𝜃 ℒ𝐴𝑢𝑥 (𝜃 𝑆 ,𝜃 𝑃𝑟𝑖 ,𝜃 𝐴𝑢𝑥 )
+> Spectral
+> Reconstruction
+> (𝜃 𝑆 ,𝜃 𝑃𝑟𝑖 ,𝜃 𝐴𝑢𝑥 )
+> Model 𝜃
+> 𝜃 =𝜃 −𝛽 ෍
+> 𝑛 =1
+> N
+> ∇𝜃 ℒ𝑃𝑟𝑖 (𝜃 𝑆
+> 𝑛 ,𝜃 𝑃𝑟𝑖
+> 𝑛 )
+> Outer update
+
+Meta -Auxiliary Testing 
+
+> Testing image
+> Shared weights
+> Spectral reconstruction
+> (Primary branch)
+> RGB reproduction
+> (Auxiliary branch)
+
+ℒ𝐴𝑢𝑥       
+
+> Feature flow
+> Gradient flow
+> 𝜃 =𝜃 −𝛼 ∇𝜃 ℒ𝐴𝑢𝑥 (𝜃 𝑆 ,𝜃 𝑃𝑟𝑖 ,𝜃 𝐴𝑢𝑥 )
+
+Figure 4. Overview of PhySpec in the meta-auxiliary learning framework: During the meta-auxiliary training phase, we first adapt the model parameters based on the auxiliary loss. The updated parameters are then evaluated on the primary task, and the model weights are ultimately refined using the primary loss derived from the adapted parameters. In the meta-testing phase, the adaptation step is applied to update the model for each test sample. 
+
+with Lin et al.’s method (Lin & Finlayson, 2020), enabling the null-space component ˆy∥ to focus solely on physically meaningful factors , instead of having to compensate range-space approximation errors caused by different capture conditions ( e.g. , devices, settings and illuminations): ˆy⊥
+
+can now serve as an efficient compensation and regulariza-tion term which enhances the spectral reconstruction with nonlinear residual information that adheres to both data measurements and prior information. 
+
+3.3. Architecture 
+
+The overview of our proposed architecture is shown in Fig. 4. It contains two tasks: the primary task G(·) takes RGB images as input to reconstruct spectra, as well as es-timates the CSS and illumination descriptor; the auxiliary task F(·) takes both estimated CSS, illumination descriptor and spectra as input to reproduce the ground-truth in a self-supervised manner. In the primary task G(·), a UNet-based encoder-decoder (Cai et al., 2022b) architecture is utilized, and we adopt a multi-scale scheme (Yang et al., 2024) to generate spectra in different scales. In the auxiliary task 
+
+F(·), several resnet (He et al., 2016) blocks are used to re-produce the final ground-truth RGB images. Overall, most parameters of the two tasks are shared. 
+
+CSS Estimation. We utilize a transformer-based en-coder (Cai et al., 2022b) as the feature extractor to extract latent feature f . A conv layer and a global average pooling layer are adapted to produce the estimated camera spectral sensitivity (CSS) ˆs.
+
+Dynamic Illumination Estimation Module. Considering the illumination information is image-specific, using fixed parameters to learn this feature may be suboptimal, espe-cially when adapting training parameters to unseen testing conv                            
+
+> conv
+> 𝒇
+> conv
+> pooling
+> ℎ×𝑤 ×𝑑 ℎ×𝑤 ×𝑐 1×1
+> 3×33×3
+> H×𝑊 ×3
+> 𝑿 𝒏
+> k×𝑘 ×𝑐
+> pooling
+> 𝐼𝑙𝑙𝑢𝑚𝑖𝑛𝑎𝑡𝑖𝑜𝑛 𝐷𝑒𝑠𝑐𝑟𝑖𝑝𝑡𝑜𝑟
+> 1×𝑐
+> Depth -wise
+> Conv
+
+Figure 5. The architecture of the dynamic illumination estimation module. The f is the latent feature learned by the encoder, and the 
+
+Xn is the input image. 
+
+samples. As such, we propose a dynamic illumination esti-mation module to adaptively capture the illumination-aware representation conditioned on each specific input feature. First, we employ two convolution layers to encode the input image into feature h. Next, we apply average pooling to the feature h to generate an illumination-aware filter with kernel size k: gk(h) ∈ Rk×k×c. At last, the latent feature f is con-volved with the illumination-aware filter with depth-wise convolution to obtain an illumination-aware representation: 
+
+l′
+
+= f ⊗ gk(f ). (11) Note that the illumination descriptor l′
+
+is implicitly esti-mated since there is no illumination information provided by the training dataset. Besides, it is also impractical to access such ground-truth illumination information in the real world. 
+
+Objective Function. As illustrated in Fig. 4, the network parameters θ are divided into three components: θS , θP ri ,and θAux . In this structure, θS denotes the shared param-eters, while θP ri and θAux correspond to the parameters specific to the primary and auxiliary tasks. The output from 5PhySpec: Physically Consistent Spectral Reconstruction 
+
+Algorithm 1 Meta-auxiliary Training 
+
+Input: (x, y, s ) triples, λ, α, β: learning rates 
+
+Output: θ: meta-auxiliary learned parameters Pre-train the whole model: θ = {θS , θ P ri , θ Aux }
+
+while not converged do 
+
+Sample whole training data {xk, yk, sk}Kk=1 
+
+Evaluate pre-training loss LP re by Eqn. 14 Update θ: ˜θ ← θ − λ∇θ LP re (θS , θ P ri , θ Aux )
+
+end 
+
+Initialize the model with the above pre-trained weights 
+
+while not converged do 
+
+Sample a mini-batch of training triple {xn, yn, sn}Nn=1 
+
+for each n do 
+
+Evaluate auxiliary loss LAux by Eqn. 13 Compute adapted parameters θn with gradient de-scent: ˜θn ← θ − α∇θ LAux (θS , θ P ri , θ Aux )
+
+Update: θAux ← θAux − α∇θ LAux (θAux )
+
+end 
+
+Validate the primary task and update: 
+
+θ ← θ − β PNn=1 ∇θ LnP ri (θnS , θ nP ri )
+
+end 
+
+the final shared layer is directed into two branches; one is responsible for generating the final spectra ˆy (the primary task), and the other uses ˆy as an additional input to recon-struct the original RGB images. This approach allows that during the testing phase, the parameters of the primary task are updated exclusively based on the auxiliary loss. For both tasks, we employ the mean relative absolute error (MRAE) as the loss function: 
+
+LP ri (θS , θ P ri ) = ∥s − ˆs∥1 +
+
+> 4
+
+X
+
+> i=1
+
+yi − ˆyi
+
+> 1
+
+, (12) 
+
+LAux (θS , θ P ri , θ Aux ) = ∥x − ˆx∥1. (13) Then, we pre-train the whole network on the training dataset, using the combination loss as: 
+
+LP re (θ) = LP ri (θS , θ P ri ) + LAux (θS , θ P ri , θ Aux ) .
+
+(14) 
+
+3.4. Meta-Auxiliary Learning 
+
+MAXL aims to integrate both external and internal learning to enable rapid adaptation of trained parameters to unseen samples, requiring only a limited number of gradient de-scent steps during testing stage. In our scenario, we further introduce MAXL to enforce generated HSIs to accurately recover ground-truth RGBs in a self-supervised manner. 
+
+Meta-Auxiliary Training . Given a triple of training images 
+
+(xn, yn, sn) and the pre-trained model θ, we first adapt θ
+
+Algorithm 2 Meta-auxiliary Testing 
+
+Input: x: a testing sample 
+
+k: gradient updating steps 
+
+α: learning rate of testing adaptation 
+
+Output: Reconstructed hyperspectral image ˆy
+
+Initialize model parameter θ with pre-trained weights 
+
+for k steps do 
+
+Evaluate auxiliary loss LAux by Eqn. 13 Update θ ← θ − α∇θ LAux (θS , θ P ri , θ Aux )
+
+end return ˆy from Eqn. 7 using the auxiliary loss with only several gradient descent updates 
+
+˜θn ← θ − α∇θ LAux (θS , θ P ri , θ Aux ) , (15) where α denotes the adaptation learning rate. Note that the adaptation step involves all parameters ( i.e. , θS , θP ri , and 
+
+θAux ) with only xn utilized. To effectively adapt the pre-trained parameters θ for testing, it is essential to update θS and θP ri corresponding to the pri-mary task. Consequently, we can define the meta-objective as follows: 
+
+arg min  
+
+> θS,θ P ri
+> N
+
+X
+
+> n=1
+
+LkP ri 
+
+ θkS , θ kP ri 
+
+ , (16) where N is the number of training samples. Note that the meta-objective in Eq. 16 can be minimized via gradient descent 
+
+θ ← θ − β
+
+> N
+
+X
+
+> n=1
+
+∇θ LkP ri 
+
+ θkS , θ kP ri 
+
+ , (17) where β denotes the meta-learning rate. In practice, we use a mini-batch instead of the entire external training dataset to update Eq. 17. The algorithm is given in Alg. 1. Note that 
+
+θS and θP ri are updated in the outer loop, whereas θAux is updated in the inner loop. 
+
+Meta-Auxiliary Testing . At the testing phase, we simply fine-tune the meta-learned parameters using merely several steps of gradient descent on a testing sample x with Eq. 15, as illustrated in Alg. 2. 
+
+## 4. Experiments 
+
+4.1. Datasets and Implementation Details Datasets. To evaluate the generalization and the fidelity of our method, we conduct experiments on three HSI recon-struction datasets ( e.g. , the ARAD-1K Synthetic dataset, the ARAD-1K Real dataset (Arad et al., 2022) and the ICVL HSI dataset (Arad & Ben-Shahar, 2016)). The ARAD-1K 6PhySpec: Physically Consistent Spectral Reconstruction HDNet  MST -L MST++ HINet AWAN  SST  SPECAT PADUT  CESST  PhySpec 
+
+Figure 6. The MSE error map obtained from the validation subset of the ARAD-1K Real dataset, which is calculated along the spectral direction, showcasing the discrepancies between the reconstructed HSIs and the corresponding ground truths. 
+
+Table 1. Quantitative evaluations. All compared methods are trained on the ARAD-1k Synthetic dataset and ICVL dataset, while directly evaluated on the ARAD-1K Real data.                                                                                                                            
+
+> Method Params (M) FLOPs (G) ARAD-1K Synthetic ARAD-1K Real ICVL SAM ↓SSIM ↑PSNR ↑SAM ↓SSIM ↑PSNR ↑SAM ↓SSIM ↑PSNR ↑
+> AWAN (CVPRW’20) (Li et al., 2020) 4.04 270.61 8.05 0.917 33.15 16.72 0.896 30.36 4.59 0.918 31.92 HDNet (CVPR’22) (Hu et al., 2022) 2.66 173.81 7.31 0.922 33.54 14.40 0.899 31.08 4.17 0.924 31.85 HINet (CVPR’21) (Chen et al., 2021) 5.21 31.04 7.04 0.930 33.91 12.11 0.903 31.35 4.19 0.928 32.01 MST-L (CVPR’2022) (Cai et al., 2022a) 2.45 32.07 5.17 0.935 34.68 10.36 0.906 31.87 3.51 0.935 32.87 MST++ (CVPRW’22) (Cai et al., 2022b) 1.62 23.05 4.87 0.939 34.93 9.62 0.910 32.05 3.04 0.941 32.44 PADUT (ICCV’23) (Li et al., 2023b) 6.38 107.15 4.34 0.952 35.49 9.03 0.912 31.97 3.11 0.948 33.07 SST (ArXiv’23) (Cai et al., 2024) 12.74 219.38 4.82 0.941 35.05 8.31 0.915 31.60 3.71 0.935 32.71 CESST (AAAI’24) (Yang et al., 2024) 1.54 90.18 4.97 0.945 36.05 7.19 0.923 32.15 3.27 0.939 32.96 SPECAT (CVPR’24) (Yao et al., 2024) 0.37 15.97 4.62 0.940 35.45 8.04 0.918 31.74 3.81 0.944 32.54 PhySpec (ours) 2.74 4.65 4.12 0.967 37.12 4.17 0.937 33.87 1.95 0.957 35.04
+
+dataset, the largest in this domain, comprises 950 RGB-HSI pairs (482 × 512 resolution, 31 spectral channels from 400nm to 700nm), with 900 used for training and 50 for validation. The ARAD-1K Synthetic dataset is constructed by randomly selecting 23 of Jiang et al.’s CSSs (Jiang et al., 2013) for training input generation and reserving 5 for test-ing. The ARAD-1K Real dataset (Arad et al., 2022) retains its original setting with unknown CSSs and compression patterns. The ICVL dataset consists of 201 high-resolution HSIs. Since paired RGB images are not provided, we gener-ate them following Magnusson et al.’s method (Magnusson et al., 2020). To ensure consistency, we exclude 18 im-ages with varying resolutions, utilizing 147 image pairs for training and 36 for testing. 
+
+Implementation Details. The proposed PhySpec is im-plemented with Pytorch. All images are linearly rescaled within the range between 0 and 1. During training, images are cropped into 128 × 128 pixel patches with a stride of 8. Data augmentation is applied through random flipping and rotation. The batch size is fixed at 20. During the pre-training stage, we utilize the Adam optimizer (Kingma & Ba, 2014) with an initial learning rate of 10 −4, following a Cosine Annealing schedule (Loshchilov & Hutter, 2016) over 300 epochs to facilitate gradual learning rate decay. During the meta-auxiliary learning phase, we set the param-eters α and β to 1 × 10 −2 and 5 × 10 −5, respectively, to balance the learning dynamics between the primary and aux-iliary tasks. For test-time adaptation, four gradient descent updates are performed. All experiments are conducted on a single NVIDIA Ampere A100 with 40G RAM. 
+
+4.2. Quantitative Results 
+
+We evaluate our method against nine state-of-the-art (SOTA) approaches, categorized as follows: three RGB-based recon-struction methods (AWAN (Li et al., 2020), MST++ (Cai et al., 2022b) and CESST (Yang et al., 2024)); five CASSI-based reconstruction methods (HDNet (Hu et al., 2022), MST-L (Cai et al., 2022a), PADUT (Li et al., 2023b), SST (Cai et al., 2024), SPECAT (Yao et al., 2024)); and one image restoration method (HINet (Chen et al., 2021)). We evaluate the performance using three widely-used metrics, including SAM, SSIM, and PSNR. The first one assesses spectral quality, while the latter two evaluate spatial quality. Lower SAM values indicate better spectral quality, while higher SSIM and PSNR values signify better spatial quality. As shown in Table 1, our method achieves the best per-formance overall metrics on both the ARAD-1K synthetic dataset and ARAD-1K real dataset, as well as the ICVL dataset. To evaluate the model complexity, we also compare parameters (spatial complexity) and FLOPs (temporal com-plexity) in Table 1. As can be seen, our method achieves the lowest FLOPs cost with relatively low parameters. 7PhySpec: Physically Consistent Spectral Reconstruction HDNet  MST -L MST++ HINet  PhySpec  Ground truth AWAN  SST  SPECAT PADUT  CESST     
+
+> RGB Patch RGB Image
+> 550 nm
+> 600 nm
+> 650 nm
+> 700 nm
+
+Figure 7. Visual comparisons on a randomly selected scene from the validation set of the ARAD-1K Real dataset with 4 spectral channels. The bottom-left spectral curves represent the region highlighted in blue in the RGB image. For better visual comparison, please zoom in. SST  SPECAT CESST  PhySpec  GT 
+
+> 35.26/0.980
+> 28.61/0.958
+> 31.17/0.836
+> 27.97/0.769
+> 31.86/0.836
+> 28.01/0.770
+> 32.57/0.925
+> 28.52/0.872
+
+Figure 8. Reproduced RGB images from reconstructed HSIs with PSNR and SSIM metrics. 
+
+4.3. Qualitative Results 
+
+Visual comparisons are provided in Fig. 6 and Fig. 7. Fig. 6 illustrates spectral-dimension MSE error maps between generated and ground-truth HSIs. Fig. 7 displays recon-structed hyperspectral images across selected spectral chan-nels (550nm, 600nm, 650nm, and 700nm). It is obvious that the existing HSI reconstruction methods exhibit limi-tations in estimating spectral intensity and recovering fine details, particularly in high-frequency regions (e.g., sky tex-tures). In contrast, PhySpec achieves enhanced spatial detail restoration and pixel-level smoothness. Additionally, the spectral density curves, shown in the bottom-left of Fig. 7, correspond to the selected region (blue box) in the RGB image (top-left). The strong correlation between our curve and the ground truth shows PhySpec’s ability to achieve spectrally consistent reconstruction. 
+
+4.4. Ablation Studies 
+
+Is PhySpec really physically consistent? Our PhySpec formulates a self-reconstruction framework to ensure the physical consistency, which is inspired by CycleGAN (Zhu et al., 2017) and CoColor (Yang et al., 2023). To validate the physically consistent property of PhySpec, we provide the 
+
+Table 2. The top sub-table illustrates the break-down ablations of our proposed PhySpec. The bottom sub-table investigates the gradient descent steps in the meta-auxiliary testing.                                                   
+
+> Method DIEM CSS MAXL Training MAXL Testing PSNR SAM Sim-PhySpe 34.67 5.12 Variant 1 ✓34.85 4.98 Variant 2 ✓✓36.10 4.71 Variant 3 ✓✓✓36.95 4.20 PhySpec ✓✓✓✓37.12 4.12
+> Setting kPSNR SAM PhySpec 036.95 4.20 PhySpec 136.98 4.17 PhySpec 237.04 4.15 PhySpec 337.04 4.14 PhySpec 437.12 4.12
+> PhySpec 537.12 4.14 PhySpec 637.11 4.13
+
+reproduced RGB comparison in Fig. 8 with PSNR and SSIM metrics. As can be seen, CESST and SPECAT fail to predict artifact-free results, while SST fails to reproduce consistent tune and brightness with ground truths. In contrast, our method reproduces results that are consistent with ground truths and achieves high quantitative results of both PSNR and SSIM, indicating the physical consistency of our model. 
+
+Is PhySpec really effective? To evaluate the effectiveness of PhySpec, we conducted a breakdown of the ablation studies for the DIEM, CSS explicit estimation mechanism, meta-auxiliary training and testing adaptation scheme to analyze the impact of each part. As shown in the top sub-table in Table 2, the Sim-PhySpec used as a baseline for comparison is the pure MST structure proposed by (Cai et al., 2022a). Variant 1 disables the CSS explicit estimation mechanism by implicitly estimating CSS without ground-truth CSS supervision. The results indicate that the CSS explicit estimation and meta-auxiliary training contribute the most to performance improvement, yielding a 1.25 dB and 0.85 dB increase in PSNR, respectively. This highlights the 8PhySpec: Physically Consistent Spectral Reconstruction 
+
+effectiveness of the integration of both physical constraints and self-supervised meta-auxiliary learning. Additionally, we also investigate the effect of gradient de-scent update step k as reported in the bottom sub-table of Table 2. We We also examined the impact of the gradient descent update step, denoted as k, as indicated in the bottom sub-table of Table 2. We determined that k = 4 provides the best performance. Increasing the number of update steps could result in overfitting on the auxiliary task. 
+
+Can PhySpec really explicitly estimate CSSs? To investi-gate the effectiveness of CSS estimation, we provide the generated CSSs from five selected testing cameras with cor-responding ground truths in Fig. 2. As can be seen, PhySpec can accurately estimate CSSs that are unseen during training, such as Nikon D700, Nikon D40, and Pentax Q, reinforcing the reliability and robustness of our method, and highlight-ing its potential for real-world applications. 
+
+## 5. Conclusion 
+
+In this paper, we introduced PhySpec, a novel method ad-dressing the colorimetric dilemma in HSI reconstruction—a critical challenge where existing approaches fail to main-tain physical consistency between reconstructed spectra and ground-truth RGB colors. PhySpec embeds imaging physics into learning via two innovations: (1) orthogonal subspace decomposition to model intrinsic HSI-RGB relationships, enabling precise CSS estimation and physically consistent spectral recovery; and (2) a self-supervised MAXL strategy that adapts model parameters to unseen test data, ensur-ing robust generalization while enforcing RGB fidelity as a physical constraint. Experiments demonstrate PhySpec’s su-perior performance over state-of-the-art methods, resolving RGB-HSI mismatches and enhancing practical reliability. By bridging data-driven learning with physical principles, our work establishes a foundation for trustworthy HSI re-construction in applications like remote sensing and com-putational photography. Future research will extend this framework to dynamic imaging and multi-sensor fusion. 
+
+## Impact Statement 
+
+This work has potential applications in remote sensing, med-ical imaging, and computational photography, where accu-rate spectral data is essential. Ensuring physical consistency mitigates risks of inaccurate predictions for practical imag-ing applications. By integrating physical integrity into ma-chine learning, PhySpec advances high-fidelity AI solutions in imaging. Future research could extend this paradigm to dynamic imaging and multi-sensor fusion, expanding its impact across diverse practical domains. 
+
+## References 
+
+Arad, B. and Ben-Shahar, O. Sparse recovery of hyper-spectral signal from natural rgb images. In European conference on computer vision , 2016. Arad, B., Timofte, R., Yahel, R., Morag, N., Bernat, A., Cai, Y., Lin, J., Lin, Z., Wang, H., Zhang, Y., et al. Ntire 2022 spectral recovery challenge and data set. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops , pp. 863–881, 2022. Borengasser, M., Hungate, W. S., and Watkins, R. Hy-perspectral remote sensing: principles and applications .CRC press, 2007. Cai, Y., Lin, J., Hu, X., Wang, H., Yuan, X., Zhang, Y., Timofte, R., and Van Gool, L. Mask-guided spectral-wise transformer for efficient hyperspectral image reconstruc-tion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 17502– 17511, 2022a. Cai, Y., Lin, J., Lin, Z., Wang, H., Zhang, Y., Pfister, H., Timofte, R., and Van Gool, L. MST++: Multi-stage spectral-wise transformer for efficient spectral reconstruc-tion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops , pp. 745–755, 2022b. Cai, Z., Liu, Z., Yu, J., Zhang, Z., Da, F., and Jin, C. Reversible-prior-based spectral-spatial transformer for efficient hyperspectral image reconstruction. Interna-tional Journal on Semantic Web and Information Systems (IJSWIS) , 20(1):1–22, 2024. Chen, L., Lu, X., Zhang, J., Chu, X., and Chen, C. Hinet: Half instance normalization network for image restora-tion. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 182–192, 2021. Cheng, Y., Wang, X., Ma, Y., Mei, X., Wu, M., and Ma, J. General hyperspectral image super-resolution via meta-transfer learning. IEEE Transactions on Neural Networks and Learning Systems , 2024. Chi, Z., Wang, Y., Yu, Y., and Tang, J. Test-time fast adap-tation for dynamic scene deblurring via meta-auxiliary learning. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 9137– 9146, 2021. He, K., Zhang, X., Ren, S., and Sun, J. Deep residual learning for image recognition. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 770–778, 2016. 9PhySpec: Physically Consistent Spectral Reconstruction 
+
+Hospedales, T., Antoniou, A., Micaelli, P., and Storkey, A. Meta-learning in neural networks: A survey. IEEE transactions on pattern analysis and machine intelligence ,44(9):5149–5169, 2021. Hu, X., Cai, Y., Lin, J., Wang, H., Yuan, X., Zhang, Y., Timofte, R., and Van Gool, L. Hdnet: High-resolution dual-domain learning for spectral compressive imaging. In Proceedings of the IEEE/CVF Conference on Com-puter Vision and Pattern Recognition , pp. 17542–17551, 2022. Huang, S., Ren, M., Yang, Y., Wang, X., and Wei, Y. Mftn: A multi-scale feature transfer network based on IMatch-Former for hyperspectral image super-resolution. In 
+
+Forty-first International Conference on Machine Learn-ing , 2024. Huo, D., Wang, J., Qian, Y., and Yang, Y.-H. Learning to recover spectral reflectance from RGB images. IEEE Transactions on Image Processing , 2024. Jiang, J., Liu, D., Gu, J., and S ¨usstrunk, S. What is the space of spectral sensitivity functions for digital color cameras? In 2013 IEEE Workshop on Applications of Computer Vision (WACV) , pp. 168–179, 2013. Johnson, W. R., Wilson, D. W., Fink, W., Humayun, M. S., and Bearman, G. H. Snapshot hyperspectral imaging in ophthalmology. Journal of biomedical optics , 12(1): 014036, 2007. Kingma, D. P. and Ba, J. Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980 , 2014. Klema, V. and Laub, A. The singular value decomposition: Its computation and some applications. IEEE Transac-tions on Automatic Control , 25(2):164–176, 1980. Lam, A. and Sato, I. Spectral modeling and relighting of reflective-fluorescent scenes. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 1452–1459, 2013. Li, J., Wu, C., Song, R., Li, Y., and Liu, F. Adaptive weighted attention network with camera spectral sensitiv-ity prior for spectral reconstruction from rgb images. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops , pp. 462–463, 2020. Li, J., Leng, Y., Song, R., Liu, W., Li, Y., and Du, Q. Mformer: Taming masked transformer for unsupervised spectral reconstruction. IEEE Transactions on Geo-science and Remote Sensing , 61:1–12, 2023a. Li, M., Fu, Y., Liu, J., and Zhang, Y. Pixel adaptive deep unfolding transformer for hyperspectral image reconstruc-tion. In Proceedings of the IEEE/CVF International Con-ference on Computer Vision , pp. 12959–12968, 2023b. Lin, Y.-T. and Finlayson, G. D. Physically plausible spectral reconstruction from rgb images. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops , pp. 532–533, 2020. Liu, S., Long, M., Wang, J., and Jordan, M. I. Generalized zero-shot learning with deep calibration network. Ad-vances in Neural Information Processing Systems , 31, 2018. Liu, S., Davison, A., and Johns, E. Self-supervised general-isation with meta auxiliary learning. Advances in Neural Information Processing Systems , 32, 2019. Loshchilov, I. and Hutter, F. SGDR: Stochastic gra-dient descent with warm restarts. arXiv preprint arXiv:1608.03983 , 2016. Lu, G. and Fei, B. Medical hyperspectral imaging: a review. 
+
+Journal of biomedical optics , 19(1):010901, 2014. Magnusson, M., Sigurdsson, J., Armansson, S. E., Ulfars-son, M. O., Deborah, H., and Sveinsson, J. R. Creat-ing rgb images from hyperspectral images using a color matching function. In IGARSS 2020-2020 IEEE Interna-tional Geoscience and Remote Sensing Symposium , pp. 2045–2048. IEEE, 2020. Robles-Kelly, A. Single image spectral reconstruction for multimedia applications. In Proceedings of the 23rd ACM international conference on Multimedia , pp. 251–260, 2015. Shi, Z., Chen, C., Xiong, Z., Liu, D., and Wu, F. Hscnn+: Advanced cnn-based hyperspectral recovery from rgb images. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops , pp. 939–947, 2018. Socher, R., Ganjoo, M., Manning, C. D., and Ng, A. Zero-shot learning through cross-modal transfer. Advances in Neural Information Processing Systems , 26, 2013. Sun, Y., Wang, X., Liu, Z., Miller, J., Efros, A., and Hardt, M. Test-time training with self-supervision for generaliza-tion under distribution shifts. In International conference on machine learning , pp. 9229–9248, 2020. Wang, Y., Hu, Y., Yu, J., and Zhang, J. GAN prior based null-space learning for consistent super-resolution. In 
+
+Proceedings of the AAAI Conference on Artificial Intelli-gence , volume 37, pp. 2724–2732, 2023. 10 PhySpec: Physically Consistent Spectral Reconstruction 
+
+Xiong, Z., Shi, Z., Li, H., Wang, L., Liu, D., and Wu, F. Hscnn: Cnn-based hyperspectral image recovery from spectrally undersampled projections. In ICCVW , pp. 518– 525, 2017. Yang, X., Chen, J., and Yang, Z. Cooperative coloriza-tion: Exploring latent cross-domain priors for nir image spectrum translation. In Proceedings of the 31st ACM International Conference on Multimedia , pp. 2409–2417, 2023. Yang, X., Chen, J., and Yang, Z. Hyperspectral image recon-struction via combinatorial embedding of cross-channel spatio-spectral clues. In Proceedings of the AAAI Confer-ence on Artificial Intelligence , volume 38, pp. 6567–6575, 2024. Yang, X., Chen, J., and Yang, Z. Learning physics-informed color-aware transforms for low-light image enhancement. 
+
+arXiv preprint arXiv:2504.11896 , 2025. Yao, Z., Liu, S., Yuan, X., and Fang, L. Specat: Spatial-spectral cumulative-attention transformer for high-resolution hyperspectral image reconstruction. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , pp. 25368–25377, 2024. Yuan, Y., Zheng, X., and Lu, X. Hyperspectral image super-resolution by transfer learning. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sens-ing , 10(5):1963–1974, 2017. Zhang, L., Nie, J., Wei, W., and Zhang, Y. Unsupervised test-time adaptation learning for effective hyperspectral im-age super-resolution with unknown degeneration. IEEE Transactions on Pattern Analysis and Machine Intelli-gence , 46(7):5008–5025, 2024. Zhu, J.-Y., Park, T., Isola, P., and Efros, A. A. Unpaired image-to-image translation using cycle-consistent adver-sarial networks. In Proceedings of the IEEE international conference on computer vision , pp. 2223–2232, 2017. Zhu, Z., Liu, H., Hou, J., Zeng, H., and Zhang, Q. Semantic-embedded unsupervised spectral reconstruction from single rgb images in the wild. In Proceedings of the IEEE/CVF International Conference on Computer Vision ,pp. 2279–2288, 2021. 11
