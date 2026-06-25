@@ -72,6 +72,31 @@ subscriptions:
           source: manual
           note: ''
       updated_at: '2026-06-25T03:27:36.019Z'
+    - tag: HSI
+      description: 高光谱图像目标检测与分类
+      enabled: true
+      paper_sources:
+        - arxiv
+      keywords:
+        - keyword: hyperspectral image classification
+          keyword_cn: 高光谱图像分类
+          query: hyperspectral image classification methods
+        - keyword: hyperspectral target detection
+          keyword_cn: 高光谱目标检测
+          query: hyperspectral target detection algorithms
+        - keyword: hyperspectral anomaly detection
+          keyword_cn: 高光谱异常检测
+          query: hyperspectral anomaly detection techniques
+        - keyword: spectral-spatial feature extraction
+          keyword_cn: 光谱-空间特征提取
+          query: spectral-spatial feature extraction for hyperspectral data
+      intent_queries:
+        - query: hyperspectral image target detection
+          query_cn: 高光谱图像目标检测
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-06-25T03:36:20.819Z'
 source_backends:
   arxiv:
     papers_table: arxiv_papers
