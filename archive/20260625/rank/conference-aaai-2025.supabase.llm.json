@@ -1,0 +1,388 @@
+{
+  "top_k": 200,
+  "generated_at": "2026-06-25T03:54:38.479983+00:00",
+  "papers": [
+    {
+      "id": "aaai-2025-32275",
+      "source": "AAAI-2025-Accepted",
+      "title": "OTIAS: OcTree Implicit Adaptive Sampling for Multispectral and Hyperspectral Image Fusion",
+      "abstract": "Implicit Neural Representation (INR) methods have demonstrated great potential in arbitrary-scale super-resolution tasks. This success is primarily due to their ability to continuously represent images using coordinates. In the task of remote sensing image fusion, INR methods have also shown promising applications. However, the previous INR methods neglect channel-wise modeling, while sharing a single kernel across all channels at each position, resulting in a lack of sensitivity to data specificity. To address these issues, we propose the OcTree Implicit Adaptive Sampling (OTIAS) method, which innovatively applies the octree structure to restore data from both horizontal and vertical directions, effectively incorporating spatial and spectral information from hyperspectral data. Additionally, we introduce a novel method to adaptively generate interpolation kernels based on coordinates. This approach efficiently produces customized interpolation kernel parameters for octree nodes, tailored to different spectral information. Overall, our method achieves state-of-the-art performance on the CAVE and Harvard datasets with 4× and 8× scaling factors, outperforming existing approaches.",
+      "authors": [
+        "Shangqi Deng",
+        "Jun Ma",
+        "Liang-Jian Deng",
+        "Ping Wei"
+      ],
+      "primary_category": "AAAI-25 Technical Tracks 3",
+      "categories": [
+        "AAAI-2025",
+        "AAAI-25 Technical Tracks 3"
+      ],
+      "published": "2025-04-11T00:00:00+00:00",
+      "link": "https://ojs.aaai.org/index.php/AAAI/article/view/32275",
+      "pdf_url": "https://ojs.aaai.org/index.php/AAAI/article/download/32275/34430",
+      "tags": [
+        "keyword:HSI",
+        "query:HSI"
+      ]
+    },
+    {
+      "id": "aaai-2025-32711",
+      "source": "AAAI-2025-Accepted",
+      "title": "HSOD-BIT-V2: A Challenging Benchmark for Hyperspectral Salient Object Detection",
+      "abstract": "Salient Object Detection (SOD) is crucial in computer vision, yet RGB-based methods face limitations in challenging scenes, such as small objects and similar color features. Hyperspectral images provide a promising solution for more accurate Hyperspectral Salient Object Detection (HSOD) by abundant spectral information, while HSOD methods are hindered by the lack of extensive and available datasets. In this context, we introduce HSOD-BIT-V2, the largest and most challenging HSOD benchmark dataset to date. Five distinct challenges focusing on small objects and foreground-background similarity are designed to emphasize spectral advantages and real-world complexity. To tackle these challenges, we propose Hyper-HRNet, a high-resolution HSOD network. Hyper-HRNet effectively extracts, integrates, and preserves effective spectral information while reducing dimensionality by capturing the self-similar spectral features. Additionally, it conveys fine details and precisely locates object contours by incorporating comprehensive global information and detailed object saliency representations. Experimental analysis demonstrates that Hyper-HRNet outperforms existing models, especially in challenging scenarios.",
+      "authors": [
+        "Yuhao Qiu",
+        "Shuyan Bai",
+        "Tingfa Xu",
+        "Peifu Liu",
+        "Haolin Qin",
+        "Jianan Li"
+      ],
+      "primary_category": "AAAI-25 Technical Tracks 6",
+      "categories": [
+        "AAAI-2025",
+        "AAAI-25 Technical Tracks 6"
+      ],
+      "published": "2025-04-11T00:00:00+00:00",
+      "link": "https://ojs.aaai.org/index.php/AAAI/article/view/32711",
+      "pdf_url": "https://ojs.aaai.org/index.php/AAAI/article/download/32711/34866",
+      "tags": [
+        "keyword:HSI",
+        "query:HSI"
+      ]
+    },
+    {
+      "id": "aaai-2025-32472",
+      "source": "AAAI-2025-Accepted",
+      "title": "Multispectral Pedestrian Detection with Sparsely Annotated Label",
+      "abstract": "Although existing Sparsely Annotated Object Detection (SAOD) approches have made progress in handling sparsely annotated environments in multispectral domain, where only some pedestrians are annotated, they still have the following limitations: (i) they lack considerations for improving the quality of pseudo-labels for missing annotations, and (ii) they rely on fixed ground truth annotations, which leads to learning only a limited range of pedestrian visual appearances in the multispectral domain. To address these issues, we propose a novel framework called Sparsely Annotated Multispectral Pedestrian Detection (SAMPD). For limitation (i), we introduce Multispectral Pedestrian-aware Adaptive Weight (MPAW) and Positive Pseudo-label Enhancement (PPE) module. Utilizing multispectral knowledge, these modules ensure the generation of high-quality pseudo-labels and enable effective learning by increasing weights for high-quality pseudo-labels based on modality characteristics. To address limitation (ii), we propose an Adaptive Pedestrian Retrieval Augmentation (APRA) module, which adaptively incorporates pedestrian patches from ground-truth and dynamically integrates high-quality pseudo-labels with the ground-truth, facilitating a more diverse learning pool of pedestrians. Extensive experimental results demonstrate that our SAMPD significantly enhances performance in sparsely annotated environments within the multispectral domain.",
+      "authors": [
+        "Chan Lee",
+        "Seungho Shin",
+        "Gyeong-Moon Park",
+        "Jung Uk Kim"
+      ],
+      "primary_category": "AAAI-25 Technical Tracks 4",
+      "categories": [
+        "AAAI-2025",
+        "AAAI-25 Technical Tracks 4"
+      ],
+      "published": "2025-04-11T00:00:00+00:00",
+      "link": "https://ojs.aaai.org/index.php/AAAI/article/view/32472",
+      "pdf_url": "https://ojs.aaai.org/index.php/AAAI/article/download/32472/34627",
+      "tags": [
+        "keyword:HSI",
+        "query:HSI"
+      ]
+    },
+    {
+      "id": "aaai-2025-34040",
+      "source": "AAAI-2025-Accepted",
+      "title": "Deep Rank-One Tensor Functional Factorization for Multi-Dimensional Data Recovery",
+      "abstract": "Many real-world data are inherently multi-dimensional, e.g., color images, videos, and hyperspectral images. How to effectively and compactly represent these multi-dimensional data within a unified framework is an important pursuit. Previous methods focus on tensor factorizations, convolutional networks, or diffusion models for multi-dimensional data representation, which may not fully utilize inherent data structures and may lead to redundant parameters. In this work, we propose a Deep Rank-One Tensor Functional Factorization (DRO-TFF), which internally utilizes more comprehensive data priors facilitated by much fewer parameters. Concretely, our DRO-TFF consists of three organically integrated blocks: compact rank-one factorizations in the spatial domain, a deep transform to capture underlying low-dimensional structures, and smooth factors parameterized by implicit neural representations. Through a series of theoretical analysis, we show the rich data priors encoded in the DRO-TFF structure, e.g., Lipschitz smoothness and low-rankness. Extensive experiments on multi-dimensional data recovery problems, such as image and video inpainting, image denoising, and hyperspectral mixed noise removal, showcase the effectiveness of the proposed method.",
+      "authors": [
+        "Yanyi Li",
+        "Xi Zhang",
+        "Yisi Luo",
+        "Deyu Meng"
+      ],
+      "primary_category": "AAAI-25 Technical Tracks 17",
+      "categories": [
+        "AAAI-2025",
+        "AAAI-25 Technical Tracks 17"
+      ],
+      "published": "2025-04-11T00:00:00+00:00",
+      "link": "https://ojs.aaai.org/index.php/AAAI/article/view/34040",
+      "pdf_url": "https://ojs.aaai.org/index.php/AAAI/article/download/34040/36195",
+      "tags": [
+        "keyword:HSI"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "type": "intent_query",
+      "tag": "HSI",
+      "paper_tag": "query:HSI",
+      "query_text": "hyperspectral image target detection",
+      "sim_scores": {
+        "aaai-2025-32711": {
+          "score": 0.01639344262295082,
+          "rank": 1
+        },
+        "aaai-2025-32472": {
+          "score": 0.015873015873015872,
+          "rank": 3
+        },
+        "aaai-2025-32275": {
+          "score": 0.014084507042253521,
+          "rank": 11
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "aaai-2025-32711",
+          "score": 1.0,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "aaai-2025-32472",
+          "score": 1.0,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "aaai-2025-34040",
+          "score": 0.7469387755102039,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "aaai-2025-32275",
+          "score": 0.6992945326278658,
+          "star_rating": 4
+        }
+      ]
+    },
+    {
+      "type": "keyword",
+      "tag": "HSI",
+      "paper_tag": "keyword:HSI",
+      "query_text": "hyperspectral anomaly detection techniques",
+      "sim_scores": {
+        "aaai-2025-32711": {
+          "score": 0.01639344262295082,
+          "rank": 1
+        },
+        "aaai-2025-32275": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "aaai-2025-32472": {
+          "score": 0.012658227848101266,
+          "rank": 19
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "HSI",
+      "paper_tag": "keyword:HSI",
+      "query_text": "hyperspectral image classification methods",
+      "sim_scores": {
+        "aaai-2025-32275": {
+          "score": 0.01639344262295082,
+          "rank": 1
+        },
+        "aaai-2025-32711": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "aaai-2025-32472": {
+          "score": 0.013888888888888888,
+          "rank": 12
+        },
+        "aaai-2025-34040": {
+          "score": 0.011627906976744186,
+          "rank": 26
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "HSI",
+      "paper_tag": "keyword:HSI",
+      "query_text": "hyperspectral target detection algorithms",
+      "sim_scores": {
+        "aaai-2025-32711": {
+          "score": 0.01639344262295082,
+          "rank": 1
+        },
+        "aaai-2025-32275": {
+          "score": 0.015625,
+          "rank": 4
+        },
+        "aaai-2025-32472": {
+          "score": 0.015384615384615385,
+          "rank": 5
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "HSI",
+      "paper_tag": "keyword:HSI",
+      "query_text": "spectral-spatial feature extraction for hyperspectral data",
+      "sim_scores": {
+        "aaai-2025-32275": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "aaai-2025-32711": {
+          "score": 0.015625,
+          "rank": 4
+        },
+        "aaai-2025-32472": {
+          "score": 0.013513513513513514,
+          "rank": 14
+        },
+        "aaai-2025-34040": {
+          "score": 0.012345679012345678,
+          "rank": 21
+        }
+      }
+    }
+  ],
+  "global_candidate_ids": [
+    "aaai-2025-32711",
+    "aaai-2025-32507",
+    "aaai-2025-32275",
+    "aaai-2025-33086",
+    "aaai-2025-32755",
+    "aaai-2025-32472",
+    "aaai-2025-32653",
+    "aaai-2025-32070",
+    "aaai-2025-33048",
+    "aaai-2025-32701",
+    "aaai-2025-33004",
+    "aaai-2025-33020",
+    "aaai-2025-32310",
+    "aaai-2025-33861",
+    "aaai-2025-35487",
+    "aaai-2025-32838",
+    "aaai-2025-32388",
+    "aaai-2025-32816",
+    "aaai-2025-33087",
+    "aaai-2025-33022",
+    "aaai-2025-32996",
+    "aaai-2025-35431",
+    "aaai-2025-34401",
+    "aaai-2025-32490",
+    "aaai-2025-32683",
+    "aaai-2025-32937",
+    "aaai-2025-32217",
+    "aaai-2025-32535",
+    "aaai-2025-32579",
+    "aaai-2025-32672",
+    "aaai-2025-32731",
+    "aaai-2025-32281",
+    "aaai-2025-32707",
+    "aaai-2025-34040",
+    "aaai-2025-32742",
+    "aaai-2025-32791",
+    "aaai-2025-33096",
+    "aaai-2025-32856",
+    "aaai-2025-33464",
+    "aaai-2025-33816",
+    "aaai-2025-32243",
+    "aaai-2025-32705",
+    "aaai-2025-33257",
+    "aaai-2025-33933",
+    "aaai-2025-32790",
+    "aaai-2025-32433",
+    "aaai-2025-32811",
+    "aaai-2025-32479",
+    "aaai-2025-32993",
+    "aaai-2025-32081",
+    "aaai-2025-35427",
+    "aaai-2025-32878",
+    "aaai-2025-32601",
+    "aaai-2025-32708",
+    "aaai-2025-32773",
+    "aaai-2025-32968",
+    "aaai-2025-32333",
+    "aaai-2025-33349",
+    "aaai-2025-32296",
+    "aaai-2025-32266",
+    "aaai-2025-32810",
+    "aaai-2025-33921",
+    "aaai-2025-32620",
+    "aaai-2025-32637",
+    "aaai-2025-32558",
+    "aaai-2025-32645",
+    "aaai-2025-33425",
+    "aaai-2025-33085",
+    "aaai-2025-33419",
+    "aaai-2025-33730",
+    "aaai-2025-32381",
+    "aaai-2025-32721",
+    "aaai-2025-32829"
+  ],
+  "global_pool_lane_top_k": 30,
+  "global_pool_limit": 120,
+  "global_pool_guaranteed_per_lane": 2,
+  "global_pool_effective_size": 73,
+  "reranked_at": "2026-06-25T03:54:49.504304+00:00",
+  "llm_ranked": [
+    {
+      "paper_id": "aaai-2025-32472",
+      "score": 8.0,
+      "evidence_en": "multispectral pedestrian target detection with sparse labels, directly relevant to hyperspectral target detection",
+      "evidence_cn": "多光谱行人目标检测，直接相关于高光谱目标检测",
+      "canonical_evidence": "多光谱行人目标检测，直接相关于高光谱目标检测",
+      "tldr_en": "Proposes a framework for sparsely annotated multispectral pedestrian detection, introducing adaptive weights and pseudo-label enhancement to handle missing annotations, improving detection performance.",
+      "tldr_cn": "针对多光谱行人检测中稀疏标注导致伪标签质量差、学习范围有限的问题，提出SAMPD框架，包括多光谱行人自适应权重和正伪标签增强模块，有效利用未标注区域的信息。在多个多光谱数据集上验证了该方法在减少标注成本的同时提升了检测精度，为高光谱目标检测中的标注稀疏问题提供了可借鉴的方法。",
+      "title_zh": "稀疏标注下的多光谱行人检测",
+      "motivation_cn": "现有稀疏标注目标检测方法在多光谱领域忽略了伪标签质量提升，且过度依赖固定真值，限制了学习多样性。",
+      "method_cn": "提出多光谱行人自适应权重（MPAW）和正伪标签增强（PPE）模块，动态调整伪标签质量。",
+      "result_cn": "在多个多光谱行人检测基准上，该方法显著优于现有稀疏标注检测方法，尤其在低标注比例下。",
+      "conclusion_cn": "该方法有效解决了多光谱稀疏标注检测中的标注不足问题，提升了检测鲁棒性。",
+      "matched_requirement_id": "req-2",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral target detection algorithms"
+    },
+    {
+      "paper_id": "aaai-2025-32711",
+      "score": 8.0,
+      "evidence_en": "hyperspectral salient object detection",
+      "evidence_cn": "高光谱显著目标检测",
+      "canonical_evidence": "高光谱显著目标检测",
+      "tldr_en": "Introduces HSOD-BIT-V2, the largest hyperspectral salient object detection benchmark, and proposes Hyper-HRNet for high-resolution detection using spectral richness.",
+      "tldr_cn": "高光谱显著目标检测（HSOD）因缺乏大规模数据集而发展受限。本文构建了目前最大的高光谱显著目标检测基准HSOD-BIT-V2，包含小目标、前后景相似等挑战样本。同时提出Hyper-HRNet高分辨率网络，充分利用光谱信息实现精准检测。实验表明，在五个挑战场景中，该方法显著优于RGB和现有高光谱方法。该基准和网络将推动高光谱目标检测研究和应用。",
+      "title_zh": "HSOD-BIT-V2: 具有挑战性的高光谱显著目标检测基准",
+      "motivation_cn": "现有显著目标检测在复杂场景下表现不佳，高光谱数据有潜力但缺乏大规模标注数据集。",
+      "method_cn": "构建最大HSOD数据集，并提出Hyper-HRNet网络，利用高光谱丰富光谱特征进行高分辨率显著目标检测。",
+      "result_cn": "在五个挑战性场景中，所提方法在各项指标上均超越当前最优RGB和高光谱方法。",
+      "conclusion_cn": "该研究为高光谱目标检测提供了基准与方法，展示了光谱信息在困难场景中的优势。",
+      "matched_requirement_id": "req-2",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral target detection algorithms"
+    },
+    {
+      "paper_id": "aaai-2025-34040",
+      "score": 6.0,
+      "evidence_en": "Proposes tensor factorization method applicable to hyperspectral data feature extraction",
+      "evidence_cn": "提出张量分解方法可用于高光谱数据特征提取",
+      "canonical_evidence": "提出张量分解方法可用于高光谱数据特征提取",
+      "tldr_en": "A deep rank-one tensor functional factorization for compact representation of multi-dimensional data, applicable to hyperspectral image analysis.",
+      "tldr_cn": "针对多维数据表示中的冗余参数问题，提出深度秩一张量函数分解方法，通过紧凑的秩一分解和功能网络集成，有效利用数据先验。该方法在彩色图像、视频和高光谱图像的数据恢复任务上验证了其高效性和低参数优势，为高光谱图像的谱-空特征提取提供了新思路。",
+      "title_zh": "深度秩一张量函数分解用于多维数据恢复",
+      "motivation_cn": "现有方法未充分利用多维数据的内在结构，导致参数冗余。",
+      "method_cn": "提出深度秩一张量函数分解，包含紧凑秩一因子分解和功能网络集成。",
+      "result_cn": "在多种多维数据恢复任务中实现了高效表示，参数更少。",
+      "conclusion_cn": "该方法为高光谱图像等数据的紧凑表示和特征提取提供了新框架。",
+      "matched_requirement_id": "req-4",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "spectral-spatial feature extraction for hyperspectral data"
+    },
+    {
+      "paper_id": "aaai-2025-32275",
+      "score": 6.0,
+      "evidence_en": "Octree-based adaptive sampling for hyperspectral image fusion, enabling improved spectral-spatial representation",
+      "evidence_cn": "基于八叉树的自适应采样用于高光谱图像融合，改善光谱-空间表示",
+      "canonical_evidence": "基于八叉树的自适应采样用于高光谱图像融合，改善光谱-空间表示",
+      "tldr_en": "An octree-based implicit adaptive sampling method for multispectral and hyperspectral image fusion, improving channel-wise modeling and spatial-spectral reconstruction.",
+      "tldr_cn": "针对现有隐式神经表示方法在遥感图像融合中忽略通道建模的问题，提出八叉树隐式自适应采样方法，从水平和垂直方向恢复数据，有效结合空间和光谱信息。实验表明该方法在多光谱与高光谱图像融合任务中优于现有技术，提升了光谱-空间特征质量。",
+      "title_zh": "OTIAS：基于八叉树隐式自适应采样的多光谱与高光谱图像融合",
+      "motivation_cn": "现有隐式方法忽略通道建模，对数据特异性不敏感。",
+      "method_cn": "提出八叉树结构结合隐式自适应采样，从水平和垂直方向恢复数据。",
+      "result_cn": "在遥感图像融合任务中取得更好的空间和光谱重建效果。",
+      "conclusion_cn": "该方法有效提升多光谱/高光谱融合质量，有助于后续分类检测任务。",
+      "matched_requirement_id": "req-4",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "spectral-spatial feature extraction for hyperspectral data"
+    }
+  ],
+  "llm_ranked_at": "2026-06-25T03:55:38.070895+00:00",
+  "display_min_score": 4.0,
+  "pruned_at": "2026-06-25T03:55:38.095626+00:00"
+}

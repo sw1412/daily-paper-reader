@@ -1,0 +1,450 @@
+Title: Deep Rank-One Tensor Functional Factorization for Multi-Dimensional Data Recovery
+
+URL Source: https://ojs.aaai.org/index.php/AAAI/article/download/34040/36195
+
+Number of Pages: 9
+
+Markdown Content:
+# Deep Rank-One Tensor Functional Factorization for Multi-Dimensional Data Recovery 
+
+## Yanyi Li 1* , Xi Zhang 1* , Yisi Luo 1† , Deyu Meng 1,2,3 
+
+> 1
+
+Xi’an Jiaotong University, Xi’an, China 
+
+> 2
+
+Pengcheng Laboratory, Shenzhen, China 
+
+> 3
+
+Macau University of Science and Technology, Macao, China yyl0605@foxmail.com, xi.zhang@stu.xjtu.edu.cn, yisiluo1221@foxmail.com, dymeng@mail.xjtu.edu.cn 
+
+Abstract 
+
+Many real-world data are inherently multi-dimensional, e.g., color images, videos, and hyperspectral images. How to ef-fectively and compactly represent these multi-dimensional data within a unified framework is an important pursuit. Pre-vious methods focus on tensor factorizations, convolutional networks, or diffusion models for multi-dimensional data rep-resentation, which may not fully utilize inherent data struc-tures and may lead to redundant parameters. In this work, we propose a Deep Rank-One Tensor Functional Factorization (DRO-TFF), which internally utilizes more comprehensive data priors facilitated by much fewer parameters. Concretely, our DRO-TFF consists of three organically integrated blocks: compact rank-one factorizations in the spatial domain, a deep transform to capture underlying low-dimensional structures, and smooth factors parameterized by implicit neural repre-sentations. Through a series of theoretical analysis, we show the rich data priors encoded in the DRO-TFF structure, e.g., Lipschitz smoothness and low-rankness. Extensive experi-ments on multi-dimensional data recovery problems, such as image and video inpainting, image denoising, and hyperspec-tral mixed noise removal, showcase the effectiveness of the proposed method. 
+
+## 1 Introduction 
+
+How to efficiently represent real-world multi-dimensional data, e.g., color images (Bengua et al. 2017; Liu et al. 2023), hyperspectral images (HSIs) (Hong et al. 2021), and videos (Hu et al. 2017), is receiving much attention in the AI community due to the wealthy information con-tained in multi-dimensional data structures and the promis-ing applicability of these representation methods in low-level and high-level downstream tasks, e.g., inpainting (Liu et al. 2013), denoising (Xie et al. 2016), super-resolution (Kawulok et al. 2020), classification (Cheng et al. 2024), and detection (Guo et al. 2023). Within the fast developments of multi-dimensional data representation methods, current methodologies can be rationally categorized into three types: tensor decomposition-based methods (Vervliet, Debals, and De Lathauwer 2019), convolutional network-based methods 
+
+> *
+
+These authors contributed equally. 
+
+> †
+
+Corresponding author. Copyright © 2025, Association for the Advancement of Artificial Intelligence (www.aaai.org). All rights reserved. 
+
+Figure 1: The average PSNR and number of parameters for hyperspectral image denoising across nine tests (see Table 2 for detailed results). The proposed DRO-TFF achieves better PSNR with fewer parameters. (Wang et al. 2024b), and diffusion model-based methods ( ¨ Ozdenizci and Legenstein 2023), as introduced next. For tensor decomposition-based methods, the most classi-cal techniques are the CP decomposition and Tucker decom-position, which provide foundational approaches for repre-senting multi-dimensional data (Kolda and Bader 2009). An-other classical method is the tensor singular value decompo-sition (T-SVD) (Kilmer and Martin 2011), which emerges as a significant advancement that offers more flexible topolo-gies for decomposing tensors. Some current methods have attempted to facilitate classical tensor decompositions with more advanced hierarchical and multi-scale structures. For example, the tensor network decompositions such as tensor train (TT) (Oseledets 2011), tensor ring (TR) (Yuan et al. 2019a), and fully connected tensor network (FCTN) (Zheng et al. 2021) decompositions are shown to be feasible in this field of multi-dimensional data representation. Deep neu-ral networks have also been widely considered to improve tensor decompositions. For instance, Wang et al. (Wang et al. 2021, 2024a) utilize coupled transforms and convo-lutional neural networks to improve the performance of T-SVD. Luo et al. (Luo et al. 2024) introduce coordinate-based neural network in the Tucker decomposition to improve the flexibility of classical tensor decompositions. These tensor The Thirty-Ninth AAAI Conference on Artificial Intelligence (AAAI-25) 
+
+18539 decomposition-based methods provide foundations for rep-resenting complex multi-dimensional data structures. In recent years, convolutional network-based methods have been extensively explored for multi-dimensional data representation. For example, the deep image prior (DIP) (Ulyanov, Vedaldi, and Lempitsky 2020) leverages the un-trained convolutional network to capture image priors with-out the need for external training datasets. This innova-tive approach demonstrates significant improvements in im-age processing tasks by utilizing the implicit priors embed-ded within neural networks. Immediately after, the spatial-spectral constraint is introduced into the DIP (Luo et al. 2021) to enhance its capability for multi-dimensional data recovery. And the classical low-rank tensor decomposition is also considered to facilitate DIP (Miao et al. 2022) for multi-dimensional data. The elaborate local feature extrac-tion abilities of the convolutional network have made it a popular backbone for many multi-dimensional data process-ing problems (Maffei et al. 2020; Yuan et al. 2019b). More recently, diffusion model has emerged and become a powerful method for multi-dimensional data representa-tion. For instance, the denoising diffusion restoration model (DDRM) (Kawar et al. 2022) is firstly proposed and at-tains good performance for color images, but it is not suit-able for data-starved HSIs. Later, the unsupervised denois-ing diffusion spatial-spectral model (DDS2M) is proposed (Miao et al. 2023), which uses variational inference-based loss function and low-rank tensor decomposition for multi-dimensional HSI representation. Another recent effort (Pang et al. 2024) has shown the potential of pre-trained generative diffusion model for HSI restoration. Benefit from the pow-erful generative abilities of diffusion models, these methods attain superior performances than convolutional network-based methods for multi-dimensional data processing tasks. Although the above methods have shown promising per-formances for multi-dimensional data representation, there is still room for improvements in terms of prior knowl-edge mining and efficiency. Specifically, current represen-tation methods either fail to fully utilize comprehensive prior knowledge underlying multi-dimensional data, which leads to sub-optimal performances and redundant parame-ters, or have limited representation abilities due to the shal-low and linear structures. In this work, we propose a Deep Rank-One Tensor Functional Factorization (DRO-TFF) for multi-dimensional data representation (see Fig. 2 for quick view). The proposed DRO-TFF utilizes more comprehen-sive prior knowledge of multi-dimensional data, obtaining a more compact tensor representation with powerful rep-resentation abilities. Specifically, DRO-TFF is a deep ten-sor decomposition-based model that has three organically integrated blocks, i.e., compact rank-one decompositions in the spatial domain, a deep transform for capturing low-dimensional structures along the spectral dimension, and smooth factors parameterized by implicit neural represen-tations (INRs) (Sitzmann et al. 2020). The proposed DRO-TFF encodes low-rankness and implicit smoothness in the spatial and spectral dimensions, and has much fewer param-eters as compared with convolutional and diffusion mod-els. Therefore, DRO-TFF is expected to obtain good perfor-=
+
+Figure 2: DRO-TFF contains three organically integrated blocks: compact rank-one factorizations, a mode-3 deep transform, and factor INRs. mances for multi-dimensional data processing tasks under favorable computational and space efficiency. The contributions of this paper are as follows: • We propose a novel tensor representation termed DRO-TFF, which consists of three organically integrated blocks, i.e., compact rank-one factorizations in the spa-tial domain, a deep transform along the spectral do-main, and spatial-spectral factors parameterized by im-plicit neural representations. The proposed DRO-TFF has a more compact structure with much fewer param-eters and incorporates more comprehensive data priors. • Theoretically, we reveal the potential representation abil-ities and low-rankness embedded in the rank-one for-mulation, and deduce the spatial-spectral smoothness brought by the functional factors parameterized by INRs. Hence, our method is expected to obtain good perfor-mances for data recovery with favorable efficiency. • We apply our DRO-TFF to different multi-dimensional data recovery tasks including image and video inpaint-ing, image denoising, and hyperspectral mixed noise re-moval. Extensive experiments demonstrate that DRO-TFF, which has a small number of parameters, has su-perior performances over state-of-the-art methods. 
+
+## 2 The Proposed DRO-TFF 
+
+2.1 Notations 
+
+In this paper, scalars, vectors, matrices, and tensors are de-fined by x, x, X, and X . X (i) denotes the i-th frontal slice of a tensor X ∈ Rn1×n2×n3 , which satisfies X (i) ∈ Rn1×n2 .The unfolding operator of a third-order tensor is denoted by 
+
+unfold (·) : Rn1×n2×n3 → Rn3×n1n2 , while fold (·) : 
+
+Rn3×n1n2 → Rn1×n2×n3 denotes the folding operator. △
+
+denotes the face-wise product between two tensors, i.e., C =
+
+A△B ⇔ C (i) = A(i)B(i). ×3 denotes the mode-3 tensor-matrix product, i.e., X × 3 H = fold (H unfold (X )) .
+
+∇x, ∇y and ∇z denote the vertical, horizontal, and spectral derivative operators respectively, e.g., ∇x(X ) = X (i + 1 , :
+
+, :) − X (i, :, :) . Furthermore, we use T (·, i ) to denote the un-squeeze operator in the i-th dimension, e.g., let X ∈ Rn1×n2
+
+and we have X = T (X, 2) ∈ Rn1×1×n2 .
+
+2.2 DRO-TFF Representation 
+
+In this section, we give the detailed formulation of the deep rank-one tensor functional factorization. Specifically, our 18540 DRO-TFF consists of three components: rank-one factoriza-tions in the spatial domain, a deep transform along the third dimension, and factor INRs. 
+
+Spatial Rank-One Factorization To represent a spatial matrix, the low-rank matrix factorization has been widely considered, i.e., X = AB where A, B are low-rank fac-tors. Real-world multi-dimensional data such as color im-ages and videos are composed of multiple spatial matrices. Given a third-order tensor X ∈ Rn1×n2×n3 , it is natural to use n3 low-rank matrix factorizations to separately repre-sent each frontal slice. However, this leads to many learn-able parameters when setting a suitable rank (often the rank is much larger than one). In this work, we propose to use rank-one factorizations with an additional transform matrix 
+
+H to represent the third-order tensor. Specifically, instead of separately modeling each frontal slice, the rank-one factor-izations have the following form: 
+
+X = ( A△B ) ×3 H, (1) where △ denotes the face-wise product between two ten-sors. A ∈ Rn1×1×r and B ∈ R1×n2×r are rank-one factor tensors (i.e., their each frontal slice is a vector, and the result-ing A△B is rank-one in each frontal slice), and H ∈ Rn3×r
+
+is a transform matrix. The advantages of the rank-one factor-izations (1) are their lightweight structures, which are essen-tial for processing large-scale multi-dimensional data. Also, due to the extra re-weighting matrix H, the rank-one factor-izations have enough expressive abilities for capturing spa-tial information of data, and such representation ability can be controlled by tuning the size r (see Theorem 2), which makes our model flexible and compact. 
+
+Mode-3 Deep Transform We propose to extend the mode-3 transform matrix H to a deep nonlinear transform to improve the expressiveness of the model. The proposed rank-one model under the deep transform has the following formulation: 
+
+X = ψ(· · · ψ(( A△B )×3 H1)×3 · · ·× 3 Hk−1)×3 Hk, (2) where A, B are rank-one factors and {Hi}ki=1 are weight matrices of the deep transform with Hi ∈ Rr×r for i =1, 2, · · · , k − 1 and Hk ∈ Rn3×r . Here, ψ(·) is a nonlinear activation and is set as LeakyReLU in this work. 
+
+Factor Implicit Neural Representations To further in-troduce the smoothness into the model, we suggest fac-tor implicit neural representations to encode the spatial-spectral smoothness that enhances the robustness of the model. Specifically, we use INRs (Sitzmann et al. 2020) to parameterize factor tensors/matrices A, B, Hk in the rank-one factorizations. Let fθ (·) : Rn → Rn×r be an INR with parameters θ (i.e., a coordinate-based neural network) that takes the coordinate vector v ∈ Rn as the input, its formu-lation is a classical multilayer perceptron (MLP): 
+
+fθ (v) := Wd(σ(Wd−1 · · · σ(W1v))) , (3) where σ(·) is a nonlinear activation function. Specifically, for each element of the input coordinate vector v ∈ Rn, the INR fθ (·) maps it into an r-th dimensional vector, which results in a final output of size n × r.
+
+Remark 1 Here, we emphasize two important techniques when using INRs to parameterize the rank-one model. 
+
+• First, the rank-one factorizations naturally allow us to use INRs to parameterize the factors. This is because the factors A, B are actually matrices instead of tensors in the rank-one setting, which can be easily combined with the INR in (3) whose output is exactly a matrix. 
+
+• When using INR to parameterize the deep transform ma-trices {Hi}ki=1 , we only need to parameterize the last matrix Hk and let the remaining matrices {Hi}k−1 
+
+> i=1
+
+to be learnable themselves, because this is enough to en-code the spectral smoothness (see Theorem 2) with little increase of parameter number. 
+
+Based on the above analysis, we use three INRs to respec-tively parameterize factors A, B, and Hk:
+
+                       
+
+> A=T(fθx(v1),2) ,v1∈Rn1
+> B=T(fθy(v2),1) ,v2∈Rn2
+> Hk=fθz(v3),v3∈Rn3,
+
+(4) where fθx (v1), f θy (v2), f θz (v3) are three INRs with input coordinate vectors v1 = [1 , · · · , n 1], v2 = [1 , · · · , n 2], and 
+
+v3 = [1 , · · · , n 3]. T (·, i ) denotes the unsqueeze operator from a matrix to a tensor. With the factor INRs, our model is no longer a discrete tensor decomposition but becomes a functional factorization, which implicitly encodes smooth-ness in the infinite dimensional domain (see Theorem 2). By plugging the factor INR formulation (4) into the deep rank-one factorizations (2), we have the following explicit formulation of the proposed deep rank-one tensor functional factorization. 
+
+Definition 1 Given a tensor X ∈ Rn1×n2×n3 , we call the following factorization as its DRO-TFF representation:                  
+
+> X=ψ(· · · ψ(( T(fθx(v1),2) △T(fθy(v2),1)) ×3H1)
+> ×3· · · × 3Hk−1)×3fθz(v3),
+
+(5) 
+
+where the learnable parameters are θx, θ y , θ z and {Hi}k−1 
+
+> i=1
+
+.
+
+2.3 Theoretical Analysis 
+
+Here, we give theoretical analysis to show that the proposed DRO-TFF encodes more comprehensive data priors within its structure, including its rank-r representation abilities, low-rankness, spatial smoothness, and spectral smoothness. First, DRO-TFF has the representation abilities to capture rank-r information ( r > 1) even with rank-one factoriza-tions. This is revealed through the following lemma. 
+
+Lemma 1 Let X ∈ Rn1×n2 and rank (X) = r, then there exist r rank-one matrices {Ci}ri=1 such that X = Pri=1 Ci.
+
+Let us consider the basic formulation of our rank-one fac-torizations in (1), i.e., X = ( A△B ) ×3 H, where A ∈ 
+
+Rn1×1×r and B ∈ R1×n2×r are rank-one factor tensors. Here, the mode-3 product ×3 can be seen as the summation operator of r rank-one matrices in A△B (i.e., each frontal slice A(i)B(i) is rank-one), and the only difference between Lemma 1 is that such summation has the weights H. How-ever, adding weights in the summation would not necessar-ily change the rank. Hence from Lemma 1 we see that the 18541 proposed model has the potential to capture rank-r spatial information even with lightweight rank-one factorizations. From another perspective, our basic model also preserves the low-rankness of the representation. This is because any matrix with rank larger than r can not be represented by the addition of r rank-one matrices. 
+
+Lemma 2 Let X ∈ Rn1×n2 and rank (X) > r . Then for r
+
+arbitrary rank-one matrices Ci ∈ Rn1×n2 (i = 1 , · · · , r )
+
+we have X̸ = Pri=1 Ci.Proof Assume that there exist rank-one matrices Ci (i =1, · · · , r ) such that X = Pri=1 Ci. Then rank (X) =
+
+rank (Pri=1 Ci) ≤ Pri=1 rank (Ci) = r, contradicting with the assumption rank (X) > r . Therefore, the original statement is true. □
+
+Theorem 1 (Low-rankness) Let X = ( A△B ) ×3 H, where 
+
+A ∈ Rn1×1×r , B ∈ R1×n2×r are rank-one factors and H ∈
+
+Rn3×r . Then we have rank (X (i)) ≤ r for i = 1 , · · · , n 3.Proof Let C = A△B , then C(i) = A(i)B(i). Since A(i)
+
+and B(i) are rank-one we have rank (C(i)) = 1 . And the fol-lowing equality holds: X (i) = Prj=1 H(i, j ) × C (j), where 
+
+H(i, j ) is a scalar that doesn’t affect the rank of C(j). Ac-cording to Lemma 2, we can get rank (X (i)) ≤ r. □
+
+Theorem 1 shows that the proposed rank-one factoriza-tions preserve the low-rankness implicitly, i.e., the represen-tation has spatial rank less than r. In practice, we introduce the mode-3 deep transform to enhance the representation abilities, which makes the tensor X not necessarily be rank-
+
+r. However, the rank-one factorizations still serve as low-rank regularization to constrain the solution space so that a good recovery result can be obtained. Except for low-rankness, our DRO-TFF also internally preserves the smoothness of the representation along the spatial and spectral dimensions attributed to the functional representation brought by factor INRs. With both the low-rank and smooth constraints, our model is essentially suit-able for data recovery tasks. 
+
+Theorem 2 (Smoothness) Let X satisfy (5) . Suppose that the MLPs fθx (·), f θy (·), f θz (·) have the same activation function σ(·) and depth d. Besides, we assume that 
+
+• σ(·) is Lipschitz continuous with Lipschitz constant κ.
+
+• The ℓ1-norm of each weight matrix Wi (i.e., ∥Wi∥ℓ1 := P 
+
+> j,k
+
+|Wi(j, k )|) in the three MLPs and the ℓ1-norm of each transform matrix Hi is bounded by η > 0.Then the resulting X in (5) satisfies the following in-equalities for all (i, j, k )s (i = 1, 2, . . . , n 1, j =1, 2, . . . , n 2, k = 1 , 2, . . . , n 3):
+
+                           
+
+> |X (i, j, k )− X (i−1, j, k )| ≤ δ|v(i)1−v(i−1) 1||X (i, j, k )− X (i, j −1, k )| ≤ δ|v(j)2−v(j−1) 2||X (i, j, k )− X (i, j, k −1) | ≤ δ|v(k)3−v(k−1) 3|,
+
+(6) 
+
+where v(i)1 denotes the i-th element of v1, δ =
+
+η3d+k−1κ3d−3ζ2, and ζ = max {∥ v1∥∞, ∥v2∥∞, ∥v3∥∞}.
+
+From the theorem it can be seen that the proposed DRO-TFF implicitly preserves the local smoothness of the rep-resentation X attributed to the Lipschitz smoothness of the factor INRs. Hence, our model is expected to obtain robust performances for multi-dimensional data recovery tasks. 
+
+2.4 Applications of DRO-TFF 
+
+Image and Video Inpainting Image and video inpainting aims to recover the clean image from the one with missing pixels. By giving the observed incompleted data O, the loss function of this task is defined as follows: 
+
+min  
+
+> Θ
+
+∥P Ω(O − X )∥2 
+
+> F
+
++ γ1∥X ∥ TV , (7) where X admits (5). Here, Θ := {θx, θ y , θ z , {Hi}k−1 
+
+> i=1
+
+} are optimization parameters and PΩ(·) is the projection opera-tor that keeps the elements in the mask Ω unchanged while changing others to be zero. The total variation (TV) regular-ization ∥X ∥ TV := ∥∇ xX ∥ l1 + ∥∇ y X ∥ l1 is used to enhance the stability, and γ1 is a trade-off parameter. 
+
+Image Denoising Gaussian noise is a common degrada-tion in multi-dimensional image. Here we consider the im-age denoising task for removing Gaussian noise, whose ob-jective is as follows: 
+
+min  
+
+> Θ
+
+∥O − X ∥ 2 
+
+> F
+
++ γ1∥X ∥ TV + γ2∥X ∥ SSTV , (8) where O is the noisy image, X admits (5), and Θ := 
+
+{θx, θ y , θ z , {Hi}k−1 
+
+> i=1
+
+} are optimization parameters. Here, 
+
+∥X ∥ SSTV := ∥∇ x∇z X ∥ l1 + ∥∇ y ∇z X ∥ l1 is the spatial-spectral TV regularization (Aggarwal and Majumdar 2016) that enhances the spatial-spectral local smoothness of the re-covered image. γ2 is a trade-off parameter. 
+
+Hyperspectral Mixed Noise Removal The purpose of hyperspectral mixed noise removal is to obtain the clean HSI from its observation corrupted by mixed noise. Here, the noisy HSI contains mixed noise including Gaussian noise, sparse noise, and deadlines (missing columns). Due to the presence of sparse noise, we additionally consider a sparse term and change the formulation as        
+
+> min
+> Θ,S∥P Ω(O − X − S )∥2
+> F+γ∥S∥ l1+γ1∥X ∥ TV +γ2∥X ∥ SSTV ,
+
+(9) where O is the observed image corrupted by mixed noise, X
+
+admits (5), S is the underlying sparse noise to be estimated, and Θ := {θx, θ y , θ z , {Hi}k−1 
+
+> i=1
+
+} are optimization parame-ters of DRO-TFF. Here, we jointly optimize the parameters of DRO-TFF and the sparse noise S to remove mixed noise from the HSI. We can use the following alternating direction method of multipliers (ADMM) to address the optimization model (9). We remark that models (7) and (8) can be ad-dressed in analogous ways. Let V1 = ∇x(X ), V2 = ∇y (X ), V3 = ∇x∇z (X ),
+
+V4 = ∇y ∇z (X ). We can write the augmented Lagrangian function of (9) by attaching Lagrangian multipliers Λi (i =1, 2, 3, 4) (see supplementary file for details). Then the joint problem can be decomposed into sev-eral sub-problems. Specifically, the V sub-problem can be 18542 solved by Vt+1 1 = Sof t γ1 
+
+> μ
+
+(∇x(X t) + Λt 
+
+> 1
+> μ
+
+), Vt+1 2 =
+
+Sof t γ1 
+
+> μ
+
+(∇y (X t)+ Λt 
+
+> 2
+> μ
+
+), Vt+1 3 = Sof t γ2 
+
+> μ
+
+(∇x∇z (X t)+ Λt 
+
+> 3
+> μ
+
+),and Vt+1 4 = Sof t γ2 
+
+> μ
+
+(∇y ∇z (X t) + Λt 
+
+> 4
+> μ
+
+), where Sof t α(·) = 
+
+sgn (·) max {|·|− α, 0} is the soft thresholding operator. The 
+
+S sub-problem can be solved by St+1 = Sof t 2γ (O − X t).The X sub-problem is to optimize the parameters of the DRO-TFF, and can be formulated as 
+
+min  
+
+> Θ
+
+∥P Ω(O − X − S t)∥2 
+
+> F
+
++ μ
+
+2 (∥∇ x(X ) − D t
+
+> 1
+
+∥2
+
+> F
+
++ ∥∇ y (X ) − D t
+
+> 2
+
+∥2 
+
+> F
+
++ ∥∇ x∇z (X ) − D t
+
+> 3
+
+∥2
+
+> F
+
++ ∥∇ y ∇z (X ) − D t
+
+> 4
+
+∥2 
+
+> F
+
+),
+
+(10) where Dti = Vti − Λti 
+
+> μ
+
+and X admits (5). We use the off-the-shell Adam optimizer to update Θ with one step in each iteration of the ADMM algorithm. The multipliers Λ can be updated by Λt+1 1 = Λ t 
+
+> 1
+
++ μ(∇x(X t) − V t
+
+> 1
+
+), Λt+1 2 = Λ t 
+
+> 2
+
++
+
+μ(∇y (X t) − V t
+
+> 2
+
+), Λt+1 3 = Λ t 
+
+> 3
+
++ μ(∇x∇z (X t) − V t
+
+> 3
+
+), and 
+
+Λt+1 4 = Λ t 
+
+> 4
+
++ μ(∇y ∇z (X t) − V t
+
+> 4
+
+).
+
+## 3 Experiments 
+
+3.1 Comparisons with State-of-the-Arts 
+
+In experiments, we perform a comparative analysis of all the introduced tasks. We use two commonly used evalu-ation metrics peak-signal-to-noise-ratio (PSNR) and struc-tural similarity (SSIM). 
+
+Datasets and Compared Methods We use publicly avail-able datasets. For image and video inpainting, we use three types of multi-dimensional data including color im-ages ( House , Tree , Jelly Beans )1, natural HSIs ( Feath-ers , Flowers , Thread Spools )2, and videos ( News , Car-phone , Hall Monitor )3 as testing data. We consider the sampling rates (SRs) 0.1, 0.2, 0.3 to perform random miss-ing. The compared methods include state-of-the-art tensor decomposition-based methods FTNN (Jiang et al. 2020), FCTN (Zheng et al. 2021), HLRTF (Luo et al. 2022), LRTFR (Luo et al. 2024), and diffusion model-based method DDS2M (Miao et al. 2023). For image denoising, we adopt three HSIs ( Face , Fake and Real Peppers (Peppers) , Egyptian Statue )2. We consider Gaussian noise with standard deviation (SD) 0.1, 0.2, 0.3 to generate noisy images. The compared methods are convo-lutional network-based methods S2DIP (Luo et al. 2021), DS2DP (Miao et al. 2022), tensor decomposition-based methods HLRTF (Luo et al. 2022), LRTFR (Luo et al. 2024), and diffusion model-based methods DDS2M (Miao et al. 2023) and HIR-Diff (Pang et al. 2024). For hyperspectral mixed noise removal, we adopt three natural HSIs ( Cloth , Chart and Stuffed Toy (Toy) , Fake and Real Food (Food) )2 and two remote sensing HSIs ( WDC Mall and Pavia University (Pavia) )4 as testing data. We con-sider three noisy cases. Case 1 contains Gaussian noise with 
+
+> 1
+
+https://sipi.usc.edu/database/database.php 
+
+> 2
+
+https://www.cs.columbia.edu/CAVE/databases/multispectral/ 
+
+> 3
+
+http://trace.eas.asu.edu/yuv/ 
+
+> 4
+
+https://lesun.weebly.com/hyperspectral-data-set.html                                                                                                                                                                                                           
+
+> SR 0.1 0.2 0.3 Params. Time Method PSNR SSIM PSNR SSIM PSNR SSIM Color images House ,Tree ,Jelly Beans (256 ×256 ×3)Observed 4.796 0.014 5.310 0.028 5.884 0.044 --FTNN 18.109 0.386 21.608 0.587 24.386 0.714 -273s FCTN 18.085 0.366 20.942 0.514 24.401 0.682 -29s HLRTF 21.664 0.586 25.231 0.747 27.700 0.833 1.0M 13s DDS2M 23.386 0.693 26.217 0.744 27.149 0.743 27.3M 249s LRTFR 23.519 0.655 25.948 0.757 26.942 0.798 0.5M 24s DRO-TFF 24.631 0.765 27.871 0.847 29.568 0.893 0.2M 22s HSIs Feathers ,Flowers ,Thread Spools (512 ×512 ×31 )Observed 13.597 0.318 14.107 0.388 14.689 0.456 --FTNN 35.973 0.974 40.425 0.992 43.416 0.996 -275s FCTN 36.560 0.951 38.376 0.966 39.490 0.973 -752s HLRTF 38.565 0.977 42.344 0.990 44.859 0.995 3.2M 47s DDS2M 32.970 0.918 35.474 0.951 37.227 0.965 27.3M 718s LRTFR 39.045 0.980 42.912 0.989 44.933 0.991 1.7M 73s DRO-TFF 41.338 0.992 43.986 0.995 45.942 0.997 0.6M 126s Videos News ,Carphone ,Hall Monitor (144 ×176 ×100 )Observed 6.825 0.024 7.338 0.064 7.916 0.112 --FTNN 22.336 0.844 25.699 0.930 28.144 0.961 -268s FCTN 29.328 0.967 30.614 0.976 31.361 0.980 -138s HLRTF 28.647 0.962 31.419 0.980 33.575 0.988 0.9M 19s DDS2M 24.065 0.883 26.747 0.938 27.955 0.951 27.4M 542s LRTFR 28.079 0.954 31.604 0.981 33.378 0.987 0.7M 29s DRO-TFF 29.970 0.973 32.590 0.985 34.153 0.989 0.1M 23s
+
+Table 1: The average quantitative results by different methods for image and video inpainting. The best and second-best values are highlighted. standard deviation 0.2 and deadlines in all spectral bands. 
+
+Case 2 contains Gaussian noise with standard deviation 0.2 and sparse noise with SR 0.1. Case 3 contains the same noise as Case 2 plus deadlines in all spectral bands. The compared methods are the same as image denoising. 
+
+Hyperparameter Settings For all tasks, the rank parame-ter r is set as int( β min( n1, n 2)) , where ni (i = 1 , 2) are the spatial sizes of the observed data, and β is a hyperparameter that is set to 0.7, 0.3, 0.3 for image and video inpainting, im-age denoising, and hyperspectral mixed noise removal. The depth of the mode-3 deep transform k is set to 3. The net-work depth of the factor INRs is set to 3. The sine activation 
+
+sin( ω0·) is used as nonlinear activation because of its Lip-schitz continuous property. For color image inpainting, ω0
+
+is set to 1, otherwise it is set to 2. The trade-off parameters 
+
+γ1, γ 2 in the loss function are set to 4×10 −5 and 4×10 −4 re-spectively. In the hyperspectral mixed noise removal model, we set γ = 0 .01 and μ = 0 .04 . For other hyperparameters, please refer to the source code. 
+
+Experimental Results The quantitative results of image and video inpainting, image denoising, and hyperspectral mixed noise removal are respectively shown in Tables 1-3. It is evident that the DRO-TFF consistently achieves supe-rior performances across all tasks. This can be attributed to 18543 PSNR 6.156 PSNR 25.939 PSNR 25.491 PSNR 27.964 PSNR 28.170 PSNR 27.045 PSNR 28.773 PSNR Inf                      
+
+> PSNR 13.295 PSNR 35.628 PSNR 36.054 PSNR 37.214 PSNR 31.573 PSNR 38.450 PSNR 40.611 PSNR Inf
+> PSNR 9.131 PSNR 27.368 PSNR 31.549 PSNR 34.449 PSNR 27.480 PSNR 33.410 PSNR 35.176 PSNR Inf Observed FTNN FCTN HLRTF DDS2M LRTFR DRO-TFF Original
+
+Figure 3: The results of image and video inpainting by different methods on color image House (SR=0.3), HSI Feathers 
+
+(SR=0.1), and video News (SR=0.3).                                                                                   
+
+> SD 0.1 0.2 0.3 Params. Time Method PSNR SSIM PSNR SSIM PSNR SSIM HSIs Face ,Peppers ,Egyptian Statue (512 ×512 ×31 )Observed 20.000 0.165 13.980 0.058 10.457 0.030 --S2DIP 41.616 0.977 38.516 0.964 36.487 0.940 1.7M 1016s DS2DP 37.507 0.941 34.988 0.901 33.856 0.892 2.7M 2105s HLRTF 39.821 0.963 36.609 0.916 35.170 0.894 1.6M 61s DDS2M 40.323 0.959 37.922 0.934 36.179 0.901 27.2M 644s LRTFR 40.059 0.972 37.040 0.950 35.805 0.925 0.9M 92s HIR-Diff 39.188 0.950 37.766 0.943 36.706 0.932 391M 146s DRO-TFF 42.184 0.980 39.530 0.969 37.808 0.956 0.1M 74s
+
+Table 2: The average quantitative results by different meth-ods for image denoising. the comprehensive data prior knowledge utilization of DRO-TFF, e.g., spatial low-rankness and Lipschitz smoothness. Furthermore, in terms of parameter count, DRO-TFF has the lowest number of parameters among all methods. For convolutional network-based methods and diffusion model-based methods such as DDS2M and HIR-Diff, the number of parameters is much more than that of the proposed DRO-TFF. This indicates that DRO-TFF is highly efficient for representing multi-dimensional data, validating its favorable computational and space efficiency. Some visual results are shown in Figs. 3-4. It can be ob-served that the DRO-TFF recovers image details better than other methods. For example, in Fig. 3 house , the pipes are more clearly restored using DRO-TFF, while the other meth-ods suffer from different degrees of blurring (see zoom-in boxes). In addition, the results of DRO-TFF is generally free of noise and artifacts, which showcases the robustness of DRO-TFF for multi-dimensional data recovery. 
+
+3.2 Ablation Study 
+
+To test the significance of the three building blocks in DRO-TFF, we test different variants as follows. • DRO-TFF without rank-one factorizations (dubbed D-TFF): To test the effectiveness of rank-one factorizations, we consider the rank-p factorizations, where p is set as 5. • DRO-TFF without deep transform (dubbed RO-TFF): To verify the importance of the mode-3 deep transform, we remove the first k−1 linear layers H1, · · · , Hk−1 and the nonlinear LeakyReLU layers, and then apply the linear transform-based model for image recovery tasks. • DRO-TFF without functional representation (dubbed DRO-TF): To validate the influence of factor INRs, we remove these INRs and directly optimize the learnable parameters A, B, {Hi}ki=1 in the model. We adopt natural HSIs Oil Painting , Pompoms , and CD 
+
+in the CAVE dataset 2 to test different variants. We con-sider three tasks including inpainting (SR=0.1), denoising (SD=0.2), and mixed noise removal (Case 3). The results are shown in Table 4. It can be seen that DRO-TFF obtains bet-ter performances than other variants, which showcases the necessity of different building blocks. Especially, the rank-one factorizations preserve the underlying low-dimensional structures of multi-dimensional data with lightweight pa-rameter number. The deep transform enhances the expres-siveness of the model, and factor INRs preserve the spatial and spectral smoothness of the data. Fig. 5 shows some vi-sual results. It can be observed that the deep transform is 18544 PSNR 13.980 PSNR 38.978 PSNR 34.578 PSNR 36.984 PSNR 38.688 PSNR 37.721 PSNR 35.388 PSNR 40.057 PSNR Inf                 
+
+> PSNR 11.293 PSNR 28.779 PSNR 30.483 PSNR 29.665 PSNR 25.862 PSNR 29.857 PSNR 26.498 PSNR 31.339 PSNR Inf Observed S2DIP DS2DP HLRTF DDS2M LRTFR HIR-Diff DRO-TFF Original
+
+Figure 4: Top row: The results of image denoising by different methods on Peppers (SD=0.2). Bottom row: The results of hyperspectral mixed noise removal by different methods on Toy (Case 3).                                                                                                                                                              
+
+> Case Case 1 Case 2 Case 3 Params. Time Method PSNR SSIM PSNR SSIM PSNR SSIM HSIs Cloth ,Toy ,Food (512 ×512 ×31 )Observed 13.853 0.152 11.346 0.109 11.373 0.100 --S2DIP 31.364 0.892 29.784 0.785 28.301 0.732 1.7M 1001s DS2DP 30.264 0.851 28.968 0.758 29.932 0.827 2.7M 2213s HLRTF 31.679 0.880 28.823 0.746 28.817 0.744 1.6M 57s DDS2M 30.494 0.894 24.777 0.643 25.439 0.637 27.2M 835s LRTFR 30.631 0.854 28.373 0.718 28.289 0.717 0.9M 113s HIR-Diff 31.149 0.907 24.994 0.631 25.997 0.638 391M 134s DRO-TFF 33.006 0.932 30.522 0.795 30.076 0.789 0.1M 124s HSIs WDC Mall ( 256 ×256 ×191 ),Pavia (256 ×256 ×93 )Observed 15.359 0.200 12.581 0.135 12.603 0.128 --S2DIP 28.940 0.809 28.967 0.873 26.905 0.763 1.8M 2290s DS2DP 30.345 0.880 29.304 0.861 30.193 0.871 2.7M 1577s HLRTF 31.347 0.884 29.185 0.861 28.997 0.853 0.4M 43s DDS2M 30.320 0.888 24.788 0.835 25.847 0.819 27.5M 940s LRTFR 28.685 0.812 27.269 0.794 27.259 0.791 0.4M 82s HIR-Diff 31.436 0.917 24.911 0.845 26.374 0.853 391M 19s DRO-TFF 31.659 0.912 29.981 0.874 30.321 0.881 0.1M 120s
+
+Table 3: The average quantitative results by different meth-ods for hyperspectral mixed noise removal. crucial for capturing fine details of the image (RO-TFF v.s. DRO-TFF). The factor INRs are helpful to avoid artifacts (DRO-TF v.s. DRO-TFF), and the rank-one factorizations are more effective than the rank-5 factorizations (D-TFF v.s. DRO-TFF). Note that the rank-one factorizations also bring an overall lightweight structure. These results validate the importance of the three basic components, and they are or-ganically integrated to obtain good performances. 
+
+## 4 Conclusions 
+
+In this paper, we propose a deep rank-one tensor functional factorization for multi-dimensional data representation. Our method contains three organically integrated components:                                        
+
+> Task Inpainting Denoising Mixed noise removal Method PSNR SSIM PSNR SSIM PSNR SSIM Observed 13.815 0.151 13.975 0.175 11.496 0.037 D-TFF 36.837 0.962 34.577 0.936 30.946 0.804 RO-TFF 30.279 0.813 31.524 0.858 31.159 0.806 DRO-TF 34.623 0.948 33.263 0.914 29.516 0.762 DRO-TFF 37.601 0.971 35.389 0.951 32.160 0.816
+
+Table 4: The average quantitative results by different vari-ants of the proposed method.         
+
+> PSNR 30.279 PSNR 34.623 PSNR 36.837 PSNR 37.601 PSNR Inf RO-TFF DRO-TF D-TFF DRO-TFF Original
+
+Figure 5: The results of image inpainting on Oil Painting 
+
+(SR=0.1) by different variants of the proposed method. the lightweight rank-one factorizations that preserve the low-rankness of the recovered data, the mode-3 deep trans-form that enhances the representation abilities of the model, and the factor INRs that capture the spatial-spectral smooth characteristics of data. Experiments on image/video inpaint-ing, denoising, and hyperspectral mixed noise removal ver-ify the superiority and efficiency of the proposed method as compared with state-of-the-art methods. 
+
+## Acknowledgments 
+
+This research was supported by the National Key R&D Pro-gram of China (2022YFA1004100), the Major Key Project of PCL under Grant PCL2024A06, and the NSFC projects under contracts 124B2029, 12226004, and 62272375. 18545 References 
+
+Aggarwal, H. K.; and Majumdar, A. 2016. Hyperspec-tral Image Denoising Using Spatio-Spectral Total Variation. 
+
+IEEE Geoscience and Remote Sensing Letters , 13(3): 442– 446. Bengua, J. A.; Phien, H. N.; Tuan, H. D.; and Do, M. N. 2017. Efficient Tensor Completion for Color Image and Video Recovery: Low-Rank Tensor Train. IEEE Transac-tions on Image Processing , 26(5): 2466–2479. Cheng, C.; Zhang, L.; Li, H.; Cui, W.; Gao, J.; and Cun, Y. 2024. A Deep High-Order Tensor Sparse Representation for Hyperspectral Image Classification. IEEE Transactions on Geoscience and Remote Sensing , 62: 1–16. Guo, T.; He, L.; Luo, F.; Gong, X.; Li, Y.; and Zhang, L. 2023. Anomaly Detection of Hyperspectral Image With Hierarchical Antinoise Mutual-Incoherence- Induced Low-Rank Representation. IEEE Transactions on Geoscience and Remote Sensing , 61: 1–13. Hong, D.; He, W.; Yokoya, N.; Yao, J.; Gao, L.; Zhang, L.; Chanussot, J.; and Zhu, X. 2021. Interpretable Hyperspec-tral Artificial Intelligence: When nonconvex modeling meets hyperspectral remote sensing. IEEE Geoscience and Remote Sensing Magazine , 9(2): 52–87. Hu, W.; Tao, D.; Zhang, W.; Xie, Y.; and Yang, Y. 2017. The Twist Tensor Nuclear Norm for Video Completion. IEEE Transactions on Neural Networks and Learning Systems ,28(12): 2961–2973. Jiang, T.-X.; Ng, M. K.; Zhao, X.-L.; and Huang, T.-Z. 2020. Framelet Representation of Tensor Nuclear Norm for Third-Order Tensor Completion. IEEE Transactions on Image Processing , 29: 7233–7244. Kawar, B.; Elad, M.; Ermon, S.; and Song, J. 2022. Denois-ing Diffusion Restoration Models. In Advances in Neural Information Processing Systems , volume 35, 23593–23606. Kawulok, M.; Benecki, P.; Piechaczek, S.; Hrynczenko, K.; Kostrzewa, D.; and Nalepa, J. 2020. Deep Learning for Multiple-Image Super-Resolution. IEEE Geoscience and Remote Sensing Letters , 17(6): 1062–1066. Kilmer, M. E.; and Martin, C. D. 2011. Factorization strate-gies for third-order tensors. Linear Algebra and its Applica-tions , 435(3): 641–658. Kolda, T. G.; and Bader, B. W. 2009. Tensor Decomposi-tions and Applications. SIAM Review , 51: 455–500. Liu, J.; Liu, R. W.; Sun, J.; and Zeng, T. 2023. Rank-One Prior: Real-Time Scene Recovery. IEEE Transactions on Pattern Analysis and Machine Intelligence , 45(7): 8845– 8860. Liu, J.; Musialski, P.; Wonka, P.; and Ye, J. 2013. Tensor Completion for Estimating Missing Values in Visual Data. 
+
+IEEE Transactions on Pattern Analysis and Machine Intelli-gence , 35(1): 208–220. Luo, Y.; Zhao, X.; Li, Z.; Ng, M. K.; and Meng, D. 2024. Low-Rank Tensor Function Representation for Multi-Dimensional Data Recovery. IEEE Transactions on Pattern Analysis and Machine Intelligence , 46(5): 3351–3369. Luo, Y.; Zhao, X.; Meng, D.; and Jiang, T. 2022. HLRTF: Hierarchical Low-Rank Tensor Factorization for Inverse Problems in Multi-Dimensional Imaging. In 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition , 19281–19290. Luo, Y.-S.; Zhao, X.-L.; Jiang, T.-X.; Zheng, Y.-B.; and Chang, Y. 2021. Hyperspectral Mixed Noise Removal via Spatial-Spectral Constrained Unsupervised Deep Image Prior. IEEE Journal of Selected Topics in Applied Earth Ob-servations and Remote Sensing , 14: 9435–9449. Maffei, A.; Haut, J. M.; Paoletti, M. E.; Plaza, J.; Bruzzone, L.; and Plaza, A. 2020. A Single Model CNN for Hyperspec-tral Image Denoising. IEEE Transactions on Geoscience and Remote Sensing , 58(4): 2516–2529. Miao, Y.; Zhang, L.; Zhang, L.; and Tao, D. 2023. DDS2M: Self-Supervised Denoising Diffusion Spatio-Spectral Model for Hyperspectral Image Restoration. In IEEE/CVF Interna-tional Conference on Computer Vision , 12086–12096. Miao, Y.-C.; Zhao, X.-L.; Fu, X.; Wang, J.-L.; and Zheng, Y.-B. 2022. Hyperspectral Denoising Using Unsupervised Disentangled Spatiospectral Deep Priors. IEEE Transac-tions on Geoscience and Remote Sensing , 60: 1–16. Oseledets, I. V. 2011. Tensor-Train Decomposition. SIAM Journal on Scientific Computing , 33(5): 2295–2317. Pang, L.; Rui, X.; Cui, L.; Wang, H.; Meng, D.; and Cao, X. 2024. HIR-Diff: Unsupervised Hyperspectral Image Restoration Via Improved Diffusion Models. In IEEE/CVF Conference on Computer Vision and Pattern Recognition ,3005–3014. Sitzmann, V.; Martel, J.; Bergman, A.; Lindell, D.; and Wet-zstein, G. 2020. Implicit Neural Representations with Peri-odic Activation Functions. In Advances in Neural Informa-tion Processing Systems , volume 33, 7462–7473. Ulyanov, D.; Vedaldi, A.; and Lempitsky, V. 2020. Deep Image Prior. International Journal of Computer Vision , 128: 1867–1888. Vervliet, N.; Debals, O.; and De Lathauwer, L. 2019. Ex-ploiting Efficient Representations in Large-Scale Tensor De-compositions. SIAM Journal on Scientific Computing , 41(2): A789–A815. Wang, J.-L.; Huang, T.-Z.; Zhao, X.-L.; Jiang, T.-X.; and Ng, M. K. 2021. Multi-Dimensional Visual Data Comple-tion via Low-Rank Tensor Representation Under Coupled Transform. IEEE Transactions on Image Processing , 30: 3581–3596. Wang, J.-L.; Huang, T.-Z.; Zhao, X.-L.; Luo, Y.-S.; and Jiang, T.-X. 2024a. CoNoT: Coupled Nonlinear Transform-Based Low-Rank Tensor Representation for Multidimen-sional Image Completion. IEEE Transactions on Neural Networks and Learning Systems , 35(7): 8969–8983. Wang, Z.; Li, D.; Zhang, M.; Luo, H.; and Gong, M. 2024b. Enhancing Hyperspectral Images via Diffusion Model and Group-Autoencoder Super-resolution Network. AAAI Con-ference on Artificial Intelligence , 38(6): 5794–5804. 18546 Xie, Q.; Zhao, Q.; Meng, D.; Xu, Z.; Gu, S.; Zuo, W.; and Zhang, L. 2016. Multispectral Images Denoising by Intrin-sic Tensor Sparsity Regularization. In IEEE Conference on Computer Vision and Pattern Recognition , 1692–1700. Yuan, L.; Li, C.; Mandic, D.; Cao, J.; and Zhao, Q. 2019a. Tensor Ring Decomposition with Rank Minimization on La-tent Space: An Efficient Approach for Tensor Completion. 
+
+AAAI Conference on Artificial Intelligence , 33(01): 9151– 9158. Yuan, Q.; Zhang, Q.; Li, J.; Shen, H.; and Zhang, L. 2019b. Hyperspectral Image Denoising Employing a Spa-tial–Spectral Deep Residual Convolutional Neural Network. 
+
+IEEE Transactions on Geoscience and Remote Sensing ,57(2): 1205–1218. Zheng, Y.-B.; Huang, T.; Zhao, X.; Zhao, Q.; and Jiang, T.-X. 2021. Fully-Connected Tensor Network Decomposition and Its Application to Higher-Order Tensor Completion. In 
+
+AAAI Conference on Artificial Intelligence .¨Ozdenizci, O.; and Legenstein, R. 2023. Restoring Vision in Adverse Weather Conditions With Patch-Based Denoising Diffusion Models. IEEE Transactions on Pattern Analysis and Machine Intelligence , 45(8): 10346–10357. 18547

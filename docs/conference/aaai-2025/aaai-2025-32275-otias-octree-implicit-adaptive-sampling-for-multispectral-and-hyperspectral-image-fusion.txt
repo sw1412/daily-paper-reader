@@ -1,0 +1,315 @@
+Title: OTIAS: OcTree Implicit Adaptive Sampling for Multispectral and Hyperspectral Image Fusion
+
+URL Source: https://ojs.aaai.org/index.php/AAAI/article/download/32275/34430
+
+Number of Pages: 9
+
+Markdown Content:
+# OTIAS: OcTree Implicit Adaptive Sampling for Multispectral and Hyperspectral Image Fusion 
+
+# Shangqi Deng 1,2 , Jun Ma 3, Liang-Jian Deng 3,† , Ping Wei 1,2,† 
+
+> 1
+
+National Key Laboratory of Human-Machine Hybrid Augmented Intelligence 
+
+> 2
+
+Institute of Artificial Intelligence and Robotics, Xi’an Jiaotong University 
+
+> 3
+
+University of Electronic Science and Technology of China 
+
+Abstract 
+
+Implicit Neural Representation (INR) methods have demon-strated great potential in arbitrary-scale super-resolution tasks. This success is primarily due to their ability to con-tinuously represent images using coordinates. In the task of remote sensing image fusion, INR methods have also shown promising applications. However, the previous INR methods neglect channel-wise modeling, while sharing a single kernel across all channels at each position, resulting in a lack of sen-sitivity to data specificity. To address these issues, we propose the OcTree Implicit Adaptive Sampling (OTIAS) method, which innovatively applies the octree structure to restore data from both horizontal and vertical directions, effectively incor-porating spatial and spectral information from hyperspectral data. Additionally, we introduce a novel method to adaptively generate interpolation kernels based on coordinates. This ap-proach efficiently produces customized interpolation kernel parameters for octree nodes, tailored to different spectral in-formation. Overall, our method achieves state-of-the-art per-formance on the CAVE and Harvard datasets with 4× and 8×
+
+scaling factors, outperforming existing approaches. 
+
+Code — https://github.com/shangqideng/OTIAS 
+
+# Introduction 
+
+Hyperspectral imaging is an advanced imaging technique used to acquire image data in different wavelength ranges. Unlike common color images, hyperspectral imaging cap-tures information not only in the three primary colors of R, G, and B but in dozens or even hundreds of very nar-row wavelength ranges, providing detailed spectral informa-tion. This means that each pixel contains data not only about color but also about the spectral characteristics of the mate-rials. Therefore, hyperspectral imaging finds wide applica-tions in fields (Bedini 2017; Adam, Mutanga, and Rugege 2010; Wang et al. 2023, 2024) such as material identifi-cation, vegetation studies, mineral exploration, and more. However, in hyperspectral imaging, physical constraints im-pose a trade-off between the number of spectral bands and spatial resolution. Typically, increasing spectral resolution results in reduced spatial resolution, and enhancing spatial 
+
+> †
+
+Corresponding authors: liangjian.deng@uestc.edu.cn, pingw ei@xjtu.edu.cn Copyright © 2025, Association for the Advancement of Artificial Intelligence (www.aaai.org). All rights reserved. Width Height Channel Width Height Channel Width Height Channel Width Height Channel INR-Sample Octree-Sample       
+
+> (1) The previous INR-based methods
+> (2) The proposed octree-based INR method
+
+Figure 1: (1) The previous INR-based methods (Tang, Chen, and Zeng 2021; Zhu et al. 2023) can be viewed as utilizing a quadtree structure for spatial sampling to enhance reso-lution. (2) The proposed OTIAS considers both spatial and channel directions to subdivide the grid of the original im-age cube, thereby improving the quality of the fused product, seeing in discussion section. resolution leads to a decrease in spectral resolution. To ad-dress this issue, practical imaging involves capturing the same scene with different sensors, respectively yielding a multispectral image with a high spatial resolution (HR-MSI) and a hyperspectral image with a low spatial resolution (LR-HSI). Recently, multispectral and hyperspectral image fu-sion (MHIF) (Li et al. 2024, 2023b,a, 2022; Xu et al. 2024; Ran et al. 2023; Cao et al. 2024) has become a crucial area, since it could fuse HR-MSI and LR-HSI to obtain a hyper-spectral image with high spatial resolution (HR-HSI). Implicit Neural Representation (INR) (Mildenhall et al. 2021) is a neural network-based approach for learning continuous representations of objects without the need for explicit geometric information. It has shown remark-able success in various 2D tasks such as image super-resolution (Tang, Chen, and Zeng 2021), thanks to its multi-The Thirty-Ninth AAAI Conference on Artificial Intelligence (AAAI-25) 
+
+2708 modal (Li and Fan 2022; Li et al. 2023e,d,f,c; Zhu et al. 2024) information fusion capability. INR utilizes Multi-Layer Perceptron (MLP) networks to map input spatial co-ordinates into continuous signal transformations. However, INR has certain limitations, such as relying on a global MLP network that may struggle to adapt to variations across dif-ferent coordinates and channels. Consequently, it may lack sufficient sensitivity to local information in some scenarios, particularly in fusion tasks where adapting to detailed vari-ations in objects or scenes is crucial. Furthermore, methods based on INR are primarily focused on spatial sampling and do not consider channel-wise information. Directly applying INR to remote sensing data with a large number of spectral bands may result in poor reconstruction performance. The octree structure allows for the hierarchical modeling of image data, enabling efficient organization and management of image information. Given the success of this concept, we specifically design a spatial-spectral sampling method for the MHIF task to enhance the efficiency and quality of sam-pling. In detail, we propose OcTree Implicit Adaptive Sam-pling (OTIAS), which combines octree structure with the INR interpolation process, achieving feature fusion through hierarchical sampling. Furthermore, an adaptive sampling kernel method is designed, allowing the network to better adjust to variations across different coordinates and chan-nels, thereby improving INR performance in the MHIF task. Our contributions are listed as follows: 1. We leverage the OcTree Hierarchy (OTH) structure for fusion super-resolution by partitioning leaf nodes in both spatial and spectral domains to store low-resolution data, while root nodes store the feature maps after fusion. Specifically, OTH uses the octree’s three-dimensional structure to model the relationships between spatial and spectral domains. 2. We propose an Adaptive Synthesis Kernel (ASK) mod-ule that allows the network to capture spatial and spectral variations at the leaf nodes of a single-layer octree. To reduce the kernel generation network’s parameter count, we design a lightweight kernel that efficiently captures terrain information in remote sensing images while min-imizing overhead. 3. We propose OcTree Implicit Adaptive Sampling (OTIAS), a novel octree-based structure that inte-grates spatial and spectral adaptability for MHIF. Our method achieves state-of-the-art performance on two public datasets, and ablation studies demonstrate the effectiveness of each OTIAS module. 
+
+# Related Work 
+
+Neural Network Methods for MHIF 
+
+In the context of MHIF (Multispectral and Hyperspec-tral Image Fusion) task, several CNN-based methods have been introduced. Among these methods, DBIN (Wang et al. 2019), an iterative fusion framework, is designed for blind hyperspectral image fusion, seamlessly fusing LR-HSI with HR-MSI without prior knowledge about the observation model and preserving spectral and spatial information simul-taneously. SSR-Net (Zhang et al. 2020) employs two consec-utive CNN modules to reconstruct the spectral and spatial information in HR-HSI after cross-overlapping LR-HSI and HR-MSI in the spectral domain. Similarly, ResTFNet (Liu, Liu, and Wang 2020) utilizes a residual network (Res-Net (He et al. 2016)) and a two-stream architecture to ex-tract spatial and spectral information separately, followed by a residual CNN for their fusion. Meanwhile, MHF-Net (Xie et al. 2022) establishes a linear relationship from the HR-HSI image to the HR-MSI and LR-HSI images, offering clear interpretability. MoG-DCN (Dong et al. 2021) intro-duces a novel model-guided deep convolutional network (MoG-DCN), which takes the observation matrix of HSI into account during end-to-end optimization. For the con-current retrieval of both spatial and spectral data, HSR-Net (Hu et al. 2021) employs adaptive structures in both spatial and channel domains. Additionally, BDT (Deng et al. 2023b) introduces a specialized Transformer-based architec-ture, leveraging spatial and spectral multi-head self-attention mechanisms along with a bidirectional hierarchy strategy, resulting in superior performance in MHIF task. QIS (Zhu et al. 2023) demonstrates the potential of INR techniques in handling remote sensing data. 
+
+Implicit Neural Representation 
+
+Recently, Implicit Neural Representation (INR) has gar-nered significant attention in the field of 2D image process-ing (Chen, Liu, and Wang 2021). Drawing inspiration from INR’s applications in 3D scenes (Mildenhall et al. 2021), the Local Implicit Image Function (LIIF) (Chen, Liu, and Wang 2021) employs 2D coordinates and features from the image for implicit representation. Due to the continuity of input coordinates, LIIF’s output results can be presented at arbi-trary resolutions. Derived from LIIF, UltraSR (Xu, Wang, and Shi 2021) incorporates various architectural designs, such as deep coordinate fusion and residual MLP, com-bined with spatial encoding, achieving remarkable super-resolution results. Additionally, JIIF (Tang, Chen, and Zeng 2021) suggests using INR to reconstruct depth images in the Low-Resolution (LR) domain by guiding them with High-Resolution (HR) RGB image to address noise-related is-sues. Furthermore, LTE (Lee and Jin 2022) represents im-age texture in 2D Fourier space and is jointly trained with a deep super-resolution architecture, facilitating the learning of high-frequency components. 
+
+Motivation 
+
+To enhance the fidelity of multispectral and hyperspectral fusion images, we consider employing the Implicit Neural Representation (INR) method. However, the previous INR-based methods (Tang, Chen, and Zeng 2021; Zhu et al. 2023) for remote sensing image fusion tasks, to some extent, ne-glect spectral information (see Fig. 1). Inspired by Pixel-Shuffle (Shi et al. 2016), we establish an OcTree Hierarchy (OTH) sampling model in the spatial-spectral dimensions, encompassing information at different scales, coordinates, and channels. To enhance the model with data specificity, we design an Adaptive Synthesis Kernel (ASK) module for 2709 Figure 2: The proposed OTIAS integrates LR-HSI and HR-MSI images to reconstruct HR-HSI, employing encoders for spectral and spatial features. The OTH and ASK are our key components, where OTH partitions leaf nodes from spatial and spectral domains, and ASK generates adaptive kernels for octree leaf nodes. each leaf node of the OTH, understanding differences in spectral information at different locations. Simultaneously, we consider reducing the network parameters for generating customized kernels, incorporating a lightweight design for improved efficiency. 
+
+# Methodology 
+
+Generally, the problem of multispectral and hyperspectral image fusion (MHIF) can be defined as follows: 
+
+Y = XBS , Z = RX , (1) where Y ∈ RS×hw , Z ∈ Rs×HW , and X ∈ RS×HW rep-resent the matrix forms of LR-HSI, HR-MSI, and HR-HSI, respectively. Additionally, h, w, and S represent the height, width, and number of bands for LR-HSI, while H, W , and s
+
+denote the corresponding dimensions for HR-MSI. Further-more, B ∈ RHW ×HW is the blur matrix, S ∈ RHW ×hw 
+
+denotes the downsampling pattern, and R ∈ Rs×S repre-sents the spectral response matrix. In short, our task aims to recover X from the information contained in Y and Z.
+
+Preliminary 
+
+We drew inspiration from INR methods (Sitzmann et al. 2020; Wu et al. 2024) and re-framed the MHIF problem in a similar fashion, as outlined below: 
+
+Φ( C) − X = 0 , Φ : C → Φ( C, Y, Z), (2) where Φ( ·) signifies an implicit neural network, Y ∈
+
+Rh×w×S denotes LR-HSI, Z ∈ RH×W ×s pertains to HR-LSI, X ∈ RH×W ×S denotes HR-HSI, and C ∈ RH×W ×2
+
+denotes the normalization of coordinates within the high-resolution (HR) domain. Specifically, we represent pixels using their center positions and map the coordinates of 
+
+H×W to a square grid of size [−1, 1] ×[−1, 1] for the conve-nience of sharing coordinates in both the high-resolution and low-resolution domains. The normalization process (Chen, Liu, and Wang 2021) in the high-resolution domain can be formulated as follows: 
+
+C(i, j ) = 
+
+h
+
+− 1 + 2i + 1 
+
+H , −1 + 2j + 1 
+
+W
+
+i
+
+, (3) where i ∈ [0 , H − 1] , j ∈ [0 , W − 1] . Furthermore, to ensure network stability and achieve better fusion results, we en-code Y and Z through neural networks, mapping them into the latent space: 
+
+ ˆY = Fϕ(Y),
+
+ˆZ = Fψ (Cat (YU , Z)) , (4) where ˆY ∈ Rh×w×d represents the feature map of the spec-tral modality, ˆZ ∈ RH×W ×d represents the feature map of the spatial modality, and YU ∈ RH×W ×S denotes the bicu-bic interpolation upsampled LR-HSI. d corresponds to the channel numbers of feature maps. The symbols ϕ and ψ de-note learnable parameters associated with the spectral and spatial encoder functions. Subsequently, we define the INR sampling process at location Cq in the form of an quadtree, where the four leaf nodes are defined as: 
+
+Nq = {fθ ( ˆYt, ˆZt, C q − Ct)|Ct ∈ C} , Nq ∈ R4×d. (5) 
+
+Cq ∈ R2 is the normalized coordinate of the query pixel in the HR domain, and C ∈ R4 denotes the coordinate of neigh-boring pixels at position Cq in the LR domain. Additionally, 
+
+ˆYt ∈ Rd and ˆZt ∈ Rd denote the spectral and spatial latent code at the position Ct, respectively. The term Cq − Ct rep-resents relative distance, fθ denotes an MLP layer, and θ is the learnable parameters. Then, the output of Φ( ·) at posi-tion Cq is stored in the root node of the quadtree, which is expressed as follows: 
+
+Φ( Cq ) = Nq ∗ K q , (6) where Kq ∈ R4×1 can be regarded as a kernel function used to associate the leaf nodes with the corresponding root 2710 node. It is not difficult to observe that this kernel function is channel-shared. We use the LIIF (Chen, Liu, and Wang 2021) method to specify Kq . LIIF utilizes a straightforward area-weighted interpolation formula (Chen, Liu, and Wang 2021): 
+
+Kq,t = Aq,t 
+
+A , (7) where Kq,t ∈ R, Aq,t represents the area formed by the pix-els diagonally opposite to the t corner pixel with respect to 
+
+Cq , and A = P 
+
+> t∈C
+
+Aq,t represents the total area serving as the denominator. The four computed corner values of Kq,t 
+
+are used to form the kernel function Kq .
+
+The Overall Architecture 
+
+The overall architecture of our model is shown in Fig. 2. We demonstrate a novel OcTree Implicit Adaptive Sam-pling (OTIAS) approach that leverages the OcTree Hierar-chy (OTH) structure to model the sampling process. Ad-ditionally, we devise an Adaptive Synthesis Kernel (ASK) module and successfully apply it to the OTH framework. The proposed OTIAS employs an approach based on INR to fuse the LR-HSI image Y ∈ Rh×w×S and the HR-MSI image Z ∈ RH×W ×s, aiming to reconstruct the HR-HSI image X ∈ RH×W ×S . First, we yield a spectral feature map 
+
+ˆY ∈ Rh×w×d and a spatial feature map ˆZ ∈ RH×W ×d via dual networks. Subsequently, we take the normalized coor-dinates C ∈ RH×W ×2 as input, which is represented as: 
+
+G = Ψ( C), (8) where Ψ( ·) denotes the OTIAS layer. G represents the fea-tures learned by OTH, sharing the same shape as HR-HSI. The OTIAS layer consists of the OcTree Hierarchy Ω( ·)
+
+structure and the Adaptive Synthesis Kernel ψ(·). Therefore, Eq. (8) can be expressed in the form: 
+
+Ψ( C) = ψ(Ω( ˆY, ˆZ, C )) , (9) where Ω( ·) involves partitioning leaf nodes both in spa-tial and spectral domains. It leverages the three-dimensional structure of an octree to better capture inter-band correla-tions. Furthermore, ψ(·) dynamically generates kernels for the octree leaf nodes based on the input information, allow-ing for improved adaptation to local characteristics. Consequently, based on prior research that suggests long skip connections in local implicit representations can en-rich high-frequency components in residuals and stabilize convergence (Kim, Lee, and Lee 2016), we incorporate the bicubic interpolated LR-HSI YU as a long skip connection. The final fusion result takes the following form: 
+
+˜X = G + YU . (10) Eq. (9) allows us to stack OTIAS layers to extend the net-work depth. Specifically, the OTIAS layer at the Cq position can be represented as: 
+
+Ψ( Cq ) = ψ(Ω( fθ ( ˆYt, ˆZt, C q − Ct), C), C q ), (11) where Ω( ·) denotes the OTH, ψ(·) means the Adaptive Syn-thesis Kernel, and ˆYt ∈ R1×1×d. The detailed process of the OTIAS layer is optimized for batch parallelism and is provided in Algorithm. 1. 
+
+Algorithm 1: Pseudo code of OTIAS layer in a PyTorch-like style. 
+
+Input: LR-domian feature ˆY: (B, h, w, d) ,HR-domain grid c: (B, HW, 2) , LR-domain grid 
+
+c ↓: (B, hw, 2) , HR-domain feature ˆZ: (B, H, W, d) .
+
+▷ Here, B means batch-size. 
+
+Output: OTIAS layer output recon : (B, H, W, d) .
+
+▷ Init ∆x, ∆y, c . 
+
+∆x = 1/h , ∆y = 1/w , c = c.clone() ;
+
+▷ Obtain query coordinate c . 
+
+c [: , :, 0] , [: , :, 1] ± = [ −1, 1] ∗ ∆x, [−1, 1] 
+
+∗∆y;
+
+▷ Init Net( ·), Reduce( ·) and Span( ·); 
+
+Net (·) = MLP (2 d + 2 , 2d);
+
+Reduce (·) = MLP (d, d//r );
+
+Span (·) = MLP (d//r, d );
+
+def forwardFunction( ˆY, c, c ↓, ˆZ):
+
+▷ Sample the LR-domian feature f based on grid c.
+
+ˆY s: (B, HW, 4, d) ← F.grid Sample ( ˆY,c ); 
+
+▷ Sample the LR-domain grid c ↓ based on grid c.
+
+c s : (B, HW, 4, 2) ← F.grid Sample (c ↓,c ); 
+
+▷ Relative sampling distance. 
+
+∆c: (B, HW, 4, 2) ← Minus (c, c s ); 
+
+▷ Construct the octree hierarchy. 
+
+o: (B, HW, 8, d) ←
+
+Net (cat ( ˆY s, ˆZ, ∆c)). view() ;
+
+▷ Obtain adaptive synthesis kernel. 
+
+k: (B, HW, 8, d) ←
+
+F.softmax (Span (Reduce (o)), dim=-2 ); 
+
+▷ Obtain the fusion reconstruction. 
+
+recon (B, H, W, d) ←
+
+(o ⊛ k). sum(-2) .view() ;
+
+return recon ;
+
+return forwardFunction( recon );
+
+OcTree Hierarchy (OTH) 
+
+For previous INR super-resolution methods, they sample Low-Resolution (LR) domain pixels in the spatial domain by calculating offsets ∆x and ∆y in the up, down, left, and right directions to obtain the nearest neighboring C ∈ R4
+
+four pixels. This process can be viewed as one layer in the form of quadtree sampling, where four leaf nodes store in-formation about the nearest neighboring pixels, and a newly generated root node stores information about the target pix-els after super-resolution. The sampling process is expressed as: 
+
+Nq = QuadTree ( ˆYt, ˆZt, C q , C), (12) where QuadTree (·) represents the quadtree sampling de-scribing the previous INR methods. Nq ∈ R4×d represents the information of the leaf nodes at position Cq .Due to C ∈ R4 having only spatial direction offsets nearby the query position Cq , the previous INR methods exclusively 2711 consider the spatial domain, neglecting the spectral infor-mation. Inspired by Pixel-Shuffle (Shi et al. 2016), we pro-pose the OcTree Hierarchy (OTH) structure denoted as Ω( ·),which expands channel information to the spatial domain re-sulted in extending the sampling space. Specifically, we fur-ther split the channels and rearrange the information on the channels into space. The structure of OTH can be viewed as an upgraded version of a quadtree, characterized by an extension along the channel dimension, which can be de-scribed as: ˆNq = Ω( ˆYt, ˆZt, C q , C). (13) In detail, based on C ∈ R4, we query four LR-domain fea-ture vectors, HR-domain feature vectors, and relative sam-pling distance at position Cq , obtaining four leaf nodes 
+
+{N q0, Nq1, Nq2, Nq3} ∈ R4×d. After that, through an MLP, we increase the channel dimension to 2d. Subsequently, we group and rearrange them along the channel direction, ob-taining the new leaf nodes ˆNq = {N q0, Nq1, · · · , Nq7} ∈ 
+
+R8×d, as illustrated in the Algorithm 1. 
+
+Adaptive Synthesis Kernel (ASK) 
+
+In order to fully account for the specificity of data located at different positions Cq , we design a strategy called Adaptive Synthesis Kernel (ASK). Taking into account a set of leaf nodes represented as ˆNq ∈ R8×d, our objective is to cre-ate an adaptive kernel based on Cq with the shape Rd×d×8.Next, we apply the adaptive kernel based on Cq to the leaf nodes ˆNq = {N q0, Nq1, · · · , Nq7} ∈ R8×d through matrix multiplication to generate the root node Ψ( Cq ) ∈ R1×d. The above process can be represented as: 
+
+Ψ( Cq ) = ψ( ˆNq , C q ). (14) However, we find that the cost of generating such a shaped kernel for each Cq is enormous. Assuming the target resolu-tion size is 64 ×64 , with a channel size of d = 128 , we would need 2 Gigabytes to store the parameters of the generated kernel for each layer, which is unacceptable for the MHIF task. To alleviate this issue, we simplify the structure of the generation kernel by designing it in the form of a depthwise convolutional kernel. Transforming it into a depthwise con-volutional kernel reduces the number of parameters to 1% of the original, significantly easing the computational burden. After obtaining eight leaf nodes ˆNq ∈ R8×d through Eq. (13), the leaf nodes are then fed into a multi-layer percep-tron with a bottleneck shape. Subsequently, a softmax oper-ation is performed on the first dimension. The entire process is represented as: 
+
+ˆKq = Softmax (Span (Reduce ( ˆNq ))) , (15) where ˆKq ∈ R8×d denotes the customized kernel. Span (·)
+
+and Reduce (·) refers to Algorithm 1. Then, we utilize the customized kernel ˆKq for executing depthwise convolution on the leaf nodes ˆNq as follows: 
+
+ψ( ˆNq , C q ) = ˆNq ⊛ ˆKq , (16) where ⊛ means the matrix product operation. Finally, we parallelize the computation of the adaptive synthesis kernel and the depth-wise convolution operation to obtain the re-stored result, recon ∈ RH×W ×d, as demonstrated in Algo-rithm 1. The learnable parameters in the entire network denoted as 
+
+θ, are optimized through data-driven iterations. The learning problem is defined as follows: 
+
+ˆθ = arg min 
+
+> θM
+
+X
+
+> m
+
+∥ Ψ( C) − X ∥ , (17) where M represents the number of training pairs. 
+
+# Experiment 
+
+Experiment Setting 
+
+Datasets. We conduct experiments to assess the perfor-mance of our model on the CAVE 1 and Harvard 2. The CAVE dataset comprises 32 hyperspectral images (HSIs) with 31 spectral bands ranging in wavelengths from 400 nm to 700 nm, and a spectral resolution of 10 nm. The pervi-ous works (Hu et al. 2021, 2022) select 20 images for train-ing, leaving the remaining 11 images for the test dataset. The Harvard dataset consists of 77 HSIs of both indoor and outdoor scenes, each with a size of 1392 × 1040 × 31 
+
+and spanning the spectral range from 420 nm to 720 nm. Twenty of these images are selected, with the upper-left por-tion cropped to ( 1000 × 1000 ), and 10 images are used for testing while the remaining 10 are used for training. 
+
+Data Simulation. We input a pair of LR-HSI and HR-MSI images, denoted as (Y, Z) , into the proposed OTIAS, uti-lizing the related HR-HSI ¯X , for training. As the ground-truth (GT), X , is not available, a simulation process is re-quired. For the CAVE dataset, we crop the 20 selected train-ing images, generating 3920 overlapping patches with a size of 64 ×64 ×31 , and these patches are used as GT, X . To gen-erate the corresponding LR-HSIs, we apply a 3×3 Gaussian kernel with a standard deviation of 0.5 to blur the HR-HSIs, followed by downsampling the blurred patches by a factor of 4. Moreover, we use the common spectral response function of the Nikon D700 3 camera to create the HR-MSI patches from the corresponding HR-HSIs. Thus, we generate 3920 LR-HSIs with a size of 16 × 16 × 31 and 3920 HR-MSIs with a size of 64 × 64 × 3. The simulated pairs with the as-sociated GTs are randomly divided into training (80%) and testing (20%) sets. For the Harvard dataset, we simulate im-ages following the same procedure. 
+
+Implementation Details and Quality Indexes. The pro-posed network is implemented in PyTorch 2.4.0 and Python 3.11. Additionally, the AdamW optimizer (P and Ba 2014) is used during training with a learning rate of 0.0001 to min-imize the sum of the absolute difference ( ℓ1). The training 
+
+> 1https://www.cs.columbia.edu/CAVE/databases/multispectral/
+> 2http://vision.seas.harvard.edu/hyperspec/index.html
+> 3https://www.maxmax.com/nikon d700 study.htm 2712
+
+Figure 3: The first and third rows show the results using the pseudo-color (R-31, G-20, B-10) representation on “ chart and stuffed toy ” and “feathers ”, respectively, from the CAVE dataset. Some close-ups are depicted in the blue rectangles. The second and fourth rows show the residuals between the GT and the fused products. (a) GT. (b) Ours. (c) MIMO (Fang et al. 2024). (d) DCT (Ma et al. 2024). (e) QIS (Zhu et al. 2023). (f) DSPNet (Sun et al. 2023). (g) 3DT-Net (Ma et al. 2023). (h) PSRT (Deng et al. 2023a). (i) DHIF (Huang et al. 2022). 
+
+epochs is fixed into 1000 on a Linux operating system with an NVIDIA RTX4090 GPU (24G). We adopt four widely-used quality metrics (Vivone 2023; Vivone et al. 2020; Wang et al. 2004): the peak signal-to-noise ratio (PSNR), the spectral angle mapper (SAM), the relative dimensionless global error synthesis (ERGAS), and the structural similarity index measure (SSIM). 
+
+Comparison with other Methods 
+
+To validate the superiority of the proposed OTIAS, we compare it with various state-of-the-art methods, includ-ing CSTF-FUS (Li et al. 2018), LTTR (Dian, Li, and Fang 2019), LTMR (Dian and Li 2019), IR-TenSR (Xu et al. 2022), SSRNet (Zhang et al. 2020), ResTFNet (Liu, Liu, and Wang 2020), HSRNet (Hu et al. 2021), MogDCN (Dong et al. 2021), Fusformer (Hu et al. 2022), DHIF (Huang et al. 2022), PSRT (Deng et al. 2023a), 3DT-Net (Ma et al. 2023), DSPNet (Sun et al. 2023), QIS (Zhu et al. 2023), DCT (Ma et al. 2024) and MIMO (Fang et al. 2024). 
+
+Results on CAVE Dataset. We assess our OTIAS method on CAVE dataset with a scaling factor of 4, conducting a comparative analysis with existing MHIF methods. As shown in the left part of Tab. 2, our OTIAS significantly surpasses other state-of-the-art models. For instance, our OTIAS improves PSNR by 1.57 dB, 2.46 dB, 0.21 dB, and 1.25 dB compared with MIMO (Fang et al. 2024), DCT (Ma et al. 2024), QIS (Zhu et al. 2023), and DSPNet (Sun et al. 2023), respectively. Concerning the absolute error maps in Fig. 3, as the reconstruction impact approaches the original picture more closely, the color of the error map tends to be more blue. It is clear that OTIAS excels in restoring texture details compared to the other techniques under considera-tion, aligning with the findings presented in Tab. 2. To ensure a fair comparison, we further evaluate the pro-posed OTIAS against two other INR methods (Tang, Chen, and Zeng 2021; Zhu et al. 2023) on the CAVE dataset, with the results summarized in Tab. 1. The results indicate that, with comparable parameter counts and FLOPs, our method delivers significantly better performance. Additionally, the absolute error maps in Fig. 4 further highlight the advan-tages of our approach in restoring fine details and textures, demonstrating its superior capability in preserving structural information and achieving high-quality reconstructions. 
+
+Method PSNR ( ↑) SAM ( ↓) ERGAS ( ↓) #Params #Flops JIIF 50.93 2.13 1.12 2.832M 8.041G QIS 52.22 1.98 1.02 2.914M 7.658G Ours 52.43 1.94 0.99 2.99M 8.722G 
+
+Table 1: The average three QIs, the parameters and flops on the CAVE dataset simulating a scaling factor of 4. 
+
+Results on Harvard Dataset. The right part of Tab. 2 pro-vides the comparison on Harvard dataset, with a scaling fac-tor of 4. Clearly, the proposed OTIAS exhibits an average PSNR value that surpasses the second-best and third-best methods by 0.2 dB and 0.79 dB, respectively. While our model exhibits a slight inferiority compared to the third-best DSPNet (Sun et al. 2023) in terms of SAM and SSIM, it is noteworthy that we achieve a reduction of 50 .7% in parame-ters compared with DSPNet. Furthermore, our model attains the best results in terms of ERGAS. 
+
+Ablation Study 
+
+We examine the effect of Adaptive Synthesis Kernel (ASK) module and the OcTree Hierarchy (OTH). 2713 Methods CAVE ×4 Harvard ×4 #Params #FLOPs PSNR ( ↑) SAM ( ↓) ERGAS ( ↓) SSIM ( ↑) PSNR ( ↑) SAM ( ↓) ERGAS ( ↓) SSIM ( ↑)Bicubic 34.33 ±3.88 4.45 ±1.62 7.21 ±4.90 0.944 ±0.0291 38.71 ±4.33 2.53 ±0.67 4.45 ±1.81 0.948 ±0.0268 − −                                                                                                                                   
+
+> CSTF-FUS (Li et al. 2018) 34.46 ±4.28 14.37 ±5.30 8.29 ±5.29 0.866 ±0.0747 39.15 ±3.45 6.93 ±2.69 4.66 ±1.81 0.914 ±0.0489 −−
+> LTTR (Dian, Li, and Fang 2019) 35.85 ±3.49 6.99 ±2.55 5.99 ±2.92 0.956 ±0.0288 40.88 ±3.94 4.01 ±1.27 4.03 ±2.18 0.957 ±0.0350 −−
+> LTMR (Dian and Li 2019) 36.54 ±3.30 6.71 ±2.19 5.39 ±2.53 0.963 ±0.0208 42.06 ±3.56 3.51 ±0.99 3.59 ±2.03 0.970 ±0.0201 −−
+> IR-TenSR (Xu et al. 2022) 35.61 ±3.45 12.30 ±4.68 5.90 ±3.05 0.945 ±0.0267 40.47 ±3.04 4.36 ±1.52 5.57 ±1.57 0.963 ±0.0137 −−
+> ResTFNet (Liu, Liu, and Wang 2020) 45.58 ±5.47 2.82 ±0.70 2.36 ±2.59 0.993 ±0.0056 45.94 ±4.35 2.61 ±0.69 2.56 ±1.32 0.985 ±0.0082 2.387M 1.75G SSRNet (Zhang et al. 2020) 48.62 ±3.92 2.54 ±0.84 1.63 ±1.21 0.995 ±0.0023 48.00 ±3.36 2.31 ±0.60 2.30 ±1.42 0.987 ±0.0070 0.027M 0.11G HSRNet (Hu et al. 2021) 50.38 ±3.38 2.23 ±0.66 1.20 ±0.75 0.996 ±0.0014 48.29 ±3.03 2.26 ±0.56 1.87 ±0.81 0.988 ±0.0073 1.09M 2.00G MogDCN (Dong et al. 2021) 51.63 ±4.10 2.03 ±0.62 1.11 ±0.82 0.997 ±0.0018 47.89 ±4.09 2.11 ±0.52 1.89 ±0.82 0.988 ±0.0073 6.840M 47.534G Fusformer (Hu et al. 2022) 49.98 ±8.10 2.20 ±0.85 2.50 ±5.21 0.994 ±0.0111 47.87 ±5.13 2.84 ±2.07 2.04 ±0.99 0.986 ±0.0101 0.504M 10.124G DHIF (Huang et al. 2022) 51.07 ±4.17 2.01 ±0.63 1.22 ±0.97 0.997 ±0.0016 47.68 ±3.85 2.32 ±0.53 1.95 ±0.92 0.988 ±0.0074 22.462M 54.273G PSRT (Deng et al. 2023a) 50.47 ±6.19 2.19 ±0.64 2.06 ±3.71 0.996 ±0.0031 47.96 ±3.21 2.18 ±0.55 1.89 ±0.86 0.989 ±0.0059 0.247M 1.138G 3DT-Net (Ma et al. 2023) 51.38 ±4.18 2.16 ±0.70 1.14 ±1.00 0.996 ±0.0026 47.78 ±4.42 2.04 ±0.51 1.98 ±0.86 0.989 ±0.0059 3.464M 68.19G DSPNet (Sun et al. 2023) 51.18 ±3.92 2.15 ±0.64 1.13 ±0.82 0.997 ±0.0014 48.29 ±3.16 2.30 ±0.55 1.92 ±0.91 0.988 ±0.0061 6.065M 6.855G QIS (Zhu et al. 2023) 52.22 ±4.21 1.98 ±0.60 1.02 ±0.81 0.997 ±0.0014 48.88 ±3.33 2.14 ±0.52 1.77 ±0.81 0.989 ±0.0064 2.914M 7.658G DCT (Ma et al. 2024) 49.97 ±3.58 2.51 ±0.80 1.25 ±0.88 0.996 ±0.0017 46.42 ±5.30 2.19 ±0.55 2.30 ±0.90 0.988 ±0.0066 5.262M 53.362G MIMO (Fang et al. 2024) 50.86 ±3.45 2.28 ±0.71 1.18 ±0.72 0.996 ±0.0014 47.03 ±5.57 2.08 ±0.52 2.02 ±0.79 0.988 ±0.0069 4.583M 1.583G OTIAS (Ours) 52.43 ±4.07 1.94 ±0.58 0.99 ±0.76 0.997 ±0.0013 49.08 ±3.28 2.09 ±0.52 1.72 ±0.76 0.989 ±0.0066 2.99M 8.722G
+
+Table 2: The average and standard deviation calculated for all the compared approaches on 11 CAVE examples and 10 Harvard examples simulating a scaling factor of 4. The best results are in red and the second best results are in blue. GT Ours JIIF QIS 
+
+Figure 4: The residuals effect diagram on the “ fake and real lemon slices ” in the CAVE dataset. 
+
+Method PSNR ( ↑) SAM ( ↓) ERGAS ( ↓) #Params #Flops JIIF 50.93 2.13 1.12 2.832M 8.041G JIIF(ASK) 51.22 1.98 1.02 2.839M 8.07G QIS 52.22 1.98 1.02 3.187M 8.811G QIS(ASK) 52.32 1.97 0.99 3.617M 10.089G 
+
+Table 3: The presence of ‘ASK’ in parentheses indicates the application of ASK technology. The average three QIs, the corresponding parameters and flops on the CAVE dataset simulating a scaling factor of 4. 
+
+ASK with previous INR methods. To further illustrate the effectiveness of the Adaptive Synthesis Kernel (ASK) strat-egy, we integrate it into two representative INR methods, namely JIIF (Tang, Chen, and Zeng 2021) and QIS (Zhu et al. 2023). The results, presented in Tab. 3, clearly demon-strate that the incorporation of the proposed ASK design en-hances the performance of the original models while intro-ducing only a negligible increase in computational cost and parameter count. This significant improvement, achieved with minimal overhead, highlights the efficiency of the ASK strategy. These experiments not only validate the robustness and generalizability of the proposed ASK design but also emphasize its potential to serve as a universal enhancement for INR frameworks. 
+
+Structure of OTH. We investigate the impact of the OcTree Hierarchy (OTH) structure on spectral fidelity. We modify our network model, where in Tab. 4, the number 1 indicates 
+
+Layer SAM ( ↓) ERGAS ( ↓) SSIM ( ↑) #Params #Flops 1 2.59 0.74 0.996 2.825M 29.419G 2 2.58 0.76 0.996 2.924M 31.116G 3 2.51 0.70 0.996 2.99M 33.842G 
+
+Table 4: The average three QIs, the parameters and flops on the CAVE dataset simulating a scaling factor of 8. a single-layer octree structure, and the number 2 indicates a two-layer octree structure. We apply these models to an 8×
+
+scaling factor task. As shown in Tab. 4, the experimental re-sults reveal that as the number of layers increases, the spec-tral fidelity of fusion results improves, with only a marginal increase in the number of parameters. 
+
+# Conclusion 
+
+In this article, we introduce a novel spatial-spectral adaptive octree sampling structure, OcTree Implicit Adaptive Sam-pling (OTIAS). Compared with previous methods, we in-novatively integrate OcTree Hierarchy (OTH) with INR for fusion tasks, enhancing both feature extraction and represen-tation capabilities. Additionally, the design of the Adaptive Synthesis Kernel (ASK) module effectively improves the performance of octree sampling in the MHIF task. Exper-imental results demonstrate that our method achieves state-of-the-art performance in the MHIF task. 
+
+# Acknowledgements 
+
+This research was partially supported by National Nat-ural Science Foundation of China (No.U23B2060, No.62088102), Youth Innovation Team of Shaanxi Universities, and partially supported by National Natural Science Foundation of China (No.12271083). We sincerely thank Yu-Jie Liang and Zihan Cao for their valuable support in this work. 2714 References 
+
+Adam, E.; Mutanga, O.; and Rugege, D. 2010. Multispec-tral and hyperspectral remote sensing for identification and mapping of wetland vegetation: a review. Wetlands ecology and management , 18: 281–296. Bedini, E. 2017. The use of hyperspectral remote sensing for mineral exploration: A review. Journal of Hyperspectral Remote Sensing , 7(4): 189–211. Cao, Z.; Cao, S.; Deng, L.-J.; Wu, X.; Hou, J.; and Vivone, G. 2024. Diffusion model with disentangled modulations for sharpening multispectral and hyperspectral images. In-formation Fusion , 104: 102158. Chen, Y.; Liu, S.; and Wang, X. 2021. Learning continu-ous image representation with local implicit image function. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 8628–8638. Deng, S.; Deng, L.-J.; Wu, X.; Ran, R.; Hong, D.; and Vivone, G. 2023a. PSRT: Pyramid shuffle-and-reshuffle transformer for multispectral and hyperspectral image fu-sion. IEEE Transactions on Geoscience and Remote Sens-ing , 61: 1–15. Deng, S.; Deng, L.-J.; Wu, X.; Ran, R.; and Wen, R. 2023b. Bidirectional Dilation Transformer for Multispectral and Hyperspectral Image Fusion. International Joint Conference on Artificial Intelligence (IJCAI) , 3633–3641. Dian, R.; and Li, S. 2019. Hyperspectral image super-resolution via subspace-based low tensor multi-rank regu-larization. IEEE Transactions on Image Processing , 28(10): 5135–5146. Dian, R.; Li, S.; and Fang, L. 2019. Learning a low tensor-train rank representation for hyperspectral image super-resolution. IEEE Transactions on Neural Networks and Learning Systems , 30(9): 2672–2683. Dong, W.; Zhou, C.; Wu, F.; Wu, J.; Shi, G.; and Li, X. 2021. Model-guided deep hyperspectral image super-resolution. 
+
+IEEE Transactions on Image Processing , 30: 5754–5768. Fang, J.; Yang, J.; Khader, A.; and Xiao, L. 2024. MIMO-SST: Multi-Input Multi-Output Spatial-Spectral Trans-former for Hyperspectral and Multispectral Image Fusion. 
+
+IEEE Transactions on Geoscience and Remote Sensing , 62: 1–20. He, K.; Zhang, X.; Ren, S.; and Sun, J. 2016. Deep residual learning for image recognition. In Conference on Computer Vision and Pattern RecognitionC , 770–778. Hu, J.; Huang, T.; Deng, L.; Dou, H.; Hong, D.; and Vivone, G. 2022. Fusformer: A Transformer-Based Fusion Net-work for Hyperspectral Image Super-Resolution. IEEE Geo-science and Remote Sensing Letters , 19: 1–5. Hu, J.; Huang, T.; Deng, L.; Jiang, T.; Vivone, G.; and Chanussot, J. 2021. Hyperspectral image super-resolution via deep spatiospectral attention convolutional neural net-works. IEEE Transactions on Neural Networks and Learn-ing Systems , 33: 7251–7265. Huang, T.; Dong, W.; Wu, J.; Li, L.; Li, X.; and Shi, G. 2022. Deep Hyperspectral Image Fusion Network With Iterative Spatio-Spectral Regularization. IEEE Transactions on Com-putational Imaging , 8: 201–214. Kim, J.; Lee, J. K.; and Lee, K. M. 2016. Accurate image super-resolution using very deep convolutional networks. In IEEE/CVF Conference on Computer Vision and Pattern Recognition , 1646–1654. Lee, J.; and Jin, K. H. 2022. Local texture estimator for im-plicit representation function. In IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 1929– 1938. Li, J.; Zheng, K.; Gao, L.; Ni, L.; Huang, M.; and Chanussot, J. 2024. Model-Informed Multistage Unsupervised Network for Hyperspectral Image Super-Resolution. IEEE Transac-tions on Geoscience and Remote Sensing , 62: 1–17. Li, J.; Zheng, K.; Li, Z.; Gao, L.; and Jia, X. 2023a. X-Shaped Interactive Autoencoders With Cross-Modality Mu-tual Learning for Unsupervised Hyperspectral Image Super-Resolution. IEEE Transactions on Geoscience and Remote Sensing , 61: 1–17. Li, J.; Zheng, K.; Liu, W.; Li, Z.; Yu, H.; and Ni, L. 2023b. Model-Guided Coarse-to-Fine Fusion Network for Unsuper-vised Hyperspectral Image Super-Resolution. IEEE Geo-science and Remote Sensing Letters , 20: 1–5. Li, J.; Zheng, K.; Yao, J.; Gao, L.; and Hong, D. 2022. Deep unsupervised blind hyperspectral and multispectral data fu-sion. IEEE Geoscience and Remote Sensing Letters , 19: 1–5. Li, S.; Dian, R.; Fang, L.; and Bioucas-Dias, J. M. 2018. Fusing hyperspectral and multispectral images via coupled sparse tensor factorization. IEEE Transactions on Image Processing , 27(8): 4118–4130. Li, W.; and Fan, X. 2022. Image-Text Alignment and Re-trieval Using Light-Weight Transformer. In International Conference on Acoustics, Speech, and Signal Processing (ICASSP) , 4758–4762. Li, W.; Ma, Z.; Deng, L.-J.; Man, H.; and Fan, X. 2023c. Modality-Fusion Spiking Transformer Network for Audio-Visual Zero-Shot Learning. In IEEE International Confer-ence on Multimedia and Expo (ICME) , 426–431. Li, W.; Ma, Z.; Deng, L.-J.; Wang, P.; Shi, J.; and Fan, X. 2023d. Reservoir Computing Transformer for Image-Text Retrieval. In ACM International Conference on Multimedia (ACM MM) , 5605–5613. Li, W.; Ma, Z.; Shi, J.; and Fan, X. 2023e. The Style Trans-former With Common Knowledge Optimization for Image-Text Retrieval. IEEE Signal Processing Letters , 30: 1197– 1201. Li, W.; Zhao, X.-L.; Ma, Z.; Wang, X.; Fan, X.; and Tian, Y. 2023f. Motion-Decoupled Spiking Transformer for Audio-Visual Zero-Shot Learning. In ACM International Confer-ence on Multimedia (ACM MM) , 3994–4002. Liu, X.; Liu, Q.; and Wang, Y. 2020. Remote sensing image fusion based on two-stream fusion network. Information Fu-sion , 55: 1–15. Ma, Q.; Jiang, J.; Liu, X.; and Ma, J. 2023. Learning a 3D-CNN and transformer prior for hyperspectral image super-resolution. Information Fusion , 101907. 2715 Ma, Q.; Jiang, J.; Liu, X.; and Ma, J. 2024. Reciprocal trans-former for hyperspectral and multispectral image fusion. In-formation Fusion , 104: 102148. Mildenhall, B.; Srinivasan, P. P.; Tancik, M.; Barron, J. T.; Ramamoorthi, R.; and Ng, R. 2021. Nerf: Representing scenes as neural radiance fields for view synthesis. Com-munications of the ACM , 65(1): 99–106. P, K. D.; and Ba, J. 2014. Adam: A method for stochastic optimization. Adam: A Method for Stochastic Optimization .Ran, R.; Deng, L.-J.; Jiang, T.-X.; Hu, J.-F.; Chanussot, J.; and Vivone, G. 2023. GuidedNet: A general CNN fusion framework via high-resolution guidance for hyperspectral image super-resolution. IEEE Transactions on Cybernetics ,53(7): 4148–4161. Shi, W.; Caballero, J.; Husz´ ar, F.; Totz, J.; Aitken, A. P.; Bishop, R.; Rueckert, D.; and Wang, Z. 2016. Real-time sin-gle image and video super-resolution using an efficient sub-pixel convolutional neural network. In IEEE/CVF Confer-ence on Computer Vision and Pattern Recognition (CVPR) ,1874–1883. Sitzmann, V.; Martel, J.; Bergman, A.; Lindell, D.; and Wet-zstein, G. 2020. Implicit neural representations with peri-odic activation functions. Neural Information Processing Systems (NeurIPS) , 33: 7462–7473. Sun, Y.; Xu, H.; Ma, Y.; Wu, M.; Mei, X.; Huang, J.; and Ma, J. 2023. Dual spatial-spectral pyramid network with trans-former for hyperspectral image fusion. IEEE Transactions on Geoscience and Remote Sensing , 61: 1–16. Tang, J.; Chen, X.; and Zeng, G. 2021. Joint implicit image function for guided depth super-resolution. In ACM Interna-tional Conference on Multimedia (ACM MM) , 4390–4399. Vivone, G. 2023. Multispectral and hyperspectral image fu-sion in remote sensing: A survey. Information Fusion , 89: 405–417. Vivone, G.; Dalla Mura, M.; Garzelli, A.; Restaino, R.; Scarpa, G.; Ulfarsson, M. O.; Alparone, L.; and Chanus-sot, J. 2020. A new benchmark based on recent advances in multispectral pansharpening: Revisiting pansharpening with classical and emerging pansharpening methods. IEEE Geo-science and Remote Sensing Magazine , 9(1): 53–81. Wang, W.; Zeng, W.; Huang, Y.; Ding, X.; and Paisley, J. 2019. Deep Blind Hyperspectral Image Fusion. In 
+
+IEEE/CVF International Conference on Computer Vision (ICCV) .Wang, Y.; He, X.; Dong, Y.; Lin, Y.; Huang, Y.; and Ding, X. 2024. Cross-Modality Interaction Network for Pan-sharpening. IEEE Transactions on Geoscience and Remote Sensing , 62: 1–16. Wang, Y.; Lin, Y.; Meng, G.; Fu, Z.; Dong, Y.; Fan, L.; Yu, H.; Ding, X.; and Huang, Y. 2023. Learning high-frequency feature enhancement and alignment for pan-sharpening. In 
+
+ACM International Conference on Multimedia (ACM MM) ,358–367. Wang, Z.; Bovik, A. C.; Sheikh, H. R.; and Simoncelli, E. P. 2004. Image quality assessment: from error visibility to structural similarity. IEEE Transactions on Image Process-ing , 13(4): 600–612. Wu, R.-C.; Deng, S.; Ran, R.; Dou, H.-X.; and Deng, L.-J. 2024. INF3: Implicit Neural Feature Fusion Function for Multispectral and Hyperspectral Image Fusion. IEEE Trans-actions on Computational Imaging , 10: 1547–1558. Xie, Q.; Zhou, M.; Zhao, Q.; Xu, Z.; and Meng, D. 2022. MHF-net: An interpretable deep network for multispectral and hyperspectral image fusion. IEEE Transactions on Pat-tern Analysis and Machine Intelligence , 44: 1457–1473. Xu, T.; Huang, T.; Deng, L.; and Yokoya, N. 2022. An It-erative Regularization Method based on Tensor Subspace Representation for Hyperspectral Image Super-Resolution. 
+
+IEEE Transactions on Geoscience and Remote Sensing , 60: 1–16. Xu, T.; Huang, T.-Z.; Deng, L.-J.; Xiao, J.-L.; Broni-Bediako, C.; Xia, J.; and Yokoya, N. 2024. A Coupled Ten-sor Double-Factor Method for Hyperspectral and Multispec-tral Image Fusion. IEEE Transactions on Geoscience and Remote Sensing , 62: 1–17. Xu, X.; Wang, Z.; and Shi, H. 2021. Ultrasr: Spatial encoding is a missing key for implicit image function-based arbitrary-scale super-resolution. arXiv preprint arXiv:2103.12716 .Zhang, X.; Huang, W.; Wang, Q.; and Li, X. 2020. SSR-NET: Spatial–spectral reconstruction network for hyper-spectral and multispectral image fusion. IEEE Transactions on Geoscience and Remote Sensing , 59(7): 5953–5965. Zhu, C.; Deng, S.; Zhou, Y.; Deng, L.-J.; and Wu, Q. 2023. QIS-GAN: A lightweight adversarial network with quadtree implicit sampling for multispectral and hyperspectral image fusion. IEEE Transactions on Geoscience and Remote Sens-ing , 61: 1–15. Zhu, C.; Zhang, T.; Wu, Q.; Li, Y.; and Zhong, Q. 2024. An Implicit Transformer-based Fusion Method for Hyperspec-tral and Multispectral Remote Sensing Image. International Journal of Applied Earth Observation and Geoinformation ,131: 103955. 2716
