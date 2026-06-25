@@ -1,0 +1,218 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-25T20:33:24.825278+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 4,
+    "quick_skim_target": 12,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2606.19204v1",
+      "source": "arxiv",
+      "title": "ROSA-TFormer: A Radar-Optical Sensor-Aware Temporal Transformer for Pinus sylvestris Plantation Classification in Northern Shaanxi Using GEE-Derived Sentinel-1/2 Time Series",
+      "abstract": "Accurate identification of Pinus sylvestris var. mongolica plantations is important for monitoring afforestation quality and ecological restoration in northern Shaanxi. This paper proposes ROSA-TFormer, a radar-optical sensor-aware temporal Transformer for P. sylvestris classification using Sentinel-1/2 time-series data generated on Google Earth Engine. The model integrates separate SAR and optical embedding branches, a sensor-aware gate, and temporal attention pooling to capture multi-source seasonal features. Experiments on monthly and half-month point-level datasets show that ROSA-TFormer achieves strong classification performance, with 99.67% overall accuracy, 99.56% macro F1, and 98.91% P. sylvestris F1 on the HalfMonth-dataBig dataset. Spatial block validation and ablation results further indicate the effectiveness of radar-optical temporal fusion and sensor-aware modeling. The results demonstrate the potential of ROSA-TFormer for point-level P. sylvestris plantation classification, while broader wall-to-wall validation remains necessary.",
+      "authors": [
+        "Nengbo Zhang",
+        "Chang sheng"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-17T15:41:42+00:00",
+      "link": "https://arxiv.org/pdf/2606.19204v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "radar-optical multimodal classification of tree species",
+      "llm_evidence_cn": "雷达-光学多模态树种分类",
+      "llm_evidence": "雷达-光学多模态树种分类",
+      "canonical_evidence": "雷达-光学多模态树种分类",
+      "llm_tldr_en": "ROSA-TFormer uses radar-optical sensor-aware temporal Transformer to fuse Sentinel-1 SAR and Sentinel-2 time series, achieving 99.67% accuracy for Pinus sylvestris plantation classification.",
+      "llm_tldr_cn": "针对樟子松人工林精确识别需求，结合Sentinel-1 SAR和Sentinel-2光学时间序列，提出ROSA-TFormer模型，包含SAR和光学独立嵌入分支、传感器感知门控和时序注意力池化，有效融合多源季节特征。在月度和半月尺度数据集上分类准确率达99.67%，为多模态遥感分类提供有效方法。",
+      "llm_tldr": "针对樟子松人工林精确识别需求，结合Sentinel-1 SAR和Sentinel-2光学时间序列，提出ROSA-TFormer模型，包含SAR和光学独立嵌入分支、传感器感知门控和时序注意力池化，有效融合多源季节特征。在月度和半月尺度数据集上分类准确率达99.67%，为多模态遥感分类提供有效方法。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.21527v1",
+      "source": "arxiv",
+      "title": "LOGOS: LiDAR-Only Gaussian Elevation Splatting for Unified Tiny Obstacle Segmentation",
+      "abstract": "Robust obstacle segmentation is essential for the safety of intelligent robots, where LiDAR-based perception systems play a fundamental role in the robot-environment interaction. While extensive LiDAR-based approaches have demonstrated high performance on common obstacles in urban scenarios, their results on tiny obstacles such as curbs, gravel, and potholes remain unsatisfactory due to the significant similarity between tiny obstacles and inherent road undulations. Moreover, their segmentation accuracy even deteriorates sharply when the LiDAR scans suffer from degradation in challenging off-road scenes. To overcome these bottlenecks, we propose LOGOS, a LiDAR-only unified tiny obstacle segmentation system, which models the road surface as a continuous mixture of 2D Gaussian primitives and distinguishes tiny obstacles via high-presicion elevation estimation. Unlike existing Gaussian splatting methods that rely on iterative RGB training, LOGOS is a backpropagation-free LiDAR-only approach. It directly estimates Gaussian parameters via a freespace-aware initialization by incrementally pruning non-road primitives using smoothness constraints. Subsequently, pointwise signed distances are computed via a novel normal-aware elevation splatting function, ensuring robustness to both flat and sloped terrains. We evaluate LOGOS on a highly heterogeneous benchmark of point cloud frames collected from urban mobility scenarios and mining haulage off-road environments. These data are practically acquired using different LiDAR sensors and exhibit large variations in point density, terrain roughness, and obstacle types. Experiments on the road and off-road scenes demonstrate that LOGOS significantly outperforms other state-of-the-art methods, particularly in degraded point cloud regions and challenging off-road scenarios, while maintaining real-time efficiency.",
+      "authors": [
+        "Nan Ming",
+        "Yeqiang Qian",
+        "Chunxiang Wang",
+        "Ming Yang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-06-19T15:25:56+00:00",
+      "link": "https://arxiv.org/pdf/2606.21527v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LiDAR-based obstacle segmentation, transferable to LiDAR image classification",
+      "llm_evidence_cn": "基于LiDAR的障碍物分割，可迁移至LiDAR图像分类",
+      "llm_evidence": "基于LiDAR的障碍物分割，可迁移至LiDAR图像分类",
+      "canonical_evidence": "基于LiDAR的障碍物分割，可迁移至LiDAR图像分类",
+      "llm_tldr_en": "Proposes LOGOS, a LiDAR-only Gaussian elevation splatting method for tiny obstacle segmentation, modeling road surface to overcome similarity issues, demonstrating strong performance on challenging off-road scenes.",
+      "llm_tldr_cn": "针对现有LiDAR方法在小障碍物分割上效果不佳的问题，本文提出LOGOS系统，仅利用LiDAR数据通过高斯高程溅射建模道路表面，有效区分小障碍物与路面起伏。在多个场景下实验表明，该方法在越野等退化条件下仍能保持高精度分割，为LiDAR图像分析提供了鲁棒方案。",
+      "llm_tldr": "针对现有LiDAR方法在小障碍物分割上效果不佳的问题，本文提出LOGOS系统，仅利用LiDAR数据通过高斯高程溅射建模道路表面，有效区分小障碍物与路面起伏。在多个场景下实验表明，该方法在越野等退化条件下仍能保持高精度分割，为LiDAR图像分析提供了鲁棒方案。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.18948v1",
+      "source": "arxiv",
+      "title": "C-ARC: Continuous-Adaptive Range Clustering for Non-Repetitive LiDAR Sensors",
+      "abstract": "Real-time LiDAR clustering identifies structures in point clouds, which is an essential prerequisite for many mobile robotics algorithms. Current methods are mostly developed for repetitive mechanical LiDAR sensors. Recently, the use of non-repetitive LiDAR sensors is strongly increasing due to their small cost and form factor. Such non-repetitive Risley prism-based sensors violate two key assumptions of repetitive mechanical sensors: structured scan lines and well-defined frame boundaries. Their Rhodonea-curve trajectories produce non-uniform point distributions, and the absence of a rotation cycle renders conventional scan line indexing inapplicable. To meet such new requirements, we developed C-ARC, a Continuous-Adaptive Range Clustering framework that maintains a persistent dual-graph over a sliding window, decoupling high-frequency point insertion from on-demand cluster retrieval. This is crucial for key functionalities like SLAM or tracking. An adaptive range grid resolution mechanism calibrates grid dimensions at initialization using an exponential control loop, balancing the sparsity-collision trade-off without prior knowledge of the scanning pattern. Implemented as an open-sourced single-threaded C++17 library, C-ARC produces real-time cluster output at 20 Hz on commodity hardware for the Livox Mid-360. Evaluation on the Livox Avia identifies unbounded cell occupancy as the primary limitation for sensors with strongly concentrated scan patterns. The adaptive resolution mechanism additionally improves clustering quality for existing grid-based methods on non-repetitive data.",
+      "authors": [
+        "Nick B. Schroeder",
+        "Jonathan Lichtenfeld",
+        "Oskar von Stryk"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-06-17T11:30:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.18948v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LiDAR point cloud clustering for classification",
+      "llm_evidence_cn": "LiDAR点云聚类用于分类",
+      "llm_evidence": "LiDAR点云聚类用于分类",
+      "canonical_evidence": "LiDAR点云聚类用于分类",
+      "llm_tldr_en": "C-ARC proposes continuous-adaptive range clustering for non-repetitive LiDAR sensors, enabling real-time structure identification in point clouds.",
+      "llm_tldr_cn": "针对非重复式LiDAR传感器点云分布不均匀、无明确帧边界的问题，提出C-ARC连续自适应范围聚类框架。该方法利用自适应邻域和连续帧处理，在多个非重复式LiDAR数据集上实现了实时且准确的点云结构分割，为后续分类任务提供了基础。对LiDAR图像分类具有方法学支持作用。",
+      "llm_tldr": "针对非重复式LiDAR传感器点云分布不均匀、无明确帧边界的问题，提出C-ARC连续自适应范围聚类框架。该方法利用自适应邻域和连续帧处理，在多个非重复式LiDAR数据集上实现了实时且准确的点云结构分割，为后续分类任务提供了基础。对LiDAR图像分类具有方法学支持作用。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.23356v1",
+      "source": "arxiv",
+      "title": "Changing Modalities: Adapting Remote Sensing Models to New Satellites and Sensors",
+      "abstract": "Machine learning models for remote sensing are trained and deployed on a static set of modalities. However, as we equip newer satellites with novel sensors and retire old ones, practitioners may wish to deploy an existing model on a substitution, superset, or subset of modalities with minimal retraining given data availability or practical computational constraints. We study the setting of updating existing models to changing modalities and identify three main scenarios: Modality Transfer (substitution), Addition (superset), and Peeking (subset). We propose DeluluNet, an architecture with modular components for all three changing modality scenarios. DeluluNet is trained end-to-end, learning a multi-modal model from a unimodal teacher and unlabeled multimodal data via modality hallucination--predicting missing modality representations from those that are present. As a result, DeluluNet can keep predicting even when input modalities change, providing a practical alternative to re-labeling and re-training in a changing world.",
+      "authors": [
+        "Tim G. Zhou",
+        "Anthony Fuller",
+        "Geoff Pleiss",
+        "Evan Shelhamer"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-22T13:56:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.23356v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multimodal remote sensing model adaptation",
+      "llm_evidence_cn": "多模态遥感模型自适应",
+      "llm_evidence": "多模态遥感模型自适应",
+      "canonical_evidence": "多模态遥感模型自适应",
+      "llm_tldr_en": "Proposes DeluluNet for adapting remote sensing models to new sensors across modality transfer, addition, and peeking scenarios via modular components.",
+      "llm_tldr_cn": "该方法针对遥感模型需要适应新传感器模态变化的问题，提出了DeluluNet架构，通过模块化组件支持模态替换、添加和子集三种场景。它利用端到端训练从单模态教师模型中学习多模态表示，实验表明在多种遥感数据集上有效提升了模型对模态变化的鲁棒性，为多模态遥感分类和融合提供了通用框架。",
+      "llm_tldr": "该方法针对遥感模型需要适应新传感器模态变化的问题，提出了DeluluNet架构，通过模块化组件支持模态替换、添加和子集三种场景。它利用端到端训练从单模态教师模型中学习多模态表示，实验表明在多种遥感数据集上有效提升了模型对模态变化的鲁棒性，为多模态遥感分类和融合提供了通用框架。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.25312v1",
+      "source": "arxiv",
+      "title": "LEVIRDet: A Million-Scale 159-Category Dataset and Foundation Model for Universal Remote Sensing Object Detection",
+      "abstract": "Remote sensing object detection has advanced rapidly with the development of large-scale benchmarks and modern detection architectures. However, existing datasets and detectors remain fragmented. Most benchmarks focus on limited categories, fixed spatial resolutions, or a single sensor, while detectors still struggle to work across different sensors and categorical systems. In this paper, we introduce LEVIRDet-159, the largest and most comprehensive remote sensing object detection dataset to date, with 159 categories, 2.56 million bounding boxes, and 700k fine-grained annotations under a multi-level taxonomy. In each key scale dimension, LEVIRDet-159 exceeds the corresponding largest existing remote sensing object detection dataset, containing approximately (7x) more images, (6x) more object instances, and (4x) more categories. Based on this dataset, we design LEVIRDetNet, a scale-hierarchy-aware detection foundation model for universal remote sensing object detection. LEVIRDetNet couples online visual Ground Sampling Distance (GSD) prediction, GSD-conditioned query modulation and allocation, and a hierarchy-aware detection head for mixed-granularity remote sensing supervision. Under stringent evaluation settings, LEVIRDetNet demonstrates strong cross-domain generalization. Even without target-domain training or fine-tuning, it achieves state-of-the-art detection performance on 9 external benchmarks, improving the strongest fully supervised competing methods by 5.02 mAP on average under each benchmark's primary metric. We hope this study will facilitate the development of strongly generalizable remote sensing object detection across diverse category systems, spatial resolutions, and sensor platforms. The dataset and trained models will be released at https://qinzheyang.github.io/LEVIRDet/, accompanying the final paper.",
+      "authors": [
+        "Qinzhe Yang",
+        "Dongyu Wang",
+        "Haohan Niu",
+        "Jia Xu",
+        "Zhenwei Shi",
+        "Zhengxia Zou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-24T02:25:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.25312v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "large-scale remote sensing object detection dataset and foundation model, applicable to hyperspectral target detection",
+      "llm_evidence_cn": "大规模遥感目标检测数据集和基础模型，可应用于高光谱目标检测",
+      "llm_evidence": "大规模遥感目标检测数据集和基础模型，可应用于高光谱目标检测",
+      "canonical_evidence": "大规模遥感目标检测数据集和基础模型，可应用于高光谱目标检测",
+      "llm_tldr_en": "Introduces the largest remote sensing object detection dataset with 159 categories and a foundation model, enabling universal detection across sensors including hyperspectral.",
+      "llm_tldr_cn": "当前遥感目标检测数据集和检测器在类别、分辨率和传感器上碎片化。本文构建了最大最全面的遥感目标检测数据集LEVIRDet-159，含159类、256万框、70万精细标注。同时提出基础模型，支持跨传感器检测，包括高光谱数据，为通用遥感目标检测奠定基础。",
+      "llm_tldr": "当前遥感目标检测数据集和检测器在类别、分辨率和传感器上碎片化。本文构建了最大最全面的遥感目标检测数据集LEVIRDet-159，含159类、256万框、70万精细标注。同时提出基础模型，支持跨传感器检测，包括高光谱数据，为通用遥感目标检测奠定基础。",
+      "llm_tags": [
+        "query:hsi:composite"
+      ],
+      "matched_query_tag": "query:hsi:composite",
+      "matched_query_text": "Papers central to 高光谱图像目标检测与分类, especially work that connects or combines: hyperspectral image classification methods; hyperspectral target detection algorithms; hyperspectral anomaly detection techniques; spectral-spatial feature extraction for hyperspectral data; hyperspectral image target detection.",
+      "matched_requirement_id": "req-composite-hsi",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

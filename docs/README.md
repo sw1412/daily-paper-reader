@@ -6,44 +6,37 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-16 ~ 2026-06-25
-- 运行时间：2026-06-25 03:44:37 UTC
+- 最新运行日期：2026-06-25
+- 运行时间：2026-06-25 20:37:07 UTC
 - 运行状态：成功
-- 本次总论文数：8
-- 精读区：2
-- 速读区：6
+- 本次总论文数：5
+- 精读区：1
+- 速读区：4
 
 ### 今日简报（AI）
-今日精选8篇遥感与AI前沿论文，聚焦少样本蚜虫检测、SAR-光学融合填云、LiDAR自监督蒸馏及森林结构制图。最值得关注的是利用GAN合成数据与Transformer实现的蚜虫少样本检测（9.0分），以及SAR-光学异质融合框架用于近实时土地覆盖制图（8.0分）。下一步建议：可深入探索少样本学习与合成数据生成的落地应用，并关注多模态遥感在云雾遮挡下的鲁棒填图方案。
-- 详情：[/20260616-20260625/README](/20260616-20260625/README)
+今日共分析5篇遥感论文，精读1篇雷达-光学融合的时序分类模型，速读3篇涵盖LiDAR障碍物分割、模型迁移与点云聚类。  
+最值得关注的是ROSA-TFormer利用Sentinel-1/2时序数据在GEE上实现陕西杨树种植区高精度分类，以及LOGOS仅用LiDAR高斯高程分割细小障碍物。  
+建议读者优先了解ROSA-TFormer的多模态时序融合方法，并关注LOGOS在无人车场景中的应用潜力。
+- 详情：[/202606/25/README](/202606/25/README)
 
 ### 精读区论文标签
-1. [Few-Shot Hyperspectral Aphid Detection via FastGAN Synthetic Data Generation, Transformer-Based Classification and Explainable AI](/20260616-20260625/2606.21267v1-few-shot-hyperspectral-aphid-detection-via-fastgan-synthetic-data-generation-transformer-based-classification-and-explainable-ai)  
-   标签：评分：9.0/10、query:hsi-lidar
-   evidence：利用FastGAN与Transformer的高光谱蚜虫检测
-2. [Heterogeneous SAR-optical fusion for near-real-time land use and land cover mapping under cloud contamination: A novel framework and global benchmark dataset](/20260616-20260625/2606.17713v1-heterogeneous-sar-optical-fusion-for-near-real-time-land-use-and-land-cover-mapping-under-cloud-contamination-a-novel-framework-and-global-benchmark-dataset)  
+1. [ROSA-TFormer: A Radar-Optical Sensor-Aware Temporal Transformer for Pinus sylvestris Plantation Classification in Northern Shaanxi Using GEE-Derived Sentinel-1/2 Time Series](/202606/25/2606.19204v1-rosa-tformer-a-radar-optical-sensor-aware-temporal-transformer-for-pinus-sylvestris-plantation-classification-in-northern-shaanxi-using-gee-derived-sentinel-12-time-series)  
    标签：评分：8.0/10、query:hsi-lidar
-   evidence：SAR与光学融合的土地覆盖分类；多模态遥感
+   evidence：雷达-光学多模态树种分类
 
 ### 速读区论文标签
-1. [HilDA: Hierarchical Distillation with Diffusion for Advancing Self-Supervised LiDAR Pre-trainin](/20260616-20260625/2606.20189v1-hilda-hierarchical-distillation-with-diffusion-for-advancing-self-supervised-lidar-pre-trainin)  
+1. [LOGOS: LiDAR-Only Gaussian Elevation Splatting for Unified Tiny Obstacle Segmentation](/202606/25/2606.21527v1-logos-lidar-only-gaussian-elevation-splatting-for-unified-tiny-obstacle-segmentation)  
    标签：评分：7.0/10、query:hsi-lidar
-   evidence：LiDAR骨干网络的自监督预训练直接支持LiDAR图像分类
-2. [HilDA: Hierarchical Distillation with Diffusion for Advancing Self-Supervised LiDAR Pre-training](/20260616-20260625/2606.20189v3-hilda-hierarchical-distillation-with-diffusion-for-advancing-self-supervised-lidar-pre-training)  
+   evidence：基于LiDAR的障碍物分割，可迁移至LiDAR图像分类
+2. [Changing Modalities: Adapting Remote Sensing Models to New Satellites and Sensors](/202606/25/2606.23356v1-changing-modalities-adapting-remote-sensing-models-to-new-satellites-and-sensors)  
    标签：评分：7.0/10、query:hsi-lidar
-   evidence：面向LiDAR分类的自监督预训练方法
-3. [Integrating national forest inventory, airborne lidar, and satellite imagery for wall-to-wall mapping of forest structure with computer vision](/20260616-20260625/2606.20291v1-integrating-national-forest-inventory-airborne-lidar-and-satellite-imagery-for-wall-to-wall-mapping-of-forest-structure-with-computer-vision)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：激光雷达与卫星影像集成进行森林结构制图；多模态融合
-4. [Aerial-ground LiDAR place recognition with patch-level self-supervised learning and expanded reciprocal re-ranking](/20260616-20260625/2606.18583v1-aerial-ground-lidar-place-recognition-with-patch-level-self-supervised-learning-and-expanded-reciprocal-re-ranking)  
+   evidence：多模态遥感模型自适应
+3. [C-ARC: Continuous-Adaptive Range Clustering for Non-Repetitive LiDAR Sensors](/202606/25/2606.18948v1-c-arc-continuous-adaptive-range-clustering-for-non-repetitive-lidar-sensors)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：基于块级自监督学习的空地LiDAR地点识别
-5. [HilDA: Hierarchical Distillation with Diffusion for Advancing Self-Supervised LiDAR Pre-training](/20260616-20260625/2606.20189v2-hilda-hierarchical-distillation-with-diffusion-for-advancing-self-supervised-lidar-pre-training)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：激光雷达预训练用于分类
-6. [UniverSat: Resolution- and Modality-Agnostic Transformers for Earth Observation](/20260616-20260625/2606.23503v1-universat-resolution--and-modality-agnostic-transformers-for-earth-observation)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：多模态遥感图像分类
+   evidence：LiDAR点云聚类用于分类
+4. [LEVIRDet: A Million-Scale 159-Category Dataset and Foundation Model for Universal Remote Sensing Object Detection](/202606/25/2606.25312v1-levirdet-a-million-scale-159-category-dataset-and-foundation-model-for-universal-remote-sensing-object-detection)  
+   标签：评分：6.0/10、query:hsi
+   evidence：大规模遥感目标检测数据集和基础模型，可应用于高光谱目标检测
 
 
 <div class="dpr-home-promo-card">
