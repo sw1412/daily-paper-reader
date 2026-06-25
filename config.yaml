@@ -25,3 +25,65 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: hsi-lidar
+      description: 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文
+      enabled: true
+      paper_sources:
+        - arxiv
+      keywords:
+        - keyword: hyperspectral image classification
+          keyword_cn: 高光谱图像分类
+          query: hyperspectral image classification
+        - keyword: LiDAR-guided hyperspectral classification
+          keyword_cn: 激光雷达图像分类
+          query: LiDAR image classification
+        - keyword: hyperspectral and LiDAR target detection
+          keyword_cn: 高光谱与激光雷达目标检测
+          query: joint classification of hyperspectral and LiDAR images
+        - keyword: hyperspectral target detection
+          keyword_cn: 高光谱图像目标检测
+          query: object detection in hyperspectral images
+        - keyword: multimodal remote sensing classification
+          keyword_cn: 多模态遥感图像分类
+          query: multimodal remote sensing image classification
+        - keyword: hyperspectral LiDAR fusion
+          keyword_cn: 高光谱与激光雷达融合
+          query: fusion of hyperspectral and LiDAR data
+      intent_queries:
+        - query: multimodal hyperspectral image classification with LiDAR data
+          query_cn: 多模态高光谱图像与激光雷达数据联合分类
+          enabled: true
+          source: manual
+          note: ''
+        - query: joint classification of hyperspectral and LiDAR images
+          query_cn: 高光谱与激光雷达图像联合分类
+          enabled: true
+          source: manual
+          note: ''
+        - query: hyperspectral and LiDAR fusion for target detection
+          query_cn: 高光谱与激光雷达融合用于目标检测
+          enabled: true
+          source: manual
+          note: ''
+        - query: multimodal hyperspectral image classification methods
+          query_cn: 多模态高光谱图像分类方法
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-06-25T03:27:36.019Z'
+source_backends:
+  arxiv:
+    papers_table: arxiv_papers
+    use_vector_rpc: true
+    vector_rpc: match_arxiv_papers
+    vector_rpc_exact: match_arxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_arxiv_papers_bm25
+    sync_table: arxiv_sync_status
+    sync_success_value: success
+    schema: public
+    kind: supabase
+    enabled: true
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
