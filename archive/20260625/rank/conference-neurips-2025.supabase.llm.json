@@ -1,0 +1,578 @@
+{
+  "top_k": 200,
+  "generated_at": "2026-06-25T03:54:49.638118+00:00",
+  "papers": [
+    {
+      "id": "openreview-neurips-2025-xqfzprbswl",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "Spectral Compressive Imaging via Chromaticity-Intensity Decomposition",
+      "abstract": "In coded aperture snapshot spectral imaging (CASSI), the captured measurement entangles spatial and spectral information, posing a severely ill-posed inverse problem for hyperspectral images (HSIs) reconstruction. Moreover, the captured radiance inherently depends on scene illumination, making it difficult to recover the intrinsic spectral reflectance that remains invariant to lighting conditions. To address these challenges, we propose a chromaticity-intensity decomposition framework, which disentangles an HSI into a spatially smooth intensity map and a spectrally variant chromaticity cube. The chromaticity encodes lighting-invariant reflectance, enriched with high-frequency spatial details and local spectral sparsity. Building on this decomposition, we develop CIDNet—a Chromaticity-Intensity Decomposition unfolding network within a dual-camera CASSI system. CIDNet integrates a hybrid spatial-spectral Transformer tailored to reconstruct fine-grained and sparse spectral chromaticity and a degradation-aware, spatially-adaptive noise estimation module that captures anisotropic noise across iterative stages. Extensive experiments on both synthetic and real-world CASSI datasets demonstrate that our method achieves superior performance in both spectral and chromaticity fidelity. Code is released at: \\url{https://github.com/xiaodongwo/CIDNet}.",
+      "authors": [
+        "Xiaodong Wang",
+        "Zijun He",
+        "Ping Wang",
+        "Lishun Wang",
+        "Yanan Hu",
+        "Xin Yuan"
+      ],
+      "primary_category": "computational imaging",
+      "categories": [
+        "computational imaging",
+        "computational photography"
+      ],
+      "published": "2025-09-18T17:42:34.78+00:00",
+      "link": "https://openreview.net/forum?id=xQfZprbSWL",
+      "pdf_url": null,
+      "tags": [
+        "keyword:HSI",
+        "query:HSI"
+      ]
+    },
+    {
+      "id": "openreview-neurips-2025-812rmogrgf",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "FRN: Fractal-Based Recursive Spectral Reconstruction Network",
+      "abstract": "Generating hyperspectral images (HSIs) from RGB images through spectral reconstruction can significantly reduce the cost of HSI acquisition. In this paper, we propose a Fractal-Based Recursive Spectral Reconstruction Network (FRN), which differs from existing paradigms that attempt to directly integrate the full-spectrum information from the R, G, and B channels in a one-shot manner. Instead, it treats spectral reconstruction as a progressive process, predicting from broad to narrow bands or employing a coarse-to-fine approach for predicting the next wavelength. Inspired by fractals in mathematics, FRN establishes a novel spectral reconstruction paradigm by recursively invoking an atomic reconstruction module. In each invocation, only the spectral information from neighboring bands is used to provide clues for the generation of the image at the next wavelength, which follows the low-rank property of spectral data. Moreover, we design a band-aware state space model that employs a pixel-differentiated scanning strategy at different stages of the generation process, further suppressing interference from low-correlation regions caused by reflectance differences. Through extensive experimentation across different datasets, FRN achieves superior reconstruction performance compared to state-of-the-art methods. Code is available at https://github.com/mongko007/frn.",
+      "authors": [
+        "Ge Meng",
+        "Zhongnan Cai",
+        "Ruizhe Chen",
+        "Jingyan Tu",
+        "Yingying Wang",
+        "Yue Huang",
+        "Xinghao Ding"
+      ],
+      "primary_category": "Hyperspectral Image",
+      "categories": [
+        "Hyperspectral Image",
+        "Spectral Reconstruction",
+        "Fractal",
+        "State Space Model"
+      ],
+      "published": "2025-09-18T17:30:17.276+00:00",
+      "link": "https://openreview.net/forum?id=812rmogRgf",
+      "pdf_url": null,
+      "tags": [
+        "keyword:HSI",
+        "query:HSI"
+      ]
+    },
+    {
+      "id": "openreview-neurips-2025-7yrwaewxto",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "InstructSAM: A Training-free Framework for Instruction-Oriented Remote Sensing Object Recognition",
+      "abstract": "Language-guided object recognition in remote sensing imagery is crucial for large-scale mapping and automated data annotation. However, existing open-vocabulary and visual grounding methods rely on explicit category cues, limiting their ability to handle complex or implicit queries that require advanced reasoning.\nTo address this issue, we introduce a new suite of tasks, including Instruction-Oriented Object Counting, Detection, and Segmentation (InstructCDS), covering open-vocabulary, open-ended, and open-subclass scenarios. We further present EarthInstruct, the first InstructCDS benchmark for earth observation. It is constructed from two diverse remote sensing datasets with varying spatial resolutions and annotation rules across 20 categories, necessitating models to interpret dataset-specific instructions.\nGiven the scarcity of semantically rich labeled data in remote sensing, we propose InstructSAM, a training-free framework for instruction-driven object recognition. InstructSAM leverages large vision-language models to interpret user instructions and estimate object counts, employs SAM2 for mask proposal, and formulates mask-label assignment as a binary integer programming problem. By integrating semantic similarity with counting constraints, InstructSAM efficiently assigns categories to predicted masks without relying on confidence thresholds. Experiments demonstrate that InstructSAM matches or surpasses specialized baselines across multiple tasks while maintaining near-constant inference time regardless of object count, reducing output tokens by 89\\% and overall runtime by over 32\\% compared to direct generation approaches. We believe the contributions of the proposed tasks, benchmark, and effective approach will advance future research in developing versatile object recognition systems. The code is available at https://VoyagerXvoyagerx.github.io/InstructSAM.",
+      "authors": [
+        "Yijie Zheng",
+        "Weijie Wu",
+        "Qingyun Li",
+        "Xuehui Wang",
+        "Xu Zhou",
+        "Aiai Ren",
+        "Jun Shen",
+        "Long Zhao",
+        "Guoqing Li",
+        "Xue Yang"
+      ],
+      "primary_category": "object recognition",
+      "categories": [
+        "object recognition",
+        "remote sensing",
+        "vision-language model"
+      ],
+      "published": "2025-09-18T17:38:46.803+00:00",
+      "link": "https://openreview.net/forum?id=7yRwAEWxto",
+      "pdf_url": null,
+      "tags": [
+        "keyword:HSI",
+        "query:HSI"
+      ]
+    },
+    {
+      "id": "openreview-neurips-2025-59tl8mpbzx",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "Unraveling Metameric Dilemma for Spectral Reconstruction: A High-Fidelity Approach via Semi-Supervised Learning",
+      "abstract": "Spectral reconstruction from RGB images often suffers from a metameric dilemma, where distinct spectral distributions map to nearly identical RGB values, making them indistinguishable to current models and leading to unreliable reconstructions.\nIn this paper, we present Diff-Spectra that integrates supervised physics-aware spectral estimation and unsupervised high-fidelity spectral regularization for HSI reconstruction.\nWe first introduce an Adaptive illumiChroma Decoupling (AICD) module to decouple illumination and chrominance information, which learns intrinsic and distinctive feature distributions, thereby mitigating the metameric issue.\nThen, we incorporate the AICD into a learnable spectral response function (SRF) guided hyperspectral initial estimation mechanism to mimic the physical image formation and thus inject physics-aware reasoning into neural networks, turning an ill-posed problem into a constrained, interpretable task. \nWe also introduce a metameric spectra augmentation method to synthesize comprehensive hyperspectral data to pre-train a Spectral Diffusion Module (SDM), which internalizes the statistical properties of real-world HSI data, enforcing unsupervised high-fidelity regularization on the spectral transitions via inner-loop optimization during inference.\nExtensive experimental evaluations demonstrate that our Diff-Spectra achieves SOTA performance on both Spectral reconstruction and downstream HSI classification.",
+      "authors": [
+        "Xingxing Yang",
+        "Jie Chen",
+        "Zaifeng Yang"
+      ],
+      "primary_category": "Semi-supervised learning",
+      "categories": [
+        "Semi-supervised learning",
+        "hyperspectral image reconstruction",
+        "diffusion model"
+      ],
+      "published": "2025-09-18T17:29:08.678+00:00",
+      "link": "https://openreview.net/forum?id=59TL8MpBzX",
+      "pdf_url": null,
+      "tags": [
+        "keyword:HSI",
+        "query:HSI"
+      ]
+    },
+    {
+      "id": "openreview-neurips-2025-vm4pijsjdg",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "Anomaly Detection by an Ensemble of  Random Pairs of Hyperspheres",
+      "abstract": "Anomaly detection is a crucial task in data mining, focusing on identifying data points that deviate significantly from the main patterns in the data. This paper introduces Anomaly Detection by an Ensemble of Random Pairs of Hyperspheres (ADERH), a new isolation-based technique leveraging two key observations: (i) anomalies are comparatively rare, and (ii) they typically deviate more strongly from general patterns than normal data points. Drawing on a delta-separation argument, ADERH constructs an ensemble of multi-scale hyperspheres built upon randomly paired data points to identify anomalies. To address inevitable overlaps between anomalous and normal regions in the feature space, ADERH integrates two complementary concepts: Pitch, which highlights points near hypersphere boundaries, and NDensity, which down-weights hyperspheres centered on sparse (and often anomalous) regions. By averaging these local, density-adjusted ``isolation'' indicators across many random subsets, ADERH yields robust anomaly scores that clearly separate normal from abnormal samples. Extensive experiments on diverse real-world datasets show that ADERH consistently outperforms state-of-the-art methods while maintaining linear runtime scalability and stable performance across varying hyperparameter settings.",
+      "authors": [
+        "Walid Durani",
+        "Collin Leiber",
+        "Khalid Durani",
+        "Claudia Plant",
+        "Christian Böhm"
+      ],
+      "primary_category": "ensemble",
+      "categories": [
+        "ensemble",
+        "isolation",
+        "anomaly detection"
+      ],
+      "published": "2025-09-18T17:40:01.231+00:00",
+      "link": "https://openreview.net/forum?id=vM4PIjsJDG",
+      "pdf_url": null,
+      "tags": [
+        "keyword:HSI"
+      ]
+    },
+    {
+      "id": "openreview-neurips-2025-nglfqtbprr",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "An Evidence-Based Post-Hoc Adjustment Framework for Anomaly Detection Under Data Contamination",
+      "abstract": "Unsupervised anomaly detection (AD) methods typically assume clean training data, yet real-world datasets often contain undetected or mislabeled anomalies, leading to significant performance degradation. Existing solutions require access to the training pipelines, data or prior knowledge of the proportions of anomalies in the data, limiting their real-world applicability. To address this challenge, we propose EPHAD, a simple yet effective test-time adaptation framework that updates the outputs of AD models trained on contaminated datasets using evidence gathered at test time. Our approach integrates the prior knowledge captured by the AD model trained on contaminated datasets with evidence derived from multimodal foundation models like Contrastive Language-Image Pre-training (CLIP), classical AD methods like the Local Outlier Factor or domain-specific knowledge. We illustrate the intuition behind EPHAD using a synthetic toy example and validate its effectiveness through comprehensive experiments across eight visual AD datasets, twenty-six tabular AD datasets, and a real-world industrial AD dataset. Additionally, we conduct an ablation study to analyse hyperparameter influence and robustness to varying contamination levels, demonstrating the versatility and robustness of EPHAD across diverse AD models and evidence pairs. To ensure reproducibility, our code is publicly available at https://github.com/sukanyapatra1997/EPHAD.",
+      "authors": [
+        "Sukanya Patra",
+        "Souhaib Ben Taieb"
+      ],
+      "primary_category": "anomaly detection",
+      "categories": [
+        "anomaly detection",
+        "anomaly",
+        "contamination",
+        "test-time adaptation"
+      ],
+      "published": "2025-09-18T17:43:18.377+00:00",
+      "link": "https://openreview.net/forum?id=NgLFQTBPRR",
+      "pdf_url": null,
+      "tags": [
+        "keyword:HSI"
+      ]
+    },
+    {
+      "id": "openreview-neurips-2025-ocooe8tt8v",
+      "source": "NeurIPS-2025-Accepted",
+      "title": "Leaving No OOD Instance Behind: Instance-Level OOD Fine-Tuning for Anomaly Segmentation",
+      "abstract": "Out-of-distribution (OOD) fine-tuning has emerged as a promising approach for anomaly segmentation. Current OOD fine-tuning strategies typically employ global-level objectives, aiming to guide segmentation models to accurately predict a large number of anomaly pixels. However, these strategies often perform poorly on small anomalies. To address this issue, we propose an instance-level OOD fine-tuning framework, dubbed LNOIB (Leaving No OOD Instance Behind). We start by theoretically analyzing why global-level objectives fail to segment small anomalies. Building on this analysis, we introduce a simple yet effective instance-level objective. Moreover, we propose a feature separation objective to explicitly constrain the representations of anomalies, which are prone to be smoothed by their in-distribution (ID) surroundings. LNOIB integrates these objectives to enhance the segmentation of small anomalies and serves as a paradigm adaptable to existing OOD fine-tuning strategies, without introducing additional inference cost. Experimental results show that integrating LNOIB into various OOD fine-tuning strategies yields significant improvements, particularly in component-level results, highlighting its strength in comprehensive anomaly segmentation.",
+      "authors": [
+        "YUXUAN ZHANG",
+        "Zhenbo Shi",
+        "Han ye",
+        "Shuchang Wang",
+        "Zhidong Yu",
+        "Shaowei Wang",
+        "Wei Yang"
+      ],
+      "primary_category": "Computer Vision",
+      "categories": [
+        "Computer Vision",
+        "Semantic Segmentation",
+        "Out-of-distribution Detection",
+        "Outlier Exposure"
+      ],
+      "published": "2025-09-18T17:37:29.752+00:00",
+      "link": "https://openreview.net/forum?id=oCOOe8tt8v",
+      "pdf_url": null,
+      "tags": [
+        "keyword:HSI"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "type": "intent_query",
+      "tag": "HSI",
+      "paper_tag": "query:HSI",
+      "query_text": "hyperspectral image target detection",
+      "sim_scores": {
+        "openreview-neurips-2025-xqfzprbswl": {
+          "score": 0.01639344262295082,
+          "rank": 1
+        },
+        "openreview-neurips-2025-812rmogrgf": {
+          "score": 0.014285714285714285,
+          "rank": 10
+        },
+        "openreview-neurips-2025-7yrwaewxto": {
+          "score": 0.014084507042253521,
+          "rank": 11
+        },
+        "openreview-neurips-2025-59tl8mpbzx": {
+          "score": 0.0136986301369863,
+          "rank": 13
+        }
+      },
+      "ranked": [
+        {
+          "paper_id": "openreview-neurips-2025-vm4pijsjdg",
+          "score": 1.0,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-neurips-2025-xqfzprbswl",
+          "score": 1.0,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-neurips-2025-812rmogrgf",
+          "score": 0.9671951886276652,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-neurips-2025-59tl8mpbzx",
+          "score": 0.9046610169491525,
+          "star_rating": 5
+        },
+        {
+          "paper_id": "openreview-neurips-2025-7yrwaewxto",
+          "score": 0.8748370273794003,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-nglfqtbprr",
+          "score": 0.7641857037582903,
+          "star_rating": 4
+        },
+        {
+          "paper_id": "openreview-neurips-2025-ocooe8tt8v",
+          "score": 0.5773717807616113,
+          "star_rating": 4
+        }
+      ]
+    },
+    {
+      "type": "keyword",
+      "tag": "HSI",
+      "paper_tag": "keyword:HSI",
+      "query_text": "hyperspectral anomaly detection techniques",
+      "sim_scores": {
+        "openreview-neurips-2025-vm4pijsjdg": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "openreview-neurips-2025-xqfzprbswl": {
+          "score": 0.015873015873015872,
+          "rank": 3
+        },
+        "openreview-neurips-2025-812rmogrgf": {
+          "score": 0.015625,
+          "rank": 4
+        },
+        "openreview-neurips-2025-nglfqtbprr": {
+          "score": 0.014084507042253521,
+          "rank": 11
+        },
+        "openreview-neurips-2025-59tl8mpbzx": {
+          "score": 0.013888888888888888,
+          "rank": 12
+        },
+        "openreview-neurips-2025-ocooe8tt8v": {
+          "score": 0.01282051282051282,
+          "rank": 18
+        },
+        "openreview-neurips-2025-7yrwaewxto": {
+          "score": 0.012345679012345678,
+          "rank": 21
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "HSI",
+      "paper_tag": "keyword:HSI",
+      "query_text": "hyperspectral image classification methods",
+      "sim_scores": {
+        "openreview-neurips-2025-xqfzprbswl": {
+          "score": 0.01639344262295082,
+          "rank": 1
+        },
+        "openreview-neurips-2025-812rmogrgf": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "openreview-neurips-2025-7yrwaewxto": {
+          "score": 0.015873015873015872,
+          "rank": 3
+        },
+        "openreview-neurips-2025-59tl8mpbzx": {
+          "score": 0.015625,
+          "rank": 4
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "HSI",
+      "paper_tag": "keyword:HSI",
+      "query_text": "hyperspectral target detection algorithms",
+      "sim_scores": {
+        "openreview-neurips-2025-xqfzprbswl": {
+          "score": 0.01639344262295082,
+          "rank": 1
+        },
+        "openreview-neurips-2025-812rmogrgf": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "openreview-neurips-2025-7yrwaewxto": {
+          "score": 0.014925373134328358,
+          "rank": 7
+        },
+        "openreview-neurips-2025-59tl8mpbzx": {
+          "score": 0.014084507042253521,
+          "rank": 11
+        }
+      }
+    },
+    {
+      "type": "keyword",
+      "tag": "HSI",
+      "paper_tag": "keyword:HSI",
+      "query_text": "spectral-spatial feature extraction for hyperspectral data",
+      "sim_scores": {
+        "openreview-neurips-2025-xqfzprbswl": {
+          "score": 0.01639344262295082,
+          "rank": 1
+        },
+        "openreview-neurips-2025-59tl8mpbzx": {
+          "score": 0.016129032258064516,
+          "rank": 2
+        },
+        "openreview-neurips-2025-812rmogrgf": {
+          "score": 0.015873015873015872,
+          "rank": 3
+        },
+        "openreview-neurips-2025-7yrwaewxto": {
+          "score": 0.015625,
+          "rank": 4
+        }
+      }
+    }
+  ],
+  "global_candidate_ids": [
+    "openreview-neurips-2025-xqfzprbswl",
+    "openreview-neurips-2025-evtxnxah0f",
+    "openreview-neurips-2025-dv6x6sv18b",
+    "openreview-neurips-2025-vm4pijsjdg",
+    "openreview-neurips-2025-812rmogrgf",
+    "openreview-neurips-2025-59tl8mpbzx",
+    "openreview-neurips-2025-zrbucj9bwg",
+    "openreview-neurips-2025-7yrwaewxto",
+    "openreview-neurips-2025-cjrggdnfg2",
+    "openreview-neurips-2025-ozdanghepx",
+    "openreview-neurips-2025-hai0japiz7",
+    "openreview-neurips-2025-c5e4tgdcj3",
+    "openreview-neurips-2025-upxytg7dtl",
+    "openreview-neurips-2025-zpgpdhupce",
+    "openreview-neurips-2025-tpi9sw04sz",
+    "openreview-neurips-2025-p2eycv4xoa",
+    "openreview-neurips-2025-27xtiafbc6",
+    "openreview-neurips-2025-fwflrgqt8x",
+    "openreview-neurips-2025-3pf7rt9fqm",
+    "openreview-neurips-2025-5ttuwjgqht",
+    "openreview-neurips-2025-my4kpjt3lm",
+    "openreview-neurips-2025-kiximjjqjv",
+    "openreview-neurips-2025-xju2ubgtrb",
+    "openreview-neurips-2025-i6bey5ru64",
+    "openreview-neurips-2025-jugw5alhnf",
+    "openreview-neurips-2025-diyduh4ntd",
+    "openreview-neurips-2025-2tqcroh3io",
+    "openreview-neurips-2025-f9aabpptfb",
+    "openreview-neurips-2025-fe91mhgeg2",
+    "openreview-neurips-2025-swdbajhbfn",
+    "openreview-neurips-2025-reahulrjzr",
+    "openreview-neurips-2025-ig5mtz8etr",
+    "openreview-neurips-2025-dooe6euxas",
+    "openreview-neurips-2025-ub5u3kvos1",
+    "openreview-neurips-2025-dcwsvabwxm",
+    "openreview-neurips-2025-pkg5zkieuv",
+    "openreview-neurips-2025-z4efqgybha",
+    "openreview-neurips-2025-hjjnwcve2m",
+    "openreview-neurips-2025-oprnsj8amk",
+    "openreview-neurips-2025-hlzrqdfugy",
+    "openreview-neurips-2025-nglfqtbprr",
+    "openreview-neurips-2025-91gzt22sef",
+    "openreview-neurips-2025-ou2twbw4zm",
+    "openreview-neurips-2025-6nczjqeco5",
+    "openreview-neurips-2025-ghybx0qlls",
+    "openreview-neurips-2025-qynkuq9x3l",
+    "openreview-neurips-2025-6uwv6ytamu",
+    "openreview-neurips-2025-w1x9wmmhvi",
+    "openreview-neurips-2025-gvtk4lzhcl",
+    "openreview-neurips-2025-kqtp6ljvlo",
+    "openreview-neurips-2025-v5kzcseaxf",
+    "openreview-neurips-2025-ngtfoxkq8b",
+    "openreview-neurips-2025-ocooe8tt8v",
+    "openreview-neurips-2025-wab4beaut6",
+    "openreview-neurips-2025-qqefm8tlcm",
+    "openreview-neurips-2025-sgqalemecy",
+    "openreview-neurips-2025-36ckp4tshf",
+    "openreview-neurips-2025-43v0raygrg",
+    "openreview-neurips-2025-foy0bwzofl",
+    "openreview-neurips-2025-fkyfdxilpi",
+    "openreview-neurips-2025-2cegvupod7",
+    "openreview-neurips-2025-meawzgfict",
+    "openreview-neurips-2025-mhfpziottw",
+    "openreview-neurips-2025-egcpmwdpg5",
+    "openreview-neurips-2025-fvgnp5whxx",
+    "openreview-neurips-2025-qwy1vk67t3",
+    "openreview-neurips-2025-1vslxdjnq8",
+    "openreview-neurips-2025-mq91rwfxmd",
+    "openreview-neurips-2025-ghvqnjvjli",
+    "openreview-neurips-2025-i7y7mgsego",
+    "openreview-neurips-2025-tciijwaxij",
+    "openreview-neurips-2025-gjjsdmlqrw",
+    "openreview-neurips-2025-nzu03j5hw5",
+    "openreview-neurips-2025-xwcftmjqh5",
+    "openreview-neurips-2025-6hidr8pj8f",
+    "openreview-neurips-2025-jjwee513am",
+    "openreview-neurips-2025-ug8bjnn1nl",
+    "openreview-neurips-2025-vae33hkqmg",
+    "openreview-neurips-2025-0owhzjrnb6",
+    "openreview-neurips-2025-1kylg7l2oq",
+    "openreview-neurips-2025-0jsoljvzjd",
+    "openreview-neurips-2025-s82afyfbj3",
+    "openreview-neurips-2025-4mkiahbmgo",
+    "openreview-neurips-2025-ltguinltbp"
+  ],
+  "global_pool_lane_top_k": 30,
+  "global_pool_limit": 120,
+  "global_pool_guaranteed_per_lane": 2,
+  "global_pool_effective_size": 84,
+  "reranked_at": "2026-06-25T03:55:00.852933+00:00",
+  "llm_ranked": [
+    {
+      "paper_id": "openreview-neurips-2025-xqfzprbswl",
+      "score": 8.0,
+      "evidence_en": "spectral-spatial decomposition for HSI; chromaticity-intensity feature extraction",
+      "evidence_cn": "高光谱图像的色度-强度分解，提取光谱-空间特征",
+      "canonical_evidence": "高光谱图像的色度-强度分解，提取光谱-空间特征",
+      "tldr_en": "Proposes chromaticity-intensity decomposition for hyperspectral image reconstruction, disentangling spatial intensity and spectral chromaticity to extract lighting-invariant reflectance, supporting downstream analysis like classification.",
+      "tldr_cn": "针对编码孔径快照光谱成像中高光谱图像重建的严重病态和光照依赖问题，本文提出色度-强度分解框架，将HSI分解为空间平滑的强度图和光谱可变的色度立方体。色度编码了光照不变的反射率，并富含高频空间细节和局部光谱稀疏性。该方法有效重建HSI，为后续高光谱图像分类和目标检测等任务提供了更好的输入表示和数据增强基础。",
+      "title_zh": "基于色度-强度分解的光谱压缩成像",
+      "motivation_cn": "CASSI中HSI重建病态且受光照影响，难以恢复光照不变的光谱反射率。",
+      "method_cn": "提出色度-强度分解框架，将HSI分解为空间平滑强度图和光谱可变色度立方体，色度编码光照不变反射率。",
+      "result_cn": "实验表明该方法能有效重建HSI，提取光照不变特征，提升后续应用性能。",
+      "conclusion_cn": "该分解为HSI重建与特征提取提供了新思路，有利于高光谱图像的分析与理解。",
+      "matched_requirement_id": "req-4",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "spectral-spatial feature extraction for hyperspectral data"
+    },
+    {
+      "paper_id": "openreview-neurips-2025-7yrwaewxto",
+      "score": 7.0,
+      "evidence_en": "remote sensing object recognition framework",
+      "evidence_cn": "遥感目标识别框架",
+      "canonical_evidence": "遥感目标识别框架",
+      "tldr_en": "InstructSAM is a training-free framework for instruction-oriented remote sensing object recognition, including detection; directly applicable to hyperspectral target detection.",
+      "tldr_cn": "该论文提出InstructSAM，一种无需训练的指令导向遥感目标识别框架，覆盖目标计数、检测和分割任务。构建了首个遥感指令理解基准EarthInstruct。该方法可直接用于高光谱图像目标检测，因其处理的是遥感图像，但未针对高光谱多波段特性优化。",
+      "title_zh": "InstructSAM：面向指令的遥感目标识别无训练框架",
+      "motivation_cn": "现有遥感目标识别依赖显式类别名，无法处理复杂隐式查询。",
+      "method_cn": "利用预训练模型和语言指令，无需训练即可完成检测任务。",
+      "result_cn": "在遥感基准上表现良好，支持开放词汇和开放子类场景。",
+      "conclusion_cn": "为遥感目标检测提供了灵活方案，可扩展至高光谱数据。",
+      "matched_requirement_id": "req-5",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image target detection"
+    },
+    {
+      "paper_id": "openreview-neurips-2025-59tl8mpbzx",
+      "score": 7.0,
+      "evidence_en": "semi-supervised HSI reconstruction for spectral super-resolution, enabling improved classification and detection",
+      "evidence_cn": "半监督高光谱重建，可提升分类与检测性能",
+      "canonical_evidence": "半监督高光谱重建，可提升分类与检测性能",
+      "tldr_en": "Diff-Spectra uses semi-supervised learning to reconstruct high-fidelity hyperspectral images from RGB, mitigating metamerism via adaptive illumination-chroma decoupling, which can serve as preprocessing for classification and detection.",
+      "tldr_cn": "针对RGB到高光谱重建中的同色异谱问题，本文提出Diff-Spectra方法，通过自适应照度色度解耦模块和学习型光谱响应函数，结合半监督学习实现高保真HSI重建。在多个数据集上的实验表明，该方法能有效提升重建精度，为下游高光谱图像分类与目标检测任务提供更优质的光谱输入。",
+      "title_zh": "解同色异谱难题：基于半监督学习的高保真光谱重建",
+      "motivation_cn": "从RGB重建高光谱存在同色异谱问题，现有方法无法区分不同光谱分布。",
+      "method_cn": "提出Diff-Spectra，包含自适应照色解耦模块（AICD）和半监督学习框架，结合物理感知的谱估计。",
+      "result_cn": "在标准数据集上实现了高保真HSI重建，显著优于现有方法。",
+      "conclusion_cn": "该方法为高光谱图像分类与检测提供了高质量的光谱先验。",
+      "matched_requirement_id": "req-composite-hsi",
+      "matched_query_tag": "query:hsi:composite",
+      "matched_query_text": "Papers central to 高光谱图像目标检测与分类, especially work that connects or combines: hyperspectral image classification methods; hyperspectral target detection algorithms; hyperspectral anomaly detection techniques; spectral-spatial feature extraction for hyperspectral data; hyperspectral image target detection."
+    },
+    {
+      "paper_id": "openreview-neurips-2025-812rmogrgf",
+      "score": 7.0,
+      "evidence_en": "spectral reconstruction network generating hyperspectral images from RGB, enabling classification",
+      "evidence_cn": "光谱重建网络从RGB生成高光谱图像，支撑分类任务",
+      "canonical_evidence": "光谱重建网络从RGB生成高光谱图像，支撑分类任务",
+      "tldr_en": "Proposes a fractal-based recursive spectral reconstruction network (FRN) to generate hyperspectral images from RGB inputs, enabling cost-effective hyperspectral acquisition for downstream classification tasks.",
+      "tldr_cn": "本文针对高光谱图像获取成本高的问题，提出基于分形的递归光谱重建网络FRN。该方法通过递归调用原子重建模块，由粗到细地预测光谱波段，从RGB图像逐步生成高光谱图像。实验表明该方法能有效重建光谱信息，降低高光谱数据获取门槛，为后续高光谱图像分类、检测等任务提供高质量输入。",
+      "title_zh": "FRN：基于分形的递归光谱重建网络",
+      "motivation_cn": "高光谱图像获取成本高昂，现有光谱重建方法一次性整合全谱信息效果有限。",
+      "method_cn": "提出基于分形的递归光谱重建网络，通过递归调用原子模块逐波段由粗到细预测光谱。",
+      "result_cn": "在多个数据集上重建精度优于现有方法，有效降低高光谱获取成本。",
+      "conclusion_cn": "为低成本高光谱数据获取提供新途径，助力高光谱图像分类等下游应用。",
+      "matched_requirement_id": "req-1",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods"
+    },
+    {
+      "paper_id": "openreview-neurips-2025-ocooe8tt8v",
+      "score": 6.0,
+      "evidence_en": "instance-level OOD fine-tuning for anomaly segmentation",
+      "evidence_cn": "实例级分布外微调用于异常分割",
+      "canonical_evidence": "实例级分布外微调用于异常分割",
+      "tldr_en": "Proposes instance-level OOD fine-tuning to improve small anomaly segmentation; method general, applicable to hyperspectral anomaly detection.",
+      "tldr_cn": "该论文针对异常分割中小目标性能差的问题，提出实例级分布外（OOD）微调框架LNOIB。通过理论分析全局目标的不足，设计实例级损失和特征分离约束。在多个数据集上，该方法有效提升了小异常的分割精度。该方法可迁移至高光谱异常检测任务中。",
+      "title_zh": "不留任何OOD实例：用于异常分割的实例级分布外微调",
+      "motivation_cn": "现有全局级OOD微调对小异常分割效果差。",
+      "method_cn": "提出实例级OOD目标及特征分离约束。",
+      "result_cn": "在分割基准上显著提升小异常检测性能。",
+      "conclusion_cn": "实例级方法通用性强，适用于高光谱异常分割。",
+      "matched_requirement_id": "req-3",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral anomaly detection techniques"
+    },
+    {
+      "paper_id": "openreview-neurips-2025-nglfqtbprr",
+      "score": 6.0,
+      "evidence_en": "test-time adaptation for anomaly detection under data contamination",
+      "evidence_cn": "数据污染下的测试时自适应异常检测",
+      "canonical_evidence": "数据污染下的测试时自适应异常检测",
+      "tldr_en": "EPHAD adjusts anomaly detection model outputs at test time using multimodal foundation models to handle data contamination; applicable to hyperspectral anomaly detection.",
+      "tldr_cn": "该论文提出EPHAD框架，针对训练数据污染问题，在测试时利用多模态基础模型收集证据来调整异常检测输出。该方法无需重训练或先验知识，简单有效。可应用于高光谱异常检测，但未在光谱数据上验证。",
+      "title_zh": "基于证据的数据污染下异常检测事后调整框架",
+      "motivation_cn": "真实异常检测数据常受污染，现有方法需访问训练流程或先验比例。",
+      "method_cn": "测试时利用多模态基础模型证据调整模型输出。",
+      "result_cn": "在多个基准上提升了污染数据下的检测性能。",
+      "conclusion_cn": "为异常检测提供了鲁棒后处理方案，具有迁移潜力。",
+      "matched_requirement_id": "req-3",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral anomaly detection techniques"
+    },
+    {
+      "paper_id": "openreview-neurips-2025-vm4pijsjdg",
+      "score": 6.0,
+      "evidence_en": "ensemble of random hyperspheres for anomaly detection",
+      "evidence_cn": "随机超球集成异常检测",
+      "canonical_evidence": "随机超球集成异常检测",
+      "tldr_en": "ADERH uses random pairs of hyperspheres to isolate anomalies; a general method applicable to hyperspectral anomaly detection.",
+      "tldr_cn": "该论文提出ADERH，一种基于随机超球对的集成异常检测方法。它利用异常点稀疏且偏离正常模式的特性，通过多尺度超球构建隔离异常。该方法无需训练，可应用于高光谱异常检测，但未考虑光谱维度特性。",
+      "title_zh": "基于随机超球对的集成异常检测",
+      "motivation_cn": "现有异常检测方法复杂且依赖假设，需要简单高效方案。",
+      "method_cn": "构建多尺度超球对，利用Pitch和Concept概念区分异常。",
+      "result_cn": "在多种异常检测任务上达到竞争性能。",
+      "conclusion_cn": "通用异常检测方法适用于高光谱场景。",
+      "matched_requirement_id": "req-3",
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral anomaly detection techniques"
+    }
+  ],
+  "llm_ranked_at": "2026-06-25T03:56:05.149015+00:00",
+  "display_min_score": 4.0,
+  "pruned_at": "2026-06-25T03:56:05.176596+00:00"
+}
