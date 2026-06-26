@@ -6,37 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-25
-- 运行时间：2026-06-25 20:37:07 UTC
+- 最新运行日期：2026-06-26
+- 运行时间：2026-06-26 22:01:41 UTC
 - 运行状态：成功
-- 本次总论文数：5
+- 本次总论文数：2
 - 精读区：1
-- 速读区：4
+- 速读区：1
 
 ### 今日简报（AI）
-今日共分析5篇遥感论文，精读1篇雷达-光学融合的时序分类模型，速读3篇涵盖LiDAR障碍物分割、模型迁移与点云聚类。  
-最值得关注的是ROSA-TFormer利用Sentinel-1/2时序数据在GEE上实现陕西杨树种植区高精度分类，以及LOGOS仅用LiDAR高斯高程分割细小障碍物。  
-建议读者优先了解ROSA-TFormer的多模态时序融合方法，并关注LOGOS在无人车场景中的应用潜力。
-- 详情：[/202606/25/README](/202606/25/README)
+今天精读了甲烷羽流分割的多模态深度学习新方案，并速读了自行车LiDAR的自动标注域迁移方法。高光谱卫星与多模态融合是甲烷监测的突破方向，值得重点跟进。下一步可探索将多模态策略应用于其他遥感气体检测任务。
+- 详情：[/202606/26/README](/202606/26/README)
 
 ### 精读区论文标签
-1. [ROSA-TFormer: A Radar-Optical Sensor-Aware Temporal Transformer for Pinus sylvestris Plantation Classification in Northern Shaanxi Using GEE-Derived Sentinel-1/2 Time Series](/202606/25/2606.19204v1-rosa-tformer-a-radar-optical-sensor-aware-temporal-transformer-for-pinus-sylvestris-plantation-classification-in-northern-shaanxi-using-gee-derived-sentinel-12-time-series)  
-   标签：评分：8.0/10、query:hsi-lidar
-   evidence：雷达-光学多模态树种分类
+1. [Methane-Plume Segmentation From Hyperspectral Satellite Imagery Via Multimodal Deep Learning](/202606/26/2606.26416v1-methane-plume-segmentation-from-hyperspectral-satellite-imagery-via-multimodal-deep-learning)  
+   标签：评分：9.0/10、query:hsi-lidar
+   evidence：基于多模态深度学习的高光谱甲烷羽流分割
 
 ### 速读区论文标签
-1. [LOGOS: LiDAR-Only Gaussian Elevation Splatting for Unified Tiny Obstacle Segmentation](/202606/25/2606.21527v1-logos-lidar-only-gaussian-elevation-splatting-for-unified-tiny-obstacle-segmentation)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：基于LiDAR的障碍物分割，可迁移至LiDAR图像分类
-2. [Changing Modalities: Adapting Remote Sensing Models to New Satellites and Sensors](/202606/25/2606.23356v1-changing-modalities-adapting-remote-sensing-models-to-new-satellites-and-sensors)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：多模态遥感模型自适应
-3. [C-ARC: Continuous-Adaptive Range Clustering for Non-Repetitive LiDAR Sensors](/202606/25/2606.18948v1-c-arc-continuous-adaptive-range-clustering-for-non-repetitive-lidar-sensors)  
+1. [Auto-Labelling-Based Domain Transfer for 3D Object Detection on a Bicycle-Mounted LiDAR Platform](/202606/26/2606.25652v1-auto-labelling-based-domain-transfer-for-3d-object-detection-on-a-bicycle-mounted-lidar-platform)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：LiDAR点云聚类用于分类
-4. [LEVIRDet: A Million-Scale 159-Category Dataset and Foundation Model for Universal Remote Sensing Object Detection](/202606/25/2606.25312v1-levirdet-a-million-scale-159-category-dataset-and-foundation-model-for-universal-remote-sensing-object-detection)  
-   标签：评分：6.0/10、query:hsi
-   evidence：大规模遥感目标检测数据集和基础模型，可应用于高光谱目标检测
+   evidence：LiDAR 3D目标检测领域的迁移基准，支持LiDAR分类任务
 
 
 <div class="dpr-home-promo-card">

@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-26",
+  "date": "2026-06-26",
+  "generated_at": "2026-06-26T22:01:48",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/26/2606.26416v1-methane-plume-segmentation-from-hyperspectral-satellite-imagery-via-multimodal-deep-learning",
+      "section": "deep",
+      "title_en": "Methane-Plume Segmentation From Hyperspectral Satellite Imagery Via Multimodal Deep Learning",
+      "authors": "Brayan Quintero, Jeferson Acevedo, Samuel Traslaviña, Hoover Rueda-Chacón",
+      "date": "2026-06-24",
+      "pdf": "https://arxiv.org/pdf/2606.26416v1",
+      "score": "9.0",
+      "evidence": "基于多模态深度学习的高光谱甲烷羽流分割",
+      "tldr": "甲烷羽流高效分割对全球变暖监测至关重要。本文提出多模态深度学习模型，通过特征引导甲烷增强（FGME）机制，将物理甲烷线索注入Transformer的RGB表示，实现多尺度语义融合。在MPDataset上，模型在MIoU、精度和召回率上分别提升0.92、0.87和1.01，且计算成本更低。该方法展示了优异的精度-效率平衡，适用于大规模遥感甲烷监测。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Efficient detection of methane plumes is crucial for understanding and mitigating global warming, as accurately identifying and segmenting them in earth observation imagery remain essential for large-scale monitoring. In this work, we propose a multimodal deep learning model that integrates a feature-guided methane enhancement (FGME) mechanism which injects physically meaningful methane cues into transformer-based RGB representations at multiple semantic scales. Our method is evaluated on the MPDataset, where it outperforms the state-of-the-art with improvements of +0.92 in MIoU, +0.87 in MPrecision and +1.01 in Recall. Notably, these gains are obtained with a substantially lower computational cost than other high-performing architectures, resulting in a favorable accuracy-efficiency trade-off for large-scale methane monitoring. These results highlight the potential of efficient multimodal fusion strategies for accurate and scalable methane plume segmentation in real-world remote sensing applications.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/26/2606.25652v1-auto-labelling-based-domain-transfer-for-3d-object-detection-on-a-bicycle-mounted-lidar-platform",
+      "section": "quick",
+      "title_en": "Auto-Labelling-Based Domain Transfer for 3D Object Detection on a Bicycle-Mounted LiDAR Platform",
+      "authors": "Mario Finkbeiner, Max A. Buettner, Kanak Mazumder, Fabian B. Flohr",
+      "date": "2026-06-24",
+      "pdf": "https://arxiv.org/pdf/2606.25652v1",
+      "score": "6.0",
+      "evidence": "LiDAR 3D目标检测领域的迁移基准，支持LiDAR分类任务",
+      "tldr": "自行车载LiDAR平台对弱势道路使用者的3D感知至关重要，但缺乏标注数据，车辆预训练检测器直接迁移存在域差距，尤其对VRU类，导致零-shot检测性能差。本文构建包含1027帧、超过18000个3D框的FUSE-Bike基准，利用自动标注流水线生成训练标签，微调四个nuScenes预训练检测器。微调后mAP提升23.4点，对行人和骑车者提升最大，检测器质量超越自动标签，零-shot域差距大部分被恢复。该工作为VRU-centric 3D检测提供基准，验证自动标注作为手动标注的可行替代。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Reliable 3D perception of vulnerable road users (VRUs) such as cyclists and pedestrians is essential for their safety in urban traffic and a core requirement for autonomous driving (AD). Alongside advances in vehicle-based perception, research increasingly equips bicycles with sensors to study traffic from a perspective native to VRUs. Such platforms still rely on LiDAR detectors originally trained on vehicle data, yet annotated 3D data from a cyclist's perspective is scarce. How well these detectors generalise to this setting has not been evaluated. We present a 3D object detection benchmark of 1,027 annotated LiDAR keyframes (over 18,000 3D bounding boxes) from the FUSE-Bike platform in urban Munich. We evaluate four nuScenes-pre-trained detectors against 1,854 human-verified ground-truth (GT) boxes both in their original form and after finetuning on training labels produced by a VRU-dedicated auto-labelling pipeline that requires no manual annotation. The zero-shot domain gap is concentrated on the VRU classes. Finetuning recovers most of it, improving mean average precision (mAP) by up to 23.4 points with the largest gains on pedestrians and cyclists, and the adapted detectors even surpass the quality of the auto-labels they were trained on. The benchmark provides a reproducible baseline for VRU-centric 3D detection and shows that auto-labels are a viable substitute for manual annotation when adapting vehicle-trained detectors to a cyclist platform.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

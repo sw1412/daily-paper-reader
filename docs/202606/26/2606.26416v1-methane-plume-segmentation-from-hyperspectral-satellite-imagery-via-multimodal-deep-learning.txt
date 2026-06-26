@@ -1,0 +1,196 @@
+Title: Methane-Plume Segmentation From Hyperspectral Satellite Imagery Via Multimodal Deep Learning
+
+URL Source: https://arxiv.org/pdf/2606.26416v1
+
+Published Time: Fri, 26 Jun 2026 00:21:50 GMT
+
+Number of Pages: 5
+
+Markdown Content:
+# METHANE-PLUME SEGMENTATION FROM HYPERSPECTRAL SATELLITE IMAGERY VIA MULTIMODAL DEEP LEARNING 
+
+Brayan Quintero , Jeferson Acevedo , Samuel Traslavi˜ na , Hoover Rueda-Chac´ on 
+
+Department of Computer Science, Universidad Industrial de Santander 
+
+Bucaramanga, 680002, Colombia 
+
+{brayan2221707, jeferson2221790, samuel2220085 }@correo.uis.edu.co, hfarueda@uis.edu.co 
+
+Abstract —Efficient detection of methane plumes is crucial for understanding and mitigating global warming, as accurately identifying and segmenting them in earth observation imagery remain essential for large-scale monitoring. In this work, we propose a multimodal deep learning model that integrates a feature-guided methane enhancement (FGME) mechanism which injects physically meaningful methane cues into transformer-based RGB representations at multiple semantic scales. Our method is evaluated on the MPDataset, where it outperforms the state-of-the-art with improvements of +0.92 in MIoU, +0.87 in MPrecision and +1.01 in Recall. Notably, these gains are obtained with a substantially lower computational cost than other high-performing architectures, resulting in a favorable accuracy–efficiency trade-off for large-scale methane monitoring. These results highlight the potential of efficient multimodal fusion strategies for accurate and scalable methane plume segmentation in real-world remote sensing applications. 
+
+Index Terms —Methane segmentation, deep learning, multi-modal fusion, hyperspectral images. 
+
+I. I NTRODUCTION 
+
+Methane (CH 4) is the second most significant greenhouse gas after carbon dioxide (CO 2) [1]. Despite its relatively low atmospheric abundance, methane exhibits a substantially higher short-term global warming potential. Methane emis-sions originate from both natural processes, such as wetlands and marine sediments, and anthropogenic activities, including agriculture, fossil fuel extraction and transport, and waste management [2]. Accurate detection and monitoring of methane emissions remain challenging due to their spatial sparsity, temporal vari-ability, and low signal-to-noise ratio [3]. Hyperspectral remote sensing has emerged as a critical technology for large-scale methane observation, as its high spectral resolution enables the detection and delineation of methane plumes from satellite and airborne platforms [4, 5]. Several deep learning–based approaches have been proposed for methane plume detection by operating directly on gas-derived enhancement representations. For instance, Radman et al. [6] generated a benchmark dataset by embedding sim-ulated methane plumes into real Sentinel-2 backgrounds and introduced an end-to-end deep learning framework trained on methane enhancement imagery. Jongaramrungruang et al. [7] proposed MethaNet, a convolutional neural network (CNN) capable of directly predicting methane point-source emissions 
+
+Fig. 1. Overview of the proposed framework. RGB imagery XRGB ∈
+
+RH×W ×3 and methane enhancement map XENH ∈ RH×W are processed by modality-specific encoders and fused through a feature-guided methane enhancement (FGME) module. The resulting representations are decoded to produce the final binary methane plume mask ˆY ∈ RH×W .
+
+from two-dimensional plume enhancement maps without re-lying on auxiliary measurements such as wind information. Joyce et al. [8] employed a UNet-based architecture for methane plume mask detection in PRISMA (Hyperspectral Precursor of the Application Mission) imagery, incorporating an additional 1 × 1 convolutional layer to emphasize methane-related anomalies. In this study, we propose a multimodal methane plume segmentation model, where the key intuition is that a physically plausible methane plume should be supported not only by a gas-related spectral signal but also by a coherent spatial structure and scene context. While methane enhance-ment provides direct evidence of gas presence, RGB imagery offers complementary information related to terrain, infrastruc-ture, and plume morphology. Motivated by this observation, our approach jointly leverages RGB information and methane-guided cues to improve segmentation robustness, producing more physically consistent methane plume detections than state-of-the-art enhancement-only methods. II. M ETHODOLOGY 
+
+A. Overall Framework 
+
+We propose a multimodal deep learning architecture for methane plume segmentation in hyperspectral remote sensing imagery. The model combines morphological RGB data with 
+
+© 2026 IEEE. Personal use of this material is permitted. Permission from IEEE must be obtained for all other uses, in any current or future media, including reprinting/republishing this material for advertising or promotional purposes, creating new collective works, for resale or redistribution to servers or lists, or reuse of any copyrighted component of this work in other works. 
+
+> arXiv:2606.26416v1 [cs.CV] 24 Jun 2026
+
+gas-related information from a methane enhancement map. Let the input be a stacked tensor 
+
+X = Cat ([ XRGB , X ENH ]) ∈ RH×W ×4, (1) where “Cat” denotes concatenation along the channel dimen-sion. As shown in Fig. 1, each modality is encoded by a dedicated backbone to extract hierarchical representations. The resulting features are then fused through a methane-guided enhancement module that injects methane enhancement-driven cues into the RGB feature to emphasize plume-consistent patterns. A lightweight segmentation decoder predicts a binary plume mask ˆY ∈ RH×W , which denotes the background and plume classes. 
+
+B. Model Architecture 1) RGB semantic encoder : The RGB XRGB ∈ RH×W ×3
+
+branch employs a DINOv3 ViT-S/16 [9] backbone to extract semantically rich representations: 
+
+{Hl}4 
+
+> l=1
+
+= fDINO (XRGB ). (2) We extract four intermediate feature maps from DINOv3 corresponding to transformer blocks 2,5,8 and 11, and concate-nate them along the channel dimension to form a tap tensor 
+
+T = Cat( H1, . . . , H 4). A four-level pyramid is then built by progressive average pooling and 1 × 1 projections: 
+
+Dl = Conv 1×1
+
+> RGB ,l
+
+(Pool 2l−1 (T )) , l ∈ { 1, 2, 3, 4}, (3) where Pool 1 is the identity and Conv 1×1 
+
+> RGB ,l
+
+denotes a 1 × 1
+
+convolution that matches the SegFormer decoder channel sizes. 
+
+2) Methane enhancement encoder : The methane en-hancement channel XENH ∈ RH×W is processed using a lightweight ResNet-18 [10] encoder, producing a hierarchy of feature maps: 
+
+{Ml}4 
+
+> l=1
+
+= fResNet (XENH ), (4) which preserve structural and spatial information relevant for localizing methane plumes. 
+
+3) Feature-guided methane enhancement : Multimodal fu-sion is performed through a feature-guided methane en-hancement (FGME) mechanism. At each semantic scale l ∈{1, . . . , 4}, the corresponding RGB and methane feature maps 
+
+Dl and Ml are fused to produce a guided feature representation 
+
+Fl. Prior to gating, Ml is bilinearly resized when necessary to match the spatial resolution of Dl. The gating mask is computed from methane features using a 1 × 1 projection followed by a sigmoid activation: 
+
+Gl = σ(Conv 1×1
+
+> gate ,l
+
+(Ml)) . (5) The fused feature map is then obtained as: 
+
+Fl = Dl ⊙ (0 .5 + Gl), (6) where the additive bias prevents complete suppression of RGB features, forcing methane cues to act as an enhancement signal rather than a replacement. 
+
+4) Semantic decoding and output head : The fused multi-scale features {F1, . . . , F 4} are decoded using a SegFormer [11] decoder, producing dense semantic representation. As illustrated in Fig. 2, a lightweight refinement is applied after decoding. This refinement head consists of a small stack of convolutional blocks combining 3x3 convolutions, Group Normalization (GN), and Gaussian Error Linear Unit (GELU) [12] activations, which operate in feature space to locally smooth predictions and sharpen plume boundaries. Finally, a 1 × 1 convolution generates class logits, which are bilinearly upsampled to the original spatial resolution to obtain the final methane plume segmentation map. 
+
+5) Loss function : The network is optimized end-to-end using a composite segmentation loss that combines a class-weighted focal loss [13] and a Dice loss [14]. 
+
+Dice loss. We employ the Dice loss to directly optimize the overlap between the predicted mask and the ground truth: 
+
+LDice = 1 − 2 P 
+
+> i
+
+yi ˆyi + ε
+
+P 
+
+> i
+
+yi + P 
+
+> i
+
+ˆyi + ε , (7) where i indexes pixel locations, yi denotes the ground-truth label, ˆyi is the predicted probability, and ε is a small constant for numerical stability. 
+
+Focal loss. To mitigate class imbalance and emphasize hard-to-classify pixels, we adopt the focal loss formulation: 
+
+LFocal = − X
+
+> i
+
+(1 − ˆyi)γ yi log(ˆ yi), (8) where γ > 0 is the focusing parameter that down-weights easy examples and encourages the model to focus on misclassified pixels. 
+
+Total loss. The final training objective is defined as the sum of both terms: 
+
+L = LDice + LFocal . (9) III. E XPERIMENTS AND RESULTS 
+
+A. Dataset 
+
+To compare our approach with the state-of-the-art, we use the EMIT methane plume dataset (MPDataset), introduced by Chen et al. [15]. This dataset is derived from NASA’s Earth Surface Mineral Dust Source Investigation (EMIT) mission, available on the NASA Earthdata website [16]. using L1B At-Sensor Calibrated Radiance (EMITL1BRAD) for RGB imagery, L2B Methane Enhancement (EMITL2BCH4ENH) for methane plume enhancements and L2B Estimated Methane Plume Complexes data (EMITL2BCH4PLM). The methane enhancement maps are expressed in units of (ppm·m) corre-sponding to methane concentration (ppm) integrated along an atmospheric path length (m). In the original MPSUNet study [15], the dataset of 4,172 samples was divided into 3,004 training images, 334 validation images, and 834 test images. Although the original study reports the split sizes, the exact assignment of samples per subset is not publicly available. To ensure consistency with prior work, we preserve the same number of samples in each Fig. 2. Multimodal architecture for methane plume segmentation. RGB images and methane enhancement maps are processed by DINOv3 and ResNet-18 encoders, respectively, producing multi-scale features. A Feature-Guided Methane Enhancement module adaptively modulates and fuses both modalities, and the resulting representations are decoded by a SegFormer-based head to generate the final plume mask. The decoder follows the SegFormer-B1 configuration, initialized from the nvidia/segformer-b1-finetuned-ade-512-512 model. 
+
+subset while adopting a unified and fixed data partition. The source code and the dataset split used in this work will be publicly released. The dataset covers the period from August 9, 2022, to April 19, 2024. It consists of 4,172 samples with a spatial resolution of 512 × 512 pixels (approx. 60m/pixel). To balance positive and negative samples, the dataset applies data augmentation through 180-degree rotations. 
+
+B. Experimental Setup 
+
+All experiments were implemented in PyTorch and executed on a single NVIDIA RTX PRO 6000 Blackwell GPU. Unless otherwise specified, a fixed random seed of 42 was used. All modules of the proposed architecture were trained end-to-end without freezing any layers. Our model was trained for 150 epochs using the AdamW optimizer with a learning rate of 6 × 10 −5, weight decay 5 ×
+
+10 −5, and a batch size of 16. The training objective combined Dice and Focal losses with equal weighting, and class weights were automatically estimated from the training data. For all methods, including our model and the VGG16+UNet and SegFormer baselines, hyperparameters were optimized via Bayesian optimization on the validation set. VGG16+UNet and SegFormer were trained for 150 epochs too. MPSUNet was trained on the same data splits following the original train-ing protocol, with the sole exception of the batch size, which was adjusted from 4 to 32 for computational considerations. All other hyperparameters, including 500 training epochs and the original random seed, were kept identical to the original configuration. 
+
+C. Quantitative Results 
+
+Quantitative results on the MPDataset are reported in Ta-ble I. All metrics correspond to performance on the test split .All reported metrics are computed exclusively on unseen test data. Performance is assessed using mean intersection                                    
+
+> TABLE I QUANTITATIVE COMPARISON OF METHANE PLUME SEGMENTATION MODELS
+> Model MIoU (%) MPrecision (%) Recall (%) MPA (%) FLOPs (G) Params (M) IT (ms) VGG16+UNet 76.74 84.92 70.31 84.99 225.98 24.89 6.74 SegFormer 73.11 83.86 60.19 79.94 6.79 3.71 2.42
+> MPSUNet [15] 81.23 89.20 75.92 87.84 226.05 24.93 15.78
+> Ours 82.15 90.07 76.93 88.36 34.75 36.78 7.06
+
+over union (M IoU = 1
+
+> N
+
+PNk=1    
+
+> T P k
+> T P k+F P k+F N k
+
+), mean pre-cision (M P recision = 1
+
+> N
+
+PNk=1   
+
+> T P k
+> T P k+F P k
+
+), recall for the plume class (Recall = T P k  
+
+> T P k+F N k
+
+), and mean pixel accuracy 
+
+(M P A = 1
+
+> N
+
+PNk=1   
+
+> T P k
+> T P k+F N k
+
+), following the evaluation pro-tocol of MPSUNet. As shown in Table I, the proposed method consistently outperforms state-of-the-art models across all reported metrics. Compared to MPSUNet, our approach achieves improvements of +0 .92 in MIoU, +0 .87 in MPrecision, +1 .01 in Recall, and +0 .52 in MPA. While SegFormer is the most lightweight model and the fastest in terms of inference time, the proposed approach requires approximately 80% fewer FLOPs than MP-SUNet and VGG16+UNet, while maintaining a competitive inference time (IT) of 7.06 ms, representing the average per-sample inference time over multiple runs. Despite contain-ing more parameters, the proposed model is computationally more efficient than previous high-performing baselines, bene-fiting from the transformer architecture efficiency and lower-resolution feature processing. 
+
+D. Qualitative Results 
+
+Figure 3 presents a qualitative comparison of methane plume segmentation results across three representative scenes, highlighting the different behaviors of the evaluated models under varying plume characteristics and background complex-ity. RGB ENH GT VGG16+UNet SegFormer MPSUNet Ours Scene 1 Scene 2 Scene 3  
+
+> Fig. 3. Qualitative comparison of methane plume segmentation results on the MPDataset. Columns show RGB input, methane enhancement (ENH), ground truth image (GT), and predictions from VGG16+UNet, SegFormer, MPSUNet, and our proposed method.
+
+In Scene 1, the plume is subtle and poorly contrasted, making localization particularly challenging. VGG16+UNet and SegFormer partially identify the plume core but produce fragmented predictions with limited spatial accuracy. MP-SUNet fails to correctly localize the plume, missing the main plume structure entirely, which highlights its reduced sensi-tivity under low-contrast enhancement conditions. In contrast, the proposed method successfully identifies the plume region and produces a compact and well-localized segmentation that aligns with the enhancement map and ground truth. In Scene 2, the methane plume is more clearly distinguish-able in the enhancement map, enabling improved detection across models. VGG16+UNet produces a strong segmentation of the main plume region but introduces a small spurious plume at the boundaries, indicating localized false positives. A similar behavior is observed for MPSUNet, which correctly captures the main plume but also predicts small artificial plume fragments near the plume edges. SegFormer again exhibits a tendency toward over-segmentation, generating plume re-gions not supported by the enhancement map. In contrast, the proposed method accurately segments the plume without introducing spurious detections, maintaining clean boundaries and strong consistency with both the enhancement map and ground truth. In Scene 3, the plume exhibits a diffuse spatial extent with varying intensity levels. VGG16+UNet and SegFormer largely fail to capture the plume structure, detecting only small isolated regions. MPSUNet identifies multiple plume fragments, including several spurious detections in regions with no methane enhancement, effectively hallucinating plume structures in low-confidence areas. In contrast, the proposed approach focuses on the high-confidence plume core, produc-ing a smaller but spatially coherent segmentation that matches the most reliable enhancement regions. This behavior reflects the precision-oriented trade-off observed in the quantitative results, favoring reliable plume delineation over exhaustive coverage of low-intensity or uncertain plume extensions. Overall, these qualitative examples corroborate the quanti-tative analysis in Table I, illustrating complementary segmen-tation characteristics across models and demonstrating that the proposed method consistently prioritizes accurate plume localization, boundary precision, and robustness against false positives across diverse scenarios. IV. C ONCLUSIONS AND FUTURE WORK 
+
+In this work, we proposed a multimodal deep learning framework for methane plume segmentation that integrates a feature-guided methane enhancement (FGME) mechanism to inject physically meaningful methane cues into RGB trans-former representations across multiple semantic scales. By effectively coupling spectral methane information with high-level visual features, the proposed approach improves plume discrimination while maintaining architectural efficiency. The experimental results show that the proposed method consistently outperforms all evaluated baselines. In addition to achieving the best overall segmentation performance, our model provides a favorable trade-off between accuracy and computational efficiency. As future work, we plan to extend the current framework by incorporating additional spectral information from wavelength regions with strong methane ab-sorption, enabling a more physically grounded representation of gas signatures. V. A CKNOWLEDGMENTS 
+
+This work was supported by the Air Force Office of Scientific Research (AFOSR) through the Southern Office of Aerospace Research and Development (SOARD) under grant number FA8655-25-1-8010. REFERENCES 
+
+[1] M. Filonchyk, M. P. Peterson, L. Zhang, V. Hurynovich, and Y. He, “Greenhouse gases emissions and global climate change: Examining the influence of co2, ch4, and n2o,” Science of The Total Environment , vol. 935, p. 173359, 2024. [2] M. Saunois, A. Martinez, B. Poulter et al. , “Global methane budget 2000–2020,” Earth System Science Data , vol. 17, no. 5, pp. 1873–1958, 2025. [3] D. J. Jacob, A. J. Turner, J. D. Maasakkers et al. , “Satellite observations of atmospheric methane and their value for quanti-fying methane emissions,” Atmospheric Chemistry and Physics ,vol. 16, no. 22, pp. 14 371–14 396, 2016. [4] A. Thorpe, C. Frankenberg, A. Aubrey et al. , “Mapping methane concentrations from a controlled release experiment using the next generation airborne visible/infrared imaging spectrometer (aviris-ng),” Remote Sensing of Environment , vol. 179, pp. 104– 115, 2016. [5] S. Kumar, C. Torres, O. Ulutan et al. , “Deep remote sensing methods for methane detection in overhead hyperspectral im-agery,” in Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV) , March 2020. [6] A. Radman, M. Mahdianpari, D. J. Varon, and F. Mohammadi-manesh, “S2metnet: A novel dataset and deep learning bench-mark for methane point source quantification using sentinel-2 satellite imagery,” Remote Sensing of Environment , vol. 295, p. 113708, 2023. [7] S. Jongaramrungruang, A. K. Thorpe, G. Matheou, and C. Frankenberg, “Methanet – an ai-driven approach to quan-tifying methane point-source emission from high-resolution 2-d plume imagery,” Remote Sensing of Environment , vol. 269, p. 112809, 2022. [8] P. Joyce, C. Ruiz Villena, Y. Huang et al. , “Using a deep neural network to detect methane point sources and quantify emissions from prisma hyperspectral satellite images,” Atmospheric Mea-surement Techniques , vol. 16, no. 10, pp. 2627–2640, 2023. [9] O. Sim´ eoni, H. V. Vo, M. Seitzer et al. , “Dinov3,” arXiv preprint arXiv:2508.10104 , 2025. [10] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2016, pp. 770–778. [11] E. Xie, W. Wang, Z. Yu et al. , “Segformer: Simple and efficient design for semantic segmentation with transformers,” Advances in Neural Information Processing Systems , vol. 34, pp. 12 077– 12 090, 2021. [12] D. Hendrycks, “Gaussian error linear units (gelus),” arXiv preprint arXiv:1606.08415 , 2016. [13] T.-Y. Lin, P. Goyal, R. Girshick, K. He, and P. Doll´ ar, “Focal loss for dense object detection,” in Proceedings of the IEEE International Conference on Computer Vision , 2017, pp. 2980– 2988. [14] F. Milletari, N. Navab, and S.-A. Ahmadi, “V-net: Fully convo-lutional neural networks for volumetric medical image segmen-tation,” in 2016 fourth International Conference on 3D Vision (3DV) . Ieee, 2016, pp. 565–571. [15] C. Chen, M. Fan, Z. Wang et al. , “Mpsunet: A deep learning-based segmentation framework for methane plume detection with space-based hyperspectral and multispectral imagery,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–15, 2025. [16] NASA Earthdata, “Earthdata search: Search and discovery of nasa’s earth science data,” NASA Earth Science Data and Information System (ESDIS), 2024, accessed: January 2026. [Online]. Available: https://search.earthdata.nasa.gov

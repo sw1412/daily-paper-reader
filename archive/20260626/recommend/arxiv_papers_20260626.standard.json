@@ -1,0 +1,97 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-26T21:59:46.400398+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.26416v1",
+      "source": "arxiv",
+      "title": "Methane-Plume Segmentation From Hyperspectral Satellite Imagery Via Multimodal Deep Learning",
+      "abstract": "Efficient detection of methane plumes is crucial for understanding and mitigating global warming, as accurately identifying and segmenting them in earth observation imagery remain essential for large-scale monitoring. In this work, we propose a multimodal deep learning model that integrates a feature-guided methane enhancement (FGME) mechanism which injects physically meaningful methane cues into transformer-based RGB representations at multiple semantic scales. Our method is evaluated on the MPDataset, where it outperforms the state-of-the-art with improvements of +0.92 in MIoU, +0.87 in MPrecision and +1.01 in Recall. Notably, these gains are obtained with a substantially lower computational cost than other high-performing architectures, resulting in a favorable accuracy-efficiency trade-off for large-scale methane monitoring. These results highlight the potential of efficient multimodal fusion strategies for accurate and scalable methane plume segmentation in real-world remote sensing applications.",
+      "authors": [
+        "Brayan Quintero",
+        "Jeferson Acevedo",
+        "Samuel Traslaviña",
+        "Hoover Rueda-Chacón"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-24T22:12:16+00:00",
+      "link": "https://arxiv.org/pdf/2606.26416v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hyperspectral methane-plume segmentation using multimodal deep learning",
+      "llm_evidence_cn": "基于多模态深度学习的高光谱甲烷羽流分割",
+      "llm_evidence": "基于多模态深度学习的高光谱甲烷羽流分割",
+      "canonical_evidence": "基于多模态深度学习的高光谱甲烷羽流分割",
+      "llm_tldr_en": "Proposes a multimodal deep learning model with feature-guided methane enhancement for segmenting methane plumes from hyperspectral satellite imagery, achieving state-of-the-art performance on MPDataset.",
+      "llm_tldr_cn": "针对高光谱卫星图像中甲烷羽流检测困难的问题，本文提出了一种多模态深度学习模型，通过特征引导的甲烷增强机制将物理甲烷线索注入RGB表示中。在MPDataset上的实验表明，该方法在MIoU、精度和召回率上分别提升0.92、0.87和1.01，且计算成本更低，为高光谱目标检测提供了高效的新范式。",
+      "llm_tldr": "针对高光谱卫星图像中甲烷羽流检测困难的问题，本文提出了一种多模态深度学习模型，通过特征引导的甲烷增强机制将物理甲烷线索注入RGB表示中。在MPDataset上的实验表明，该方法在MIoU、精度和召回率上分别提升0.92、0.87和1.01，且计算成本更低，为高光谱目标检测提供了高效的新范式。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.25652v1",
+      "source": "arxiv",
+      "title": "Auto-Labelling-Based Domain Transfer for 3D Object Detection on a Bicycle-Mounted LiDAR Platform",
+      "abstract": "Reliable 3D perception of vulnerable road users (VRUs) such as cyclists and pedestrians is essential for their safety in urban traffic and a core requirement for autonomous driving (AD). Alongside advances in vehicle-based perception, research increasingly equips bicycles with sensors to study traffic from a perspective native to VRUs. Such platforms still rely on LiDAR detectors originally trained on vehicle data, yet annotated 3D data from a cyclist's perspective is scarce. How well these detectors generalise to this setting has not been evaluated. We present a 3D object detection benchmark of 1,027 annotated LiDAR keyframes (over 18,000 3D bounding boxes) from the FUSE-Bike platform in urban Munich. We evaluate four nuScenes-pre-trained detectors against 1,854 human-verified ground-truth (GT) boxes both in their original form and after finetuning on training labels produced by a VRU-dedicated auto-labelling pipeline that requires no manual annotation. The zero-shot domain gap is concentrated on the VRU classes. Finetuning recovers most of it, improving mean average precision (mAP) by up to 23.4 points with the largest gains on pedestrians and cyclists, and the adapted detectors even surpass the quality of the auto-labels they were trained on. The benchmark provides a reproducible baseline for VRU-centric 3D detection and shows that auto-labels are a viable substitute for manual annotation when adapting vehicle-trained detectors to a cyclist platform.",
+      "authors": [
+        "Mario Finkbeiner",
+        "Max A. Buettner",
+        "Kanak Mazumder",
+        "Fabian B. Flohr"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-24T10:08:17+00:00",
+      "link": "https://arxiv.org/pdf/2606.25652v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LiDAR 3D object detection benchmark for domain transfer, supporting LiDAR-based classification tasks",
+      "llm_evidence_cn": "LiDAR 3D目标检测领域的迁移基准，支持LiDAR分类任务",
+      "llm_evidence": "LiDAR 3D目标检测领域的迁移基准，支持LiDAR分类任务",
+      "canonical_evidence": "LiDAR 3D目标检测领域的迁移基准，支持LiDAR分类任务",
+      "llm_tldr_en": "This paper presents a 3D LiDAR detection benchmark from a bicycle perspective and evaluates domain transfer methods, showing that detectors can adapt to new viewpoints, benefiting LiDAR classification.",
+      "llm_tldr_cn": "该论文为自行车视角的LiDAR 3D目标检测建立了基准，并评估了领域迁移方法。研究发现，现有检测器在新视角下有一定泛化能力，但仍有提升空间。该基准为LiDAR感知研究提供了新平台，有助于推动LiDAR图像分类等任务的发展。",
+      "llm_tldr": "该论文为自行车视角的LiDAR 3D目标检测建立了基准，并评估了领域迁移方法。研究发现，现有检测器在新视角下有一定泛化能力，但仍有提升空间。该基准为LiDAR感知研究提供了新平台，有助于推动LiDAR图像分类等任务的发展。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
