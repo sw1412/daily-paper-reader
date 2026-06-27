@@ -1,0 +1,39 @@
+{
+  "label": "2026-06-27",
+  "date": "2026-06-27",
+  "generated_at": "2026-06-27T21:26:34",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202606/27/2606.24092v1-progressive-pixel-neighborhood-deformable-cross-attention-for-multispectral-object-detection",
+      "section": "quick",
+      "title_en": "Progressive Pixel-Neighborhood Deformable Cross-Attention for Multispectral Object Detection",
+      "authors": "Tian Qiu, Jifeng Shen, Xin Zuo",
+      "date": "2026-06-23",
+      "pdf": "https://arxiv.org/pdf/2606.24092v1",
+      "score": "7.0",
+      "evidence": "用于多光谱目标检测的跨模态注意力机制",
+      "tldr": "多光谱目标检测面临跨模态特征对齐和交互挑战，全局交叉注意力计算复杂。本文提出渐进式像素邻域可变形交叉注意力融合方法PNAFusion，通过像素邻域交叉注意力和自适应可变形对齐模块，集中处理局部邻域内的特征交互，捕捉非线性空间对应，并利用迭代反馈逐步精炼对齐。在FLIR、M3FD、DroneVehicle数据集上取得优异性能，内存和计算量显著降低。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Effective cross-modal feature alignment and interaction are central challenges in multispectral object detection. Although global cross-attention provides strong long-range modeling ability, its quadratic complexity with respect to feature size limits deployment on resource-constrained platforms. We therefore propose Progressive Pixel-Neighborhood Deformable Cross-Attention for multispectral feature fusion, termed PNAFusion. The proposed framework is motivated by two observations: weak misalignment between visible and thermal images is usually concentrated around local neighborhoods, and semantic correspondence across modalities often follows non-linear spatial mappings that fixed receptive fields cannot model well. To address these issues, PNAFusion incorporates local spatial priors into its architectural design to concentrate feature interaction and alignment on the most relevant neighborhoods. Specifically, a Pixel-Neighborhood Cross-Attention (PNCA) module is introduced to avoid redundant global feature matching and suppress background noise. Meanwhile, an Adaptive Deformable Alignment (ADA) module captures non-linear spatial correspondences through learned pixel-wise offsets. These components are further integrated through an iterative feedback mechanism to progressively refine cross-modal feature alignment. Experiments on FLIR, M3FD, and DroneVehicle show that PNAFusion achieves 84.2, 90.5, and 85.5 mAP@0.5, respectively, under the YOLOv5 detector, and further reaches 86.8 mAP@0.5 on FLIR and 90.8 mAP@0.5 on M3FD when transferred to Co-DETR. Efficiency analysis indicates that PNAFusion reduces allocated GPU memory by 33.0\\% compared with ICAFusion and reduces theoretical FLOPs from 194.8 G to 156.4 G, although the deformable sampling and iterative refinement introduce additional latency. Our code will be available at https://github.com/DanielQiuTian/PNAFusion.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202606/27/2606.25953v1-dsp-slam-a-unified-framework-for-multi-class-high-fidelity-object-slam-in-the-wild",
+      "section": "quick",
+      "title_en": "DSP-SLAM++: A Unified Framework for Multi-Class, High-Fidelity Object SLAM in the Wild",
+      "authors": "Ahmad Kourani, Ghina Daoud, Daniel Asmar, Imad Elhajj",
+      "date": "2026-06-24",
+      "pdf": "https://arxiv.org/pdf/2606.25953v1",
+      "score": "6.0",
+      "evidence": "用于物体SLAM的激光雷达传感器融合",
+      "tldr": "现有物体感知SLAM系统在实时性能、多类支持和生成高保真语义连贯物体模型之间存在权衡。DSP-SLAM++通过引入异步映射流水线和针对单目鱼眼-激光雷达套件的专用传感器融合，解决了这一难题。实验表明，该方法最大物体处理延迟降低70%，在25Hz多类数据集上实现鲁棒实时性能，并生成多个物体类别的细粒度几何完整形状。这项工作使高保真多类物体SLAM更实用，适用于配备常见鱼眼-激光雷达传感器的自动驾驶和机器人操纵平台。开源代码已发布。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Existing object-aware SLAM systems force a trade-off between real-time performance, multi-class support, and the generation of high-fidelity, semantically coherent object models. To address this trade-off, we present DSP-SLAM++, which extends the DSP-SLAM framework with an asynchronous mapping pipeline for real-time performance and dedicated sensor fusion adaptations for a monocular fisheye-LiDAR suite. Experiments demonstrate that our system generates fine-grained, geometrically-complete shapes for multiple object classes while eliminating severe mapping thread bottlenecks by reducing maximum object processing latency by up to 70\\% compared to the state-of-the-art baseline, enabling robust, real-time performance on a challenging 25 Hz multi-class datasets. This work makes high-fidelity, multi-class object SLAM more practical for real-world applications like autonomous driving and robotic manipulation by enabling its use on platforms with common fisheye-LiDAR sensor setups. The open-source code is available at: [github.com/AUBVRL/DSP-SLAMpp].",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

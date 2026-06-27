@@ -1,0 +1,97 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-27T21:24:39.512289+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 12,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.24092v1",
+      "source": "arxiv",
+      "title": "Progressive Pixel-Neighborhood Deformable Cross-Attention for Multispectral Object Detection",
+      "abstract": "Effective cross-modal feature alignment and interaction are central challenges in multispectral object detection. Although global cross-attention provides strong long-range modeling ability, its quadratic complexity with respect to feature size limits deployment on resource-constrained platforms. We therefore propose Progressive Pixel-Neighborhood Deformable Cross-Attention for multispectral feature fusion, termed PNAFusion. The proposed framework is motivated by two observations: weak misalignment between visible and thermal images is usually concentrated around local neighborhoods, and semantic correspondence across modalities often follows non-linear spatial mappings that fixed receptive fields cannot model well. To address these issues, PNAFusion incorporates local spatial priors into its architectural design to concentrate feature interaction and alignment on the most relevant neighborhoods. Specifically, a Pixel-Neighborhood Cross-Attention (PNCA) module is introduced to avoid redundant global feature matching and suppress background noise. Meanwhile, an Adaptive Deformable Alignment (ADA) module captures non-linear spatial correspondences through learned pixel-wise offsets. These components are further integrated through an iterative feedback mechanism to progressively refine cross-modal feature alignment. Experiments on FLIR, M3FD, and DroneVehicle show that PNAFusion achieves 84.2, 90.5, and 85.5 mAP@0.5, respectively, under the YOLOv5 detector, and further reaches 86.8 mAP@0.5 on FLIR and 90.8 mAP@0.5 on M3FD when transferred to Co-DETR. Efficiency analysis indicates that PNAFusion reduces allocated GPU memory by 33.0\\% compared with ICAFusion and reduces theoretical FLOPs from 194.8 G to 156.4 G, although the deformable sampling and iterative refinement introduce additional latency. Our code will be available at https://github.com/DanielQiuTian/PNAFusion.",
+      "authors": [
+        "Tian Qiu",
+        "Jifeng Shen",
+        "Xin Zuo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-23T03:14:27+00:00",
+      "link": "https://arxiv.org/pdf/2606.24092v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "cross-modal attention for multispectral object detection",
+      "llm_evidence_cn": "用于多光谱目标检测的跨模态注意力机制",
+      "llm_evidence": "用于多光谱目标检测的跨模态注意力机制",
+      "canonical_evidence": "用于多光谱目标检测的跨模态注意力机制",
+      "llm_tldr_en": "PNAFusion proposes Progressive Pixel-Neighborhood Deformable Cross-Attention for multispectral object detection, addressing misalignment and nonlinear spatial mapping with linear complexity, suitable for resource-constrained platforms.",
+      "llm_tldr_cn": "多光谱目标检测中跨模态特征对齐和交互是关键挑战。PNAFusion提出渐进像素邻域可变形交叉注意力机制，利用局部邻域和可变形采样处理可见光与热红外图像之间的弱对齐和非线性空间映射，同时保持线性复杂度。在多个多光谱检测基准上显著提升了检测精度，且计算效率高，适用于资源受限平台。",
+      "llm_tldr": "多光谱目标检测中跨模态特征对齐和交互是关键挑战。PNAFusion提出渐进像素邻域可变形交叉注意力机制，利用局部邻域和可变形采样处理可见光与热红外图像之间的弱对齐和非线性空间映射，同时保持线性复杂度。在多个多光谱检测基准上显著提升了检测精度，且计算效率高，适用于资源受限平台。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.25953v1",
+      "source": "arxiv",
+      "title": "DSP-SLAM++: A Unified Framework for Multi-Class, High-Fidelity Object SLAM in the Wild",
+      "abstract": "Existing object-aware SLAM systems force a trade-off between real-time performance, multi-class support, and the generation of high-fidelity, semantically coherent object models. To address this trade-off, we present DSP-SLAM++, which extends the DSP-SLAM framework with an asynchronous mapping pipeline for real-time performance and dedicated sensor fusion adaptations for a monocular fisheye-LiDAR suite. Experiments demonstrate that our system generates fine-grained, geometrically-complete shapes for multiple object classes while eliminating severe mapping thread bottlenecks by reducing maximum object processing latency by up to 70\\% compared to the state-of-the-art baseline, enabling robust, real-time performance on a challenging 25 Hz multi-class datasets. This work makes high-fidelity, multi-class object SLAM more practical for real-world applications like autonomous driving and robotic manipulation by enabling its use on platforms with common fisheye-LiDAR sensor setups. The open-source code is available at: [github.com/AUBVRL/DSP-SLAMpp].",
+      "authors": [
+        "Ahmad Kourani",
+        "Ghina Daoud",
+        "Daniel Asmar",
+        "Imad Elhajj"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.CV"
+      ],
+      "published": "2026-06-24T15:27:23+00:00",
+      "link": "https://arxiv.org/pdf/2606.25953v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "LiDAR sensor fusion for object SLAM",
+      "llm_evidence_cn": "用于物体SLAM的激光雷达传感器融合",
+      "llm_evidence": "用于物体SLAM的激光雷达传感器融合",
+      "canonical_evidence": "用于物体SLAM的激光雷达传感器融合",
+      "llm_tldr_en": "DSP-SLAM++ extends DSP-SLAM with an asynchronous mapping pipeline and dedicated sensor fusion for monocular fisheye-LiDAR, achieving real-time multi-class object SLAM with 70% latency reduction.",
+      "llm_tldr_cn": "DSP-SLAM++针对现有物体SLAM系统在实时性、多类别支持和高质量建模之间的权衡，提出异步映射流水线和专用的单目鱼眼-激光雷达传感器融合适配。实验表明，系统在25Hz挑战性数据上实现实时性能，将最大物体处理延迟降低70%，生成精细几何完整的多类物体模型，为机器人感知提供了高效解决方案。",
+      "llm_tldr": "DSP-SLAM++针对现有物体SLAM系统在实时性、多类别支持和高质量建模之间的权衡，提出异步映射流水线和专用的单目鱼眼-激光雷达传感器融合适配。实验表明，系统在25Hz挑战性数据上实现实时性能，将最大物体处理延迟降低70%，生成精细几何完整的多类物体模型，为机器人感知提供了高效解决方案。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
