@@ -6,31 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-27
-- 运行时间：2026-06-27 21:26:26 UTC
+- 最新运行日期：2026-06-28
+- 运行时间：2026-06-28 20:34:09 UTC
 - 运行状态：成功
 - 本次总论文数：2
-- 精读区：0
-- 速读区：2
+- 精读区：1
+- 速读区：1
 
 ### 今日简报（AI）
-今天速读了两篇论文，聚焦多光谱目标检测与统一目标SLAM框架。
-
-最值得关注的是7分论文《Progressive Pixel-Neighborhood Deformable Cross-Attention》，其可变形交叉注意力机制在多光谱检测中效果显著。
-
-建议后续可尝试将该注意力方法拓展至其他跨模态任务，或对比SLAM++的野外实例重建效果。
-- 详情：[/202606/27/README](/202606/27/README)
+今天阅读了2篇论文，精读1篇遥感领域状态空间模型综述，速读1篇无监督多传感器回归方法。值得关注的方向：状态空间模型在遥感中的系统化应用，以及如何应对传感器异构偏差。建议下一步深入探索SSM与遥感多模态数据的融合潜力。
+- 详情：[/202606/28/README](/202606/28/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [State Space Models Meet Remote Sensing: A Survey](/202606/28/2606.25329v1-state-space-models-meet-remote-sensing-a-survey)  
+   标签：评分：8.0/10、query:hsi-lidar
+   evidence：关于SSM用于遥感的综述，涵盖多模态数据，包括高光谱和LiDAR
 
 ### 速读区论文标签
-1. [Progressive Pixel-Neighborhood Deformable Cross-Attention for Multispectral Object Detection](/202606/27/2606.24092v1-progressive-pixel-neighborhood-deformable-cross-attention-for-multispectral-object-detection)  
+1. [Neural Conjugate Aggregation: Identifiable Unsupervised Multi-Sensor Regression under Heterogeneous Sensor Bias](/202606/28/2606.22200v1-neural-conjugate-aggregation-identifiable-unsupervised-multi-sensor-regression-under-heterogeneous-sensor-bias)  
    标签：评分：7.0/10、query:hsi-lidar
-   evidence：用于多光谱目标检测的跨模态注意力机制
-2. [DSP-SLAM++: A Unified Framework for Multi-Class, High-Fidelity Object SLAM in the Wild](/202606/27/2606.25953v1-dsp-slam-a-unified-framework-for-multi-class-high-fidelity-object-slam-in-the-wild)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：用于物体SLAM的激光雷达传感器融合
+   evidence：适用于高光谱与LiDAR数据融合的无监督多源融合方法
 
 
 <div class="dpr-home-promo-card">

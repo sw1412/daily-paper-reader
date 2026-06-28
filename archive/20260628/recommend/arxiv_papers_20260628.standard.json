@@ -1,0 +1,101 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-28T20:31:49.644808+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.25329v1",
+      "source": "arxiv",
+      "title": "State Space Models Meet Remote Sensing: A Survey",
+      "abstract": "State Space Models (SSMs), designed for long-range modeling, offer linear computational complexity and strong capabilities in capturing long-range dependencies. In the field of remote sensing, SSMs have gained popularity due to their effectiveness in addressing unique challenges such as dense visual predictions, multi-modal remote sensing data, and temporal remote sensing data, which have also yielded significant advancements in customized architectures. This paper presents a comprehensive review of SSM-based approaches in remote sensing, covering most of the relevant studies since SSMs were first introduced to the field. We offer a multi-dimensional analysis examining SSM applications in remote sensing tasks and discussing advancements in architecture design. This paper not only synthesizes the rapid progress in SSM-based research but also identifies key challenges and future opportunities. By providing a detailed perspective, this paper aims to serve as a foundational resource for remote sensing researchers, offering actionable insights to foster further advancements in this evolving domain. We will keep tracing related works at https://github.com/QinzheYang/Awesome-RS-State-Space-Model.",
+      "authors": [
+        "Qinzhe Yang",
+        "Chenyang Liu",
+        "Jia Xu",
+        "Zhenwei Shi",
+        "Zhengxia Zou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-24T02:50:31+00:00",
+      "link": "https://arxiv.org/pdf/2606.25329v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "survey on SSM for remote sensing covering multi-modal data, including hyperspectral and LiDAR",
+      "llm_evidence_cn": "关于SSM用于遥感的综述，涵盖多模态数据，包括高光谱和LiDAR",
+      "llm_evidence": "关于SSM用于遥感的综述，涵盖多模态数据，包括高光谱和LiDAR",
+      "canonical_evidence": "关于SSM用于遥感的综述，涵盖多模态数据，包括高光谱和LiDAR",
+      "llm_tldr_en": "This survey comprehensively reviews state space model applications in remote sensing, emphasizing long-range dependencies and multi-modal data handling, relevant to hyperspectral and LiDAR fusion.",
+      "llm_tldr_cn": "状态空间模型(SSM)因其线性复杂度与长程依赖捕获能力在遥感领域日益受到关注。本文系统综述了SSM在遥感各任务中的应用，特别针对多模态遥感数据（包括高光谱与LiDAR）的处理与融合。文章从架构设计、任务适配等维度展开分析，总结了SSM在分类、检测等任务上的优势与挑战。该综述为多模态高光谱与LiDAR联合分析提供了重要的方法学参考。",
+      "llm_tldr": "状态空间模型(SSM)因其线性复杂度与长程依赖捕获能力在遥感领域日益受到关注。本文系统综述了SSM在遥感各任务中的应用，特别针对多模态遥感数据（包括高光谱与LiDAR）的处理与融合。文章从架构设计、任务适配等维度展开分析，总结了SSM在分类、检测等任务上的优势与挑战。该综述为多模态高光谱与LiDAR联合分析提供了重要的方法学参考。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.22200v1",
+      "source": "arxiv",
+      "title": "Neural Conjugate Aggregation: Identifiable Unsupervised Multi-Sensor Regression under Heterogeneous Sensor Bias",
+      "abstract": "We study regression-based data fusion under uncertainty, where multiple noisy and biased measurement sources are available but ground-truth labels are absent during training. This setting arises in sensor networks, simulation ensembles, and scientific monitoring systems where supervision is costly or infeasible. We propose the Neural Conjugate Aggregation Model (NCAM), a hierarchical Bayesian framework that combines neural networks with conjugate Gaussian inference for unsupervised multi-source fusion. NCAM learns source-specific bias and reliability conditioned on contextual covariates, yielding an analytically tractable posterior over a latent target variable with decomposed epistemic and aleatoric uncertainty. Structural non-identifiability is resolved through sensor anchoring and variance regularization, enabling stable and interpretable posterior aggregation. To complement Bayesian uncertainty with finite-sample guarantees, we integrate locally adaptive Monte Carlo conformal prediction, producing heteroscedastic prediction intervals with coverage guarantees under exchangeability assumptions. Experiments on synthetic and real-world air-quality datasets demonstrate improved predictive accuracy and well-calibrated uncertainty compared to unsupervised baselines, including mean aggregation, probabilistic PCA, and Kalman filtering.",
+      "authors": [
+        "Muhammed Faruk Aytin",
+        "Zehra Demir",
+        "Alper Ünal",
+        "Julian Marshall",
+        "Gözde Ünal"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-06-20T19:30:21+00:00",
+      "link": "https://arxiv.org/pdf/2606.22200v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "unsupervised multi-source fusion method applicable to hyperspectral and LiDAR data fusion",
+      "llm_evidence_cn": "适用于高光谱与LiDAR数据融合的无监督多源融合方法",
+      "llm_evidence": "适用于高光谱与LiDAR数据融合的无监督多源融合方法",
+      "canonical_evidence": "适用于高光谱与LiDAR数据融合的无监督多源融合方法",
+      "llm_tldr_en": "NCAM is a Bayesian framework for unsupervised multi-sensor fusion that learns source biases and reliability, providing tractable posterior and uncertainty decomposition, applicable to remote sensing data fusion.",
+      "llm_tldr_cn": "针对多传感器数据融合中标签缺失与偏差未知的挑战，该论文提出神经共轭聚合模型(NCAM)，一种融合神经网络与共轭高斯推理的层级贝叶斯框架。NCAM能够学习每个传感器的偏置与可靠性，并输出具有解析形式的潜在变量后验分布，同时分解认知不确定性与偶然不确定性。该方法可推广至高光谱与LiDAR等多模态遥感数据融合任务。",
+      "llm_tldr": "针对多传感器数据融合中标签缺失与偏差未知的挑战，该论文提出神经共轭聚合模型(NCAM)，一种融合神经网络与共轭高斯推理的层级贝叶斯框架。NCAM能够学习每个传感器的偏置与可靠性，并输出具有解析形式的潜在变量后验分布，同时分解认知不确定性与偶然不确定性。该方法可推广至高光谱与LiDAR等多模态遥感数据融合任务。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
