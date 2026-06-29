@@ -1,0 +1,319 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-29T21:46:57.851749+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 2,
+    "deep_cap": 7,
+    "deep_selected": 2,
+    "quick_candidates": 5,
+    "quick_skim_target": 12,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2606.27491v1",
+      "source": "arxiv",
+      "title": "SelectAnyTree: A Promptable Instance Segmentation Model for 3D Forest LiDAR Point Clouds",
+      "abstract": "Automated instance segmentation of forest LiDAR point clouds is increasingly critical as forest monitoring moves toward scalable, detailed, 3D measurement. Yet, progress is constrained by label scarcity for tree instances; a single hectare can hold millions of points and hundreds of overlapping, complex crowns, making manual annotation from scratch with raw data laborious and error-prone. Annotations are often corrected from automatic pre-segmentations, but remain costly as these provide no interactive or AI-assisted refinement. Inspired by the promptable paradigm of foundation segmentation models, we propose SelectAnyTree, a promptable instance segmentation model that delineates any individual tree in a 3D forest point cloud from a few clicks. It introduces two key components: Click-to-query prompt encoder and Canopy Height Model (CHM)-guided first prompt. The former turns each click into a single content query, encoding its 3D position and positive/negative polarity together with a pooled local backbone feature. The latter provides treetops as a geometry- and ecologically guided first prompt without any user input. The resulting prompt query is then decoded into one tree mask by a state-space query decoder to efficiently capture long-range context in large-scale forest scenes with linear-time complexity. We evaluate SelectAnyTree in interactive and instance-level settings across seven diverse forest regions and an independent held-out test dataset, demonstrating strong generalization beyond the training domains. It segments a target tree to 78.2 Intersection over Union (IoU) from a single click, 24.8 points above the strongest promptable baseline, and reaches every accuracy target with the fewest clicks, while using far fewer parameters and less inference time than prior promptable models. The source code is available at https://github.com/thanhhff/SelectAnyTree.",
+      "authors": [
+        "Trung Thanh Nguyen",
+        "Daniel Lusk",
+        "Kilian Gerberding",
+        "Janusch Vajna-Jehle",
+        "Tuan-Anh Vu",
+        "Duc Viet Le",
+        "Tu Vo",
+        "Phi Le Nguyen",
+        "Yasutomo Kawanishi",
+        "Takahiro Komamizu",
+        "Ichiro Ide",
+        "Julian Frey",
+        "Teja Kattenborn"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-25T19:15:36+00:00",
+      "link": "https://arxiv.org/pdf/2606.27491v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LiDAR point cloud instance segmentation for tree delineation",
+      "llm_evidence_cn": "LiDAR点云实例分割用于单树勾画",
+      "llm_evidence": "LiDAR点云实例分割用于单树勾画",
+      "canonical_evidence": "LiDAR点云实例分割用于单树勾画",
+      "llm_tldr_en": "SelectAnyTree introduces a promptable instance segmentation model for 3D forest LiDAR point clouds, enabling efficient single-tree segmentation from prompts, addressing label scarcity.",
+      "llm_tldr_cn": "针对森林LiDAR点云中单树分割的标签稀缺问题，本文提出SelectAnyTree，一种基于提示的实例分割模型。该模型借鉴基础分割模型的提示范式，从少量点或框提示中精确分割任意单树，无需大量标注。在多个森林数据集上验证了其有效性，显著减少了人工标注成本，为大规模自动化森林监测提供了实用方案。",
+      "llm_tldr": "针对森林LiDAR点云中单树分割的标签稀缺问题，本文提出SelectAnyTree，一种基于提示的实例分割模型。该模型借鉴基础分割模型的提示范式，从少量点或框提示中精确分割任意单树，无需大量标注。在多个森林数据集上验证了其有效性，显著减少了人工标注成本，为大规模自动化森林监测提供了实用方案。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.25312v1",
+      "source": "arxiv",
+      "title": "LEVIRDet: A Million-Scale 159-Category Dataset and Foundation Model for Universal Remote Sensing Object Detection",
+      "abstract": "Remote sensing object detection has advanced rapidly with the development of large-scale benchmarks and modern detection architectures. However, existing datasets and detectors remain fragmented. Most benchmarks focus on limited categories, fixed spatial resolutions, or a single sensor, while detectors still struggle to work across different sensors and categorical systems. In this paper, we introduce LEVIRDet-159, the largest and most comprehensive remote sensing object detection dataset to date, with 159 categories, 2.56 million bounding boxes, and 700k fine-grained annotations under a multi-level taxonomy. In each key scale dimension, LEVIRDet-159 exceeds the corresponding largest existing remote sensing object detection dataset, containing approximately (7x) more images, (6x) more object instances, and (4x) more categories. Based on this dataset, we design LEVIRDetNet, a scale-hierarchy-aware detection foundation model for universal remote sensing object detection. LEVIRDetNet couples online visual Ground Sampling Distance (GSD) prediction, GSD-conditioned query modulation and allocation, and a hierarchy-aware detection head for mixed-granularity remote sensing supervision. Under stringent evaluation settings, LEVIRDetNet demonstrates strong cross-domain generalization. Even without target-domain training or fine-tuning, it achieves state-of-the-art detection performance on 9 external benchmarks, improving the strongest fully supervised competing methods by 5.02 mAP on average under each benchmark's primary metric. We hope this study will facilitate the development of strongly generalizable remote sensing object detection across diverse category systems, spatial resolutions, and sensor platforms. The dataset and trained models will be released at https://qinzheyang.github.io/LEVIRDet/, accompanying the final paper.",
+      "authors": [
+        "Qinzhe Yang",
+        "Dongyu Wang",
+        "Haohan Niu",
+        "Jia Xu",
+        "Zhenwei Shi",
+        "Zhengxia Zou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-24T02:25:54+00:00",
+      "link": "https://arxiv.org/pdf/2606.25312v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Large-scale remote sensing object detection dataset and foundation model applicable to hyperspectral and multimodal data",
+      "llm_evidence_cn": "大规模遥感目标检测数据集与基础模型，可适用于高光谱和多模态数据",
+      "llm_evidence": "大规模遥感目标检测数据集与基础模型，可适用于高光谱和多模态数据",
+      "canonical_evidence": "大规模遥感目标检测数据集与基础模型，可适用于高光谱和多模态数据",
+      "llm_tldr_en": "Introduces LEVIRDet-159, the largest remote sensing object detection dataset with 159 categories and 2.56M boxes, and a foundation model for universal detection across sensors, including hyperspectral.",
+      "llm_tldr_cn": "现有遥感目标检测数据集和模型往往局限于少量类别、固定分辨率或单一传感器，难以跨传感器泛化。本文提出了LEVIRDet-159数据集，包含159个类别、256万标注框和70万细粒度注释，是迄今最大最全面的遥感目标检测数据集。基于该数据集，训练了通用基础检测模型，能够在不同传感器和分类体系下工作。实验表明，该模型在多个遥感检测基准上达到领先性能，为多模态遥感目标检测（包括高光谱图像）提供了强大基础。",
+      "llm_tldr": "现有遥感目标检测数据集和模型往往局限于少量类别、固定分辨率或单一传感器，难以跨传感器泛化。本文提出了LEVIRDet-159数据集，包含159个类别、256万标注框和70万细粒度注释，是迄今最大最全面的遥感目标检测数据集。基于该数据集，训练了通用基础检测模型，能够在不同传感器和分类体系下工作。实验表明，该模型在多个遥感检测基准上达到领先性能，为多模态遥感目标检测（包括高光谱图像）提供了强大基础。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.24786v1",
+      "source": "arxiv",
+      "title": "Counting Trees from Satellite Imagery with Noisy Supervision",
+      "abstract": "Counting individual trees is a fundamental task for environmental monitoring, yet remains largely unexplored with satellite imagery. At these resolutions, isolated trees may still be identifiable, but crown boundaries become ambiguous in dense forests, making the notion of an individual tree inherently ill-defined. Moreover, large-scale manual annotations of individual trees are prohibitively expensive. While scalable supervision can be derived from airborne LiDAR, the resulting annotations are noisy and difficult to exploit effectively.   We address these challenges by formulating tree counting as a spatial density matching problem supervised through Unbalanced Optimal Transport. This formulation naturally accommodates both precise localization of isolate trees and robust density estimation in dense forests. We further introduce a self-correction mechanism that leverages transport residuals to progressively refine noisy supervision during training.   We evaluate our approach on TinyTrees, a new benchmark spanning three continents and three satellite sensors, comprising over 215 million tree annotations (including 773K manually verified instances) across 23,000 sq.km. Our method consistently outperforms detection-based, regression-based, and transport-based distribution-matching baselines, demonstrating the effectiveness of unbalanced transport and reliability-aware supervision for large-scale tree counting from satellite imagery. Code, data and models are available at https://github.com/dgominski/treematch.",
+      "authors": [
+        "Dimitri Gominski",
+        "Maurice Mugabowindekwe",
+        "Qiue Xu",
+        "Xiaowei Tong",
+        "Martin Brandt",
+        "Hieu Le",
+        "Rasmus Fensholt",
+        "Dimitris Samaras",
+        "Loic Landrieu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-23T16:45:05+00:00",
+      "link": "https://arxiv.org/pdf/2606.24786v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "uses LiDAR as noisy supervision for satellite tree counting",
+      "llm_evidence_cn": "利用激光雷达作为卫星图像树木计数的含噪监督",
+      "llm_evidence": "利用激光雷达作为卫星图像树木计数的含噪监督",
+      "canonical_evidence": "利用激光雷达作为卫星图像树木计数的含噪监督",
+      "llm_tldr_en": "Proposes tree counting from satellite imagery using Unbalanced Optimal Transport with LiDAR-derived noisy annotations, accommodating both precise localization and dense counting.",
+      "llm_tldr_cn": "针对卫星图像中树木计数任务缺乏精确标注且LiDAR标注含噪的问题，本文提出将计数视为空间密度匹配问题，采用非平衡最优传输进行监督。该方法同时处理精确局部定位和密集区域计数，有效利用LiDAR噪声标注训练模型。实验表明该方法优于现有方法，为大规模环境监测提供了可扩展的解决方案，展示了LiDAR数据与卫星图像融合的潜力。",
+      "llm_tldr": "针对卫星图像中树木计数任务缺乏精确标注且LiDAR标注含噪的问题，本文提出将计数视为空间密度匹配问题，采用非平衡最优传输进行监督。该方法同时处理精确局部定位和密集区域计数，有效利用LiDAR噪声标注训练模型。实验表明该方法优于现有方法，为大规模环境监测提供了可扩展的解决方案，展示了LiDAR数据与卫星图像融合的潜力。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.26763v1",
+      "source": "arxiv",
+      "title": "Calibrated Harmonic Overlaid Implicit Neural Representations for Multi-Dimensional Data",
+      "abstract": "Implicit neural representation (INR) has emerged as a powerful prior for multi-dimensional data (e.g., multispectral images and videos). However, most INR methods employing periodic activation functions (e.g., Sine) predominantly rely on function composition. This mechanism introduces optimization instability as network depth increases, thereby limiting their performance. Meanwhile, these methods fail to incorporate proper physical priors to effectively alleviate spectrum bias. To address these issues, inspired by the commonalities between deep periodic networks and generalized Fourier series, we propose a novel Calibrated Harmonic Overlaid Implicit Neural Representation (CHOIR). Specifically, we utilize Coordinated Harmonic Superposition (CHS) to replace the conventional function composition used in most INRs, thereby ensuring optimization stability when scaling network depth. Furthermore, we introduce a Perceptual Spectrum Calibration (PSC) to mitigate spectrum bias. This calibration embeds the ubiquitous power-law spectrum prior of natural images and adjusts the globally fixed spectrum towards a physically plausible log-uniform distribution. Extensive experiments on various multidimensional data recovery problems demonstrate that our method achieves superior performance over state-of-the-art approaches. Code is available at https://github.com/chorl0229/CHOIR.",
+      "authors": [
+        "Honghang Chen",
+        "Xiujun Zhang",
+        "Xiaoli Sun",
+        "Mingqing Xiao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-25T08:48:31+00:00",
+      "link": "https://arxiv.org/pdf/2606.26763v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "implicit neural representation for multi-dimensional data like multispectral images",
+      "llm_evidence_cn": "用于多光谱等多维数据的隐式神经表示",
+      "llm_evidence": "用于多光谱等多维数据的隐式神经表示",
+      "canonical_evidence": "用于多光谱等多维数据的隐式神经表示",
+      "llm_tldr_en": "CHOIR introduces a calibrated harmonic overlaid INR that improves spectral bias handling for multi-dimensional data (e.g., multispectral images).",
+      "llm_tldr_cn": "CHOIR针对隐式神经表示中的频谱偏置问题，提出校准谐波叠加方法，在多光谱图像等数据上提升表示质量，为光谱-空间特征提取提供了新型工具。",
+      "llm_tldr": "CHOIR针对隐式神经表示中的频谱偏置问题，提出校准谐波叠加方法，在多光谱图像等数据上提升表示质量，为光谱-空间特征提取提供了新型工具。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "spectral-spatial feature extraction for hyperspectral data",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.25329v1",
+      "source": "arxiv",
+      "title": "State Space Models Meet Remote Sensing: A Survey",
+      "abstract": "State Space Models (SSMs), designed for long-range modeling, offer linear computational complexity and strong capabilities in capturing long-range dependencies. In the field of remote sensing, SSMs have gained popularity due to their effectiveness in addressing unique challenges such as dense visual predictions, multi-modal remote sensing data, and temporal remote sensing data, which have also yielded significant advancements in customized architectures. This paper presents a comprehensive review of SSM-based approaches in remote sensing, covering most of the relevant studies since SSMs were first introduced to the field. We offer a multi-dimensional analysis examining SSM applications in remote sensing tasks and discussing advancements in architecture design. This paper not only synthesizes the rapid progress in SSM-based research but also identifies key challenges and future opportunities. By providing a detailed perspective, this paper aims to serve as a foundational resource for remote sensing researchers, offering actionable insights to foster further advancements in this evolving domain. We will keep tracing related works at https://github.com/QinzheYang/Awesome-RS-State-Space-Model.",
+      "authors": [
+        "Qinzhe Yang",
+        "Chenyang Liu",
+        "Jia Xu",
+        "Zhenwei Shi",
+        "Zhengxia Zou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-24T02:50:31+00:00",
+      "link": "https://arxiv.org/pdf/2606.25329v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Survey of State Space Models for multimodal remote sensing including classification",
+      "llm_evidence_cn": "状态空间模型在遥感中的综述，涵盖多模态分类",
+      "llm_evidence": "状态空间模型在遥感中的综述，涵盖多模态分类",
+      "canonical_evidence": "状态空间模型在遥感中的综述，涵盖多模态分类",
+      "llm_tldr_en": "Comprehensive survey of SSM applications in remote sensing, covering multi-modal data classification, dense prediction, and temporal analysis.",
+      "llm_tldr_cn": "本文全面综述了状态空间模型（SSM）在遥感领域的应用，涵盖多模态遥感数据分类、密集预测与时序分析等任务。系统分析了SSM架构设计进展，并探讨了其在遥感中的独特优势，为后续研究提供了重要参考。",
+      "llm_tldr": "本文全面综述了状态空间模型（SSM）在遥感领域的应用，涵盖多模态遥感数据分类、密集预测与时序分析等任务。系统分析了SSM架构设计进展，并探讨了其在遥感中的独特优势，为后续研究提供了重要参考。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.26812v1",
+      "source": "arxiv",
+      "title": "Multi-modality Image Fusion under Adverse Weather: Mask-Guided Feature Restoration and Interaction",
+      "abstract": "Multi-modality image fusion (MMIF) enhances scene representation by exploiting complementary cues from different modalities. Adverse weather, however, causes significant image degradation, disrupting feature representation and requiring simultaneous feature restoration and cross-modal complementarity. Existing methods often struggle with effective representation learning under such conditions, limiting their practical performance. To address these challenges, we propose a mask-guided MMIF method that integrates feature restoration and interaction. We first introduce \"Pseudo Ground Truth\" to simplify training, promoting faster and more effective feature learning. Then, we design a mask generation mechanism based on the mapping relationship between the fused result and the source images, quantifying the relative contribution of each modality during the fusion process. By incorporating the proposed mask-guided cross-modal cross-attention mechanism, the network is encouraged to selectively attend to informative features during modality interaction, mitigating the risk of overfitting to the static distribution of the \"Pseudo Ground Truth\". Additionally, we propose a mask-guided learning strategy and a task-coupled degradation-aware learning strategy to balance feature restoration and interaction. Extensive experiments on synthetic and real-world datasets demonstrate that our method surpasses state-of-the-art approaches in visual quality, quantitative metrics, and downstream tasks. The source code is available at https://github.com/ixilai/AMG-Fuse.",
+      "authors": [
+        "Xilai Li",
+        "Xiaosong Li",
+        "Haishu Tan",
+        "Tao Ye",
+        "Huafeng Li",
+        "Hongbin Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-25T09:54:32+00:00",
+      "link": "https://arxiv.org/pdf/2606.26812v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multi-modality image fusion method with feature restoration and interaction",
+      "llm_evidence_cn": "多模态图像融合方法，包含特征恢复与交互",
+      "llm_evidence": "多模态图像融合方法，包含特征恢复与交互",
+      "canonical_evidence": "多模态图像融合方法，包含特征恢复与交互",
+      "llm_tldr_en": "Proposes mask-guided multi-modality image fusion with feature restoration and interaction under adverse weather, directly applicable to HSI-LiDAR fusion.",
+      "llm_tldr_cn": "该论文提出一种掩码引导的多模态图像融合方法，在恶劣天气下同时进行特征恢复和跨模态互补。引入伪地面真值简化训练，并设计基于映射的掩码生成机制。该方法能有效处理多模态数据退化问题，可推广至高光谱与LiDAR融合场景。",
+      "llm_tldr": "该论文提出一种掩码引导的多模态图像融合方法，在恶劣天气下同时进行特征恢复和跨模态互补。引入伪地面真值简化训练，并设计基于映射的掩码生成机制。该方法能有效处理多模态数据退化问题，可推广至高光谱与LiDAR融合场景。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.27818v1",
+      "source": "arxiv",
+      "title": "Scalable and Differentiable Point-Cloud Registration Using Maximum Mean Discrepancy",
+      "abstract": "We present MMD-Reg, a novel correspondence-free approach to point-cloud registration that is differentiable and has linear computational complexity in the number of points. We model registration as a nonlinear least-squares problem based on the Maximum Mean Discrepancy, approximated using random Fourier features. The resulting objective can be solved efficiently with standard methods such as Levenberg-Marquardt, and the solution is differentiable via the implicit function theorem. This allows MMD-Reg to be used as a differentiable optimization layer within end-to-end trainable models, supporting registration under challenging conditions such as poor initial alignment and partial overlap. We demonstrate this Neural MMD-Reg formulation by integrating the layer with a set transformer, training the resulting model in supervised and unsupervised settings, and comparing its performance against recent learning-based methods. We also evaluate standalone MMD-Reg, comparing its accuracy and scalability against widely used non-learning-based registration methods.",
+      "authors": [
+        "Rixon Crane",
+        "Fahira Afzal Maken",
+        "Nicholas Lawrance",
+        "Stanislav Funiak",
+        "Kasra Khosoussi",
+        "Ming Xu",
+        "Russell Tsuchida"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-26T07:59:30+00:00",
+      "link": "https://arxiv.org/pdf/2606.27818v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "point-cloud registration for LiDAR data",
+      "llm_evidence_cn": "用于激光雷达数据的点云配准",
+      "llm_evidence": "用于激光雷达数据的点云配准",
+      "canonical_evidence": "用于激光雷达数据的点云配准",
+      "llm_tldr_en": "Proposes MMD-Reg, a correspondence-free, differentiable point-cloud registration method with linear complexity, enabling use as an optimization layer in end-to-end models for LiDAR processing.",
+      "llm_tldr_cn": "针对点云配准在初始对齐差和部分重叠等挑战条件下性能不佳且缺乏可微性的问题，本文提出MMD-Reg方法，通过随机傅里叶特征近似最大均值差异，将配准转化为可微的非线性最小二乘问题，具有线性计算复杂度。该方法可作为优化层嵌入端到端网络，支持反向传播。实验证明MMD-Reg在多种困难场景下达到高精度配准，为激光雷达点云处理提供了灵活可扩展的解决方案。",
+      "llm_tldr": "针对点云配准在初始对齐差和部分重叠等挑战条件下性能不佳且缺乏可微性的问题，本文提出MMD-Reg方法，通过随机傅里叶特征近似最大均值差异，将配准转化为可微的非线性最小二乘问题，具有线性计算复杂度。该方法可作为优化层嵌入端到端网络，支持反向传播。实验证明MMD-Reg在多种困难场景下达到高精度配准，为激光雷达点云处理提供了灵活可扩展的解决方案。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

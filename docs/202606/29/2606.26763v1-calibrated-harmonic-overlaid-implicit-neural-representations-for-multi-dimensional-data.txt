@@ -1,0 +1,530 @@
+Title: Calibrated Harmonic Overlaid Implicit Neural Representations for Multi-Dimensional Data
+
+URL Source: https://arxiv.org/pdf/2606.26763v1
+
+Published Time: Fri, 26 Jun 2026 01:02:35 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+# Calibrated Harmonic Overlaid Implicit Neural Representations for Multi-Dimensional Data 
+
+Honghang Chen 1 , Xiujun Zhang 2(B) , Xiaoli Sun 1(B) , and Mingqing Xiao 3 
+
+> 1
+
+Shenzhen University, Shenzhen, China  
+
+> 2
+
+Shenzhen Polytechnic University, Shenzhen, China  
+
+> 3
+
+Southern Illinois University Carbondale, USA 
+
+honghangchenhaha@gmail.com 
+
+Abstract. Implicit neural representation (INR) has emerged as a pow-erful prior for multi-dimensional data (e.g., multispectral images and videos). However, most INR methods employing periodic activation func-tions (e.g., Sine) predominantly rely on function composition. This mech-anism introduces optimization instability as network depth increases, thereby limiting their performance. Meanwhile, these methods fail to in-corporate proper physical priors to effectively alleviate spectrum bias. To address these issues, inspired by the commonalities between deep periodic networks and generalized Fourier series, we propose a novel Calibrated Harmonic Overlaid Implicit Neural Representation (CHOIR). Specifi-cally, we utilize Coordinated Harmonic Superposition (CHS) to replace the conventional function composition used in most INRs, thereby en-suring optimization stability when scaling network depth. Furthermore, we introduce a Perceptual Spectrum Calibration (PSC) to mitigate spec-trum bias. This calibration embeds the ubiquitous power-law spectrum prior of natural images and adjusts the globally fixed spectrum towards a physically plausible log-uniform distribution. Extensive experiments on various multidimensional data recovery problems demonstrate that our method achieves superior performance over state-of-the-art approaches. Code is available at https://github.com/chorl0229/CHOIR .
+
+Keywords: Implicit Neural Representation · Multi-Dimensional Data ·
+
+Calibrated Harmonic Overlaid 
+
+1 Introduction 
+
+Implicit Neural Representations (INR) have become a powerful paradigm for multi-dimensional data recovery, such as multispectral images, videos, and other forms of data, by parameterizing the signal as a continuous function of coordi-nates [17,22,32,34,38,50]. Among them, methods employing periodic activation functions (e.g., sine functions) [38] enable efficient modeling of high-frequency components and exhibit prominent advantages in representing high-frequency  
+
+> B
+
+Corresponding author. 
+
+> arXiv:2606.26763v1 [cs.CV] 25 Jun 2026
+
+2 H. Chen et al. 
+
+details, which has made them one of the important research directions in this field. Although subsequent works have continuously improved them through po-sition encoding [12, 27, 41] or activation function design [22, 32, 34], the deep scalability of INR has not been fully explored, and spectral bias calibration matched to natural-image statistics remains underexplored. In response, we reveal the reasons for the limitations of these methods from the perspective of harmonic signal representation. First, most periodic INR methods generally adopt a layer-wise function composition Φθ = ϕL ◦ · · · ◦ ϕ1,whereas the superposition principle of signals requires the components to be ad-ditive. This architectural mismatch leads to a bottleneck: gradient pathologies that destabilize deep network optimization and constrain model expressiveness. Furthermore, the energy distribution of natural signals generally follows a 1/f 
+
+power-law statistic [9], while most INR methods constrain all neurons with a globally fixed frequency scaling ω0. This gives rise to another bottleneck: un-constrained frequency distributions that impede model convergence. Resolving these critical limitations to enable stable and scalable deep periodic INRs con-stitutes our primary contribution. Figure 1 effectively confirms this problem. As shown, the PSNR of our method increases gradually with the network depth and achieves the highest value at 15 layers. All subsequent experiments use 12 layers for performance-efficiency trade-off. In contrast, other methods, such as SIREN [38], FINER [22] and FreSh [12], reach their peak PSNR at relatively shallow layers. A deeper network brings no performance gain for these meth-ods; instead, it causes a clear performance degradation. Meanwhile, our method exhibits stronger robustness to the learning rate than other methods. 3 6 9 12 15             
+
+> Layers
+> 1e-4
+> 5e-4
+> 1e-3
+> 3e-3
+> 5e-3
+> LR
+> SIREN
+> 36912 15
+> Layers
+> FINER
+> 36912 15
+> Layers
+> FreSh
+> 36912 15
+> Layers
+> CHOIR
+> 15
+> 20
+> 25
+> 30
+> 35
+> 40
+> 45
+> 50
+> PSNR (dB)
+
+Fig. 1: PSNR heatmap vs. network depth and learning rate for sine-based INR methods under data missing completion (random missing and observation rate OR=0.30) on MSI Flowers dataset. 
+
+Inspired by the inherent equivalence between deep periodic INR and gener-alized Fourier series, we replace the function composition paradigm with hybrid composition-superposition architecture and propose Calibrated Harmonic Over-laid Implicit Neural Representations (CHOIR) . CHOIR includes two key mechanisms: Coordinated Harmonic Superposition (CHS), which eliminates op-timization instability caused by deep networks via implicit curriculum learning, and Perceptual Spectrum Calibration (PSC), which embeds the 1/f power-law CHOIR for Multi-Dimensional Data 3
+
+spectrum prior into frequency allocation to systematically alleviate spectrum bias. The core contributions of this paper are summarized as follows: (i) We theoretically reveal the fundamental contradiction between the function composition architecture of deep periodic INR and the superposition princi-ple of signals, clarifying the essential reason for the deep scalability limitation of most INR methods. (ii) We propose the Coordinated Harmonic Superposition (CHS) mechanism, which enables stable deep scaling of hybrid composition-superposition archi-tecture through implicit curriculum learning, fully unleashing the represen-tational potential of deep periodic INR. (iii) We introduce the Perceptual Spectrum Calibration (PSC) strategy, embed-ding the 1/f power-law spectrum prior as a physical calibration into fre-quency learning, significantly improving high-frequency detail reconstruction in multi-dimensional data recovery tasks. 
+
+2 Related Work 
+
+2.1 Implicit Neural Representations 
+
+INR parameterizes signals as continuous coordinate mappings, emerging as a powerful paradigm for multi-dimensional data representation. However, frequency principles [30,44] reveal that ReLU-based MLPs inherently prioritize low-frequency components during training, introducing a bias against high-frequency signals. To alleviate this limitation, existing research has primarily focused on two di-rections: advances in position encoding and advances in activation functions. On the position encoding front, Gaussian Fourier feature encoding [41] lifts low-dimensional coordinates into a high-dimensional frequency space via random mappings. NeRF [27] popularized sine position encoding for novel view synthe-sis, laying the foundation for modern coordinate encoding schemes. Subsequent works further refined this line of research. BACON [20] proposed band-limited coordinate networks to control spectrum bandwidth for multi-scale representa-tion. PNF [45] enables controllable subband decomposition and manipulation, while BANF [35] realizes band-limited filtering for level-of-detail reconstruction. Instant-NGP [29] introduced multi-resolution hash encoding to drastically accel-erate training convergence. FreSh [12] adaptively aligned frequency initialization with input data. Additionally, batch normalization has been shown to effectively mitigate spectrum bias in coordinate networks [5]. Regarding activation functions, SIREN [38] pioneered the use of sine ac-tivations for efficient high-frequency representation, establishing the theoretical framework for periodic INR. MSIREN [26] further modulates periodic activations for generalizable local representations, and INCODE [13] conditions sinusoidal activations with prior-knowledge embeddings. WIRE [34] extended this by em-ploying continuous Gabor wavelet activations to jointly model time-frequency domains, while [31] constructed a unified framework that transcends pure pe-riodicity using Gaussian activations. MIRE [11] matches layer-wise activation 4 H. Chen et al. 
+
+functions to target signals through dictionary learning. Recent efforts have fo-cused on adaptive and constrained designs. MFN [7] applies multiplicative filters directly to the input coordinates and admits a basis-expansion interpretation. However, it still relies on layer-wise nested multiplicative modulation rather than explicitly altering the functional representation through additive superposition. FINER [22] introduced variable-period activations for flexible spectrum adjust-ment. STAF [28] parameterized activations as trainable Fourier-series functions for adaptive spectral learning. SASNet [8] localized sinusoidal responses with spatially adaptive masks to reduce frequency leakage. [37] proposed Fourier repa-rameterization to impose structural constraints on weights in the frequency do-main. SL2A-INR [32] leveraged a single-layer learnable activation for adaptive frequency response, and IGA-INR [36] further reduced spectrum bias through inductive gradient adjustments. 
+
+2.2 INR-based Methods in Multi-dimensional Data 
+
+Using the network structure itself as an implicit prior has emerged as an impor-tant research direction in multi-dimensional data recovery. Deep Image Prior (DIP) [42] first demonstrated the implicit regularization effect derived from the structure of untrained convolutional networks. CoIL [40] further introduced coordinate-based INR into imaging inverse problems, revealing the potential of MLP-based continuous coordinate mappings for image recovery tasks. In-spired by these advances, treating INR as a continuous prior has become a vital paradigm for multi-dimensional data recovery [25]. In this paradigm, discrete factor matrices are replaced by MLP-parameterized continuous factor functions, which unify low-rank structures and implicit smooth regularization within a uni-fied framework. Specifically, LRTFR [23] substitutes the discrete factor matrices in Tucker decomposition with MLP-based continuous factor functions, achieving a theoret-ical unification of low-rank constraints and Lipschitz smoothness. DRO-TFF [19] adopts three separate INR parameterizations for each dimensional factor under a rank-1 spatial decomposition and deep modal transformation framework, en-abling space-spectral dual smoothness encoding with extremely few parameters. CRNL [24] leverages continuous functions instead of discrete block metrics to capture non-local self-similarity, and further exploits coupled low-rank function decomposition to model both cross-group shared patterns and intra-group in-dividual variations. Furthermore, S-INR [17] incorporates superpixel semantic units with a joint-attention MLP and shared dictionaries. FA-INR [50] performs divide-and-conquer modeling of frequency components in a learnable frequency space, thereby enhancing high-frequency representation capacity. Physics-guided priors have also shown effectiveness in inverse reconstruction, as demonstrated by MicroFM [48]. Although existing methods have achieved encouraging progress, they still fall short of addressing the optimization instability and insufficient spectral calibra-tion based on natural-signal statistics in deep periodic INR from a fundamental architectural perspective, which is the key motivation of this work. CHOIR for Multi-Dimensional Data 5
+
+3 Method 
+
+3.1 Our Motivations 
+
+Most INR methods based on periodic activation functions (e.g., sine [34, 38], Gabor wavelet [22]) normalize input coordinates v ∈ [−1, 1] N (with N being the signal dimensionality) and map them to signal values layer by layer, resulting in the following network output:          
+
+> Φθ(v) = ϕL◦ · · · ◦ ϕ1(v),ϕl(x)≜ρ(l)
+> W(l)x+b(l)
+> (1)
+
+where x is the input to the layer, W(l), b(l) are the weights and biases, and ρ(l) is the activation function. From this equation, the product of Jacobian matrices in backpropagation, JΦ = QLl=1 Jϕl [10], leads to gradient vanishing or exploding as depth increases [16], limiting network scalability. From a harmonic perspective, the ideal signal representation should be the explicit superposition of frequency components, i.e., the generalized Fourier se-ries:           
+
+> Φθ(v) = X
+> k
+> h
+> Akcos  ω⊤
+> kv+Bksin  ω⊤
+> kvi
+> (2)
+
+where Ak, Bk are the cosine and sine amplitudes of the k-th harmonic, and ωk
+
+are the angular frequencies. Notably, using the trigonometric identity sin( x+y) = sin x cos y + cos x sin y, a sine unit with bias sin( ω⊤v + b) can be decomposed as a linear combination of sine and cosine bases [2], making both representations fundamentally equivalent. Comparing the composition structure ϕL ◦ · · · ◦ ϕ1 with Eq. (2), we observe two major deficiencies in general INR architectures: (i) Lack of a superposition paradigm. The nested function composition fails to establish a one-to-one correspondence between learnable coefficients and basis functions under the P 
+
+> k
+
+summation operator, making it difficult to achieve term-wise pairing with {(Ak, Bk)}. This impedes harmonic coexis-tence and tends to introduce conflicting behaviors that aggravate overfitting. (ii) Frequency rigidity. Common INRs adopt a globally fixed base frequency scaling (e.g., scaling all neuron activations by a constant ω0), resulting in a frequency support set entirely determined by initialization [47], which is inconsistent with the 1/f power-law statistics of natural signals [9]. Further-more, since the magnitude of parameter gradients is proportional to their corresponding frequencies, the update step of the gradient in the high fre-quency part is much larger than that of the low frequency, which is easy to produce shock and lead to unstable training. Based on these issues, although many INRs claim to integrate deep networks, experiments typically show optimal performance only in very shallow networks (3–5 layers), with rapid degradation as depth increases. Fourier harmonic anal-ysis theory offers unique advantages in solving these two problems, motivating the work presented in this paper. The overview of proposed CHOIR is shown in Figure 2. 6 H. Chen et al.  
+
+> Fig. 2: Overview of the architecture of our proposed CHOIR vs. most periodic INR methods (e.g., SIREN [38]). CHOIR establishes a hybrid composition-superposition paradigm and leverages the power-law distribution of natural images for spectrum cal-ibration. In the figure, different colors indicate different angular frequencies of neurons.
+
+3.2 Coordinated Harmonic Superposition (CHS) 
+
+To address these issues, we propose the Coordinated Harmonic Superposition (CHS) mechanism, which restructures function composition into term-wise har-monic superposition. The network first maps the input coordinate v to an initial hidden state h0(v) = W(0) v + b(0) . Then, inspired by residual scaling [1], the output of each harmonic module Fl (detailed in Sec. 3.3) is scaled by a learnable scalar βl (initialized to zero) and added to the input feature hl:
+
+hl+1 = hl + βlFl(hl), l = 0 , 1, . . . , L − 1 (3) Thus, at the beginning of training, the network degenerates into a simple linear mapping ( hL = h0). This initialization ensures the overall Jacobian matrix JΦ
+
+is highly stable, providing a good starting point for optimization. The stability allows the network to first learn basic low-frequency components before handling higher-frequency details. This structure enables the network output to be expressed as an explicit additive superposition, corresponding to the generalized Fourier series:     
+
+> Φθ(v) = Wout hL(v) = Wout h0(v) +
+> L−1X
+> l=0
+> βlFl(hl(v))
+> !
+> (4)
+
+where {βlWout Fl(·)} denotes a set of adaptive harmonic terms modulated by 
+
+βl and Wout h0(v) corresponds to the zero-frequency component. As noted in Sec. 3.1, a sine unit with bias can be decomposed into orthogonal sine and cosine bases, supporting harmonic superposition. As optimization proceeds, the contribution of each harmonic term is dynam-ically introduced through its weight βl. The gradient of βl is determined by the CHOIR for Multi-Dimensional Data 7
+
+inner product between Fl(hl) and the downstream gradient ∂L 
+
+> ∂hl+1
+
+: 
+
+> ∂L
+> ∂β l
+> =
+> 
+> Fl(hl),∂L
+> ∂hl+1
+> 
+> (5)
+
+This follows from the chain rule ∂L 
+
+> ∂β l
+
+= ∂L  
+
+> ∂hl+1
+> ⊤∂hl+1
+> ∂β l
+
+with ∂hl+1  
+
+> ∂β l
+
+= Fl(hl). Eq. (5) reveals an implicit curriculum learning mechanism [3] in CHS: the weight βl of a harmonic term increases only if its output direction Fl aligns with the negative gradient direction [15]. This guides the network to begin with the simplest model and progressively activate the harmonic components most effective for fitting the residual, decomposing the complex optimization into a sequence of simpler subproblems. 
+
+3.3 Perceptual Spectrum Calibration (PSC) 
+
+To resolve frequency rigidity and specify the internal structure of Fl, we further propose the Perceptual Spectrum Calibration (PSC). This mechanism embeds physical priors into the network via frequency sampling and amplitude modula-tion, achieving stable harmonic allocation that matches natural signal statistics. 
+
+Log-uniform Frequency Distribution. We assign an angular frequency 
+
+ωl,i to each neuron in the l-th layer. The frequency range is set as [ωmin , ω max ],with the lower bound ωmin = π, corresponding to the fundamental frequency on the normalized coordinate domain [−1, 1] N . According to the Nyquist sam-pling theorem [33], the theoretical upper bound should be the Nyquist frequency 
+
+ωNyq = π · min( D1, . . . , D N )/2. However, when taking it as the upper bound, the spatial period corresponding to this frequency contains only two sampling points, with a phase difference of π between them. This causes the continuous sinusoid to degenerate into an alternating sequence of signs [39], leading to rel-atively unstable gradient optimization. Moreover, near this upper bound, the energy in natural signals is extremely low (following a 1/f spectrum [9]) and is sensitive to noise and sampling errors. Adopting it as the upper bound would waste capacity and increase the potential for error. Therefore we introduce a scaling factor γ (determined by ablation in Sec. 4.4) and set 
+
+ωmax = γ · ωNyq = γ · (π · min( D1, . . . , D N )/2) . (6) Within the interval [ωmin , ω max ], frequencies for d neurons are assigned ac-cording to a geometric progression (i.e., equally spaced on a logarithmic axis): 
+
+ωl,i = ωmin ·
+
+ ωmax 
+
+ωmin 
+
+ i−1
+
+> d−1
+
+, i = 1 , . . . , d.  (7) Since adjacent neurons satisfy ∆ω ∝ ω, the sampling density becomes ρ(ω) ∝
+
+1/ω , which matches the power-law spectrum P (ω) ∝ 1/ω of natural signals [9]. Consequently, model capacity allocated to each frequency band is proportional to its energy, automatically assigning more parameters to energy-dense low fre-quencies while maintaining sufficient high-frequency coverage. 8 H. Chen et al. 
+
+Algorithm 1 CHOIR Algorithm for Multi-dimensional Data 
+
+Require: Degraded observations Y, mask Ω, depth L, width d
+
+Ensure: Network parameters θ
+
+1: Pre-compute {ωl,i , ˜ωl} for all l via log-uniform spacing (Eq. (6) Eq. (7)) 2: Initialize {W(l), b(l)} with SIREN scheme; βl ← 0; α ← 2.0
+
+3: for epoch = 1 to MaxEpochs do 
+
+4: h0 ← W(0) v + b(0) 
+
+5: for l = 0 to L − 1 do 
+
+6: Compute Fl(hl) via PSC amplitude modulation (Eq. (8)) 7: Update hl+1 via CHS additive gating (Eq. (3)) 8: end for 
+
+9: Φθ (v) ← Wout hL + bout 
+
+10: Update θ via Adam on L(PΩ (Φθ ), PΩ (Y)) 
+
+11: end for 
+
+12: return θ
+
+Adaptive Amplitude Modulation. To counteract the optimization in-stability caused by high-frequency gradients dominating in standard periodic networks, we design an adaptive amplitude modulation method. Leveraging the power-law spectrum decay P (ω) ∝ ω−α, we constrain amplitudes to be propor-tional to the square root of the power spectrum density, i.e., A ∝ P 1/2 ∝ ω−α/ 2.Combined with log-uniform sampling, the output of the i-th neuron in Fl is defined as: 
+
+Fl(hl)i =
+
+ ˜ωl
+
+ωl,i 
+
+α/ 2
+
+sin  ωl,i (w⊤
+
+> l,i
+
+hl + bl,i ), (8) 
+
+where α is a globally learnable spectral decay rate (initialized to 2.0), ˜ωl =
+
+  Q dj=1 ωl,j 
+
+1/d is the geometric mean of frequencies in layer l, computed once at initialization and kept fixed. The amplitude factor (˜ ωl/ω l,i )α/ 2 compresses high-frequency neuron outputs following the power law, suppressing their ten-dency to dominate gradients. Specifically, when α = 2 , the gradient norm with respect to wl,i becomes proportional to ˜ωl ·| cos( ·)|·∥ hl∥2, which has the same ex-pectation for all frequencies, yielding a naturally balanced training initialization. During training, α is adaptively updated to fit the actual spectral distribution of the target signal. In summary, PSC integrates physical priors through coordi-nated frequency and amplitude modulation, not only constraining the solution space but also improving the geometry of the optimization landscape, leading to stable and efficient training. 
+
+3.4 Problem Formulation 
+
+To solve the inverse problem of multi-dimensional data recovery, we employ an implicit neural representation (INR) as a self-supervised prior. Concretely, we parameterize the target tensor T as a continuous mapping Φθ : RN → RC imple-mented by an MLP, where N and C are the coordinate dimensionality and num-ber of channels, respectively. For any coordinate v ∈ [−1, 1] N , the network out-puts Φθ (v) ∈ RC . Querying the full coordinate grid produces the reconstructed CHOIR for Multi-Dimensional Data 9
+
+tensor T (θ). The recovery problem is then formulated as an optimization over the network parameters θ:
+
+min  
+
+> θ
+
+L(θ) = ℓ PΩ
+
+ Φθ
+
+, PΩ (Y) , (9) where Y is the degraded observation, PΩ is the projection operator that retains only entries in the observable index set Ω, and ℓ(·, ·) is a task-adaptive per-sample loss. The complete training procedure is summarized in Algorithm 1. More anal-ysis and results on convergence are provided in the supplementary material. 
+
+4 Experiment 
+
+4.1 Experimental Setup 
+
+We employ Peak Signal-to-Noise Ratio (PSNR, in dB), Structural Similarity In-dex (SSIM) [43], and Learned Perceptual Image Patch Similarity (LPIPS) [49] to assess recovery quality. Additionally, the number of parameters (Params, in M) and runtime (Time, in seconds) are used to comprehensively evaluate all methods. All reported results are the average of five independent runs. In imple-mentation, we use the Adam optimizer [14] with a learning rate of 1 × 10 −4 and weight decay. For all compared methods, we either use their open-source imple-mentations or strictly reproduce them according to the published papers, care-fully tuning hyperparameters to ensure optimal performance. All experiments are conducted on two NVIDIA RTX A6000 GPUs. In all tables of comparisons, the best and second-best values are highlighted. 
+
+4.2 Evaluation of Representation Capability 
+
+To assess the intrinsic representation capability of INRs, we conduct two types of experiments: (1) 2D signal fitting , which is commonly used as a benchmark for INRs due to its rich composition of both low and high-frequency compo-nents. We employ the House image ( 512 × 768 × 3) from the Kodak dataset [6] as the test data. (2) 5D Novel view synthesis , which examines the capability of modeling neural radiance fields from 5D coordinates to RGB. We utilize the classic NeRF Blender synthetic dataset [27], which comprises 8 synthetic scenes with complex geometry and fine textures. From the training set, 25 images are randomly sampled (downsampled to 200 × 200 ) for training, and the synthesis quality on unseen viewpoints is evaluated. Comparison methods include: MLP with Positional Encoding (PEMLP) [41], SIREN [38] based on sinusoidal ac-tivation functions, Gauss [31] which employs Gaussian activation functions to overcome purely periodic limitations, FINER [22] which flexibly regulates spec-tral bias through variable-period activations, SL2A-INR [32] which introduces learnable single-layer activation functions, and IGA-INR [36] which mitigates spectral bias via induced gradient adjustment. On the signal fitting task, as shown in Figure 3, CHOIR consistently out-performs all comparison methods across all evaluation metrics (PSNR, SSIM, 10 H. Chen et al. Ground Truth 
+
+> PSNR(dB) / SSIM / LPIPS
+> SIREN (NeurIPS 2020)
+> 31.071 dB / 0.911 / 0.085
+> PEMLP (ACMMM 2021)
+> 26.611 dB / 0.745 / 0.308
+> Gauss (ECCV 2022)
+> 27.830 dB / 0.859 / 0.220
+> FINER (CVPR 2024)
+> 33.991 dB / 0.940 / 0.040
+> SL2A-INR (ICCV 2025)
+> 32.470 dB / 0.910 / 0.082
+> FreSh (ICLR 2025)
+> 35.336 dB / 0.953 / 0.027
+> CHOIR (Ours)
+> 38.153 dB / 0.970 / 0.015
+
+Fig. 3: Results of signal fitting by different methods on RGB House dataset. 
+
+LPIPS) on the House dataset. Moreover, the visual results reveal that our method fits higher-frequency signals, such as the clearer contour of the woman under the eaves. For novel view synthesis, Table 1 systematically demonstrates that CHOIR also achieves superior performance on the NeRF Blender dataset. From the zoomed-in details in Figure 4, it can be observed that CHOIR recovers the drums with more lustrous stands and sharper body. These two experiments validate the excellent fitting capability and generality of our proposed method. 
+
+4.3 Evaluation on Data Recovery Task 
+
+To assess the performance of CHOIR on multi-dimensional data recovery tasks, we conduct two categories of experiments: (1) Data Missing Completion , used to evaluate the capability of recovering complete data from partial observations. Experiments are performed under two observation rates ( OR ∈ { 10% , 30% }), 
+
+Table 1: Quantitative results on novel view synthesis in various methods. 
+
+Methods Chair Drums Ficus Hotdog Lego Materials Mic Ship PSNR ↑
+
+PEMLP [27] 32.576 25.418 24.665 31.421 25.340 25.319 28.281 25.277 SIREN [38] 32.843 24.719 24.949 35.187 23.793 27.114 32.394 22.719 Gauss [31] 34.115 24.237 25.458 36.555 20.034 28.877 28.354 25.235 FINER [22] 32.249 24.553 25.472 33.901 23.700 26.516 31.633 25.625 SL2A-INR [32] 34.273 25.257 25.539 36.088 24.644 29.698 33.357 25.094 IGA-INR [36] 34.676 25.997 24.891 36.066 23.550 28.131 31.584 27.368 CHOIR(Ours) 35.317 26.430 27.650 37.454 28.299 29.793 35.613 27.555 
+
+> SSIM ↑
+
+PEMLP [27] 0.972 0.921 0.904 0.959 0.904 0.918 0.963 0.893 SIREN [38] 0.973 0.915 0.908 0.977 0.862 0.933 0.980 0.894 Gauss [31] 0.979 0.893 0.909 0.981 0.768 0.944 0.964 0.895 FINER [22] 0.967 0.901 0.911 0.971 0.854 0.920 0.977 0.886 SL2A-INR [32] 0.981 0.916 0.922 0.979 0.886 0.951 0.981 0.896 IGA-INR [36] 0.984 0.930 0.903 0.980 0.884 0.937 0.973 0.917 CHOIR(Ours) 0.986 0.939 0.952 0.985 0.933 0.955 0.987 0.926 
+
+> LPIPS ↓
+
+PEMLP [27] 0.036 0.097 0.161 0.048 0.077 0.086 0.050 0.093 SIREN [38] 0.034 0.103 0.153 0.021 0.130 0.053 0.020 0.134 Gauss [31] 0.031 0.174 0.209 0.021 0.258 0.045 0.045 0.129 FINER [22] 0.040 0.112 0.175 0.030 0.150 0.055 0.019 0.130 SL2A-INR [32] 0.025 0.120 0.110 0.024 0.110 0.034 0.015 0.084 IGA-INR [36] 0.078 0.090 0.144 0.042 0.094 0.036 0.064 0.069 
+
+CHOIR(Ours) 0.017 0.088 0.078 0.015 0.088 0.030 0.013 0.080 CHOIR for Multi-Dimensional Data 11 Groundtruth PEMLP(2021ACMMM) 
+
+> PSNR: 25.418 dB
+> SIREN(2020NeurIPS)
+> PSNR: 24.719 dB
+> Gauss(2022ECCV)
+> PSNR: 24.237 dB
+> FINER(2024CVPR)
+> PSNR: 24.553 dB
+> SL2A-INR(2025ICCV)
+> PSNR: 25.257 dB
+> IGA-INR(2025ICML)
+> PSNR: 25.997 dB
+> CHOIR(Ours)
+> PSNR: 26.430 dB
+
+Fig. 4: Results of novel view synthesis by different methods on Drums dataset. 
+
+Table 2: Quantitative results on data missing completion in various methods. 
+
+Datasets Methods Random OR=0.10 Random OR=0.30 Tube OR=0.10 Tube OR=0.30 
+
+PSNR ↑ SSIM ↑ LPIPS ↓ PSNR ↑ SSIM ↑ LPIPS ↓ PSNR ↑ SSIM ↑ LPIPS ↓ PSNR ↑ SSIM ↑ LPIPS ↓
+
+HSI WDC SIREN [38] 36.466 0.901 0.032 37.149 0.905 0.029 24.670 0.661 0.260 27.832 0.783 0.134 LRTFR [23] 32.530 0.917 0.121 34.201 0.942 0.069 23.643 0.648 0.367 27.983 0.834 0.168 CRNL [24] 44.212 0.994 0.009 50.694 0.998 0.003 27.158 0.803 0.246 31.207 0.919 0.089 FINER [22] 43.016 0.980 0.010 46.090 0.988 0.007 24.390 0.696 0.374 27.392 0.818 0.214 DRO-TFF [19] 40.254 0.981 0.015 42.084 0.985 0.009 26.152 0.743 0.387 30.861 0.904 0.085 FreSh [12] 38.762 0.916 0.020 40.145 0.922 0.017 23.310 0.607 0.428 25.883 0.713 0.265 CHOIR 46.475 0.996 0.004 51.359 0.999 0.002 28.142 0.832 0.196 31.414 0.928 0.080 
+
+HSI Urban SIREN [38] 39.482 0.984 0.012 40.835 0.988 0.010 21.756 0.562 0.272 25.138 0.782 0.109 LRTFR [23] 29.979 0.978 0.135 32.479 0.933 0.063 19.478 0.315 0.499 24.617 0.700 0.218 CRNL [24] 42.533 0.993 0.006 47.955 0.998 0.003 23.423 0.638 0.255 27.343 0.840 0.091 
+
+FINER [22] 38.495 0.979 0.013 39.504 0.982 0.011 21.440 0.494 0.365 24.692 0.716 0.184 DRO-TFF [19] 37.150 0.979 0.014 38.671 0.984 0.009 23.023 0.601 0.293 27.357 0.843 0.096 FreSh [12] 38.974 0.982 0.013 39.791 0.985 0.011 20.242 0.440 0.416 23.800 0.692 0.254 CHOIR 44.412 0.995 0.005 49.317 0.998 0.001 23.493 0.643 0.247 27.578 0.847 0.096 MSI Flowers SIREN [38] 37.268 0.854 0.036 38.570 0.863 0.030 28.159 0.764 0.119 32.992 0.836 0.054 LRTFR [23] 33.735 0.892 0.160 35.660 0.933 0.117 25.337 0.711 0.337 31.677 0.884 0.176 CRNL [24] 39.975 0.991 0.031 48.604 0.998 0.005 27.333 0.882 0.182 33.097 0.964 0.053 FINER [22] 37.995 0.940 0.051 45.436 0.971 0.006 24.833 0.743 0.237 31.814 0.869 0.078 DRO-TFF [19] 40.912 0.986 0.017 45.754 0.996 0.005 27.991 0.871 0.146 33.277 0.964 0.051 FreSh [12] 36.660 0.855 0.040 39.569 0.869 0.021 27.096 0.735 0.166 31.898 0.824 0.057 CHOIR 41.316 0.992 0.014 50.395 0.998 0.001 28.726 0.894 0.138 33.465 0.973 0.048 
+
+MSI Toys SIREN [38] 37.147 0.927 0.035 38.964 0.934 0.029 25.547 0.827 0.182 30.595 0.906 0.058 LRTFR [23] 32.135 0.907 0.144 34.115 0.943 0.082 22.771 0.707 0.398 28.963 0.884 0.170 CRNL [24] 39.582 0.992 0.018 49.015 0.998 0.003 24.908 0.853 0.212 30.883 0.955 0.054 FINER [22] 37.430 0.964 0.051 46.818 0.989 0.005 22.863 0.775 0.316 28.435 0.918 0.122 DRO-TFF [19] 39.846 0.992 0.013 43.610 0.996 0.004 25.103 0.851 0.217 30.728 0.951 0.061 FreSh [12] 36.553 0.927 0.052 40.018 0.939 0.025 24.443 0.785 0.267 29.580 0.893 0.089 CHOIR 41.748 0.993 0.010 49.216 0.998 0.002 25.640 0.864 0.211 30.903 0.958 0.051 
+
+Video Shop SIREN [38] 28.146 0.854 0.123 31.551 0.933 0.061 21.087 0.577 0.485 25.704 0.861 0.168 LRTFR [23] 25.567 0.864 0.182 27.667 0.902 0.118 20.229 0.599 0.449 24.671 0.844 0.179 CRNL [24] 27.877 0.904 0.094 29.755 0.932 0.069 21.150 0.774 0.285 26.390 0.907 0.109 FINER [22] 24.470 0.679 0.320 30.914 0.902 0.081 16.171 0.203 0.969 23.848 0.698 0.378 DRO-TFF [19] 28.729 0.927 0.060 29.376 0.936 0.056 22.338 0.759 0.286 26.362 0.900 0.100 FreSh [12] 26.564 0.788 0.188 31.451 0.924 0.068 18.762 0.376 0.712 24.433 0.767 0.338 CHOIR 29.383 0.942 0.034 33.581 0.974 0.016 23.267 0.781 0.263 26.656 0.918 0.099 
+
+Video News SIREN [38] 31.502 0.933 0.047 33.586 0.947 0.036 20.395 0.731 0.231 26.120 0.906 0.053 LRTFR [23] 28.188 0.855 0.149 30.566 0.901 0.084 18.684 0.459 0.482 24.820 0.757 0.250 CRNL [24] 31.618 0.953 0.036 36.686 0.983 0.011 21.825 0.716 0.286 26.390 0.918 0.099 FINER [22] 30.414 0.894 0.056 36.631 0.958 0.012 19.819 0.554 0.385 25.170 0.805 0.145 DRO-TFF [19] 32.505 0.955 0.025 35.557 0.969 0.014 22.148 0.805 0.227 27.402 0.917 0.075 FreSh [12] 29.532 0.912 0.062 34.337 0.953 0.017 19.054 0.528 0.430 25.408 0.845 0.117 CHOIR 33.502 0.963 0.021 38.739 0.986 0.006 22.597 0.818 0.166 27.518 0.920 0.069 
+
+considering both random missing and tube missing patterns. (2) Mixed Degra-dation Restoration , used to evaluate the recovery capability under coexisting complex noise and non-uniform missing data. Three progressive scenarios are designed: Scene 1 adds Gaussian noise ( σ = 0 .20 ); Scene 2 further adds salt-and-pepper noise with a sampling rate ( SR = 10% ); Scene 3 addition-ally removes 3% of entire rows and 3% of entire columns from all channels to simulate sensor stripe failures. The datasets used in these two categories 12 H. Chen et al. Random Missing                         
+
+> PSNR 8.973 PSNR 31.502 PSNR 28.188 PSNR 31.618 PSNR 30.414 PSNR 32.505 PSNR 29.532 PSNR 33.502 PSNR Inf
+> Tube Missing
+> PSNR 13.970 PSNR 28.159 PSNR 25.337 PSNR 27.333 PSNR 24.833 PSNR 27.091 PSNR 27.096 PSNR 28.726 PSNR Inf
+> Mixed Noise
+> PSNR 11.977
+> Observed PSNR 24.856
+> SIREN PSNR 25.213
+> LRTFR PSNR 25.102
+> FINER PSNR 24.398
+> CRNL PSNR 24.233
+> DRO-TFF PSNR 23.772
+> FreSh PSNR 26.072
+> CHOIR PSNR Inf
+> Original
+
+Fig. 5: Results of different methods on data recovery tasks. Top: random missing and OR=0.1 on Video News dataset. Middle: tube missing and OR=0.1 on MSI Flowers dataset. Bottom: mixed degradation restoration (Scene 3) on MSI Cloth dataset. 
+
+cover various modalities of multi-dimensional data: (1) Hyperspectral Images (HSI) : Pavia University (cropped to 200 × 200 × 80 ) [21], Washington DC Mall (cropped to 256 × 256 × 191 ) [21], and Urban (downsampled to 256 × 256 × 162 ); (2) Multispectral Images (MSI) : Cloth, Toys, and Flowers from the CAVE dataset [46] (all downsampled to 256 × 256 × 31 ); (3) Videos : Grayscale video Shop ( 144 × 192 × 157 ) [18] and RGB video News ( 288 × 352 × 3 × 10 ) [4]; (4) 
+
+RGB Images : Bird and Statue from the Kodak dataset [6] (downsampled to 
+
+256 × 256 × 3). In addition to representative INR methods, we also include con-tinuous representation methods that integrate structured priors with INRs as baselines. These include SIREN [38], FINER [22], FreSh [12] (which initializes frequency offsets to match the target signal spectrum), LRTFR [23] (which in-corporates functional transformations into a low-rank factorization framework), CRNL [24] (which exploits non-local self-similarity priors via continuous rep-resentations), and DRO-TFF [19] (based on depth-one tensor function factor-ization). Notably, in mixed degradation experiments, continuous representation methods such as LRTFR employ TV regularization following their original set-tings to strengthen denoising and smoothing. In contrast, CHOIR inherently encodes strong implicit smoothing priors and does not require task-specific ex-plicit regularization such as TV regularization. Tables 2 and 3 systematically demonstrate that CHOIR achieves the best performance on both categories of multi-dimensional data recovery experiments. This consistent advantage in scenarios with large-scale missing entries or dense noise with non-uniform structured missing entries strongly validates the detail preservation and recovery capabilities of CHOIR. The recovery of various multi-dimensional data (e.g., RGB, HSI, Video) also systematically reflects the gener-CHOIR for Multi-Dimensional Data 13 
+
+Table 3: Quantitative results under mixed degradation scenario in various methods. 
+
+Datasets Methods Scene 1 Scene 2 Scene 3 
+
+PSNR ↑ SSIM ↑ LPIPS ↓ PSNR ↑ SSIM ↑ LPIPS ↓ PSNR ↑ SSIM ↑ LPIPS ↓
+
+HSI WDC SIREN [38] 24.729 0.588 0.134 24.688 0.585 0.142 24.585 0.578 0.149 LRTFR [23] 28.615 0.610 0.292 28.468 0.607 0.302 28.255 0.591 0.308 CRNL [24] 23.373 0.435 0.574 23.602 0.464 0.538 23.529 0.459 0.489 FINER [22] 24.766 0.585 0.128 24.774 0.586 0.130 24.669 0.575 0.146 DRO-TFF [19] 24.188 0.518 0.340 25.532 0.635 0.521 25.527 0.634 0.499 FreSh [12] 24.646 0.582 0.144 24.620 0.578 0.146 24.423 0.567 0.152 CHOIR 31.242 0.884 0.118 31.047 0.883 0.126 30.595 0.870 0.145 
+
+HSI Pavia SIREN [38] 27.641 0.870 0.059 27.507 0.867 0.062 27.228 0.853 0.068 LRTFR [23] 28.212 0.824 0.182 28.080 0.819 0.189 27.847 0.812 0.194 CRNL [24] 27.103 0.820 0.093 27.028 0.816 0.095 26.790 0.810 0.098 FINER [22] 27.501 0.871 0.082 27.392 0.865 0.083 27.107 0.854 0.089 DRO-TFF [19] 27.323 0.836 0.095 26.105 0.730 0.224 25.865 0.718 0.242 FreSh [12] 27.056 0.855 0.076 26.756 0.839 0.075 26.718 0.829 0.107 CHOIR 30.401 0.904 0.048 29.959 0.895 0.057 29.691 0.882 0.047 
+
+MSI Flowers SIREN [38] 23.400 0.470 0.187 23.356 0.471 0.195 23.315 0.465 0.201 LRTFR [23] 29.749 0.601 0.227 29.676 0.600 0.237 29.528 0.596 0.237 CRNL [24] 23.822 0.465 0.297 23.766 0.464 0.205 23.624 0.455 0.370 FINER [22] 23.345 0.462 0.224 23.287 0.456 0.236 23.204 0.452 0.245 DRO-TFF [19] 23.861 0.469 0.154 30.151 0.701 0.214 29.805 0.696 0.221 FreSh [12] 23.068 0.452 0.228 22.975 0.465 0.272 22.956 0.451 0.218 CHOIR 33.094 0.856 0.122 32.919 0.852 0.129 32.605 0.847 0.130 
+
+MSI Cloth SIREN [38] 25.435 0.774 0.164 25.250 0.768 0.174 24.856 0.753 0.182 LRTFR [23] 26.076 0.733 0.216 25.953 0.727 0.221 25.213 0.716 0.229 CRNL [24] 25.265 0.783 0.201 25.301 0.765 0.194 25.102 0.777 0.205 FINER [22] 24.826 0.753 0.268 24.504 0.760 0.161 24.398 0.752 0.173 DRO-TFF [19] 25.799 0.726 0.171 24.584 0.739 0.261 24.233 0.717 0.262 FreSh [12] 24.422 0.756 0.212 24.287 0.749 0.220 23.772 0.727 0.237 CHOIR 26.612 0.798 0.138 26.482 0.794 0.147 26.072 0.779 0.152 
+
+RGB Bird SIREN [38] 24.639 0.695 0.324 24.505 0.679 0.344 24.345 0.667 0.355 LRTFR [23] 17.217 0.357 0.808 17.089 0.336 0.822 16.986 0.323 0.824 CRNL [24] 20.914 0.338 0.710 20.009 0.304 0.752 19.482 0.286 0.784 FINER [22] 22.793 0.680 0.391 22.646 0.664 0.404 22.655 0.664 0.407 DRO-TFF [19] 19.046 0.277 0.895 17.460 0.626 0.751 17.479 0.647 0.744 FreSh [12] 23.015 0.674 0.400 22.864 0.653 0.422 22.797 0.647 0.435 CHOIR 25.536 0.736 0.311 25.380 0.724 0.325 25.115 0.720 0.335 
+
+RGB Statue SIREN [38] 24.464 0.681 0.481 24.350 0.673 0.488 24.220 0.666 0.492 LRTFR [23] 22.391 0.487 0.635 22.012 0.464 0.656 21.680 0.445 0.662 CRNL [24] 18.976 0.317 0.958 18.388 0.293 1.033 18.171 0.285 1.037 FINER [22] 23.547 0.618 0.494 23.225 0.598 0.498 22.820 0.574 0.494 DRO-TFF [19] 21.231 0.446 0.763 24.118 0.650 0.524 24.100 0.651 0.527 FreSh [12] 22.990 0.584 0.477 22.701 0.633 0.493 22.628 0.627 0.501 CHOIR 25.534 0.702 0.446 25.456 0.700 0.470 25.175 0.679 0.481 
+
+alization of CHOIR. As shown in Figure 5, the visual results indicate that our method exhibits robust performance against uniform missing, non-uniform miss-ing, and complex noise. For instance, the lip edges in News are smoother, the petal details in Flowers are more realistic, and the pattern colors in Cloth are more lustrous. Due to space limitations, more experimental visualization results are detailed in the supplementary materials, including additional high-resolution experiments on the full CAVE dataset ( 512 × 512 × 31 ). 
+
+4.4 Ablation Studies Effectiveness of Core Components of Our Method. To validate the ef-fectiveness of the core components of our method, we conduct ablation stud-ies on the MSI Flowers dataset. As summarized in Table 4, introducing CHS 14 H. Chen et al. 
+
+Table 4: Ablation studies of our core components on MSI Flowers dataset. 
+
+Variants Scale γ Random OR=0.10 Scene 3 Params Time/iter 
+
+PSNR ↑ SSIM ↑ LPIPS ↓ PSNR ↑ SSIM ↑ LPIPS ↓
+
+Sine - 33.500 0.929 0.099 26.238 0.487 0.363 0.202M 0.046s Sine+CHS - 39.136 0.982 0.018 32.296 0.801 0.135 0.202M 0.054s Sine+PSC 1.0 37.251 0.969 0.044 28.025 0.599 0.273 0.204M 0.050s Sine+PSC 1/2 37.507 0.968 0.036 29.094 0.627 0.262 0.204M 0.050s Sine+PSC 1/4 39.846 0.980 0.019 30.308 0.691 0.159 0.204M 0.050s Sine+PSC 1/8 40.335 0.982 0.016 31.143 0.704 0.147 0.204M 0.050s Sine+PSC 1/16 38.629 0.966 0.041 30.305 0.669 0.158 0.204M 0.050s 
+
+CHOIR 1/8 41.316 0.992 0.014 32.605 0.847 0.130 0.204M 0.064s 
+
+alone yields a significant PSNR improvement over the sinusoidal activation base-line, demonstrating that its additive compositional structure effectively stabilizes deep optimization. While employing PSC alone, reducing the frequency scaling factor γ from 1.0 to 1/8 brings consistent gains, highlighting the superiority of embedding the 1/f power-law prior and frequency scaling factor γ. However, an excessively small γ (e.g., 1/16 ) impedes the model from capturing necessary high-frequency components, leading to performance degradation. Therefore, the experiments use γ = 1 /8. The full CHOIR model, which integrates both CHS and PSC, achieves the best performance across all evaluation metrics, verifying the effective synergy between these two core components. 10 1 10 0 10 1 10 2 
+
+> log (Params. (M))
+> 28
+> 32
+> 36
+> 40
+> 44
+> 48
+> PSNR (dB)  SIREN(NeurIPS2020)
+> Gauss(ECCV2022)
+> WIRE(CVPR2023)
+> LRTFR(TPAMI2023)
+> FINER(CVPR2024)
+> CRNL(TPAMI2024)
+> DRO-TFF(AAAI2025)
+> SL2A-INR(ICCV2025)
+> FreSh(ICLR2025)
+> IGA-INR(ICML2025)
+> CHOIR (Ours)
+
+(a) 0.5 0 0.5            
+
+> 0.5
+> 0
+> 0.5
+> SIREN (NeurIPS 2020)
+> 0.0
+> 200
+> 400
+> 600
+> 800
+> 1000
+> 1200
+> 0.5 00.5
+> 0.5
+> 0
+> 0.5
+> Gauss (ECCV 2022)
+> 0.0
+> 2.0
+> 4.0
+> 6.0
+> 8.0
+> 10
+> 12
+> 14
+> 0.5 00.5
+> 0.5
+> 0
+> 0.5
+> FINER (CVPR 2024)
+> 0.0
+> 250
+> 500
+> 750
+> 1000
+> 1250
+> 1500
+> 1750
+> 0.5 00.5
+> 0.5
+> 0
+> 0.5
+> SL2A-INR (ICCV 2025)
+> 0.0
+> 25
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+> 0.5 00.5
+> 0.5
+> 0
+> 0.5
+> FreSh (ICLR 2025)
+> 0.0
+> 200
+> 400
+> 600
+> 800
+> 1000
+> 1200
+> 1400
+> 0.5 00.5
+> 0.5
+> 0
+> 0.5
+> CHOIR (Ours)
+> 0.0
+> 5000
+> 10000
+> 15000
+> 20000
+> 25000
+
+(b) 
+
+Fig. 6: (a) Comparison of various INR-based methods on HSI WDC dataset under data missing completion (random missing, OR=0.10). The size of each circle represents the runtime. (b) Visualization of NTK matrices at initialization for various INR methods. 
+
+Comparative Analysis of Method Complexity. As shown in Figure 6 (a), we compare various INR-based methods on the HSI WDC dataset under random missing completion (OR=0.10) in terms of PSNR, model parameters (logarith-mic scale), and runtime. The horizontal axis represents ( log 10 ) (Params. (M)), the vertical axis denotes PSNR (dB), and the size of each circle indicates run-time. The proposed CHOIR method achieves the highest PSNR with relatively few parameters and short runtime. In contrast, although CRNL [24] attains com-CHOIR for Multi-Dimensional Data 15 
+
+petitive PSNR, it requires an excessively large number of parameters and long runtime. Lighter methods such as SIREN [38], Gauss [31], and WIRE [34] re-main in the low-parameter regime but yield lower PSNR performance. Overall, CHOIR offers a better trade-off among reconstruction quality, model parameter count, and computational efficiency. 
+
+Neural Tangent Kernel (NTK) Analysis. The Neural Tangent Kernel (NTK) characterizes the gradient similarity between different input coordinates. Its structure at initialization reflects the inductive bias of an untrained network as well as its ability to perform decoupled updates. The degree of diagonal dom-inance in the NTK indicates the independence of gradient updates across spatial coordinates. A stronger diagonal with weaker off-diagonal elements (correspond-ing to a darker blue background in the figure) implies that gradient updates are more spatially decoupled, thereby enabling stronger fitting capacity, particularly for capturing high-frequency details. As shown in Fig. 6 (b), CHOIR exhibits the strongest diagonal dominance, accompanied by the darkest blue background. This observation theoretically validates that CHOIR possesses a more favorable inductive bias and superior high-frequency representation capability, which is consistent with the conclusions presented in Sec. 4.2. A more detailed introduc-tion to the NTK matrix is provided in the supplementary materials. 
+
+5 Conclusion 
+
+We propose CHOIR to fundamentally address the optimization instability that has long plagued periodic INRs, which arises from their nested function compo-sition architecture. With our novel Coordinated Harmonic Superposition (CHS) and Perceptual Spectrum Calibration (PSC) mechanisms, CHOIR enables sta-ble training of deep periodic INRs and efficient data-adaptive spectrum learning. Comprehensive experiments demonstrate that CHOIR consistently outperforms state-of-the-art methods and sets new state-of-the-art benchmarks across a vari-ety of multidimensional data recovery tasks. For future work, we aim to extend our experimental evaluations to unstructured or irregularly sampled data, such as point clouds, event-camera streams, and spatial transcriptomics, to further validate the generalization and effectiveness of our model. 
+
+Acknowledgements 
+
+This work was supported by the National Natural Science Foundation of China (Grant Nos. 62272313 and 62372302). 
+
+References 
+
+> 1. Bachlechner, T., Majumder, B.P., Mao, H., Cottrell, G., McAuley, J.: Rezero is all you need: Fast convergence at large depth. In: Uncertainty in Artificial Intelligence. pp. 1352–1361. PMLR (2021)
+
+16 H. Chen et al. 2. Benbarka, N., Höfer, T., Riaz, H.u.M., Zell, A.: Seeing implicit neural represen-tations as fourier series. In: Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision. pp. 2041–2050 (2022) 3. Bengio, Y., Louradour, J., Collobert, R., Weston, J.: Curriculum learning. In: Pro-ceedings of the 26th annual International Conference on Machine Learning. pp. 41–48 (2009) 4. Bengua, J.A., Phien, H.N., Tuan, H.D., Do, M.N.: Efficient tensor completion for color image and video recovery: Low-rank tensor train. IEEE Transactions on Image Processing 26 (5), 2466–2479 (2017) 5. Cai, Z., Zhu, H., Shen, Q., Wang, X., Cao, X.: Batch normalization alleviates the spectral bias in coordinate networks. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 25160–25171 (2024) 6. Eastman Kodak Company: Kodak lossless true color image suite. Dataset (1993), photo CD PCD0992 7. Fathony, R., Sahu, A.K., Willmott, D., Kolter, J.Z.: Multiplicative filter net-works. In: International Conference on Learning Representations (2021), https: //openreview.net/forum?id=OmtmcPkkhT 
+
+8. Feng, H., Aldana, D., Novello, T., De Floriani, L.: Sasnet: Spatially-adaptive sinu-soidal networks for inrs. In: Proceedings of the IEEE/CVF Conference on Com-puter Vision and Pattern Recognition. pp. 41964–41973 (2026) 9. Field, D.J.: Relations between the statistics of natural images and the response properties of cortical cells. Journal of the Optical Society of America A 4(12), 2379–2394 (1987) 10. Glorot, X., Bengio, Y.: Understanding the difficulty of training deep feedforward neural networks. In: Proceedings of the thirteenth international Conference on Artificial Intelligence and Statistics. pp. 249–256. JMLR Workshop and Conference Proceedings (2010) 11. Jayasundara, D., Zhao, H., Labate, D., Patel, V.M.: Mire: Matched implicit neural representations. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. pp. 8279–8288 (2025) 12. Kania, A., Mihajlovic, M., Prokudin, S., Tabor, J., Spurek, P.: Fresh: Frequency shifting for accelerated neural representation learning. In: The Thirteenth Interna-tional Conference on Learning Representations (2025) 13. Kazerouni, A., Azad, R., Hosseini, A., Merhof, D., Bagci, U.: Incode: Implicit neural conditioning with prior knowledge embeddings. In: Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision. pp. 1298– 1307 (2024) 14. Kingma, D.P., Ba, J.: Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980 (2014) 15. Kumar, M., Packer, B., Koller, D.: Self-paced learning for latent variable models. Advances in Neural Information Processing Systems 23 (2010) 16. LeCun, Y., Bengio, Y., Hinton, G.: Deep learning. Nature 521 (7553), 436–444 (2015) 17. Li, J., Zhao, X., Wang, J., Wang, C., Wang, M.: Superpixel-informed implicit neural representation for multi-dimensional data. In: European Conference on Computer Vision. pp. 258–276. Springer (2024) 18. Li, L., Huang, W., Gu, I.Y.H., Tian, Q.: Statistical modeling of complex back-grounds for foreground object detection. IEEE Transactions on Image Processing 
+
+13 (11), 1459–1472 (2004) CHOIR for Multi-Dimensional Data 17 19. Li, Y., Zhang, X., Luo, Y., Meng, D.: Deep rank-one tensor functional factorization for multi-dimensional data recovery. In: Proceedings of the AAAI Conference on Artificial Intelligence. vol. 39(17), pp. 18539–18547 (2025) 20. Lindell, D.B., Van Veen, D., Park, J.J., Wetzstein, G.: Bacon: Band-limited co-ordinate networks for multiscale scene representation. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 16252– 16262 (2022) 21. Liu, J., Musialski, P., Wonka, P., Ye, J.: Tensor completion for estimating miss-ing values in visual data. IEEE Transactions on Pattern Analysis and Machine Intelligence 35 (1), 208–220 (2012) 22. Liu, Z., Zhu, H., Zhang, Q., Fu, J., Deng, W., Ma, Z., Guo, Y., Cao, X.: Finer: Flexible spectral-bias tuning in implicit neural representation by variable-periodic activation functions. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 2713–2722 (2024) 23. Luo, Y., Zhao, X., Li, Z., Ng, M.K., Meng, D.: Low-rank tensor function represen-tation for multi-dimensional data recovery. IEEE Transactions on Pattern Analysis and Machine Intelligence 46 (5), 3351–3369 (2023) 24. Luo, Y., Zhao, X., Meng, D.: Revisiting nonlocal self-similarity from continuous representation. IEEE Transactions on Pattern Analysis and Machine Intelligence 
+
+47 (1), 450–468 (2024) 25. Luo, Y., Zhao, X., Meng, D.: Continuous representation methods, theories, and ap-plications: An overview and perspectives. arXiv preprint arXiv:2505.15222 (2025) 26. Mehta, I., Gharbi, M., Barnes, C., Shechtman, E., Ramamoorthi, R., Chandraker, M.: Modulated periodic activations for generalizable local functional representa-tions. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 14214–14223 (2021) 27. Mildenhall, B., Srinivasan, P.P., Tancik, M., Barron, J.T., Ramamoorthi, R., Ng, R.: Nerf: Representing scenes as neural radiance fields for view synthesis. Commu-nications of the ACM 65 (1), 99–106 (2021) 28. Morsali, A., Vaez, M., Soltani, M., Kazerouni, A., Taati, B., Mohammad-Noori, M.: Staf: Sinusoidal trainable activation functions for implicit neural representation. arXiv preprint arXiv:2502.00869 (2025) 29. Müller, T., Evans, A., Schied, C., Keller, A.: Instant neural graphics primitives with a multiresolution hash encoding. ACM transactions on graphics (TOG) 41 (4), 1–15 (2022) 30. Rahaman, N., Baratin, A., Arpit, D., Draxler, F., Lin, M., Hamprecht, F., Ben-gio, Y., Courville, A.: On the spectral bias of neural networks. In: International Conference on Machine Learning. pp. 5301–5310. PMLR (2019) 31. Ramasinghe, S., Lucey, S.: Beyond periodicity: Towards a unifying framework for activations in coordinate-mlps. In: European Conference on Computer Vision. pp. 142–158. Springer (2022) 32. Rezaeian, R., Heidari, M., Azad, R., Merhof, D., Soltanian-Zadeh, H., Haci-haliloglu, I.: Sl2a-inr: Single-layer learnable activation for implicit neural represen-tation. In: Proceedings of the IEEE/CVF International Conference on Computer Vision. pp. 26065–26074 (2025) 33. Ricci, L., Perinelli, A., Prevedelli, M.: Nyquist–shannon sampling theorem. In: The Physics Behind Electronics, pp. 199–212. Springer (2024) 34. Saragadam, V., LeJeune, D., Tan, J., Balakrishnan, G., Veeraraghavan, A., Bara-niuk, R.G.: Wire: Wavelet implicit neural representations. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 18507– 18516 (2023) 18 H. Chen et al. 35. Shabanov, A., Govindarajan, S., Reading, C., Goli, L., Rebain, D., Yi, K.M., Tagliasacchi, A.: Banf: Band-limited neural fields for levels of detail reconstruction. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 20571–20580 (2024) 36. Shi, K., Chen, H., Zhang, L., Gu, S.: Inductive gradient adjustment for spectral bias in implicit neural representations. In: Forty-second International Conference on Machine Learning (2025) 37. Shi, K., Zhou, X., Gu, S.: Improved implicit neural representation with fourier reparameterized training. In: Proceedings of the IEEE/CVF Conference on Com-puter Vision and Pattern Recognition. pp. 25985–25994 (2024) 38. Sitzmann, V., Martel, J., Bergman, A., Lindell, D., Wetzstein, G.: Implicit neural representations with periodic activation functions. Advances in Neural Information Processing Systems 33 , 7462–7473 (2020) 39. Smith, J.O.: Mathematics of the Discrete Fourier Transform (DFT): With Audio Applications. Julius Smith, Stanford, 2nd ed. edn. (2007) 40. Sun, Y., Liu, J., Xie, M., Wohlberg, B., Kamilov, U.S.: Coil: Coordinate-based internal learning for tomographic imaging. IEEE Transactions on Computational Imaging 7, 1400–1412 (2021) 41. Tancik, M., Srinivasan, P., Mildenhall, B., Fridovich-Keil, S., Raghavan, N., Sing-hal, U., Ramamoorthi, R., Barron, J., Ng, R.: Fourier features let networks learn high frequency functions in low dimensional domains. Advances in Neural Infor-mation Processing Systems 33 , 7537–7547 (2020) 42. Ulyanov, D., Vedaldi, A., Lempitsky, V.: Deep image prior. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. pp. 9446–9454 (2018) 43. Wang, Z., Simoncelli, E.P., Bovik, A.C.: Multiscale structural similarity for image quality assessment. In: The thirty-seventh asilomar Conference on Signals, Systems & Computers, 2003. vol. 2, pp. 1398–1402. IEEE (2003) 44. Xu, Z.Q.J., Zhang, Y., Luo, T., Xiao, Y., Ma, Z.: Frequency principle: Fourier anal-ysis sheds light on deep neural networks. arXiv preprint arXiv:1901.06523 (2019) 45. Yang, G., Benaim, S., Jampani, V., Genova, K., Barron, J., Funkhouser, T., Har-iharan, B., Belongie, S.: Polynomial neural fields for subband decomposition and manipulation. Advances in Neural Information Processing Systems 35 , 4401–4415 (2022) 46. Yasuma, F., Mitsunaga, T., Iso, D., Nayar, S.K.: Generalized assorted pixel camera: postcapture control of resolution, dynamic range, and spectrum. IEEE Transac-tions on Image Processing 19 (9), 2241–2253 (2010) 47. Yüce, G., Ortiz-Jiménez, G., Besbinar, B., Frossard, P.: A structured dictionary perspective on implicit neural representations. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 19228–19238 (2022) 48. Zhan, X., Jiang, R., Gupta, V., Swaminathan, T., Wang, Y., Zhang, G., Wang, H., Xu, M.: Microfm: Physics-guided flow matching for isotropic microscopy re-construction. In: Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. pp. 15639–15648 (2026) 49. Zhang, R., Isola, P., Efros, A.A., Shechtman, E., Wang, O.: The unreasonable effectiveness of deep features as a perceptual metric. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. pp. 586–595 (2018) 50. Zhou, T.W., Zhao, X.L., Wu, W.H., Wang, J.L., Luo, Y.S.: Frequency-aware im-plicit neural representation for multi-dimensional data recovery. IEEE Transactions on Circuits and Systems for Video Technology 35 (11), 10862–10874 (2025)

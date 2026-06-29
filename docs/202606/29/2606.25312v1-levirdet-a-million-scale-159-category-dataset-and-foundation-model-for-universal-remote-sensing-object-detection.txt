@@ -1,0 +1,938 @@
+Title: LEVIRDet: A Million-Scale 159-Category Dataset and Foundation Model for Universal Remote Sensing Object Detection
+
+URL Source: https://arxiv.org/pdf/2606.25312v1
+
+Published Time: Thu, 25 Jun 2026 00:25:00 GMT
+
+Number of Pages: 18
+
+Markdown Content:
+JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 1
+
+# LEVIRDet: A Million-Scale 159-Category Dataset and Foundation Model for Universal Remote Sensing Object Detection 
+
+Qinzhe Yang, Dongyu Wang, Haohan Niu, Jia Xu, Zhenwei Shi, Senior Member, IEEE , and Zhengxia Zou ⋆, Senior Member, IEEE 
+
+Abstract —Remote sensing object detection has advanced rapidly with the development of large-scale benchmarks and modern detection architectures. However, existing datasets and detectors remain fragmented. Most benchmarks focus on limited categories, fixed spatial resolutions, or a single sensor, while detectors still struggle to work across different sensors and categorical systems. In this paper, we introduce LEVIRDet-159, the largest and most comprehensive remote sensing object detection dataset to date, with 159 categories, ∼2.56 million bounding boxes, and ∼700k fine-grained annotations under a multi-level taxonomy. In each key scale dimension, LEVIRDet-159 exceeds the corresponding largest existing remote sensing object detection dataset, containing approximately 7× more images, 6× more object instances, and 4× more categories. Based on this dataset, we design LEVIRDetNet, a scale-hierarchy-aware detection foundation model for universal remote sensing object detection. LEVIRDetNet couples online visual Ground Sampling Distance (GSD) prediction, GSD-conditioned query modulation and allocation, and a hierarchy-aware detection head for mixed-granularity remote sensing supervision. Under stringent evaluation settings, LEVIRDetNet demonstrates strong cross-domain generalization. Even without target-domain training or fine-tuning, it achieves state-of-the-art detection performance on 9 external benchmarks, improving the strongest fully supervised competing methods by 5.02 mAP on average under each benchmark’s primary metric. It also remains strongest in score-threshold comparisons with open-set and grounding models, maintaining stable precision and recall at practical confidence thresholds. We hope this study will facilitate the development of strongly generalizable remote sensing object detection across diverse category systems, spatial resolutions, and sensor platforms. The full image tiles, annotations, source-license manifest, code, and trained models will be released in a versioned project repository at https://qinzheyang.github.io/LEVIRDet/, accompanying the final paper. 
+
+Index Terms —Remote Sensing Object Detection, Visual Foundation Model, Object Detection Dataset 
+
+✦
+
+1 Introduction 
+
+# Remote sensing object detection is a fundamental task for Earth observation, supporting applications such as urban monitoring, transportation analysis, and maritime surveillance. It has advanced rapidly with the development of large-scale bench-marks and modern detection architectures [1], [2]. Existing bench-marks have expanded category coverage and annotation density, while transformer-based detectors and visual foundation models have improved end-to-end detection and cross-dataset transfer [3]– [5]. However, these advances have not yet led to a universal detector that can reliably operate across sensors, resolutions, and category systems. This gap comes from both data and model limitations. On the data side, existing benchmarks usually cover only a narrow portion of the remote sensing detection space [3]–[23]. Some datasets focus on a small set of common categories, some are designed 
+
+• Qinzhe Yang and Haohan Niu are with Shen Yuan Honors College, Beihang University, Beijing 100191, China. 
+
+• Dongyu Wang, Zhenwei Shi, and Zhengxia Zou are with the Department of Aerospace Intelligent Science and Technology, School of Astronautics, and with the State Key Laboratory of Virtual Reality Technology and Systems, Beihang University, Beijing 100191, China. 
+
+• Jia Xu is with the Qian Xuesen Laboratory of Space Technology, China Academy of Space Technology, Beijing 100094, China. 
+
+• ⋆ Corresponding author (zhengxiazou@buaa.edu.cn) 
+
+• The work was supported by the National Natural Science Foundation of China under Grants 62125102, 62471014, U24B20177, U25A20401, and in part by the Fundamental Research Funds for the Central Universities. 
+
+for a single object family such as aircraft, ships, or vehicles [8], [10]–[12], [17], [18], [22], [23], and others emphasize specific set-tings such as tiny-object detection or fine-grained recognition [3], [5]–[7], [13]–[16], [19]–[21]. Their image collections are often limited in scale, tied to fixed spatial resolutions or a narrow GSD range, and dominated by one sensor, platform, or imaging style. As a result, detectors trained on these benchmarks are exposed to limited category vocabularies, object-size distributions, scene densities, and sensor appearances, which weakens their ability to transfer across real-world remote sensing scenarios. In addition, their category definitions, bounding-box protocols, and image resolutions are often inconsistent. Directly aggregating them can introduce conflicting supervision, where visually similar objects are annotated with di ff erent box conventions, category granularities, or instance completeness across sources. On the model side, most remote sensing detectors still inherit general natural-image detection designs, including two-stage, one-stage, and DETR-like architectures. These models rarely encode domain-specific factors such as ground sampling distance (GSD), image-dependent scene density, or ancestor-descendant relations among mixed-granularity categories, making them di ffi cult to transfer across di ff erent sensors, spatial resolutions, and categor-ical systems. We argue that a practical remote sensing detection foundation model requires not only larger training data, but also model structures that reflect the scale, density, and semantic hierarchy of remote sensing imagery.                        
+
+> arXiv:2606.25312v1 [cs.CV] 24 Jun 2026 JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 2Imgs.
+> Anns.
+> Cats.
+> XL Obj.
+> L Obj.
+> M Obj.
+> SObj. T Obj.
+> ET Obj.
+> FG Ship
+> Anns.
+> FG Vehicle
+> Anns.
+> FG Ship
+> Cats
+> FG Vehicle
+> Cats
+> FG Airc raft
+> Cats
+> Cats. w/
+> FG
+> Cats. w/o
+> FG Anns. w/
+> FG
+> ×1.85
+> ×7.44
+> ×6.52
+> ×4.3
+> ×5.99
+> ×9.73
+> ×6.65
+> ×3.02 ×2.71
+> ×28.1
+> ×8.68
+> ×1.27
+> ×3.37
+> ×2.29
+> ×1.08
+> ×4.09
+> ×4.16 ×1.5
+> Common
+> Metrics
+> Size
+> Distribution
+> Fine-grained
+> Metrics FG Airc raft
+> Anns.
+> Levir-ship
+> DOTA
+> UCAS-AOD
+> NWPU-VHR-10
+> RSOD
+> HRRSD
+> DIOR
+> HRSC2016
+> VEDAI
+> Bridge Dataset
+> OIRDS
+> FAIR1M
+> LEVIRD et-159 (Our)
+
+(a) Dataset-scale comparison across 18 dimensions    
+
+> 70 75 80
+> LEVIRDetNet
+> DEIMv2
+> (DINOv3)
+> YOLOv12x
+> DynamicVis-L 70.52
+> 75.17
+> 75.54
+> 80.56
+> Average primary AP (%)
+> +5.02
+> mAP
+> vs SOTA
+
+(b) Average primary AP on 9 benchmarks    
+
+> 020 40 60
+> AOSD
+> RarePlanes
+> RSD-GOD
+> SkyFusion-ship
+> +17.65
+> +8.34
+> +8.46
+> +22.11
+
+(c) mAP comparison with open-set competitors  
+
+> mAP (%)
+> SOTA method
+> LEVIRDetNet
+
+Fig. 1: Overview of target-training-free cross-benchmark performance and dataset-scale comparison. (a) Dataset-scale comparison for LEVIRDet-159 dataset. (b) Average primary AP on 9 benchmarks. (c) mAP comparison with open-set competitors. The figure indicates the scale of each dataset, and LEVIRDet-159 has reached the largest scale in 18 dimensions. FG, Anns., Cats., and Obj. denote fine-grained, annotations, categories, and objects, respectively. ET, T, S, M, L, and XL denote extremely tiny, tiny, small, medium, large, and extra-large objects, respectively. Object size is measured by the square root of bounding-box area: ET < 4 pixels, T ∈ [4 , 8) pixels, S ∈ [8 , 16) pixels, M ∈ [16 , 32) pixels, L ∈ [32 , 96) pixels, and XL ≥ 96 pixels. To address these issues, we present LEVIRDet 1, a univer-sal remote sensing object detection framework consisting of LEVIRDet-159 and LEVIRDetNet. LEVIRDet-159 is a 159-category, million-scale dataset with ∼1.8 × 10 5 images, ∼2.56 million bounding boxes, and ∼700k fine-grained annotations under a multi-level taxonomy. Compared with representative public re-mote sensing detection datasets [3]–[5], [7]–[23], it is substantially larger in image count ( ×7), annotation count ( ×6), and category coverage ( ×4), making it, to our knowledge, the first million-box dataset built for broad-category universal remote sensing object detection under a unified tight horizontal bounding box (tight-HBB) protocol. Beyond scale, LEVIRDet-159 is organized around semantic observability: each instance is labeled at the most specific category supported by visual evidence, while ambiguous objects can fall back to reliable ancestor categories. LEVIRDet-159 is derived from heterogeneous public remote sensing resources [3]–[5], [7]–[23], but it is not a direct merge of their original labels. Instead, we rebuild the annotations through a systematic data engine that standardizes sources with tight hor-izontal boxes, a multi-level taxonomy, and source-controlled split rules. A large portion of the final annotations are newly produced or revised, including ∼1.48 million newly added boxes and ∼0.85 million boxes refined through geometry correction or fine-grained relabeling. This process converts heterogeneous resources into consistent, dense, and semantically reliable supervision, while preserving the limits of visual evidence under varying GSD and imaging conditions. By a conservative estimate, it required over 10k person-hours of human annotation and quality control. Based on LEVIRDet-159, we design LEVIRDetNet, a scale-hierarchy-aware detection foundation model for universal remote sensing object detection. LEVIRDetNet adapts an end-to-end 
+
+> 1. LEVIR refers to the authors’ laboratory, namely the LEarning, VIsion, and Remote Sensing Laboratory.
+
+detector to remote sensing by coupling online visual GSD condi-tioning, dynamic query allocation, and a hierarchy-aware detection head. The GSD branch provides an image-level physical scale cue for query modulation, the dynamic query module adjusts object hypotheses to scene density, and the hierarchy-aware head learns from mixed-granularity labels while remaining compatible with flat benchmark evaluation. These designs jointly address the large resolution span, heterogeneous imaging appearance, dense small-object scenes, and complex category structure of remote sensing imagery. We evaluate LEVIRDetNet in a target-training-free cross-benchmark setting. LEVIRDetNet is trained once on LEVIRDet-159 and then evaluated on the test sets of 9 external benchmarks without using any target-benchmark training images, annotations, or fine-tuning. In contrast, the closed-set competing detectors in Fig. 1(b) follow the standard target-supervised protocol and are trained or fine-tuned on the corresponding target benchmarks. Un-der this stricter setting, LEVIRDetNet achieves an average primary AP of 80.56 across benchmarks covering aircraft, vehicles, ships, and general aerial objects, outperforming the strongest target-supervised averaged baseline by 5.02 mAP. When compared with the strongest target-supervised competitor on each benchmark and averaged over benchmarks, LEVIRDetNet still brings a 3.33 mAP gain. Threshold-sweep comparisons further show stronger precision-recall stability than open-set and grounding models under practical confidence thresholds. The contributions of this paper can be summarized as follows: 1) We construct LEVIRDet-159, the up-to-date largest and most fine-grained remote sensing object detection dataset, con-taining 174,488 images, over 173.5 billion pixels, and 2,563,973 instances. It covers 30 common parent categories and 159 category types across global regions and diverse imaging conditions, and surpasses existing datasets in category number ( ×4), image num-JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 3
+
+ber ( ×7), annotation number ( ×6), object-size coverage ( ×2.71 ∼×28 .1), and geographic coverage. 2) We propose LEVIRDetNet, a scale-hierarchy-aware de-tection foundation model designed for universal remote sensing detection. Built upon a unified data engine with tight horizontal boxes, multi-level taxonomy, and visual-evidence-aware mixed-granularity labels, LEVIRDetNet explicitly models the coupling among object scale, scene density, and semantic hierarchy. It introduces online visual GSD conditioning for scale-aware query modulation, dynamic query allocation for image-adaptive object hypotheses, and hierarchy-aware classification for learning from mixed-granularity supervision while remaining compatible with flat benchmark evaluation. 3) Comprehensive experiments conducted on nine external benchmarks, including CarPK [24], NWPU [9], VHRV [25], SkyFusion [26], among others [8], [23], [27], [28], reveal that LEVIRDetNet achieves state-of-the-art target-training-free cross-benchmark performance compared with existing closed-set, open-set, and grounding-based detectors. Without target-domain train-ing or fine-tuning, LEVIRDetNet ranks first on all nine bench-marks and improves the strongest competing methods by 5.02 mAP on average, while maintaining stronger precision-recall sta-bility under practical confidence thresholds. These results demon-strate not only higher detection accuracy, but also strong gener-alization across diverse category systems, spatial resolutions, and sensor platforms, which is a key property of a remote sensing detection foundation model. 
+
+2 Related Work 
+
+This section reviews three key areas relevant to our proposed method: object detection, remote sensing detection datasets, and scale variation and fine-grained detection.  
+
+> 2.1 Object Detection
+
+Existing methods can be broadly classified into traditional dense-prediction detectors and query-based detectors [29]. Represen-tative dense-prediction detectors include Faster R-CNN [30], Cascade R-CNN [31], YOLO series [32], SSD [33], RetinaNet [34], FCOS [35], and CenterNet [36], while query-based detectors include DETR [37], Deformable DETR [38], DINO [39], RT-DETR [40], and DEIM-style detectors [41]. Recent advances in visual foundation models and open-vocabulary detection have catalyzed significant progress. Methods such as Grounding DINO [42], LAE-DINO [43], and OWL-ViT [44] introduce language prompts or vision-language pre-training to improve category transfer. However, these models are still sensitive to small objects, prompt wording, score thresholds, and duplicate predictions in remote sensing scenes. Moreover, they do not directly resolve inconsistent annotation protocols, scale-dependent visual observability, or mixed-granularity labels. In contrast, our work focuses on universal remote sensing detection by jointly constructing a unified large-scale dataset and designing a detector that explicitly models scale, density, and semantic hierarchy.  
+
+> 2.2 Remote Sensing Detection Datasets
+
+Remote sensing object detection has been greatly advanced by large-scale benchmark datasets [1], [45]. Early datasets such as NWPU VHR-10 [9] and HRSC2016 [13] provide standard evaluation settings for general aerial objects and ships. DOTA [3] promotes oriented object detection in large aerial images, while DIOR [4] expands category diversity for horizontal detection, and FAIR1M [5] focuses on fine-grained oriented object detection. Other resources, including ShipRSImageNet [21], RarePlanes [46], and CarPK [24], study family-specific recognition, tiny objects, or vehicle counting. Despite their progress, existing remote sensing detection datasets remain insu ffi cient for training a universal detection foun-dation model. Many benchmarks are designed for specific object families or task settings, while general-purpose datasets still have limited category coverage and semantic granularity [7], [8], [10], [11], [13], [47]. Their resolution range and source diversity are also constrained, making it di ffi cult to capture the scale variation and imaging diversity of real remote sensing applications. As a result, detectors trained on these datasets often learn dataset-specific priors rather than broadly transferable object semantics. To address these limitations, we construct LEVIRDet-159 as a large-scale universal detection dataset with broad categories, multi-source imagery, and a multi-level taxonomy, providing a stronger data foundation for generalizable remote sensing object detection.  
+
+> 2.3 Scale Variation and Fine-Grained Detection
+
+Scale variation, object density, and category hierarchy are central challenges in remote sensing detection [5], [29]. Existing methods usually handle scale variation through feature or image pyra-mids, multi-scale training, and tiny-object enhancement strategies [48]. Dense scenes are often addressed by improving assignment strategies, proposal generation, or post-processing [6], [49], [50]. Fine-grained and hierarchical recognition methods further exploit category structures to distinguish visually similar objects and organize predictions at di ff erent semantic levels [13], [21], [51]. However, most existing methods treat scale, density, and hierarchy as separate problems. Scale is mainly modeled at the feature level, density is handled by proposal or query design, and hierarchy is often used only for label organization or post-hoc grouping [52]. This decoupled treatment is insu ffi cient for universal remote sensing detection, where the reliable semantic depth of an object depends on GSD, imaging quality, object size, and scene context. Therefore, we propose LEVIRDetNet, which addresses these factors through dedicated but coordinated components, including online visual GSD estimation, dynamic query allocation, and hierarchy-aware classification to jointly model scale, density, and semantic granularity. 
+
+3 Dataset and Data Engine  
+
+> 3.1 LEVIRDet-159 Dataset
+
+LEVIRDet-159 is built for universal remote sensing object de-tection rather than for a single object family and sensor. Its central design is to couple cross-source image diversity, tight dense localization, and semantic labels whose depth depends on visual evidence. This coupling is important because a universal detector must decide not only where objects are, but also how many object hypotheses are needed in a scene and how fine a category prediction can be trusted under the available GSD and image quality. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 40 1–10 11–50 51–100 101–200 >200            
+
+> 0
+> 25000
+> 50000
+> 75000
+> 100000
+> Image Count
+> (a) Images by Object Number
+> 0–8
+> 8–16
+> 16–32
+> 32–64
+> 64–128
+> 128–256
+> 256–512
+> >512
+> 0
+> 200000
+> 400000
+> 600000
+> 800000
+> Object Count
+> (b) Objects by Object Size
+> 01234–5 6–10 >10
+> 0
+> 20000
+> 40000
+> 60000
+> Image Count
+> (c) Images by Category Number
+> Dataset
+> DIOR DOTA FAIR1M HRRSD LEVIRDet-159 xView
+
+Fig. 2: Comparison of dataset statistics. The three panels compare image counts by object number, object counts by object size, and image counts by category number. Comparison datasets include DIOR [4], DOTA [3], FAIR1M [5], HRRSD [11], and xView [53]. 
+
+Fig. 3: An image source distribution of LEVIRDet-159, covering more than ten satellite, aerial, and map-service sources. 
+
+3.1.1 Overall Scale 
+
+To the best of our knowledge, LEVIRDet-159 is up-to-date the largest and most fine-grained remote sensing object detection dataset, containing 174,488 images, over 173.5 billion pixels, and 2,563,973 instances. It covers 30 parent categories and 159 object types under a unified detection protocol. The taxonomy is organized as a multi-level tree. The top level contains 30 common remote sensing categories covering transportation, energy facilities, public facilities, sports fields, mar-itime infrastructure, aerial platforms, and other objects. For object families where fine-grained recognition is visually meaningful, we further define detailed branches, including 45 aircraft types, 13 vehicle types, and 71 ship types. The dataset contains 702,707 fine-grained annotations, including 102,076 aircraft instances, 414,405 vehicle instances, and 186,226 ship instances, as shown in Fig. 1. These three branches make LEVIRDet-159 a multi-family fine-grained detection benchmark rather than a collection of independent family-specific datasets. 
+
+3.1.2 Density, Category Breadth, and Object-Size Coverage 
+
+Fig. 2 analyzes LEVIRDet-159 from three complementary views. The image-by-object-number distribution shows that the dataset contains both sparse scenes and dense scenes, instead of being dominated by either isolated large objects or crowd-like counting images. The image-by-category-count distribution further shows that the dataset includes both single-category scenes and multi-category scenes, which is necessary for learning object co-occurrence and suppressing category shortcuts in complex remote sensing imagery. The object-size distribution is especially important for remote sensing detection. Using the square root of box area as the object-size measure, the positive-tile protocol contains 640,998 objects below 16 pixels and 946,768 objects in [16 , 32). In proportion, 25.00% of instances are smaller than 16 pixels and 61.93% are smaller than 32 pixels, while 38.07% are no smaller than 32 pixels. LEVIRDet-159 therefore covers both tiny-object detection and large-structure localization under one unified protocol, which is di ffi cult to obtain from specialized benchmarks alone. 
+
+3.1.3 Source and Sensor Diversity 
+
+The images in LEVIRDet-159 are collected from a broad range of existing resources, including object detection (Levir-ship [7], DOTA [3], UCAS-AOD [8], NWPU [9], RSOD [10], HRRSD [11], TAS [12], DIOR [4], HRSC [13], VEDAI [14], ITCVD [15], DLR3K [16], Bridge [17], OIRDS [18], MAR20 [19], FAIR1M [5], VHRShips [20], ShipRSImageNet [21], Ningbo [22], HRPlanev2 [23]), segmentation (Vaihingen [54], Potsdam [54], Toronto [54]), classification (MTARSI [47]), and pre-training datasets (fMoW [55]), as well as images released in public challenges (MASATI [56], Airbus-ship [57], Airbus-aircraft [58]). The source distribution in Fig. 3 shows that LEVIRDet-159 is not tied to a single imaging platform. Google /Baidu map-service imagery contributes 51.84% of the images, while the remaining 48.16% comes from other sources and sensors. Named satellite sensors account for a large portion of this diversity, including SPOT (18.38%), GF-2 /3 (11.89%), JL-1 (1.89%), GF-1 (1.44%), GF-6 (1.03%), and Pl´ eiades (0.59%). Aerial imagery contributes 5.09%, Bing contributes 4.02%, and other public sources con-tribute 3.84%. This composition exposes the detector to di ff erent resolutions, imaging styles, regions, and acquisition conditions, which is essential for cross-dataset transfer. Cross-source integration also introduces a risk. A large dataset may appear diverse while allowing the model to learn source-specific appearance or annotation conventions [45]. LEVIRDet-159 controls this risk at both the split and annotation levels. When an original source provides o ffi cial partitions, we preserve them rather than randomly redistributing images after aggregation. For sources derived from large scenes or adjacent crops, splitting is performed at the parent-scene or large-image level so that neighboring or overlapping tiles do not appear in both training and evaluation. Images converted from segmentation, classification, or tracking resources inherit the split of the original image. During fine-grained relabeling, source identity is hidden from annotators, and the unified category scope is applied to all sources rather than only to newly introduced classes. 
+
+3.1.4 Annotation and Protocol Unification 
+
+LEVIRDet-159 is not a direct combination of public annotations. As shown in Fig. 5, only a small portion of boxes are directly inherited after protocol checking. Under the positive-tile protocol, JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 50-8 
+
+> 8-16
+> 16-32
+> 32-64
+> 64-128
+> 128-256
+> 256-512
+> 512+
+
+Before annotation 
+
+> Object size range
+
+After annotation           
+
+> LEV-S
+> DOTA
+> UCAS
+> NWPU
+> RSOD
+> HRRSD
+> DIOR
+> HRSC
+> VEDAI
+> Bridge
+> OIRDS
+> FAIR1M
+> TAS
+> ITCVD
+> DLR3k
+> MASATI
+> NB-Pyl
+> Airbus-A
+> GDIT
+> HRP-v2
+> Pots.
+> MTARSI
+> Tor.
+> Vaih.
+> K-AirS
+> fMoW
+> VHRS
+> ShipRS
+> MAR20+
+> OUR
+> Car
+> Ship
+> Plane
+> Heli
+> Base.
+> Bask.
+> Golf
+> Track
+> Rugby
+> Soccer
+> Stad.
+> Pool
+> Tennis
+> Chim.
+> Cont.
+> C. Crane
+> Serv. Area
+> Toll Sta.
+> Airport
+> Train Sta.
+> Harbor
+> Parking
+> Helipad
+> Bridge
+> Round.
+> Overpass
+> Pylon
+> Windmill
+> Tank
+> Dam
+> LEV-S
+> DOTA
+> UCAS
+> NWPU
+> RSOD
+> HRRSD
+> DIOR
+> HRSC
+> VEDAI
+> Bridge
+> OIRDS
+> FAIR1M
+> TAS
+> ITCVD
+> DLR3k
+> MASATI
+> NB-Pyl
+> Airbus-A
+> GDIT
+> HRP-v2
+> Pots.
+> MTARSI
+> Tor.
+> Vaih.
+> K-AirS
+> fMoW
+> VHRS
+> ShipRS
+> MAR20+
+> OUR
+> 10 110 210 310 410 510 6
+> Category count
+> Category present (colored by class) Checked and confirmed absent Absent / not present Size-bin count heatmap (darker = more) Heatmap white = 0 Category count bar (log scale)
+
+Fig. 4: Category and annotation expansion of LEVIRDet-159. The figure compares category coverage before and after unification, summarizes annotation changes, category counts, and the object-size distribution heatmap. 231,960 boxes are directly reused, 431,348 boxes receive fine-grained relabeling, 422,634 boxes are geometrically corrected, and 1,478,031 boxes are newly added. In other words, more than 90% of the final positive-tile annotations are newly created or revised in some form. This decomposition is important for interpreting the large number of newly added boxes. We do not treat the source datasets as inaccurate. Many were designed for di ff erent evaluation proto-cols or category scopes. New boxes mainly come from newly in-troduced categories, instances outside the original category scope, and all-category image-level review after taxonomy harmoniza-tion. The geometry-corrected boxes mainly arise from di ff erences between original box styles and the tight horizontal-box protocol. For example, directly enclosing an oriented box can be much looser than the minimum tight horizontal box for a diagonally oriented aircraft or ship, which may substantially reduce IoU under COCO-style evaluation [59]. The fine-grained relabeled boxes correspond to existing localized objects whose parent labels are preserved while aircraft, vehicle, or ship subclasses are assigned when visual evidence is su ffi cient. Fig. 4 further compares category coverage before and after unification. The expansion is not limited to adding a few rare classes. It increases coverage across common remote sensing parents, newly introduced scene objects, and fine-grained aircraft, vehicle, and ship branches. This makes the dataset useful for training a single detector with a broad category vocabulary, while preserving a strict localization standard. 
+
+3.1.5 Fine-Grained Hierarchy and Visual Evidence 
+
+The examples in Fig. 6 illustrate why LEVIRDet-159 uses a hierarchy instead of forcing every instance into a flat leaf class. Aircraft, vehicles, and ships can often be distinguished at fine granularity when the object crop is su ffi ciently resolved, but the Final 
+
+# 2.56M 
+
+annotations 
+
+Size/shape 
+
+0.42M 
+
+(16.5%) 
+
+Category 
+
+0.43M 
+
+(16.8%) 
+
+Direct 
+
+0.23M 
+
+(9.1%) 
+
+Added 
+
+1.48M 
+
+(57.6%)  
+
+> DIOR
+> 79.6k HRRSD
+> 28.5k DOTA
+> 27.2k
+> FAIR1M
+> 372.0k
+> DOTA
+> 234.4k
+> DIOR
+> 102.8k
+> Airbus-ship
+> 40.4k HRRSD
+> 592.4k
+> Others
+> 277.4k
+> DOTA
+> 261.4k
+> DIOR
+> 157.4k
+> FAIR1M
+> 63.9k
+> MAR
+> 38.1k
+> ShipRS
+> 42.0k
+> HRPlane v2
+> 42.2k
+
+Directly used 
+
+Modified size/shape 
+
+Modified category 
+
+Newly added 
+
+Fig. 5: An annotation refinement composition of LEVIRDet-159. The nested chart separates directly inherited boxes, fine-grained relabeled boxes, geometry-corrected boxes, and newly added boxes, showing that the dataset is constructed through systematic annotation revision rather than simple dataset combination. same semantic family may become ambiguous under low GSD or severe image degradation. LEVIRDet-159 therefore annotates each instance at the most specific reliable level supported by the image evidence and falls back to an ancestor category when fine-grained cues are not visually resolvable. This hierarchy is not only a visual description of category JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 6rugby-court helicopter 
+
+Fig. 6: A category-wise visualization of LEVIRDet-159, showing representative object crops across all categories. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 7
+
+relationships. It is used as an operational structure throughout the dataset and model. It defines valid mixed-depth labels during annotation, provides ancestor-path supervision during training, guides compatible matching, and supports tree-collapsed predic-tions.  
+
+> 3.1.6 License, Privacy, and Release Plan
+
+LEVIRDet-159 is constructed from publicly accessible remote sensing resources, public challenge datasets, and map-service imagery under terms compatible with research use and dataset release. For transparency, the released dataset will include a source manifest for every image tile, recording the source dataset or provider, sensor or platform when available, original split infor-mation, citation, license or usage-term category, and redistribution status. Source-specific attribution and usage requirements will be preserved in the release documentation. The dataset contains overhead remote sensing imagery of outdoor scenes and does not collect private user data, street-level imagery, faces, license plates, or individual-level behav-ioral information. The annotations describe object categories and bounding boxes rather than personal identities. The public release will include the full image tiles, annotations, metadata, prepro-cessing scripts, trained models, and evaluation code in a versioned repository accompanying the final paper. A contact and removal procedure will also be provided for source owners if attribution, access, or redistribution conditions change.  
+
+> 3.2 Resolution-Aware Data Engine
+
+Building a universal remote sensing detection dataset requires more than collecting images. Source datasets di ff er in category scope, localization protocol, and semantic granularity. If these di ff erences are not resolved, a detector may learn source-specific annotation styles rather than transferable object semantics. We therefore construct LEVIRDet-159 with a resolution-aware data engine that separates localization standardization, fine-grained relabeling, and full-image consistency review. The data engine follows two principles. First, box geometry is standardized before fine-grained recognition, so all objects follow the tight horizontal bounding box protocol. Second, semantic depth is determined by visual evidence. When fine-grained identity is unreliable because of low resolution or image degradation, the annotation falls back to the most reliable ancestor category instead of forcing a noisy leaf label. This produces dense localization supervision while recording the limits of semantic observability under di ff erent GSDs.  
+
+> 3.2.1 Stage I: Geometry-First Parent Annotation
+
+The first stage establishes a unified localization protocol. Anno-tators inspect each image under the full LEVIRDet-159 category scope and localize every supported object with the tightest hori-zontal rectangle around its visible extent. Only parent categories are assigned at this stage, which prevents uncertain fine-grained recognition from a ff ecting box drawing. This stage also converts heterogeneous source annotations into the unified tight-HBB protocol. Existing horizontal boxes are checked for tightness, while oriented boxes are treated as candidates rather than directly converted into enclosing rectan-gles [59], [60]. For elongated objects such as aircraft and ships, such conversion can produce loose boxes and reduce IoU under COCO-style evaluation. To improve geometric quality control, we use segmentation-assisted review as an outlier detector. For each candidate object, a segmentation model produces a mask proposal whose minimum enclosing rectangle is compared with the human box. If the side-length di ff erence exceeds a tolerance or the IoU is below a threshold, the object is sent to an additional review round. The segmentation model is not used to replace human annotation. It only surfaces suspicious boxes. This stage produces directly in-herited boxes, geometry-corrected boxes, and newly added parent boxes under one protocol.  
+
+> 3.2.2 Stage II: Source-Blind Fine-Grained Relabeling
+
+After geometry is stabilized, parent-level boxes are cropped and sent to a source-blind labeling interface. Annotators label object crops without seeing the source dataset identity, reducing reliance on dataset-specific naming or appearance cues. Crops are pre-sented from large to small so that annotators first establish reliable visual distinctions from clear examples and then handle smaller or more ambiguous instances. Clear instances are assigned fine-grained aircraft, vehicle, or ship labels, while ambiguous ones remain at the most reliable ancestor node. This stage makes the taxonomy operational. It defines valid label depths, supports fallback under limited visual evidence, and allows mixed-granularity annotations to coexist in one training set. This fallback is central to LEVIRDet-159. Fine-grained supervi-sion is added when the image supports it, but visually ambiguous objects remain valid training samples at a coarser level instead of becoming noisy leaf labels.  
+
+> 3.2.3 Stage III: Projection-Back Review and Global Calibration
+
+The third stage projects fine-grained labels back to the original im-age coordinates and reviews the results in full-image context. This step corrects errors that are di ffi cult to judge from isolated crops, including duplicate or missing instances, context mismatches, and local density inconsistency. All images undergo multiple rounds of calibration so that box tightness, label granularity, and instance completeness follow the same protocol. Projection-back review is especially important for the large number of newly added boxes. These boxes are not produced by indiscriminately densifying every image or by only supple-menting newly introduced categories. Instead, reviewers inspect all categories under the unified scope. For small objects, the local crop and surrounding scene are checked together to avoid over-dense or context-inconsistent annotation. If the object extent or fine-grained identity is not visually supportable, the annotation is either rejected or kept at a reliable parent level. After the three stages, each annotation belongs to one of four interpretable outcomes: directly inherited, geometry corrected, fine-grained relabeled, or newly added. This decomposition ex-plains why LEVIRDet-159 contains many new and revised boxes without implying that source datasets were wrong. They were often built for di ff erent evaluation protocols and category scopes. In addition, public imagery with available resolution metadata is collected to train the online GSD predictor in LEVIRDetNet, linking the resolution-aware annotation protocol with the scale-aware model design. 
+
+4 Methodology 
+
+LEVIRDetNet is a scale-hierarchy-aware detector built on aDEIM-style end-to-end detection framework, as illustrated in Fig. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 8ℒcls = 𝐀𢐀𝐀 (𝐀𧐀𝐀 ℎ ∙ 𝐀𧐀𝐀𣠀 , 𝐀𨀀𝐀𤀀𝐀 )           
+
+> 110100
+> 𝐀 𝐀 𝐀 𝐀 𝐀 𝐀 𝐀 𝐀 𝐀 𝐀 𝐀 𝐀
+> Path target (1 = on path)
+> Hierarchy weights
+> Min( score_path )
+> Depth-weight
+> Top-k
+> ℒ𝐀 𝐀 𝐀 𝐀
+> Decode
+> Rescale
+> Training Stage Inference Stage
+> Ancestor weight
+> Self weight
+> Family weight
+> Class
+> hierarchy
+> Box pred
+
+×     
+
+> Label A
+> Label B
+> Label C
+> 0.82 0.63 0.47
+> 𝐀 𝐀
+> 𝐀 𝐀 𝐀 𝐀
+> 𝐀 𝐀 𝐀 𝐀 𝐀 𝐀
+
+(c) Hierarchy-aware Head              
+
+> Large
+> Object
+> Small
+> Object 𝐀 𝐀 𝐀 𝐀 𝐀 𝐀 = 7 𤀀 𝐀 𝐀 𝐀 𝐀 𝐀 =2/7𝐀 𝐀 𝐀 = N/A
+> Encoder
+> Memory
+> Predicted
+> GSD
+> GSD
+> Encoder
+> Initial
+> Queries
+> Semantic Encoder
+> (Global pool)
+> FILM
+> GSD-embedding
+> Queries
+> Keep
+> Group
+> C
+> Density/Scale priors
+> Query Group
+> Head
+> [200,400] [400,600] [600,800] …
+> …
+> …
+> …
+> ℒ𝐀 𝐀 𝐀 (𝐀 𝐀 +𝐀 𤀀 +𝐀 𝐀 , Query)
+
+(b) GSD-guided Query Embedding & Selection 
+
+> Prediction Head
+> Sobel
+> Lap
+> Gelu
+> Norm
+> ResNet
+> Flatten
+> Norm
+> Gelu
+> Gated Fusion Block
+> 𝐀 𝐀𗀀𗀀
+> 𝐀 𝐀𝐀𝐀
+> 𝐀 𝐀𗠀𝐀𝐀
+> Gelu
+> Norm
+> 2DFFT
+> Conv1d
+
+(a) Online GSD Predictor      
+
+> Transformer
+> Decoder
+> Backbone + DETR Encoder
+> (DINOv3)
+> Encoder
+> Memory
+> Top-K
+> Queries
+> …
+> Predicted GSD
+> GSD-embedding
+> Queries (c) Hierarchy-
+> aware Head
+> Dynamic
+> Query number
+> …
+> (a) Online GSD Predictor
+> (b) GSD-guided Query
+> Embedding & Selection
+> New Components
+> Unchanged Components
+> Cls pred
+> Decoder
+
+Fig. 7: An overview of the proposed LEVIRDetNet. The framework adapts a DEIM-style end-to-end detector to universal remote sensing object detection by integrating visual scale estimation, scene-aware query allocation, and hierarchy-aware classification under the LEVIRDet-159 annotation protocol. Panel (a) shows the online GSD predictor. Panel (b) illustrates how the predicted GSD is embedded into decoder queries and used for active query budget prediction. Panel (c) presents the hierarchy-aware detection head and summarizes the training and inference paths. 7. The backbone, encoder, box branch, and distribution-refinement losses follow the base detector, while the query and classification components are adapted to the properties of LEVIRDet-159. The method contains three coupled modules: GSD-aware query conditioning, dynamic query allocation, and a hierarchy-aware detection head. Together, they connect visual scale, scene density, and semantic granularity within one query-based detector. 
+
+4.1 LEVIRDetNet Model Framework 
+
+LEVIRDetNet is a scale-hierarchy-aware detection foundation model built on a DEIM-style end-to-end detector. It uses aDINOv3-initialized ViT backbone for feature extraction, followed by transformer encoder and decoder modules for query-based ob-ject prediction. All components, including the backbone, encoder, decoder, and prediction heads, are fully trained without LoRA. To adapt this framework to universal remote sensing detection, LEVIRDetNet introduces three task-specific modules. The online visual GSD predictor provides image-level scale cues, the GSD-guided query module adjusts query embeddings and query bud-gets, and the hierarchy-aware head learns from mixed-granularity labels while supporting flat benchmark evaluation. These modules strengthen the detector under large scale variation, dense scenes, and hierarchical category systems. 
+
+4.2 GSD-Aware Query Conditioning 
+
+The apparent size of objects in overhead imagery is strongly aff ected by ground sampling distance (GSD). Two images resized to the same input resolution may correspond to di ff erent physical footprints, and the same pixel-sized object may provide di ff erent semantic evidence under di ff erent GSDs. Instead of relying on external metadata, which may be unavailable or inconsistent, we learn an online visual GSD cue and use it as a detector-conditioning signal, as illustrated in Fig. 7 (a). For each image, the GSD branch extracts K fixed patches 
+
+{Pk}Kk=1. For large images, patches are sampled from the four corners and the image center. For smaller images, center-biased patches are used. Each patch is normalized and encoded by three complementary descriptors: 
+
+ecnn  
+
+> k
+
+= fcnn (Pk), eff t 
+
+> k
+
+= fff t(Pk), eedge  
+
+> k
+
+= fedge (Pk). (1) where Pk denotes the k-th sampled image patch, and K is the number of sampled patches. fcnn (·), fff t(·), and fedge (·) denote the CNN, frequency-domain, and edge-statistic descriptor extractors, respectively. ecnn  
+
+> k
+
+, eff t 
+
+> k
+
+, and eedge  
+
+> k
+
+are the corresponding descriptors of patch Pk.The CNN descriptor captures semantic and texture cues. The FFT descriptor summarizes radial frequency statistics from the gray-scale spectrum. The edge descriptor encodes Sobel and Laplacian statistics, which are useful for estimating spatial detail and image sharpness. The three descriptors are fused by a learned gate: 
+
+αk = softmax Wg
+
+hecnn  
+
+> k
+
+, eff t 
+
+> k
+
+, eedge 
+
+> k
+
+i , (2) where αk denotes the descriptor-fusion weight vector of patch 
+
+Pk. Wg is the learnable gating projection. [ ·] denotes feature concatenation, and softmax( ·) normalizes the descriptor weights across the three descriptor types. 
+
+ek = αk,1ecnn  
+
+> k
+
++ αk,2eff t 
+
+> k
+
++ αk,3eedge  
+
+> k
+
+. (3) where ek is the fused representation of patch Pk. αk,1, αk,2, and αk,3
+
+are the three components of αk, corresponding to the CNN, FFT, and edge descriptors. Patch-level features are then aggregated by attention: 
+
+ak = softmax( w⊤ 
+
+> a
+
+ek), eI =
+
+> K
+
+X
+
+> k=1
+
+akek. (4) JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 9
+
+where ak denotes the attention weight of patch Pk. wa is the learnable attention vector. eI is the image-level representation aggregated from all sampled patches. A regression head predicts the image-level GSD estimate ˆ g. To reduce the dynamic range, we use the logarithmic GSD value: 
+
+zg = ψ  log(max(ˆ g, ϵ ))  , (5) where ˆ g denotes the predicted visual GSD. ϵ is a small constant for numerical stability. log( ·) compresses the dynamic range of the predicted GSD. ψ(·) is a two-layer MLP followed by layer normalization, and zg is the resulting GSD embedding. The GSD embedding zg modulates the initial decoder query encoding q0 
+
+> i
+
+. In the FILM mode used in our implementation, zg is mapped to a scale-shift pair ( γg, β g), and each query is updated as ˜q0 
+
+> i
+
+= q0 
+
+> i
+
+⊙ (1 + λγ g) + λβ g, (6) where q0 
+
+> i
+
+denotes the original initial embedding of query i, and ˜q0 
+
+> i
+
+is the GSD-modulated query embedding. γg and βg denote the GSD-conditioned scale and shift terms, respectively. λ controls the modulation strength, and ⊙ denotes element-wise multiplication. This design does not impose hard scale rules. Instead, it biases the decoder toward a resolution-aware interpretation of candidate objects. 
+
+4.3 Dynamic Query Allocation 
+
+Remote sensing images range from sparse large-object scenes to dense small-object regions. A fixed query budget is therefore in-effi cient. Too few queries may miss objects in dense scenes, while too many queries introduce redundant decoding and matching cost in sparse scenes. We introduce a dynamic query allocation module that predicts an image-specific active query budget while preserving the ranked query structure of the base detector, as illustrated in Fig. 7 (b). The module receives four types of information: the global en-coder memory ¯M, the GSD embedding zg, a density prior pdensity ,and a scale prior pscale . The density prior is computed from the average channel variance of encoder memory, while the scale prior measures the energy contrast between coarse and fine encoder levels. These visual priors describe the resized feature distribution, while zg provides complementary physical-scale information. The input to the query allocator is 
+
+u = h ¯M, zg, pdensity , pscale 
+
+i . (7) where u denotes the input feature of the query allocator. ¯M is the global encoder-memory representation. zg is the GSD embedding. 
+
+pdensity and pscale denote the density prior and scale prior, respec-tively. [ ·] denotes concatenation. The allocator predicts logits over a discrete query budget set 
+
+B = {300 , 600 , 800 }:
+
+π = hq(u), ˆb = arg max  
+
+> b∈B
+
+πb. (8) where hq(·) denotes the query-budget prediction head. π is the predicted logit vector over the candidate budget set B. πb is the logit corresponding to budget b, and ˆ b is the predicted active query budget. During training, the dynamic query module is supervised without changing the main Hungarian assignment and denoising layout. The target budget is derived from the number of ground-truth objects, the fraction of small objects, the normalized object density, and a scale bonus: 
+
+s = wnngt + wsrsmall + wdd + wb max(0 , r0 − ¯r), (9) where s denotes the continuous scene-complexity score used to derive the target query budget. ngt is the number of ground-truth objects, rsmall is the small-object ratio, d is the normalized object density, and ¯ r is the mean normalized object scale. wn, ws, wd, and 
+
+wb are scalar weights. r0 is the threshold used by the scale bonus, and max( ·) keeps the bonus active only when the mean object scale is smaller than r0.The target budget b⋆ is assigned to the nearest bin in B, and the auxiliary loss is 
+
+Ldyn = λqCE( π, b⋆). (10) where b⋆ denotes the target query budget. Ldyn is the auxiliary dynamic query loss. λq is the loss weight, and CE( ·) denotes the cross-entropy loss between the predicted budget logits π and the target budget b⋆.At inference, the predicted budget selects the active prefix of ranked queries, while inactive queries are masked out. This allows the detector to retain high capacity for dense small-object scenes and reduce redundant decoding for sparse scenes. 
+
+4.4 Hierarchy-Aware Detection Head 
+
+LEVIRDet-159 contains both coarse parent categories and fine-grained subclasses. Its taxonomy includes 30 common remote sensing parent categories and fine-grained branches for aircraft, vehicles, and ships. This structure allows the annotation protocol to assign the most specific visually supported label and fall back to an ancestor category when fine-grained evidence is insu ffi cient, as illustrated in Fig. 7 (c). A flat classifier is not ideal for such mixed-granularity super-vision, because it may penalize predictions that are semantically compatible with the annotation but appear at a di ff erent taxonomy depth. We therefore replace the flat classification head with a hierarchy-aware multi-label head. The box regression branch is kept the same as the base detector, while the classification branch produces sigmoid scores over all taxonomy nodes. Let y be the ground-truth label of a matched object, and let 
+
+A(y) denote the set containing y and all its ancestors. For a predicted box with IoU quality r, the classification target for class 
+
+c is defined as 
+
+tc(y) =
+
+
+
+r, c ∈ A (y),
+
+0, otherwise . (11) where tc(y) denotes the target score for class c under ground-truth label y. y is the ground-truth taxonomy node, c is a candidate taxonomy node, and A(y) is the ancestor path of y including y
+
+itself. r denotes the IoU quality of the matched predicted box. The target is optimized with a varifocal-style sigmoid loss. To reduce harsh penalties between semantically related cate-gories, we introduce a class-pair weight matrix W:
+
+Wy,c =
+
+
+
+1, c ∈ A (y),
+
+0, c ∈ D (y),λsib , c ∈ S (y),λfam , c ∈ F (y),
+
+1, otherwise ,
+
+(12) JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 10 
+
+where Wy,c denotes the class-pair weight between ground-truth label y and class c. D(y), S(y), and F (y) denote the descendant, sibling, and same-family sets of class y, respectively. λsib and λfam 
+
+are scalar weights for sibling and same-family negatives. The hierarchy-aware classification loss is 
+
+Lhcls =
+
+X
+
+> c
+
+Wy,cLvfl (pc, tc(y)) . (13) where Lhcls denotes the hierarchy-aware classification loss. pc is the predicted score of class c, and Lvfl (·) denotes the varifocal loss. The same multi-level targets are also used for denoising queries, ensuring that the auxiliary denoising objective is con-sistent with the main detection loss. 
+
+4.5 Multi-Level Matching and Tree-Collapsed Prediction 
+
+LEVIRDetNet follows the end-to-end assignment paradigm of DETR-like detectors. In the early training stage, we use ahierarchy-compatible Hungarian assigner with three costs: clas-sification cost, L1 box cost, and generalized IoU cost. The clas-sification term considers labels compatible with the ground-truth path and prevents coarse and fine labels along the same taxonomy path from competing during matching. After the detector becomes stable, the matching objective is switched to a DEIM-style quality-aware cost. For a ground-truth label y, the hierarchy-compatible class evidence is computed as ˆpy = max 
+
+> c
+
+pcCy,c
+
+ , (14) where ˆpy denotes the hierarchy-compatible class evidence for ground-truth label y. pc is the predicted score of class c, and 
+
+Cy,c is the taxonomy compatibility mask between ground-truth label y and class c. max c(·) selects the strongest compatible class evidence. The switched matching cost is 
+
+Cswitch = − ˆpy · IoU( b, ˆb)α. (15) where Cswitch denotes the switched matching cost. b and ˆ b denote the ground-truth and predicted boxes, respectively. IoU( ·) is the intersection-over-union function, and α controls the strength of IoU-quality weighting. This cost emphasizes high-quality localization and compatible semantic confidence in the late stage of training. At inference, hierarchical predictions are collapsed to one label per query for standard benchmark evaluation. We first replace the score of each class by the minimum score along its ancestor path: 
+
+spath  
+
+> c
+
+= min  
+
+> a∈A (c)
+
+pa. (16) where spath  
+
+> c
+
+denotes the path-consistent score of class c. A(c) is the ancestor path of c including c itself. a denotes an ancestor node on this path, and pa is the predicted score of node a. min( ·) requires all nodes on the path to be consistently confident. Then each query selects the class with the highest depth-adjusted score: ˆc = arg max  
+
+> c
+
+spath 
+
+> c
+
+ 1 + ρ(depth( c) − 1)  , (17) where ˆ c denotes the final collapsed class label. spath  
+
+> c
+
+is the path-consistent score of class c. depth( c) is the taxonomy depth of class 
+
+c, and ρ is a small coe ffi cient that mildly favors confident fine-grained labels. The selected predictions are decoded into bounding boxes. 
+
+4.6 Implementation Details 
+
+4.6.1 Network Design 
+
+LEVIRDetNet is implemented using MMDetection [61] and MMEngine [62] frameworks. The default input resolution is 1024 × 1024, and batch-level random resizing samples from 
+
+{896 , 960 , 1024 , 1088 , 1152 }. The detector uses 800 object queries before dynamic query allocation, and the query budget bins are 
+
+{300 , 600 , 800 }. The GSD branch predicts from five 224 × 224 patches using a ResNet-50 CNN encoder, 64 radial FFT bins, gated descriptor fusion, and attention-based patch aggregation. GSD FILM modulation uses λ = 0.5, and the dynamic query auxiliary loss weight is set to 0.05. For the hierarchy-aware head, the descendant negative weight is 0, the sibling negative weight is 0.25, and the same-family negative weight is 0.5. 
+
+4.6.2 Training Details 
+
+Following the model’s structural design, we adopt a two-stage training strategy. First, the online GSD predictor is pretrained on an auxiliary GSD-labeled remote sensing dataset containing approximately 800k 512 × 512 image patches. The images are collected from public remote sensing resources with available spatial-resolution metadata, including ISPRS [54], VEDAI [14], COWC [63], DLR [16], Inria Aerial [64], xView [53], fMoW [55], and BigEarth [65]. Each patch is assigned a GSD label in meters per pixel (m /pixel). This auxiliary GSD pretraining set, together with its source metadata and license manifest, will be released as an accompanying component of LEVIRDet-159. This stage is trained for 1.6M iterations, enabling the predictor to learn a robust visual representation of spatial resolution from image content. Second, the full LEVIRDetNet is trained on LEVIRDet-159 for 120 epochs. The pretrained GSD predictor is loaded into the detector but is not frozen. It is jointly optimized with the detec-tion network so that the GSD representation remains physically meaningful while adapting to query modulation, dynamic query allocation, and hierarchy-aware detection. For optimization, we employ the AdamW optimizer with an initial learning rate of 5 × 10 −4 and a weight decay of 1 .25 × 10 −4. The learning rate is adjusted using a cosine annealing scheduler with linear warm-up. Training is conducted using bfloat16 precision. 
+
+5 Experiments and Analysis 
+
+5.1 Experimental Setup 
+
+5.1.1 Experimental Protocol 
+
+We evaluate LEVIRDetNet under a target-training-free cross-benchmark protocol, where LEVIRDetNet is trained on LEVIRDet-159 and directly tested on external benchmarks with-out target-dataset fine-tuning. This setting is stricter than con-ventional supervised benchmark evaluation, since a single model must handle unseen imagery, scene distributions, and annotation conventions with one set of weights. To ensure a valid evaluation, we follow the same split-control rules used in dataset construction. External benchmarks are evaluated with their original images and annotations, and no evaluation image, tile, or parent scene is included in the LEVIRDet-159 training split. For source datasets that also con-tribute to LEVIRDet-159, we preserve their o ffi cial partitions and exclude test or validation imagery from training. For example, the NWPU-VHR-10 and HRPlanev2 test images evaluated here are JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 11 
+
+TABLE 1: Comparison with other methods on ADCOS [28], UCAS-AOD [8], HRPlane-v2 [23], and CORS-ADD [27]. 
+
+Method ADCOS [28] UCAS-AOD [8] HRPlane-v2 [23] CORS-ADD [27] AP bbox AP 50 bbox AP 75 bbox AP bbox AP 50 bbox AP 75 bbox AP bbox AP 50 bbox AP 75 bbox AP bbox AP 50 bbox AP 75 bbox 
+
+HrNet [66] 76.73 92.03 90.50 69.32 89.55 81.43 75.56 97.72 92.66 63.19 89.61 72.68 Fast R-CNN [67] 70.42 90.89 84.31 68.08 90.68 80.66 69.25 96.45 86.72 60.79 89.19 69.75 YOLOv3 [32] 54.51 85.64 61.36 51.04 86.27 53.96 65.39 96.03 75.18 52.17 85.80 56.89 YOLOF [68] 47.14 74.16 55.05 37.29 74.16 34.54 61.58 94.80 75.66 43.69 76.05 45.66 Sparse R-CNN [69] 58.70 74.45 69.80 73.67 88.91 86.98 48.02 69.62 58.75 51.79 76.90 58.21 RTMDet [70] 79.45 91.87 89.62 74.32 94.40 84.94 77.37 98.50 93.67 69.40 92.78 80.58 Effi cientDet [71] 68.95 90.77 82.27 64.88 91.58 75.95 65.00 96.81 80.03 62.77 91.10 71.76 CenterNet [36] 59.75 89.90 69.75 41.47 81.36 41.56 45.55 67.87 52.93 43.55 82.08 41.62 Deformable DETR [38] 60.56 86.40 71.93 60.87 88.78 71.84 70.29 95.67 87.38 58.16 88.78 66.06 DINO [39] 70.72 96.17 87.71 66.71 89.80 78.04 76.09 97.59 93.13 63.54 92.69 74.72 FCOS [35] 66.83 89.81 79.76 37.00 86.64 18.89 71.04 96.04 89.27 59.19 89.66 65.47 RetinaNet [34] 53.25 80.46 62.92 64.88 91.58 75.95 58.66 92.62 70.78 49.15 80.58 53.10 TridentNet [72] 70.23 89.83 82.26 61.50 89.12 72.32 72.50 96.52 89.42 61.58 88.05 69.81 SSD [33] 70.53 95.50 85.37 58.23 89.62 67.64 68.14 97.59 85.00 57.58 89.13 65.84 Faster R-CNN [30] 72.39 98.92 89.65 67.71 87.48 80.02 73.08 97.64 91.77 59.84 87.94 67.86 YOLOX [73] 77.96 98.13 94.48 68.86 93.27 80.68 73.44 98.51 91.74 67.99 94.25 79.64 YOLOv12x [74] 78.72 98.67 95.31 74.67 94.34 86.31 78.51 98.59 94.83 71.70 95.46 82.69 YOLOv10s-C2F-SIoU [75] – – – – – – – 92.20 – – – –YOLOv10s-C2F [75] – – – – – – – 96.50 – – – –DEIM [41] 77.46 97.77 94.46 69.37 92.08 81.05 71.66 97.54 90.73 67.08 94.30 78.76 DEIMv2 (DINOv3 + CNN) [76] 77.54 98.51 94.30 54.08 85.46 61.30 74.81 97.87 90.84 67.39 94.27 78.14 DEIMv2 (DINOv3 + ViT-Base) [76] 77.79 98.68 84.46 75.38 96.14 87.40 78.87 98.47 95.17 68.26 95.28 79.41 DynamicVis-base [77] 76.10 91.70 89.00 69.30 93.60 80.80 72.50 96.20 89.40 65.00 89.40 74.20 DynamicVis-large [77] 77.10 91.80 89.50 69.90 93.60 82.00 75.00 97.30 91.70 64.60 90.90 74.50 
+
+LEVIRDetNet ( +4.15, +5.02, +3.05, +0.36) 83.60 98.82 97.55 80.40 98.63 90.62 81.92 98.53 96.10 72.06 94.88 83.56 
+
+TABLE 2: Comparison with other methods on SkyFusion-plane [26], VHRV [25], SkyFusion-ship [26], and NWPU [9]. 
+
+Method SkyFusion-plane [26] VHRV SkyFusion-ship [26] NWPU [9] AP 50 bbox AP s 
+
+> bbox
+
+AP m 
+
+> bbox
+
+AP bbox AP 50 bbox AP 75 bbox AP 50 bbox AP s 
+
+> bbox
+
+AP m 
+
+> bbox
+
+AP bbox AP 50 bbox AP 75 bbox 
+
+HrNet [66] 90.64 59.15 69.47 65.05 82.81 77.14 31.85 10.94 47.32 67.81 91.77 79.23 Fast R-CNN [67] 90.10 45.98 61.59 62.99 82.59 75.13 21.53 7.70 49.57 60.14 89.77 70.11 YOLOv3 [32] 91.28 49.13 65.27 16.06 42.64 9.18 25.07 6.38 34.73 49.80 85.08 53.43 YOLOv5xu [78] 96.30 – – – – – 47.70 – – – – –YOLOF [68] 83.38 26.47 54.30 8.73 24.78 5.04 11.32 2.46 45.92 50.69 85.78 54.49 Sparse R-CNN [69] 51.27 20.81 28.28 46.27 59.57 53.96 31.30 9.59 28.78 52.13 74.53 57.02 RTMDet [70] 92.00 60.70 70.00 64.11 81.72 76.04 30.20 10.70 35.42 67.01 91.82 77.93 Effi cientDet [71] 91.32 48.55 60.87 35.97 66.31 33.16 25.15 7.81 6.15 52.75 86.11 60.97 Deformable DETR [38] 94.40 54.11 70.53 32.86 62.08 31.90 19.86 5.08 11.28 47.54 83.93 45.71 DINO [39] 94.28 59.67 72.75 58.91 85.91 74.41 44.74 15.40 45.20 66.06 87.56 74.74 FCOS [35] 91.36 54.64 66.87 33.31 64.60 30.28 40.94 13.99 42.12 44.17 70.99 48.14 RetinaNet [34] 66.48 13.26 35.98 32.64 62.24 30.43 25.15 7.81 6.15 22.43 43.41 21.04 TridentNet [72] 90.37 51.21 64.33 46.39 74.03 49.34 5.94 0.51 31.85 62.70 91.71 70.51 SSD [33] 89.66 46.56 62.23 37.22 69.58 39.19 28.77 7.62 36.18 59.86 91.25 65.85 Faster R-CNN [30] 90.52 53.26 66.38 61.67 80.61 74.67 26.21 7.61 45.52 63.20 90.84 74.72 YOLOX [73] 91.47 56.40 67.04 54.81 86.65 67.87 35.64 4.29 9.16 65.81 92.02 75.41 YOLOv12x [74] 94.52 61.72 76.70 72.58 94.11 84.04 43.56 17.66 16.74 65.01 88.81 74.13 DEIM [41] 91.05 50.39 67.27 54.88 79.13 66.38 17.90 5.71 15.62 53.81 77.09 63.07 DEIMv2 (DINOv3 + CNN) [76] 91.47 53.90 68.94 18.44 38.05 18.14 27.58 8.11 28.92 72.09 94.70 82.69 DEIMv2 (DINOv3 + ViT-Base) [76] 97.58 64.62 78.79 67.58 92.21 82.14 44.10 15.18 49.06 73.60 97.18 86.40 DynamicVis-base [77] 92.80 69.70 75.40 61.40 80.70 72.40 43.40 15.90 30.10 68.50 90.80 79.60 DynamicVis-large [77] 92.70 71.00 75.80 62.10 82.00 72.80 45.50 15.20 42.60 69.10 93.10 80.80 
+
+LEVIRDetNet ( +0.69, +0.97, +12.69, +2.44) 98.27 58.29 72.25 73.55 96.52 88.01 60.39 26.86 53.41 76.04 93.08 85.09 
+
+not integrated into LEVIRDet-159 and are assessed using their original benchmark annotations rather than LEVIRDet-adjusted labels. We organize the comparisons into two groups to avoid am-biguity between target-supervised evaluation and direct-transfer evaluation. LEVIRDetNet is always evaluated under the direct-transfer setting: it is trained only on LEVIRDet-159 and is directly tested on each external benchmark without using the target bench-mark training split, target-domain fine-tuning, or target-specific adaptation. In contrast, all supervised baselines are evaluated in the conventional target-supervised setting. For each benchmark, these baselines are trained on the o ffi cial training split of that benchmark and evaluated using the corresponding o ffi cial evaluation protocol. We reproduce all baseline results using the released implemen-tations and recommended training settings whenever the code is available. For methods without publicly available code, we report the results from the original papers or o ffi cial benchmark records and mark them accordingly. This setting intentionally compares a single universal detector without target-domain training against target-supervised detectors trained separately for each benchmark, thereby providing a stringent evaluation of cross-dataset general-ization. We compare the proposed LEVIRDetNet with other state-of-the-art approaches, representative supervised and Transformer-based detectors, including Fast R-CNN [67], Faster R-CNN [30], HrNet [66], Sparse R-CNN [69], RTMDet [70], YOLO variants [32], [68], [73]–[75], [78], [79], E ffi cientDet [71], CenterNet [36], Deformable DETR [38], DINO [39], FCOS [35], RetinaNet [34], SSD [33], TridentNet [72], DynamicVis [77], DEIM [41], and DEIMv2 [76] with DINOv3 [80]. In addition, we include dataset-JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 12 
+
+specific state-of-the-art methods that are specially designed or extensively reported for their corresponding benchmarks [79], [81]–[91], enabling a more comprehensive comparison under each dataset setting. We further compare with open-vocabulary or open-set methods, including LAE-DINO [43] and SAM3 [92], using threshold-sweep evaluation. For these methods, we report the full score-threshold curve from 0 to 1, the best point on each curve, and representative operating points at thresholds 0.3, 0.5, and 0.7. For supervised baselines trained in our environment, we follow the o ffi cial paper or codebase recipes and use the longest default schedule available for each method. The same target training data and evaluation protocol are used within each comparison group, with only necessary adaptations to class mappings and input formats. This ensures that the comparison reflects model generalization rather than di ff erences in data leakage, annotation rewriting, or shortened optimization. 
+
+5.1.2 Benchmark Datasets and Evaluation Metrics 
+
+We evaluate LEVIRDetNet on nine external remote sensing benchmarks covering aircraft, vehicles, ships, and general aerial objects, including ADCOS [28], HRPlanev2 [23], SkyFusion-plane [26], UCAS-AOD [8], CORS-ADD [27], VHRV [25], NWPU-VHR-10 [9], CarPK [24], and SkyFusion-ship [26]. NWPU-VHR-10 and HRPlanev2 are related to sources used in LEVIRDet-159 construction, but their benchmark test images are excluded from LEVIRDet-159 and are evaluated with their origi-nal annotations. UCAS-AOD is evaluated by converting oriented boxes to horizontal boxes, while the remaining datasets are not included in the LEVIRDet-159 training set and are used to assess cross-dataset generalization. We report standard COCO-style detection metrics, including mAP, AP 50 bbox , and AP 75 bbox when available. For datasets with size-specific protocols, we additionally report APs and APm. For threshold-sweep analysis, we evaluate mAP, AP 50 bbox , precision, and recall over score thresholds from 0 to 1, which avoids relying on a single manually selected confidence threshold. Although LEVIRDetNet uses a hierarchy-aware head, all ex-ternal benchmark comparisons are conducted under a strict single-label protocol. Except for NWPU-VHR-10, each prediction is collapsed to one category before evaluation and matched only to the corresponding benchmark label. We do not use ancestor-descendant compatibility, mixed-depth matching, or hierarchy-specific ignore rules, ensuring direct comparability with standard flat detectors and grounding models. NWPU-VHR-10 is the only exception and is evaluated with a class-wise protocol because its original annotations are not fully dense across all visible categories. Joint multi-class evaluation could count reasonable detections of unlabeled objects as false positives. Therefore, for each target class, we evaluate only the corresponding category-specific image subset and then average over classes. This protocol is used only for NWPU-VHR-10 and is kept separate from the stricter cross-dataset and threshold-sweep evaluations. 
+
+5.1.3 Official Validation on LEVIRDet-159 
+
+We also report results on the offi cial LEVIRDet-159 train /validation split to provide a fixed in-dataset benchmark in addition to external transfer evaluation. Table 4 reports the parent-level comparison and the fine-grained LEVIRDetNet results. On the 30-category parent-level protocol, LEVIRDetNet im-proves over DEIMv2 +DINOv3 by 2.85 mAP and raises AP s from TABLE 3: Comparison with other methods on the CARPK dataset [24]. 
+
+Method AP 50 bbox AP m 
+
+> bbox
+
+AP 75 bbox 
+
+HrNet [66] 80.95 52.87 61.29 Fast R-CNN [67] 80.07 52.78 60.76 YOLOv3 [32] 85.46 43.33 60.97 YOLOF [68] 74.16 36.78 55.05 Sparse R-CNN [69] 48.92 25.10 21.17 RTMDet [70] 91.87 57.37 89.62 Effi cientDet [71] 76.87 41.44 39.28 CenterNet [36] 81.09 54.33 64.40 Deformable DETR [38] 77.37 44.82 47.25 DINO [39] 90.14 60.16 70.81 FCOS [35] 77.98 52.05 60.99 RetinaNet [34] 77.72 48.27 52.90 TridentNet [72] 89.83 47.48 82.26 SSD [33] 90.15 50.66 50.58 Faster R-CNN [30] 80.96 53.28 63.24 YOLOX [73] 93.86 58.87 66.60 R-FCN [84] 86.13 – –DSSD [81] 87.27 – –FSSD [83] 87.59 – –FS-SSD [82] 89.52 – –ATSS [85] 95.94 – –GFLV2 [86] 94.91 – –VFNet [87] 94.97 – –QueryDet [88] 93.96 – –CZ Det [89] 92.18 – –MHA-YOLOv5 [79] 97.95 – –DSTDA [90] 98.20 – –Hossein [91] 97.20 – –YOLOv12x [74] 97.29 71.35 84.41 DEIM [41] 94.25 67.23 80.27 DEIMv2 (DINOv3 + CNN) [76] 91.06 64.37 79.13 DEIMv2 (DINOv3 + ViT-Base) [76] 96.74 74.21 89.68 DynamicVis-base [77] 78.40 48.30 51.90 DynamicVis-large [77] 78.70 51.50 57.90 
+
+LEVIRDetNet ( +0.59) 98.79 98.82 90.70 
+
+TABLE 4: Validation results on the o ffi cial LEVIRDet-159 valida-tion split. The coarse protocol evaluates the 30 parent categories, while the fine protocol evaluates the complete 159-category tax-onomy.                               
+
+> Protocol Method mAP AP 50 AP 75 AP sAP mAP l
+> Coarse DEIMv2 +DINOv3 63.73 84.18 70.37 27.82 55.59 77.79 Coarse LEVIRDetNet 66.58 85.97 73.28 32.17 58.22 79.65
+> Fine LEVIRDetNet 60.13 71.82 66.98 27.87 57.92 66.29
+
+27.82 to 32.17, showing that its gain also holds when both models are trained and evaluated on the same LEVIRDet-159 split. We report the baseline comparison at the coarse level because forcibly flattening the complete hierarchy changes the semantics of parent categories, as analyzed in Table 10. Training every baseline on the full 159-category taxonomy is costly, so this table uses the strongest DEIMv2 +DINOv3 baseline as the full-set reference. The 159-category row is therefore reported as the o ffi cial fine-grained LEVIRDetNet benchmark. 
+
+5.2 Quantitative Analysis 
+
+5.2.1 Cross-Benchmark Generalization Results 
+
+LEVIRDetNet trained on LEVIRDet-159 demonstrates strong target-training-free cross-benchmark performance across diverse external benchmarks. LEVIRDetNet achieves the best mAP on JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 13 
+
+Fig. 8: Visualization of LEVIRDetNet on unseen external remote sensing images outside LEVIRDet-159. Each image is processed by a single 1024 ×1024 forward pass without tiling. The results show strong generalization across diverse scenes, categories, resolutions, and imaging conditions without target-domain training. TABLE 5: A threshold-sweep peak mAP comparison on four external benchmarks.                               
+
+> Dataset LAE-DINO [43] SAM3 [92] DEIMv2-DIOR [76] DEIMv2-xView [76] DEIMv2-DOTA [76] LEVIRDetNet (Our) AOSD [93] 22.66 15.48 28.26 11.82 36.97 54.63 ( +17.65)
+> RarePlanes [46] 14.16 36.92 51.59 29.62 15.57 59.93 ( +8.34)
+> RSD-GOD [94] 40.25 14.92 25.51 18.21 27.71 48.71 ( +8.46)
+> SkyFusion-ship [26] 1.34 1.48 2.34 4.27 5.52 27.63 ( +22.11)
+
+ADCOS, HRPlanev2, UCAS-AOD, and VHRV, reaching 83.60, 81.92, 80.40, and 73.55 mAP, respectively, and improving the strongest competing baselines by 4.15, 3.05, 5.02, and 0.97 points. It also generalizes well to vehicle- and ship-centric datasets, obtaining 90.70 AP75 and 98.79 AP50 on CarPK, 60.39 AP50 on SkyFusion-ship, and 98.27 AP50 on SkyFusion-plane, with clear gains over the strongest competing methods on the latter two benchmarks. These results indicate that large-scale fine-grained supervision and scale-aware modeling improve cross-domain de-tection rather than only fitting the training benchmark. Under the class-wise NWPU-VHR-10 protocol, LEVIRDetNet achieves 76.04 mAP, the best among all compared methods. Al-though DEIMv2 +DINOv3 obtains slightly higher AP50 and AP75 on this dataset, LEVIRDetNet shows stronger overall precision-recall behavior under the full COCO-style metric. This suggests that cross-benchmark evaluation should rely on mAP rather than AP50 alone, especially when benchmarks di ff er in annotation density and localization strictness. 
+
+5.2.2 Comparison With Open-Set Detectors 
+
+We further compare LEVIRDetNet with open-set and open-vocabulary methods under score-threshold sweeps. This setting is well aligned with grounding models, since they can be prompted with new category names and applied to unseen datasets without target-domain fine-tuning. The key question is therefore whether their score calibration, localization quality, and small-object be-havior are reliable enough for remote sensing detection. Threshold sweeping is necessary because confidence scores have di ff erent meanings across detector families. In closed-set detectors, the score is produced by a fixed classifier, whereas in grounding models it may reflect text-image alignment, prompt compatibility, mask quality, or post-processing. Generic recom-mended thresholds may suppress most detections in remote sens-ing scenes, while overly low thresholds can introduce many false positives. We therefore report the full score-threshold curves on AOSD [93], RarePlanes [46], RSD-GOD [94], and SkyFusion-ship [26], including the best point on each curve as an oracle-threshold upper bound and representative operating points. SAM3 is evaluated using the o ffi cial detection demo that converts masks to boxes. Since a zero threshold does not produce a meaningful box set in this pipeline, its curve starts from 0.3. For open-set and grounding baselines, we use a fixed prompt dictionary and duplicate-removal protocol for all threshold values. The final prompt-to-class mapping is: {plane, airplane }→ plane; 
+
+{tank, oiltank, storagetank }→ oiltank; {airbase, airport }→ airport; ship →ship; warship →warship; and helicopter →helicopter. Dupli-cate boxes produced by multiple prompts are removed using NMS with an IoU threshold of 0.5, and at most 300 detections are retained per image. The same prompt dictionary, synonym-merging rules, NMS setting, and threshold grid are used for all compared open-set methods. LEVIRDetNet achieves the best peak mAP on all four threshold-sweep benchmarks, as shown in Fig. 9. It reaches 54.63 mAP on AOSD, outperforming the strongest competing curve by 17.65 points; 59.93 mAP on RarePlanes, exceeding the best baseline by 8.34 points; 48.71 mAP on RSD-GOD, improving over LAE-DINO by 8.46 points; and 27.63 mAP on SkyFusion-ship, surpassing the strongest competing curve by 22.11 points. These results show that LEVIRDetNet maintains strong transfer performance across aircraft-centric, general object, and challeng-ing cross-source scenarios. The curve shapes further reveal di ff erent failure modes. Grounding models often preserve more candidates at very low thresholds and can outperform single-dataset closed-set baselines JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 14 AirbusOilStorage RarePlane sRSD-GOD SkyFusion-ship 
+
+mAP AP 50 Precision Reca ll   
+
+> Our SAM3
+> LAE-DINO DEIM v2 (DINOv3+DIOR)
+> DEIMv2 (DINOv3+ xView)
+> DEIM v2 (DINOv3+DOTA)
+
+Score threshold Score threshold Score threshold Score threshold 
+
+Fig. 9: A comparison between LEVIRDetNet and open-set /grounding baselines at di ff erent score thresholds. Each row reports mAP, AP 50 , precision, and recall on four external benchmarks, illustrating both peak performance and practical-threshold stability. in this range, reflecting their advantage in open-category transfer. However, their performance usually drops rapidly as the threshold increases, indicating weak score calibration for remote sensing objects. In contrast, single-dataset DEIMv2 baselines often show a rise-then-fall pattern. Thresholding removes low-score false positives at first, but later suppresses true positives as well. Their best source dataset also varies across benchmarks, suggesting brittle cross-dataset transfer. LEVIRDetNet is more stable at practical thresholds. At thresh-old 0.3, it obtains 50.30, 57.79, 46.50, and 25.65 mAP on Air-busOilStorage (AOSD), RarePlanes, RSD-GOD, and SkyFusion-ship, respectively. At threshold 0.5, it still keeps high preci-sion and useful recall, achieving 97.1% /68.3%, 97.8% /89.3%, 85.8% /82.8%, and 85.1% /47.4% precision /recall on the four datasets. This indicates that LEVIRDetNet combines the com-plementary strengths of the baselines. It preserves cross-dataset recall similar to grounding models while maintaining the precision and score stability of supervised detectors. The comparison also supports our central claim that universal remote sensing detection requires not only large-scale data, but also strict category, geome-try, and split unification. 
+
+5.3 Ablation Study 
+
+In this section, we conduct component ablations to validate the eff ectiveness of our proposed method. Unless otherwise specified, these ablations use a development subset containing 25% of the full training samples and 50% of the full validation samples to reduce training cost, so the results should be compared within each ablation table rather than with the full-set validation scores in Table 4. TABLE 6: Ablation study of GSD-aware conditioning on the validation set.                               
+
+> Method mAP AP 50 AP 75 AP sAP mAP l
+> Baseline 50.53 69.63 54.85 16.25 43.12 68.92
+> Baseline +GSD 50.86 69.41 55.45 17.96 43.70 67.71 Baseline +GSD +Emb. 51.14 70.26 55.60 18.13 43.92 67.43
+
+5.3.1 Ablation on GSD Conditioning 
+
+We ablate the e ff ect of GSD-aware conditioning on the validation set. The baseline is a DEIM-style detector without the GSD branch. We then add the predicted visual GSD cue and further introduce a learnable GSD embedding for query-level condition-ing. All variants are trained and evaluated under the same settings. Table 6 shows that GSD conditioning improves mAP from 50.53 to 50.86 and raises AP s by 1.71 points. The learnable embedding further improves mAP to 51.14 and AP s to 18.13, indicating that visual scale is most useful for small and medium objects where pixel size and physical object size are weakly aligned. The slight AP l drop is acceptable because large objects are already well handled by the baseline, while the GSD branch mainly benefits small and medium objects where scale ambiguity is more severe. Overall, the ablation verifies that GSD-aware query conditioning brings consistent gains, particularly for small-object detection and stricter localization quality. 
+
+5.3.2 Ablation on GSD Prediction 
+
+Table 7 studies the e ff ect of di ff erent feature designs for visual GSD estimation. RMSE and Acc are both computed in the original GSD space, with GSD measured in meters per pixel (m /pixel). JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 15 
+
+TABLE 7: Ablation study of di ff erent feature designs for GSD estimation on the validation set.                       
+
+> Method RMSE Acc@1 Acc@0 .5Acc@0 .2CNN 0.2568 99.06% 97.09% 79.96% CNN +FFT 0.2214 99.35% 96.66% 77.88% CNN +FFT +EDGE 0.1728 99.51% 98.08% 90.19%
+
+TABLE 8: Ablation study of dynamic query allocation on the validation set. 
+
+Method mAP AP 50 AP 75 AP s AP m AP l
+
+w/o DynQ 50.06 69.19 54.50 18.37 43.49 66.35 w/ DynQ 50.66 69.81 55.31 18.46 43.07 67.09 
+
+TABLE 9: Runtime and performance comparison. FPS and latency are measured on a single RTX 4090 with batch size 1. mAP close 
+
+denotes the average primary AP over the nine closed-set external benchmarks, and mAP open denotes the average peak mAP on the four threshold-sweep benchmarks.                               
+
+> Method FPS (imgs /s) Latency (ms) FLOPs (G) mAP close mAP open
+> LAE-DINO 9.00 111.10 300 –19.60 SAM3 3.86 258.87 5036.94 –17.20 YOLOv12x 96.30 10.38 184.6 75.17 –DEIMv2 18.55 53.91 174 75.54 26.93 LEVIRDetNet 15.20 65.78 216.0 80.56 47.73
+
+Acc@1 denotes the percentage of samples whose absolute di ff er-ence between the predicted and ground-truth GSD values is less than 1 m /pixel. Using only the CNN descriptor already achieves high coarse accuracy, but its RMSE remains relatively large. Introducing the FFT descriptor reduces the RMSE from 0.2568 to 0.2214, indicating that frequency-domain statistics provide useful global cues for spatial resolution estimation. However, FFT alone does not consistently improve the stricter accuracy metrics. After further adding edge statistics, the model obtains the best performance on all metrics, reducing the RMSE to 0.1728 and improving Acc@0.2 to 90.19%. These results suggest that CNN features, frequency responses, and edge-based sharpness cues are complementary, and their combination provides a more reliable visual GSD representation. 
+
+5.3.3 Efficiency and Dynamic Query Allocation Analysis 
+
+We further analyze the e ff ect of dynamic query allocation and the runtime e ffi ciency of LEVIRDetNet. The dynamic query module is not designed as a pure acceleration component. Its main purpose is to adapt the query capacity to image density. Using a small fixed query budget may miss objects in dense scenes, while using a large fixed budget for all images allocates many queries to background regions in sparse scenes and makes optimization less stable. In DETR-style detectors, one-to-one matching is used during training, whereas inference directly decodes object queries without Hungarian matching or back-propagation [37]. Therefore, the number of queries should be interpreted together with empiri-cal runtime rather than as a standalone inference-cost indicator. As shown in Table 8, the dynamic-query variant obtains slightly higher overall mAP, AP s and AP l. This result indicates that dynamic query allocation should not be viewed as an isolated accuracy booster. Instead, it provides an adaptive query-budget mechanism for images with di ff erent object densities, avoiding the TABLE 10: Ablation study of the hierarchy-aware head. L1,
+
+L2, and L3 denote parent, intermediate, and fine-grained levels, respectively.                                                   
+
+> Branch Level Hier. head Flat head mAP AP 50 AP 75 mAP AP 50 AP 75
+> Plane L183.10 97.50 91.70 75.50 93.60 83.80 Plane L272.03 82.13 80.00 52.13 60.17 58.50 Plane L365.85 70.84 69.89 80.91 89.01 87.15
+> Ship L170.10 92.40 78.50 58.20 71.80 63.70 Ship L263.85 83.35 75.35 57.30 74.95 66.55 Ship L339.85 51.26 46.66 37.69 48.66 43.23
+
+need to use one fixed query number for both sparse and crowded scenes. Table 9 shows that LEVIRDetNet remains practically e ffi cient despite using a high maximum query budget. It runs at 15.20 FPS on a single RTX 4090 with batch size 1. Compared with DEIMv2, LEVIRDetNet introduces moderate additional cost due to GSD conditioning, dynamic query allocation, and hierarchy-aware clas-sification, but improves the average closed-set external-benchmark AP from 75.54 to 80.56 and the average open-set threshold-sweep peak mAP from 26.93 to 47.73. Compared with LAE-DINO and SAM3, LEVIRDetNet is substantially faster while achieving much stronger open-benchmark performance. These results suggest that the proposed scale-hierarchy-aware design improves transfer per-formance without making inference impractical. 
+
+5.3.4 Ablation on Hierarchy-Aware Head 
+
+We compare the hierarchy-aware head with a flat head that treats parent, intermediate, and leaf nodes as independent categories while keeping the detector and training data unchanged. Table 10 shows the cost of flattening. A flat head changes a parent node from an inclusive family label into a residual class ex-cluding its children, so parent and child supervision compete. The hierarchy-aware head improves aircraft L1/L2 mAP by 7.60 /19.90 points and ship L1/L2 mAP by 11.90 /6.55 points. Although the flat head increases aircraft L3 accuracy, it does so by sacrificing higher-level semantics, and it does not improve fine-grained ship detection. This supports using hierarchy-aware classification for mixed-granularity labels. 
+
+5.4 Discussion and Limitations 
+
+The results indicate that LEVIRDet’s gains come from coupling data unification with model design. Scale alone is not su ffi cient. Heterogeneous annotations must be completed, corrected, and placed under one tight-HBB and hierarchical protocol. On this su-pervision, LEVIRDetNet benefits from modeling visual scale and mixed-granularity categories, matching the fact that an object’s reliable semantic depth depends on image evidence. The direct-transfer results further suggest that LEVIRDet-159 can serve as a training foundation for universal remote sensing object detection. LEVIRDet still has limitations. The GSD predictor provides a detection-useful visual scale cue, not a replacement for sensor calibration. Fine-grained fallback under severe visual degradation still depends on annotation rules and human review. The current protocol uses horizontal boxes and does not directly address oriented detection. The deepest taxonomy focuses on aircraft, vehicles, and ships. Expanding reliable fine-grained branches for other geospatial objects remains future work. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 16 
+
+6 Conclusion 
+
+This paper presents LEVIRDet, a unified data-and-model framework for universal remote sensing object detection built around LEVIRDet-159, a 159-category million-scale dataset, and LEVIRDetNet, a scale-hierarchy-aware detection foundation model. The LEVIRDet-159 dataset provides 159-category million-scale annotations under a unified tight-HBB protocol, with large-scale instance completion, geometry correction, fine-grained re-labeling, and mixed-depth hierarchical labels. Built on this su-pervision, LEVIRDetNet introduces online visual GSD condition-ing, dynamic query allocation, and hierarchy-aware classification to adapt query-based detection to cross-source remote sensing scenes. Comprehensive experiments on nine external benchmarks demonstrate state-of-the-art target-training-free cross-benchmark performance without target-domain fine-tuning, while threshold-sweep comparisons show more stable precision-recall behavior than open-set and grounding models. These results highlight LEVIRDet’s central message. High-quality annotation unification and scale-hierarchy-aware model design are complementary foun-dations for practical universal remote sensing detection. 
+
+References 
+
+[1] J. Ding, N. Xue, G.-S. Xia, X. Bai, W. Yang, M. Y. Yang, S. Belongie, J. Luo, M. Datcu, M. Pelillo, and L. Zhang, “Object detection in aerial images: A large-scale benchmark and challenges,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 44, no. 11, pp. 7778– 7796, 2022. [2] Z. Zou, K. Chen, Z. Shi, Y. Guo, and J. Ye, “Object detection in 20 years: A survey,” Proceedings of the IEEE , vol. 111, no. 3, pp. 257–276, 2023. [3] G.-S. Xia, X. Bai, J. Ding, Z. Zhu, S. Belongie, J. Luo, M. Datcu, M. Pelillo, and L. Zhang, “Dota: A large-scale dataset for object detection in aerial images,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2018, pp. 3974–3983. [4] K. Li, G. Wan, G. Cheng, L. Meng, and J. Han, “Object detection in optical remote sensing images: A survey and a new benchmark,” ISPRS journal of photogrammetry and remote sensing , vol. 159, pp. 296–307, 2020. [5] X. Sun, P. Wang, Z. Yan, F. Xu, R. Wang, W. Diao, J. Chen, J. Li, Y. Feng, T. Xu et al. , “Fair1m: A benchmark dataset for fine-grained object recognition in high-resolution remote sensing imagery,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 184, pp. 116–130, 2022. [6] G. Cheng, X. Yuan, X. Yao, K. Yan, Q. Zeng, X. Xie, and J. Han, “Towards large-scale small object detection: Survey and benchmarks,” 
+
+IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 45, no. 11, pp. 13 467–13 488, 2023. [7] J. Chen, K. Chen, H. Chen, Z. Zou, and Z. Shi, “A degraded recon-struction enhancement-based method for tiny ship detection in remote sensing images with a new large-scale dataset,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–14, 2022. [8] H. Zhu, X. Chen, W. Dai, K. Fu, Q. Ye, and J. Jiao, “Orientation robust object detection in aerial images using deep convolutional neural network,” in 2015 IEEE International Conference on Image Processing (ICIP) , 2015, pp. 3735–3739. [9] G. Cheng, J. Han, P. Zhou, and L. Guo, “Multi-class geospatial object detection and geographic image classification based on collection of part detectors,” ISPRS Journal of Photogrammetry and Remote Sensing ,vol. 98, pp. 119–132, 2014. [10] Y. Long, Y. Gong, Z. Xiao, and Q. Liu, “Accurate object localization in remote sensing images based on convolutional neural networks,” IEEE Transactions on Geoscience and Remote Sensing , vol. 55, no. 5, pp. 2486–2498, 2017. [11] Y. Zhang, Y. Yuan, Y. Feng, and X. Lu, “Hierarchical and robust convolutional neural network for very high-resolution remote sensing object detection,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 57, no. 8, pp. 5535–5548, 2019. [12] G. Heitz and D. Koller, “Learning spatial context: Using stu ff to find things,” in European conference on computer vision . Springer, 2008, pp. 30–43. [13] Z. Liu, L. Yuan, L. Weng, and Y. Yang, “A high resolution optical satellite image dataset for ship recognition and some new baselines,” in International conference on pattern recognition applications and methods , vol. 2. SciTePress, 2017, pp. 324–331. [14] S. Razakarivony and F. Jurie, “Vehicle detection in aerial imagery: A small target detection benchmark,” Journal of Visual Communication and Image Representation , vol. 34, pp. 187–203, 2016. [15] M. Y. Yang, W. Liao, X. Li, Y. Cao, and B. Rosenhahn, “Vehicle detection in aerial images,” Photogrammetric Engineering & Remote Sensing ,vol. 85, no. 4, pp. 297–304, 2019. [16] K. Liu and G. Mattyus, “Fast multiclass vehicle detection on aerial images,” IEEE Geoscience and Remote Sensing Letters , vol. 12, no. 9, pp. 1938–1942, 2015. [17] K. Nogueira, C. Cesar, P. H. Gama, G. L. Machado, and J. A. dos Santos, “A tool for bridge detection in major infrastructure works using satellite images,” in 2019 XV Workshop de Vis˜ ao Computacional (WVC) . IEEE, 2019, pp. 72–77. [18] F. Tanner, B. Colder, C. Pullen, D. Heagy, M. Eppolito, V. Carlan, C. Oertel, and P. Sallee, “Overhead imagery research data set—an annotated data library & tools to aid in the development of computer vision algorithms,” in 2009 IEEE Applied Imagery Pattern Recognition Workshop (AIPR 2009) . IEEE, 2009, pp. 1–8. [19] Y. Wenqi, C. Gong, W. Meijun, Y. Yanqing, X. Xingxing, Y. Xiwen, and H. Junwei, “Mar20: A benchmark for military aircraft recognition in remote sensing images,” National Remote Sensing Bulletin , vol. 27, no. 12, pp. 2688–2696, 2024. [20] S. Kızılkaya, U. Alganci, and E. Sertel, “Vhrships: An extensive bench-mark dataset for scalable deep learning-based ship detection applica-tions,” ISPRS International Journal of Geo-Information , vol. 11, no. 8, p. 445, 2022. [21] Z. Zhang, L. Zhang, Y. Wang, P. Feng, and R. He, “Shiprsimagenet: A large-scale fine-grained dataset for ship detection in high-resolution optical remote sensing images,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 14, pp. 8458– 8472, 2021. [22] D. Yu and S. Ji, “A new spatial-oriented object detection framework for remote sensing images,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–16, 2021. [23] T. Bakırman and E. Sertel, “A benchmark dataset for deep learning-based airplane detection: Hrplanes,” International Journal of Engineering and Geosciences , vol. 8, no. 3, pp. 212–223, 2023. [24] M.-R. Hsieh, Y.-L. Lin, and W. H. Hsu, “Drone-based object counting by spatially regularized regional proposal network,” in Proceedings of the IEEE international conference on computer vision , 2017, pp. 4145–4153. [25] F. B¨ uy¨ ukkanber, M. Yanalak, and N. Musao˘ glu, “Vhrv: Very high-resolution benchmark dataset for vessel detection,” Remote Sensing Applications: Society and Environment , vol. 39, p. 101641, 2025. [26] I. Hassan and Z. Xinyou, “Performance evolution of yolo models in remote sensing images,” in 2024 21st International Computer Confer-ence on Wavelet Active Media Technology and Information Processing (ICCWAMTIP) . IEEE, 2024, pp. 1–4. [27] T. Shi, J. Gong, S. Jiang, X. Zhi, G. Bao, Y. Sun, and W. Zhang, “Com-plex optical remote-sensing aircraft detection dataset and benchmark,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 61, pp. 1–9, 2023. [28] J. Hu, X. Zhi, B. Zhang, T. Shi, Q. Cui, and X. Sun, “A benchmark dataset for aircraft detection in optical remote sensing imagery,” Remote Sensing , vol. 16, no. 24, p. 4699, 2024. [29] Q. Yang, K. Chen, J. Xu, Z. Shi, and Z. Zou, “E ffi cient remote sensing instance segmentation with linear-time state space distilled visual foun-dation models,” IEEE Transactions on Geoscience and Remote Sensing ,pp. 1–1, 2026. [30] S. Ren, K. He, R. Girshick, and J. Sun, “Faster r-cnn: Towards real-time object detection with region proposal networks,” IEEE transactions on pattern analysis and machine intelligence , vol. 39, no. 6, pp. 1137–1149, 2016. [31] Z. Cai and N. Vasconcelos, “Cascade r-cnn: Delving into high quality object detection,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2018, pp. 6154–6162. [32] J. Redmon, S. Divvala, R. Girshick, and A. Farhadi, “You only look once: Unified, real-time object detection,” in Proceedings of the IEEE conference on computer vision and pattern recognition , 2016, pp. 779– 788. [33] W. Liu, D. Anguelov, D. Erhan, C. Szegedy, S. Reed, C.-Y. Fu, and A. C. Berg, “Ssd: Single shot multibox detector,” in European conference on computer vision . Springer, 2016, pp. 21–37. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 17 
+
+[34] T.-Y. Lin, P. Goyal, R. Girshick, K. He, and P. Doll´ ar, “Focal loss for dense object detection,” in Proceedings of the IEEE international conference on computer vision , 2017, pp. 2980–2988. [35] Z. Tian, C. Shen, H. Chen, and T. He, “Fcos: Fully convolutional one-stage object detection,” in Proceedings of the IEEE /CVF international conference on computer vision , 2019, pp. 9627–9636. [36] X. Zhou, D. Wang, and P. Kr¨ ahenb¨ uhl, “Objects as points,” arXiv preprint arXiv:1904.07850 , 2019. [37] N. Carion, F. Massa, G. Synnaeve, N. Usunier, A. Kirillov, and S. Zagoruyko, “End-to-end object detection with transformers,” in Eu-ropean conference on computer vision . Springer, 2020, pp. 213–229. [38] X. Zhu, W. Su, L. Lu, B. Li, X. Wang, and J. Dai, “Deformable detr: Deformable transformers for end-to-end object detection,” arXiv preprint arXiv:2010.04159 , 2020. [39] H. Zhang, F. Li, S. Liu, L. Zhang, H. Su, J. Zhu, L. M. Ni, and H.-Y. Shum, “Dino: Detr with improved denoising anchor boxes for end-to-end object detection,” arXiv preprint arXiv:2203.03605 , 2022. [40] Y. Zhao, W. Lv, S. Xu, J. Wei, G. Wang, Q. Dang, Y. Liu, and J. Chen, “Detrs beat yolos on real-time object detection,” in Proceedings of the IEEE /CVF conference on computer vision and pattern recognition , 2024, pp. 16 965–16 974. [41] S. Huang, Z. Lu, X. Cun, Y. Yu, X. Zhou, and X. Shen, “Deim: Detr with improved matching for fast convergence,” in Proceedings of the computer vision and pattern recognition conference , 2025, pp. 15 162–15 171. [42] S. Liu, Z. Zeng, T. Ren, F. Li, H. Zhang, J. Yang, Q. Jiang, C. Li, J. Yang, H. Su et al. , “Grounding dino: Marrying dino with grounded pre-training for open-set object detection,” in European conference on computer vision . Springer, 2024, pp. 38–55. [43] J. Pan, Y. Liu, Y. Fu, M. Ma, J. Li, D. P. Paudel, L. Van Gool, and X. Huang, “Locate anything on earth: Advancing open-vocabulary object detection for remote sensing community,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 39, no. 6, 2025, pp. 6281– 6289. [44] M. Minderer, A. Gritsenko, A. Stone, M. Neumann, D. Weissenborn, A. Dosovitskiy, A. Mahendran, A. Arnab, M. Dehghani, Z. Shen et al. ,“Simple open-vocabulary object detection,” in European conference on computer vision . Springer, 2022, pp. 728–755. [45] Y. Li, J. Luo, Y. Zhang, Y. Tan, J.-G. Yu, and S. Bai, “Learning to holistically detect bridges from large-size vhr remote sensing imagery,” 
+
+IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 46, no. 12, pp. 11 507–11 523, 2024. [46] J. Shermeyer, T. Hossler, A. Van Etten, D. Hogan, R. Lewis, and D. Kim, “Rareplanes: Synthetic data takes flight,” in Proceedings of the IEEE /CVF Winter Conference on Applications of Computer Vision , 2021, pp. 207–217. [47] Z. Wu, S. Wan, X. Wang, M. Tan, L. Zou, X. Li, and Y. Chen, “A benchmark data set for aircraft type recognition from remote sensing images,” Applied Soft Computing , vol. 89, p. 106132, 2020. [48] T.-Y. Lin, P. Doll´ ar, R. Girshick, K. He, B. Hariharan, and S. Belongie, “Feature pyramid networks for object detection,” in 2017 IEEE Confer-ence on Computer Vision and Pattern Recognition (CVPR) , 2017, pp. 936–944. [49] C. Xu, J. Wang, , W. Yang, H. Yu, L. Yu, and G.-S. Xia, “Detecting tiny objects in aerial images: A normalized wasserstein distance and a new benchmark,” ISPRS Journal of Photogrammetry and Remote Sensing ,2022. [50] X. Yang, J. Yan, W. Liao, X. Yang, J. Tang, and T. He, “Scrdet ++ :Detecting small, cluttered and rotated objects via instance-level feature denoising and rotation loss smoothing,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 45, no. 2, pp. 2384–2399, 2023. [51] B. Chen, L. Liu, Z. Zou, and Z. Shi, “Target detection in hyperspectral remote sensing image: Current status and challenges,” Remote Sensing ,vol. 15, no. 13, p. 3223, 2023. [52] Q. Yang, C. Liu, J. Xu, Z. Shi, and Z. Zou, “State space models meet remote sensing: A survey,” SCIENCE CHINA Information Sciences ,2026. [53] D. Lam, R. Kuzma, K. McGee, S. Dooley, M. Laielli, M. Klaric, Y. Bulatov, and B. McCord, “xview: Objects in context in overhead imagery,” arXiv preprint arXiv:1802.07856 , 2018. [54] I. Markus Gerke, “Use of the stair vision library within the isprs 2d semantic labeling benchmark (vaihingen),” Use of the stair vision library within the isprs 2d semantic labeling benchmark (vaihingen) , 2014. [55] G. Christie, N. Fendley, J. Wilson, and R. Mukherjee, “Functional map of the world,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2018, pp. 6172–6180. [56] A.-J. Gallego, A. Pertusa, and P. Gil, “Automatic ship classification from optical aerial images with convolutional neural networks,” Remote Sensing , vol. 10, no. 4, p. 511, 2018. [57] Airbus, “Airbus ship detection challenge,” Kaggle , 2018. [58] ——, “Airbus aircraft detection challenge,” Kaggle , 2021. [59] Y. Xu, M. Fu, Q. Wang, Y. Wang, K. Chen, G.-S. Xia, and X. Bai, “Gliding vertex on the horizontal bounding box for multi-oriented object detection,” IEEE Transactions on Pattern Analysis and Machine Intelli-gence , vol. 43, no. 4, pp. 1452–1459, 2021. [60] G. Nie and H. Huang, “Multi-oriented object detection in aerial images with double horizontal rectangles,” IEEE Transactions on Pattern Analy-sis and Machine Intelligence , vol. 45, no. 4, pp. 4932–4944, 2023. [61] K. Chen, J. Wang, J. Pang, Y. Cao, Y. Xiong, X. Li, S. Sun, W. Feng, Z. Liu, J. Xu et al. , “Mmdetection: Open mmlab detection toolbox and benchmark,” arXiv preprint arXiv:1906.07155 , 2019. [62] M. Contributors, “MMEngine: Openmmlab foundational library for train-ing deep learning models,” 2022. [63] T. N. Mundhenk, G. Konjevod, W. A. Sakla, and K. Boakye, “A large contextual dataset for classification, detection and counting of cars with deep learning,” in European conference on computer vision . Springer, 2016, pp. 785–800. [64] E. Maggiori, Y. Tarabalka, G. Charpiat, and P. Alliez, “Can semantic labeling methods generalize to any city? the inria aerial image labeling benchmark,” in 2017 IEEE International geoscience and remote sensing symposium (IGARSS) . IEEE, 2017, pp. 3226–3229. [65] G. Sumbul, M. Charfuelan, B. Demir, and V. Markl, “Bigearthnet: A large-scale benchmark archive for remote sensing image understanding,” 
+
+arXiv preprint arXiv:1902.06148 , 2019. [66] J. Wang, K. Sun, T. Cheng, B. Jiang, C. Deng, Y. Zhao, D. Liu, Y. Mu, M. Tan, X. Wang et al. , “Deep high-resolution representation learning for visual recognition,” IEEE transactions on pattern analysis and machine intelligence , vol. 43, no. 10, pp. 3349–3364, 2020. [67] R. Girshick, “Fast r-cnn,” in Proceedings of the IEEE international conference on computer vision , 2015, pp. 1440–1448. [68] Q. Chen, Y. Wang, T. Yang, X. Zhang, J. Cheng, and J. Sun, “You only look one-level feature,” in Proceedings of the IEEE /CVF conference on computer vision and pattern recognition , 2021, pp. 13 039–13 048. [69] P. Sun, R. Zhang, Y. Jiang, T. Kong, C. Xu, W. Zhan, M. Tomizuka, Z. Yuan, and P. Luo, “Sparse r-cnn: An end-to-end framework for object detection,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 45, no. 12, pp. 15 650–15 664, 2023. [70] C. Lyu, W. Zhang, H. Huang, Y. Zhou, Y. Wang, Y. Liu, S. Zhang, and K. Chen, “Rtmdet: An empirical study of designing real-time object detectors,” arXiv preprint arXiv:2212.07784 , 2022. [71] M. Tan, R. Pang, and Q. V. Le, “E ffi cientdet: Scalable and e ffi cient object detection,” in Proceedings of the IEEE /CVF conference on computer vision and pattern recognition , 2020, pp. 10 781–10 790. [72] Y. Li, Y. Chen, N. Wang, and Z. Zhang, “Scale-aware trident networks for object detection,” in Proceedings of the IEEE /CVF international conference on computer vision , 2019, pp. 6054–6063. [73] Z. Ge, S. Liu, F. Wang, Z. Li, and J. Sun, “Yolox: Exceeding yolo series in 2021,” arXiv preprint arXiv:2107.08430 , 2021. [74] Y. Tian, Q. Ye, and D. Doermann, “Yolov12: Attention-centric real-time object detectors,” Advances in neural information processing systems ,vol. 38, pp. 78 433–78 457, 2026. [75] M.-T. Do, M.-H. Ha, D.-C. Nguyen, and O. T.-C. Chen, “You only look once based-c2fghost using e ffi cient siou loss function for airplane detection,” in 2024 9th International Conference on Frontiers of Signal Processing (ICFSP) . IEEE, 2024, pp. 1–5. [76] S. Huang, Y. Hou, L. Liu, X. Yu, and X. Shen, “Real-time object detection meets dinov3,” arXiv preprint arXiv:2509.20787 , 2025. [77] K. Chen, C. Liu, B. Chen, W. Li, Z. Zou, and Z. Shi, “Dynamicvis: An effi cient and general visual foundation model for remote sensing image understanding,” arXiv preprint arXiv:2503.16426 , 2025. [78] R. Khanam and M. Hussain, “What is yolov5: A deep look into the internal features of the popular object detector,” arXiv preprint arXiv:2407.20892 , 2024. [79] G. Song, H. Du, X. Zhang, F. Bao, and Y. Zhang, “Small object detection in unmanned aerial vehicle images using multi-scale hybrid attention,” 
+
+Engineering Applications of Artificial Intelligence , vol. 128, p. 107455, 2024. [80] O. Sim´ eoni, H. V. Vo, M. Seitzer, F. Baldassarre, M. Oquab, C. Jose, V. Khalidov, M. Szafraniec, S. Yi, M. Ramamonjisoa et al. , “Dinov3,” 
+
+arXiv preprint arXiv:2508.10104 , 2025. [81] C.-Y. Fu, W. Liu, A. Ranga, A. Tyagi, and A. C. Berg, “Dssd: Deconvo-lutional single shot detector,” arXiv preprint arXiv:1701.06659 , 2017. JOURNAL OF L ATEX CLASS FILES, VOL. XX, NO. XX, XXX XXXX 18 
+
+[82] X. Liang, J. Zhang, L. Zhuo, Y. Li, and Q. Tian, “Small object detection in unmanned aerial vehicle images using feature fusion and scaling-based single shot detector with spatial context analysis,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 30, no. 6, pp. 1758–1770, 2019. [83] Z. Li, L. Yang, and F. Zhou, “Fssd: feature fusion single shot multibox detector,” arXiv preprint arXiv:1712.00960 , 2017. [84] J. Dai, Y. Li, K. He, and J. Sun, “R-fcn: Object detection via region-based fully convolutional networks,” Advances in neural information processing systems , vol. 29, 2016. [85] S. Zhang, C. Chi, Y. Yao, Z. Lei, and S. Z. Li, “Bridging the gap between anchor-based and anchor-free detection via adaptive training sample selection,” in Proceedings of the IEEE /CVF conference on computer vision and pattern recognition , 2020, pp. 9759–9768. [86] X. Li, W. Wang, X. Hu, J. Li, J. Tang, and J. Yang, “Generalized focal loss v2: Learning reliable localization quality estimation for dense object detection,” in Proceedings of the IEEE /CVF conference on computer vision and pattern recognition , 2021, pp. 11 632–11 641. [87] H. Zhang, Y. Wang, F. Dayoub, and N. Sunderhauf, “Varifocalnet: An iou-aware dense object detector,” in Proceedings of the IEEE /CVF conference on computer vision and pattern recognition , 2021, pp. 8514– 8523. [88] C. Yang, Z. Huang, and N. Wang, “Querydet: Cascaded sparse query for accelerating high-resolution small object detection,” in Proceedings of the IEEE /CVF Conference on computer vision and pattern recognition ,2022, pp. 13 668–13 677. [89] A. Meethal, E. Granger, and M. Pedersoli, “Cascaded zoom-in detector for high resolution aerial images,” in Proceedings of the IEEE /CVF conference on computer vision and pattern recognition , 2023, pp. 2046– 2055. [90] S. Lu, Y. Guo, J. Long, Z. Liu, Z. Wang, and Y. Li, “Dense small target detection algorithm for uav aerial imagery,” Image and Vision Computing , vol. 156, p. 105485, 2025. [91] M. H. Hamzenejadi and H. Mohseni, “Fine-tuned yolov5 for real-time vehicle detection in uav imagery: Architectural improvements and per-formance boost,” Expert Systems with Applications , vol. 231, p. 120845, 2023. [92] N. Carion, L. Gustafson, Y.-T. Hu, S. Debnath, R. Hu, D. Suris, C. Ryali, K. V. Alwala, H. Khedr, A. Huang et al. , “Sam 3: Segment anything with concepts,” arXiv preprint arXiv:2511.16719 , 2025. [93] Airbus, “Airbus oil storage detection,” Kaggle , 2021. [94] S. Zhuang, P. Wang, B. Jiang, G. Wang, and C. Wang, “A single shot framework with multi-scale feature fusion for geospatial object detection,” Remote Sensing , vol. 11, no. 5, p. 594, 2019.

@@ -6,55 +6,43 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-05-31 ~ 2026-06-29
-- 运行时间：2026-06-29 08:05:45 UTC
+- 最新运行日期：2026-06-29
+- 运行时间：2026-06-29 21:50:52 UTC
 - 运行状态：成功
-- 本次总论文数：11
-- 精读区：6
+- 本次总论文数：7
+- 精读区：2
 - 速读区：5
 
 ### 今日简报（AI）
-今天日报关注高光谱图像分类与跨传感器超分辨率等方向，共11篇论文，精读6篇，速读5篇，其中两篇满分论文聚焦高光谱图像分类的轻量级框架。  
-最值得关注的是高光谱图像分类的MixerSENet和数据高效特征融合网络（均获10分），展示了轻量高效分类的新思路。  
-建议深入阅读这两篇满分论文，并关注结合视觉语言模型的高光谱目标跟踪等前沿方向。
-- 详情：[/20260531-20260629/README](/20260531-20260629/README)
+今日聚焦两个高精度遥感基础模型：LEVIRDet数据集及通用目标检测、SelectAnyTree三维森林点云分割。  
+最值得看的方向是百万级遥感目标检测基础模型LEVIRDet与可提示的森林点云分割模型（均8分），速读中卫星树木计数、状态空间模型遥感综述及恶劣天气多模态融合也值得关注。  
+建议优先精读两篇高分论文，掌握遥感基础模型前沿；速读部分可结合卫星树木计数与多模态融合的实际应用。
+- 详情：[/202606/29/README](/202606/29/README)
 
 ### 精读区论文标签
-1. [MixerSENet: A Lightweight Framework for Efficient Hyperspectral Image Classification](/20260531-20260629/2606.01700v1-mixersenet-a-lightweight-framework-for-efficient-hyperspectral-image-classification)  
-   标签：评分：10.0/10、query:hsi-lidar
-   evidence：高光谱图像分类框架
-2. [Data Efficient Complex Feature Fusion Network For Hyperspectral Image Classification](/20260531-20260629/2606.04710v1-data-efficient-complex-feature-fusion-network-for-hyperspectral-image-classification)  
-   标签：评分：10.0/10、query:hsi-lidar
-   evidence：直接针对高光谱图像分类
-3. [Adaptive Band Selection for Hyperspectral Classification with Spatially Disjoint Evaluation](/20260531-20260629/2606.06684v1-adaptive-band-selection-for-hyperspectral-classification-with-spatially-disjoint-evaluation)  
-   标签：评分：9.0/10、query:hsi-lidar
-   evidence：高光谱波段选择用于分类，直接相关于高光谱图像分类
-4. [Quantum Enchanced Multi-Scale CNN with Bi-directional Mamba for Crop Field Analysis](/20260531-20260629/2606.17222v1-quantum-enchanced-multi-scale-cnn-with-bi-directional-mamba-for-crop-field-analysis)  
-   标签：评分：9.0/10、query:hsi-lidar
-   evidence：高光谱图像分类，涉及多尺度CNN和光谱注意力
-5. [A Fast Methane Detection Pipeline on Board Satellites Based on Mag1c-SAS and LinkNet](/20260531-20260629/2606.03675v1-a-fast-methane-detection-pipeline-on-board-satellites-based-on-mag1c-sas-and-linknet)  
+1. [LEVIRDet: A Million-Scale 159-Category Dataset and Foundation Model for Universal Remote Sensing Object Detection](/202606/29/2606.25312v1-levirdet-a-million-scale-159-category-dataset-and-foundation-model-for-universal-remote-sensing-object-detection)  
    标签：评分：8.0/10、query:hsi-lidar
-   evidence：使用ACE和CEM目标检测方法的高光谱甲烷检测
-6. [Anti-Hyperspectral Anomaly Detection: A First Study on Stealthy Lipschitz-Forcing Perturbations Against Unknown Detectors](/20260531-20260629/2606.05369v1-anti-hyperspectral-anomaly-detection-a-first-study-on-stealthy-lipschitz-forcing-perturbations-against-unknown-detectors)  
+   evidence：大规模遥感目标检测数据集与基础模型，可适用于高光谱和多模态数据
+2. [SelectAnyTree: A Promptable Instance Segmentation Model for 3D Forest LiDAR Point Clouds](/202606/29/2606.27491v1-selectanytree-a-promptable-instance-segmentation-model-for-3d-forest-lidar-point-clouds)  
    标签：评分：8.0/10、query:hsi-lidar
-   evidence：高光谱异常检测对抗攻击，直接与高光谱目标检测相关
+   evidence：LiDAR点云实例分割用于单树勾画
 
 ### 速读区论文标签
-1. [Vision-Language Guided Hyperspectral Object Tracking via Semantics Fusion and Contextual Template Updating](/20260531-20260629/2606.09167v1-vision-language-guided-hyperspectral-object-tracking-via-semantics-fusion-and-contextual-template-updating)  
-   标签：评分：8.0/10、query:hsi-lidar
-   evidence：高光谱目标跟踪，与高光谱图像目标检测密切相关
-2. [Physics-Guided Deep Unfolding for Blind Cross-Sensor Spectral Super-Resolution via Learning the Spectral Transformation Function](/20260531-20260629/2606.05759v1-physics-guided-deep-unfolding-for-blind-cross-sensor-spectral-super-resolution-via-learning-the-spectral-transformation-function)  
+1. [Counting Trees from Satellite Imagery with Noisy Supervision](/202606/29/2606.24786v1-counting-trees-from-satellite-imagery-with-noisy-supervision)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：利用激光雷达作为卫星图像树木计数的含噪监督
+2. [State Space Models Meet Remote Sensing: A Survey](/202606/29/2606.25329v1-state-space-models-meet-remote-sensing-a-survey)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：状态空间模型在遥感中的综述，涵盖多模态分类
+3. [Multi-modality Image Fusion under Adverse Weather: Mask-Guided Feature Restoration and Interaction](/202606/29/2606.26812v1-multi-modality-image-fusion-under-adverse-weather-mask-guided-feature-restoration-and-interaction)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：多模态图像融合方法，包含特征恢复与交互
+4. [Scalable and Differentiable Point-Cloud Registration Using Maximum Mean Discrepancy](/202606/29/2606.27818v1-scalable-and-differentiable-point-cloud-registration-using-maximum-mean-discrepancy)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：用于激光雷达数据的点云配准
+5. [Calibrated Harmonic Overlaid Implicit Neural Representations for Multi-Dimensional Data](/202606/29/2606.26763v1-calibrated-harmonic-overlaid-implicit-neural-representations-for-multi-dimensional-data)  
    标签：评分：6.0/10、query:hsi
-   evidence：高光谱重建方法，可服务于下游分类任务
-3. [An Enhanced Geometric-Spectral Feature Learning Framework for Airborne Multispectral Point Cloud Classification](/20260531-20260629/2606.09123v1-an-enhanced-geometric-spectral-feature-learning-framework-for-airborne-multispectral-point-cloud-classification)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：多光谱点云分类，采用几何-光谱特征融合，与多模态遥感分类相关
-4. [How do Self-Supervised Remote Sensing Vision Models Transfer to Downstream Tasks?](/20260531-20260629/2606.13896v1-how-do-self-supervised-remote-sensing-vision-models-transfer-to-downstream-tasks)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：自监督遥感模型用于下游分类任务
-5. [Learning Entropy Signature for Image Representation and Classification](/20260531-20260629/2606.22634v1-learning-entropy-signature-for-image-representation-and-classification)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：图像分类方法可迁移至高光谱
+   evidence：用于多光谱等多维数据的隐式神经表示
 
 
 <div class="dpr-home-promo-card">
