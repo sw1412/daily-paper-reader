@@ -1,0 +1,619 @@
+Title: Anti-Hyperspectral Anomaly Detection: A First Study on Stealthy Lipschitz-Forcing Perturbations Against Unknown Detectors
+
+URL Source: https://arxiv.org/pdf/2606.05369v1
+
+Published Time: Fri, 05 Jun 2026 00:18:06 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+> 1
+
+# Anti-Hyperspectral Anomaly Detection: A First Study on Stealthy Lipschitz-Forcing Perturbations Against Unknown Detectors 
+
+Chia-Hsiang Lin, Senior Member, IEEE , Si-Sheng Young, Student Member, IEEE ,and Jon Atli Benediktsson, Life Fellow, IEEE 
+
+Abstract —Hyperspectral imagery represents the best contem-porary technology to remotely detect anomalous objects. Never-theless, hyperspectral anomaly detection (HAD) technique makes ground facilities/situations completely exposed. For the first time, we develop the first anti-HAD (AHAD) technique rendering the key objects undetected, without perfect coordinate/position state information (CSI) of the detectors (e.g., reconnaissance aircraft). Our AHAD algorithm is generally applicable to defend against almost all the existing benchmark data-driven and model-driven HAD methods. AHAD is fundamentally different from conventional adversarial attacks, so novel theory is needed. We customize novel regularizers for assimilating real anomalies into the backgrounds (ARAB) and fooling the detectors with pseudo-anomalies, thereby optimizing an energy-efficient stealthy perturbation signal for AHAD. The ARAB regularization is mathematically interpretable as flattening the topology-enhanced anomaly/background structures in the feature space, hence termed Lipschitz-forcing perturbations. Considering the imper-fect CSI, we further develop a robust AHAD criterion, where the uncertainty is mathematically described as matrix-shifting misalignment for statistically generating the robust perturbation. Comprehensive experiments demonstrate the effectiveness and robustness of our AHAD algorithm across diverse real-world datasets. Remarkably, our algorithm generates a single AHAD perturbation signal that can simultaneously evade almost all benchmark detectors, greatly enhancing its practicality, given that the reconnaissance detector type is usually unknown. To the best of our knowledge, this is the first formal AHAD study. As a side contribution, we propose a new quantitative performance index, ArmCBA, to evaluate the robustness of an HAD method against our AHAD signal. 
+
+Index Terms —Hyperspectral anomaly detection, hyperspec-tral remote sensing, anti-reconnaissance method, anti-detection method, adversarial attack. 
+
+I. I NTRODUCTION 
+
+In modern remote sensing (RS), advanced hyperspectral imaging systems can capture a broad spectral range [1], [2], and the resulting spectral signatures are unique across different materials, enabling advanced object identification [3] and 
+
+This study was partly supported by the Emerging Young Scholar Program (namely, the 2030 Cross-Generation Young Scholars Program) of National Science and Technology Council (NSTC), Taiwan, under Grant NSTC 114-2628-E-006-002. We thank the National Center for Theoretical Sciences (NCTS) and the National Center for High-performance Computing (NCHC) for providing the computing resources. 
+
+(Co-corresponding authors: Chia-Hsiang Lin, and Jon Atli Benediktsson) 
+
+C.-H. Lin is with the Department of Electrical Engineering, Na-tional Cheng Kung University, Tainan, Taiwan (R.O.C.) (e-mail: chiah-siang.steven.lin@gmail.com). S.-S. Young is with the Institute of Computer and Communication Engineer-ing, Department of Electrical Engineering, National Cheng Kung University, Tainan, Taiwan (R.O.C.) (e-mail: q38121509@gs.ncku.edu.tw). J. A. Benediktsson is with the Faculty of Electrical and Computer Engi-neering, University of Iceland, Reykjav´ ık, Iceland (e-mail: benedikt@hi.is). 
+
+Fig. 1: Schematic illustration of the anti-hyperspectral anomaly detection (AHAD) problem. Hyperspectral anomaly detection techniques enable the identification of anomalous objects under a fully blind setting. However, when an unknown hyper-spectral sensor observes a target area, such advanced detection capabilities expose our ground facilities and activities. To address this security-critical limitation, this study formally defines the AHAD problem and, to the best of our knowledge, develops the first AHAD solution. Physical restrictions behind AHAD, such as imperfect coordinate/position state informa-tion (CSI), are introduced in Section I detection [4]. Among diverse RS applications, hyperspectral anomaly detection (HAD), as a security-critical application [5], has been extensively investigated to detect distinct spectral signatures (potential threats) relative to their background under a blind setting. For example, deep learning (DL)-based HAD algorithms [6]–[8] have been widely developed (cf. Section II-A). Such advanced techniques fully expose ground facil-ities and situations, leaving no place to hide for suspicious anomalies. Although HAD techniques ensure a high level of monitoring capability, the introduced advantages can be seen as a double-edged sword. When unknown hyperspectral sensors (e.g., reconnaissance aircraft) pass over a target area on our side (cf. Figure 1), the associated ground facilities and activities are just exposed under the opponent’s HAD technique. Unfortunately, this critical and risky RS dilemma has not yet been discussed. 
+
+> arXiv:2606.05369v1 [eess.IV] 3 Jun 2026 2
+
+Fig. 2: Schematic illustration showing why the existing perturbation/interference schemes, including (a) strong noise effect, (b) hyperspectral adversarial attack, and (c) minus anomaly signal, are inadequate for the challenging AHAD task, even when high-energy perturbation signals are applied. These limitations motivate the development of a radically new AHAD framework. More details can be found in Section I and Section II. More worryingly, none of the existing techniques can be used effectively as remedial actions. With the above strong motiva-tions, this paper introduces, for the first time, the concept of the anti-HAD (AHAD) along with the first customized AHAD technique (cf. Figure 1) to address this challenging problem. More detailed problem definitions and practical challenges, such as imperfect coordinate/position state information (CSI) of sensors, are discussed in Section III. Briefly explaining, let YH ∈ RH×W ×C denote a C-band HSI with L = HW pixels of the target area, AHAD technique aims to estimate a perturbation signal P ∈ RH×W ×C such that the resulting AHAD image YA = YH + P renders the key objects undetected (cf. Figure 1). Since we do not know the opponent’s hyperspectral detectors, we need to compute an universal P that can interfere almost all the mainstream HAD methods, thereby achieving reliable protection. Although AHAD appears mathematically simple at first glance, it is in fact highly challenging and requires a fundamentally different theory, as discussed below. First of all, the actual HSI sensed by the opposing sensors (e.g., reconnaissance aircraft) is typically inaccessible. To estimate the perturbation signal, having a surrogate HSI 1
+
+eYH ∈ RH×W ×C to approximate YH is essential. Con-structing eYH is relatively straightforward (e.g., using HSI synthesis [10]) when the CSI of the opposing sensors is known. Specifically, comprehensive information on the ground facilities and activities within the anti-detecting area is acces-sible on our side. Moreover, the hardware configurations of contemporary hyperspectral sensors are often available or can be reasonably approximated [11]; for instance, their spectral ranges may be reasonably assumed to be some subsets of existing high-standard hyperspectral systems (e.g., NASA’s AVIRIS [12]). In this context, the perfect CSI (e.g., sensor positions, imaging geometry, and viewing angles) enables the 
+
+> 1In the black-box adversarial attack, the target model is inaccessible, and an approximate network, called a surrogate network [9], is used to estimate the perturbation. Similarly, as the target HSI is generally unavailable in the AHAD task, we refer to the available approximate HSI as a surrogate HSI.
+
+construction of eYH via specific techniques (e.g., sensor pose estimation [13], viewing image synthesis [14]–[16]), which serves as an alternative to YH and facilitates subsequent AHAD signal estimation. More details are provided in Section III-A. In practice, however, CSIs of the reconnaissance sensors must be estimated [17], [18] and therefore remain imper-fect. This imperfection poses a limitation similar to those encountered in data fusion (i.e., pixel shifting) [19], [20], but remains significantly more challenging. In detail, multimodal RS data often require additional pixel-level calibration for ac-curate data fusion [21], [22]. However, the calibration strategy remains impractical for AHAD. As a result, the imperfect CSI manifests as uncertainty in spatial alignment (i.e., pixel shifting), as illustrated in the green and red regions in Figure 1. Consequently, after constructing the eYH , a practically applicable AHAD framework is supposed to produce P that is robust against spatial misregistration, unless the CSI can be perfectly known. 
+
+A. Differences Between AHAD and Conventional Attacks 
+
+After introducing the AHAD problem, we present some seemingly related problems (e.g., adversarial attacks) and discuss their fundamental differences, suggesting that AHAD is a new topic and requires a new solution. For the design of the AHAD signal P, a prioritized yet fundamental requirement is to be generally applicable for defending against almost all mainstream HAD methods (un-certainty of the detectors), as aforementioned. Furthermore, we have the uncertainty caused by the imperfect CSI. We emphasize that even with perfect CSI, constructing a reliable 
+
+P still remains highly non-trivial. Subsequently, we explain why almost all existing inter-ference/perturbation schemes (cf. Figure 2), including strong noise effects, hyperspectral adversarial attacks (HAA), and the use of minus anomaly signals, are inapplicable to this AHAD task. First, as shown in Figure 2, an intuitive AHAD approach is to treat P as a high-energy noise signal; however, this is 3
+
+impractical because existing HAD approaches are robust to a certain (or even relatively high) noise level. To substantiate this robustness, we compare the detection results of a mainstream HAD method [23] obtained from an unperturbed HSI and its extremely noise-perturbed counterpart (SNR:= 3 dB). As presented in Figure 2(a), such strong noise perturbations have a very limited impact on the detection performance; even if the noise degrades performance, well-established hyperspectral noise-removal/restoration techniques [24]–[26] can be used to recover clean spectral signatures. These facts, taken together, hinder the noise-based AHAD strategy. As for the HAA [cf. Figure 2(b)] and minus anomaly signals [cf. Figure 2(c)] schemes, the former is primarily developed to attack hyperspectral classification baselines, while the latter produce solely a small residual signal that has negligible effects on the HAD process. Both schemes can not be used to effectively defend HAD methods. Since these interference schemes require more background knowledge to understand their theoretical limitations, we refer readers to Section II for a more detailed discussion. Consequently, none of the existing approaches is suitable to achieve the AHAD tasks, necessitating the development of a radically new theory. 
+
+B. Backgrounds of the Proposed AHAD Solution 
+
+In this study, a solution for the AHAD task is to assimilate real anomalies into background components (ARAB). To be specific, given an HSI, anomalies refer to pixels with distinct spectral characteristics relative to their surrounding background [4], [5]. In light of this, anomalies and background pixels are expected to exhibit relatively large differences in terms of Euclidean distance or gradient. To accomplish ARAB, the objective can be mathematically interpreted as to flattening the topologies of the perturbed structures. When the perturbed data topologies exhibit no clearly distinguishable anomalous pixels, we empirically found that mainstream detectors tend to identify all spectral signatures as background, a process referred to as ARAB. Moreover, by flattening the topology-enhanced structures (rather than the original structures; cf. Section III), we can more effectively assimilate the anomalies into the backgrounds, thereby facilitating the ARAB process. However, in the original hyperspectral domain, the ARAB aims to minimize spectral variations across high-dimensional signatures, which results in a heavy computational burden due to the hundreds of bands. Fortunately, remotely sensed HSIs have been shown to lie in an N -dimensional subspace (with N ≪ C) due to their low-rank nature. An appropriate feature extraction or dimension reduction technique, such as subspace identification [25], [27], can effectively address the spectral redundancy while preserving informative structure. Therefore, we perform an efficient ARAB process in the feature space, rather than in the original hyperspectral domain. Moreover, in the feature space, we observe that anomalies are typically distributed far from the data mean, which motivates us to construct a data-to-center-weighted mask (D2CM). The D2CM enhances the data topology by radially scaling each data point based on its data-to-center distance (D2C), thereby amplifying the variations of real anomalies and making ARAB more targeted (to be detailed in Section III). Building on these observations, we propose an ARAB regularization that minimizes the discrete gradient of the D2CM-topology-enhanced structures in the fea-ture space. Once anomalies exhibit only low disparity (relative to background) in the topology-enhanced structure, they natu-rally become indistinguishable from background components, even without D2CM. Echoing the Lipschitz constraint in DL models, we refer to these AHAD signals as Lipschitz-forcing perturbations. On the other hand, we are aware that certain advanced detectors may still be able to identify anomalies, even when the difference between anomaly and background pixels is significantly reduced (e.g., after applying ARAB regulariza-tion). To further fool these detectors, we additionally introduce the pseudo-anomaly effect. In detail, real-world anomalies often correspond to a small group of substances that devi-ate from the dominant background components. Therefore, amplifying the energy of the tail (non-principal) components enables us to produce noticeable pseudo-anomalies. Taking the above ARAB regularization and pseudo-anomalies production strategy together, the proposed AHAD framework is able to generate an AHAD perturbation signal that can evade almost all mainstream detectors under the perfect CSI assumption. Finally, as we mentioned above, the imperfect CSI, which manifests as an uncertainty in the pixel-shifting issue between 
+
+eYH and YH , should be considered to facilitate practical applicability. To address this limitation, we further develop a robust AHAD criterion using stochastic optimization (cf. Lemma 1). Specifically, when a reconnaissance sensor passes through the target area (our side), the corresponding eYH must be constructed based on an estimated CSI with the highest confidence/probability. Under this assumption, a larger pixel shifting indicates a greater deviation between the estimated CSI and the true CSI of the unknown sensor. In practice, these worst scenarios (i.e., severe pixel shifting) are expected to retain lower confidence/probability under the estimated CSI model, because the most confident CSI (which is expected to be a no-shift case) has been employed to construct eYH .Hence, it is reasonable to assume that the spatial misalignment caused by imperfect CSI follows a normal distribution; more details are provided in Section III-C. With this prior distribu-tion of CSI uncertainty, a robust perturbation signal (against pixel-shifting) can be naturally achieved by minimizing the expectation (with respect to all possible eYH ) of the AHAD criterion. Then, inspired by the 5G/6G techniques (channel uncertainty, in particular) [28], the induced probabilistic ob-jective function is transformed into a deterministic one, in order to facilitate the subsequent optimization procedure (cf. Lemma 1). With the above customized designs, the proposed AHAD solution is hence advanced as a fully model-free, annotation-free, unsupervised framework. These advantages enable us to realistically construct a single perturbation signal that simultaneously evades almost all mainstream detectors and is highly robust across numerous pixel-shifting cases. To the best of our knowledge, this article presents the first AHAD study. The remainder of this article is structured as follows. In 4
+
+Section II, we review the limitations of the existing HAA approaches in addressing AHAD tasks, and introduce main-stream HAD algorithms. Next, Section III mathematically presents the problem definitions, formulations, and implemen-tation details of the proposed AHAD framework. Section IV demonstrates the effectiveness and robustness of our AHAD algorithm across diverse real-world datasets. Finally, Section V concludes this article and lists some future works. II. R ELATED WORKS AND CONVENTIONAL NOTATIONS 
+
+To develop an effective AHAD framework, it is essential to understand the theoretical foundations of mainstream HAD baselines. Accordingly, Section II-A first recaps the theory and formulation of representative HAD approaches. Then, Section II-B briefly introduces the existing HAA methods and explains why they are not applicable to the AHAD task. Frequently used notations are collectively defined in Section II-C. 
+
+A. Hyperspectral Anomaly Detection 
+
+In the RS field, HAD methods assign an anomaly score within the range of [0 , 1] to each pixel (i.e., spectral signature) in the target HSI. It is worth noting that the obtained scores retain “soft” rather than typical binary classification. This is because the so-called anomaly is identified with respect to the surrounding background [4], [6] and lacks an explicit, generally accepted definition. Due to the scarcity of large-scale HAD datasets with annotations, most mainstream HAD methods are developed unsupervisedly, commonly using background reconstruction strategy. Let X ∈ RC×L denote the matrix representations of an HSI with L pixels, based on which we briefly introduce the mathematical formulations of HAD. First, the robust principal component analysis (RPCA) criterion [29] is widely adopted to preliminarily formulate the HAD problem, 
+
+min   
+
+> B,A
+
+∥B∥∗ + λ∥A∥1 s.t. X = B + A, (1) where B denotes a low-rank background and A represents the sparse anomaly component [30]. Consequently, the result-ing detection map can be obtained naturally as PCi=1 [A]i, :,followed by an intensity standardization. Based on the ba-sic criterion in (1), various regularizations (e.g., confidence-weighted prior [31] and Mahalanobis regularization [32]) have been incorporated, leading to numerous RPCA variants for the HAD task. In particular, SuperRPCA [5] introduces a novel collaborative superpixel representation prior into the RPCA formulation. SuperRPCA first employs a real-time superpixel-based collaborative representation to reconstruct the rough background component. The convex Q-quadratic norm [33] is then incorporated to extract informative structures from the rough background component, thereby providing effective regularization for RPCA. Nevertheless, complex and diverse real-world scenarios render the decomposition of B and A
+
+highly ill-posed, significantly hindering the HAD performance. Rather than further complicating the formulations (e.g., more regularizers), an effective improvement is to introduce a customized background subspace D = [ d1, d2, · · · , dk] ∈
+
+RC×k. When the subspace, typically known as a dictio-nary, adequately represents the background (i.e., B = DS ), the residual component naturally remains only the desired anomaly matrix. The strategy results in a more general HAD formulation, i.e., 
+
+min   
+
+> S,A
+
+rank (S) + λ sparse (A) s.t. X = DS + A, (2) which is referred to as low-rank representation (LRR) [34]. Similar to the RPCA-based methods, diverse and innovative regularizations (e.g., graph and total variation [35], deep plug-and-play [36]), customized dictionary construction [37], [38], and the Tensor-based LRR [39], [40] are further developed to improve the HAD performance. On the other hand, integrating subspace-guided strategies with a transformer is also proposed for HAD (e.g., TGFA-AD [4]), which first projects the target HSI into the discriminative abundance domain via convex geometry [41], followed by applying a transformer-guided fractional attention to capture the anomalies. Recently, both quantum deep networks (QUEEN) [24], [25], [42], [43] and classical neural networks [44], [45] have achieved remarkable success in the RS field. As a represen-tative example, HyFuHAD [1] integrates the Einstein fuzzy computing with QUEEN to develop a quantum-classical fuzzy multi-criteria decision-making (MCDM) framework for HAD. By exploiting unique and informative quantum features, the QUEEN-based MCDM can substantially enhance the overall detection performance [1, Section IV-C]. We remark that due to the scarcity of large-scale annotated data, unsupervised and single-data learning have become the mainstream strategies for developing DL-based HAD methods. For instance, following a strategy similar to the well-known deep image prior (DIP) [46]–[48], a fully convolutional neural network (CNN) [6] can be adopted to reconstruct background structures B from a randomly sampled noise tensor. Under an unsupervised reconstruction, the distance between the reconstruction and the original target HSI is typically employed as an optimization objective [4]. Since the background component dominates the overall HSI structure (i.e., B ≈ X), such an unsupervised scheme can effectively recover B, while the residual com-ponent is naturally considered as the anomaly (i.e., A =
+
+X −B). Building upon this unsupervised strategy, customized architectural design (e.g., blind-spot network [8], [49], gated transformer [4], fractional attention [4]) and regularization strategies (e.g., graph structure [23] and adaptive weighted loss [6]) have been proposed to further suppress the anomaly effect during the reconstruction. According to the above perspectives, directly adopting a minus anomaly component −A as the perturbation signal P
+
+appears to be a reasonable and straightforward approach for anomaly assimilation. However, in practice, HAD baselines only need to ensure that anomalous pixels exhibit a rela-tively large disparity in A, rather than completely decompose anomaly components. As a result, the energy of A is extremely small and leads to a negligible impact on the overall hyper-spectral structure. In other words, even under the perfect CSI assumption (i.e., zero-pixel shift), the detection maps obtained using X and X − A remain almost the same [cf. Figure 5
+
+2(c)], alluding that developing a fundamentally new solution for AHAD is necessary. 
+
+B. Hyperspectral Adversarial Attack 
+
+Recently, DL models for vision tasks, such as classification and object recognition, have demonstrated their remarkable capability. However, these advanced techniques remain vul-nerable to small deviations. In particular, the hierarchical structures of deep networks may amplify imperceptible devia-tions [50], leading to substantially biased predictions [51]. For instance, a deep classifier may misclassify a dog image as a bird category when subjected to certain designed perturbations. Such signals are referred to as adversarial perturbations, and the techniques for generating them are known as adversarial attacks (AAs). Among existing AA methods, gradient-based approaches are widely studied and are generally regarded as particularly effective [52]. Given an input image x and its corresponding reference label y, gradient-based attacks estimate the perturbation signal δ by performing a single-step or iterative optimization via 
+
+δ⋆ = arg max  
+
+> ∥δ∥p≤ϵ
+
+L(fθ (x + δ), y), (3) where fθ (·) denotes the target network with pretrained param-eters θ, while L(·) and ϵ represent the task-specific objective (e.g., cross-entropy for classification) and a predefined attack budget in terms of ℓp-norm. Representative gradient-based AA methods include the fast gradient sign method (FGSM) [53], basic iterative method (BIM) [54], and projected gradient descent method (PGD) [55]. It is worth noting that AA meth-ods typically require full access to the target network (e.g., its pretrained parameters and architecture) and the reference label to generate adversarial perturbations, which are referred to as white-box attacks. However, the information regarding the target network may be only partially available (or even unavailable) in practice. A realistic approach is to construct a surrogate model for the target one and use it to perform AA estimations [56]. In light of the high transferability of adversarial perturbations [57], this strategy enables AA meth-ods to effectively attack target models using only incomplete information, a strategy known as a black-box attack. In the hyperspectral field, AA algorithms have also been extended to material identification tasks [58], emerging as a security-critical research topic and attracting considerable attention. For example, boundary adversarial samples (BASs) are generated via a modified DeepFool scheme [58], where the AA loss function is iteratively optimized through network backpropagation. However, unlike conventional 3-band RGB images, remotely sensed hyperspectral data is inherently high-dimensional but contains substantial spectral redundancy. This poses a significant challenge for HAA because different deep classifiers may exploit distinct subsets of spectral bands for decision-making, leading to struggles with transferability and robustness. To address this limitation, a universal object-level attack strategy [59], built upon a spatial-spectral super-pixel template, has been developed to improve baseline HAA methods, including FGSM, momentum iterative FGSM (MI-FGSM) [60], and variance tuning MI-FGSM (VMI-FGSM) [61]. More recently, a physically interpretable HAA method, named sparse unmixing-guided AA (SUGAA) [62], has been proposed using blind source separation (BSS) techniques [63]. In the SUGAA framework, the adversarial perturbations are es-timated using gradient-based methods in the low-dimensional abundance domain [4], [41], [64] to ensure the physical con-sistency of natural HSIs, thereby improving the effectiveness and robustness of HAA. Nevertheless, as shown in Figure 2(b), such powerful tech-niques remain theoretically inapplicable to our AHAD task, whether in white-box or black-box settings. This limitation stems from the fact that both AA for computer vision tasks or HAA techniques generally follow the principle in (3), and mostly adopt gradient-based signal estimation. Specifically, AAs are formulated to maximize the loss function of apretrained DL model [cf. (3)], thereby effectively amplify-ing perturbations and eventually leading to biased results. However, mainstream DL-based HAD detectors are generally unsupervised and require optimization from scratch for each detection (cf. Section II-A), making AHAD fundamentally different from AA/HAA tasks. Under such unsupervised settings, the parameters are dy-namically updated, making AA optimizations difficult and hindering their applicability to AHAD. Moreover, even if the HAD loss function L (typically some reconstruction errors) can be maximized using certain AA frameworks, this does not necessarily degrade the detection performance. In fact, the HAD performance may even be improved as long as the reconstruction errors of anomaly pixels remain relatively substantial. Furthermore, even if the above limitations were alleviated, the presence of state-of-the-art (SOTA) non-DL-based HAD methods would still render the AA-based AHAD ineffective. The above limitations, collectively, highlight the necessity of developing a radically new theory for AHAD. 
+
+C. Notations 
+
+The notations used throughout this article are defined as follows. Throughout this article, we use regular letters z,lowercase bold italic letters z, uppercase bold italic letters Z,and uppercase bold upright letters Z to denote scalar, vector, matrix, and tensor, respectively. Given a positive integer K,
+
+IK ≜ {1 · · · , K }. RM ×N and RM ×N ×C denote real-valued 
+
+(M × N )-dimensional matrix space and (M × N × C)-dimensional tensor space, respectively. Given a M -way tensor 
+
+X, [X]a1,a 2,··· ,a M and X(n) denotes its (a1, a 2, · · · , a M )th entry and its mode-n matricization [65], respectively. max (X)
+
+refers to the absolute maximum entry of the tensor X. More-over, given a matrix Z with appropriate dimension, the tensor mode-n multiplication [48] between X and Z is denoted as 
+
+X ×n Z. ∥ · ∥ ∗, ∥ · ∥ 1, ∥ · ∥ F , and ⊙ denote the nuclear norm, 
+
+ℓ1-norm, Frobenius norm, and elementwise multiplication, respectively. For the tensor ℓ1-norm and Frobenius norm, we use the same notation as for the matrix, while the explicit definitions are provided upon first use. ∇x represents the discrete differential operator [35] along the x direction. 6
+
+III. P ROPOSED UNSUPERVISED AHAD M ETHOD 
+
+To the best of our knowledge, this study presents the first AHAD framework in the RS field. To explicitly define the AHAD task, we first provide a detailed problem definition in Section III-A. Accordingly, an AHAD criterion with per-fect CSI is proposed and solved in Section III-B, where a novel ARAB regularization is customized to address the challenging AHAD task. To facilitate practical applicability, the uncertainty induced by imperfect CSI is further described as matrix-shifting misalignment, motivating us to design a robust probabilistic AHAD criterion, as detailed in Section III-C. Implementation details are presented in Section III-D. 
+
+A. Problem Characteristics of Anti-HAD 
+
+We define the target AHAD problem together with several practical considerations. For a target area requiring anti-detection, let YH ∈ RH×W ×C denote the corresponding HSI remotely sensed by an unknown hyperspectral detector (cf. Figure 1). Here, H, W , and C represent the image height, image width, and number of spectral bands, respectively. The AHAD problem can be characterized as follows: (C1) (Black-Box Uncertainty) Let A(·) denote an arbitrary HAD method from the opponent’s side (cf. Figure 1), which is assumed to be unknown yet effective. (C2) (ARAB Property) The goal of the AHAD is to estimate a perturbation/anti-detection signal P ∈ RH×W ×C , such that the perturbed HSI (i.e., YA = YH + P) yields an anomaly detection map A(YA) in which the ground facilities and activities (of our side) are barely identified (cf. Figure 1). (C3) (Energy Efficiency, EE) Minimum energy consumption of P is essential to control the transmit power [66], [67]. Since the transmission of the anti-detection signal relies on the base station (cf. Figure 1), unbounded or excessive transmitting power remains impractical in real-world scenarios. Thus, as commonly considered in wireless communications [28], minimizing the energy of the anti-detection signal P while fulfilling the AHAD requirement (C2) leads to a more practical solution. (C4) (Restoration Resistance, RR) Surely, for reliable anti-detection, the perturbation P should be robust against the removal/restoration techniques D(·). Specifically, noise removal and restoration techniques, which can recover the clean HSI from a severely corrupted obser-vation, have been widely used as a preprocessing step in recent RS field [26], [68], [69]. For instance, advanced quantum techniques can effectively remove mixed noise (i.e., Gaussian, impulse, and stripe noise) for NASA’s highly damaged HSI [25], enabling subsequent sophisti-cated blind signal processing tasks [24]. Such advanced techniques suppress various noise types, so noise-like anti-detection signals P can not reliably achieve AHAD [cf. Figure 2(a)]. Therefore, an effective anti-detection signal P should not be recognized as noise effect by the denoiser D(·) (i.e., D(YA) ≈ YA). Note that simultaneously achieving (C3) and (C4) already seems infeasible, as they appear to contradict each other, not to mention the other two challenging characteristics, (C1)-(C2), and additional real-world considerations (e.g., imperfect CSI, to be discussed next). Existing HAA techniques hence remain inapplicable for AHAD, whether under white-box or black-box settings (cf. Section II-B). Under (C1)-(C4), we will develop an AHAD criterion with perfect CSI information (cf. Section III-B), and then extend it to a probabilistic robust criterion to address the uncertainty of CSI (cf. Section III-C). To this end, we first discuss the definitions of perfect/imperfect CSI. The remotely sensed HSI YH is essential for estimating 
+
+P, but it is typically unavailable. In practice, however, the challenge in the availability of YH can be simplified as to addressing its spatial misalignment caused by imperfect CSI (e.g., imperfectly estimated detector position). In this case, a 
+
+surrogate HSI eYH can be reasonably obtained to approximate 
+
+YH when estimating the anti-detection signal P.
+
+Assumption 1 Through some high-confidence CSI estimation, the surrogate HSI eYH can be reasonably obtained to serves as an alternative to the unknown YH . □
+
+Specifically, the position of the unknown detector can be effectively estimated based on contemporary techniques, such as radar-based localization [70]. With this essential yet obtain-able information, powerful AI-empowered imaging systems (e.g., sensor pose estimation [13] and viewing image synthesis [15], [16]) can exploit different geometric perspectives (e.g., our own sensor) along with estimated detector position to synthesize the corresponding images eYH . Even when the synthesis images exhibit limited spectral resolutions (e.g., multispectral images), advanced spectral super-resolution algo-rithms enable the reconstruction of a high-fidelity HSI from its multispectral counterpart [71]–[73]. Therefore, the challenge in the availability of YH can be greatly alleviated, as its sur-rogate eYH can be reasonably obtained based on contemporary technologies. Even though, the estimated detector CSI could still remain imperfect; thus, directly assuming eYH = YH may be overly idealized. In fact, images acquired from different positions naturally exhibit spatial misalignment. So, when estimating the anti-detection signal based on eYH , an AHAD criterion robust to the spatial misalignment between eYH and true YH (i.e., pixel shifting) should be considered to facilitate reliable anti-detection, as detailed in Section III-C. 
+
+B. AHAD Criterion for Perfect CSI 
+
+According to (C1)-(C4), we first design the AHAD criterion for the zero-shifting case. Let eYA = eYH + P denote the perturbed HSI with respect to the surrogate HSI eYH .Generally, the AHAD criterion can be cast as the following optimization problem, i.e., 
+
+min  
+
+> P
+
+∥P∥F + REG 1(P) + REG 2( eYA)
+
+s.t. eYA ∈ [0 , 1] H×W ×C , (4) 7
+
+where ∥P∥F ≜
+
+qPHi=1 
+
+PWj=1 
+
+PCk=1 [P]2 
+
+> i,j,k
+
+represents the energy of the anti-detection signal in terms of the tensor Frobenius norm. This energy term ∥P∥F , together with the box constraint (i.e., eYA ∈ [0 , 1] H×W ×C ), reduces energy con-sumption and enables a practically feasible solution, thereby satisfying the EE requirement in (C3). In addition, REG 1(·)
+
+and REG 2(·) are used to regularize the anti-detection signal and perturbed HSI, respectively. In the AHAD criterion (4), REG 1(·) enforces the RR in (C4), while REG 2(·) encourages the ARAB property in (C2). Comprehensive experiments (cf. Section IV) will demonstrate that the single anti-detection signal P (computed by (4)) can indeed simultaneously fail almost all the benchmark HCD methods, without knowing the detector information, thereby addressing the black-box uncer-tainty in (C1). Next, we explicitly design the two regularizers. For the first regularizer REG 1, we employ the spectral-spatial total variation (SSTV), defined as REG 1(P) := SSTV (P)
+
+≜ α∥∇ H P∥1 + β∥∇ W P∥1 + γ∥∇ C P∥1, (5) where ∥X∥1 ≜ PHi=1 
+
+PWj=1 
+
+PCk=1 |[X]i,j,k | is the tensor ℓ1-norm of X ∈ RH×W ×C . As discussed in (C4), a reliable anti-detection signal should not be recognized as a noise effect. In general, noise or outlier effects tend to exhibit noticeable and unfavorable non-smoothness [68], [69]. The SSTV promotes the smoothness of P, thereby preventing our AHAD criterion from resulting in a high-frequency, non-smooth solution. See our discussions in Section IV-C. Next, we design the ARAB regularizer, REG 2, to encour-age eYA to meet (C2). Recall that hyperspectral anomalies are pixels whose spectral characteristics deviate significantly from those of the surrounding background [4]. Moreover, the background components in HSIs are typically composed of large and smooth regions. According to these observations, the anomaly effect is likely to induce spatial discontinuities, thereby increasing the variation in HSIs relative to their anomaly-assimilated counterparts (i.e., the same HSIs but re-moving anomalies). To achieve (C2), the ARAB regularization can be mathematically formulated as to flattening the spatial variation of the perturbed HSI, which is to minimize 
+
+∥∇ H eYA∥F + ∥∇ W eYA∥F . (6) Here, we adopt the Frobenius norm rather than the commonly used ℓ1-norm in TV, since the latter promotes gradient sparsity and concentrates variation in a specific region, which may instead strengthen the anomaly effect rather than promote the ARAB property. By contrast, (6) is actually the ridge regres-sion that promotes uniformly distributed gradients, thereby having the effect to flatten the spatial variation of eYA.However, minimizing variation across high-dimensional (i.e., C-band) hyperspectral signatures may render the ARAB process less efficient due to spectral redundancy. Fortunately, HSIs typically lie in an N -dimensional subspace ( N ≪ C)[25], [27]. This motivates us to flatten the topology of the perturbed data in the feature space, obtained by the affine set fitting (ASF) [41], [74]. Specifically, we first center eYA at the origin by mean shifting, i.e., eYsA = eYA − fMA, where fMA
+
+denotes the mean tensor of eYA, defined as 
+
+[fMA]i,j, : = 1
+
+HW 
+
+> H
+
+X
+
+> i=1
+> W
+
+X
+
+> j=1
+
+[ eYA]i,j, :, ∀(i, j ) ∈ I H × I W .
+
+The mean-shifted HSI eYsA is then projected on an N -dimensional affine set to obtain the feature tensor, i.e., 
+
+eZA = eYsA ×3 U ∈ RH×W ×N ,
+
+where U ∈ RC×N consists of the top-N left singular vectors of the mode-3 unfolded mean-shifted HSI eYs(3)  
+
+> A
+
+. This allows us to reformulate (6) to a more efficient form, i.e., 
+
+∥∇ H eZA∥F + ∥∇ W eZA∥F , (7) which is a function of P. Besides the dimension reduction, a topology enhancement strategy is developed to strengthen the ARAB process on the real anomalies. In particular, before performing anti-detection, we observe that anomalies within 
+
+YH (resp., eYH ) often distribute relatively far from the data mean in the feature space. This motivates us to construct a D2CM W ∈ RH×W ×N by 
+
+W := η
+
+eZH ⊙ eZH
+
+
+
+, (8) where eZH can be obtained by performing the ASF on the surrogate eYH . Besides, the scaling factor η ≥ 0 determines the strength of this topology enhancement strategy. To be more specific, based on the manifold assumption [35], in the low-dimensional subspace, data points deviating from the back-ground manifold are commonly referred to as anomalies [35]. Nevertheless, the absence of annotations makes it difficult to identify the background manifold, hence hindering the use of the standard point-to-manifold distance (P2M) [75] for the topology enhancement. Alternatively, we employ the D2C as the surrogate distance of the standard P2M. In detail, since the background components dominate the overall data structure, while the anomalies account for only a limited proportion of pixels within the HSI. The overall data mean is expected to be very close to the background mean, which corresponds to the role of the center of background manifold. From this perspective, the entries of D2CM W can be regarded as a preliminary yet straightforward measure of the deviation from the anomaly to the background manifold. Accordingly, W can be used to radially scale each data point of eZA, i.e., eZA ⊙ W. This topology-enhancement strategy further amplifies the variation introduced by real anomalies. If ARAB process is conducted on the topology-enhanced eZA ⊙W to make the anomolies no longer clear, then the anomalies in eZA should also be well assimilated into the background, implying an highly effective ARAB procedure. Consequently, the topology-enhanced ARAB regularization with respect to the weight W can be explicitly expressed as 
+
+ΦW(eZA) ≜
+
+> N
+
+X
+
+> i=1
+
+∥∇ H [eZA ⊙ W]:,:,i ∥F + ∥∇ W [eZA ⊙ W]:,:,i ∥F .
+
+(9) 8
+
+Once the topology-enhanced feature eZA ⊙ W exhibits suf-ficiently limited variations, the original eYA naturally fulfills the AHAD purpose. By (9), we refer to the resulting anti-detection signals as Lipschitz-forcing perturbations, as the topology-enhanced ARAB regularization strongly suppresses local pixel-wise variations (i.e., discrete gradient). This echoes the Lipschitz constraint bounding the DL network sensitivity (i.e., network gradient) and facilitates stable models [76]. Finally, to further fool the unknown detectors [cf. (C1)], we introduce the tail energy-based regularization to produce a pseudo-anomaly effect. Although the anomaly effect can be significantly suppressed by (9), advanced detectors may still be able to detect true anomalies owing to their high sensitivity to the anomalous signatures. Therefore, a straightforward approach is to generate pseudo-anomalies on the background regions, serving as part of the ARAB process, as the resulting pseudo-backgrounds (i.e., pseudo-anomalies corrupted back-grounds) also have an effect to assimilate the real anomalies, thereby further strengthening the ARAB regularization. This goal can be mathematically formulated as to maxi-mizing the tail singular values (SVs) of the perturbed HSI. Specifically, after removing the global mean spectrum, the background components usually dominate the overall data structure of the mean-shifted HSI, which typically lies in some low-dimensional subspace. These observations suggest that most of the background energy concentrates along the top-
+
+N principal directions (PDs), which can be characterized by the top-N SVs, i.e., σ1 ≥ σ2 ≥ · · · ≥ σN . In contrast, since anomalies deviate from the background components, they are unlikely to share consistent PDs with the background. Hence, their energy is expected to be retained along the remaining tail PDs. Consequently, by Eckart–Young–Mirsky theorem [77], the pseudo-anomaly generation of eYA can be mathematically written as to maximize the tail energy, i.e., 
+
+∥ eYsA − eYsA ×3 U T ×3 U ∥F . (10) Remarkably, although maximizing the tail SVs may also induce noise effects, the usage of SSTV regularization [cf. (5)] can effectively mitigate this dilemma when introducing the pseudo-anomaly effect. Thus, one can say that the designs of REG 1(·) and REG 2(·) echo each other. Overall, given 
+
+λ1, λ 2 ≥ 0 as the trade-off parameters, the ARAB regular-ization REG 2( eYA) can be expressed as REG 2( eYA) := λ1ΦW(eZA) − λ2∥ eYsA − eYsA ×3 U T ×3 U ∥F ,
+
+(11) wherein eYsA, U , and eZA are derivable from eYA. Therefore, we have completed the design of the AHAD criterion (4), whose implementation will be discussed in Section III-D. 
+
+C. Robust AHAD Criterion for Imperfect CSI 
+
+Since the CSIs (e.g., detector position) require additional estimation (cf. Assumption 1), they remain inherently imper-fect. In practice, images acquired from different viewpoints naturally exhibit spatial misalignment. Accordingly, we further extend (4) to a robust AHAD criterion against unknown misalignment (pixel-shifting) between eYA and YA for reliable anti-detection. To this end, we first elaborate on the modeling of the pixel-shiftings, in order to mathematically define the spatial misalignment between eYA and YA.In real-world scenarios, the internal geometrical calibration of high-quality airborne hyperspectral imagery can achieve sub-pixel-level accuracy [78]. However, the spatial misalign-ment caused by imperfect CSI is closer to cross-sensor cases (e.g., RS image fusion [79]), which are commonly modeled as pixel-level shifting in the RS field [80]. Hence, let r be a non-negative integer denoting the considered maximum pixel-shifting range. The collection of all candidate (2 r + 1) 2 pixel-shifting cases can be written as 
+
+S = {− r, . . . , +r} × {− r, . . . , +r}. (12) Specifically, for a pixel-shifting case ∆ = (∆ h, ∆w) ∈ S ,the pixel-shifted HSI T∆( eYH ) ∈ RH×W ×C can be explicitly written as 
+
+[T∆( eYH )] h,w, : = [ eYH ](h+∆ h),(w+∆ w ),:, (13) wherein the boundary pixels can be determined based on a predefined boundary rule, such as padding, cropping, or resampling (cf. Section IV-A). As boundary pixels account for a relatively small proportion of the HSI, they are likely to have a limited effect on the subsequent optimization. Accordingly, YH and eYH are said to have a pixel-shifting 
+
+∆ if YH = T∆( eYH ) under an appropriate boundary rule. This definition is also applicable to the perfect CSI case [i.e., 
+
+∆ = (0 , 0) ] as it naturally yields YH = T(0 ,0) ( eYH ) = eYH .Based on the above definitions, we proceed to the design of the robust AHAD criterion. Let L(P| eYH ) = ∥P∥F +
+
+REG 1(P) + REG 2( eYA) denote the AHAD objective function [cf. (4)] conditioned on the surrogate HSI. If the pixel-shifting 
+
+∆ is known (cf. Figure 1), the AHAD criterion in (4) can be readily reformulated as 
+
+min  
+
+> P
+
+L(P | T ∆( eYH )) s.t. eY(∆) 
+
+> A
+
+∈ [0 , 1] H×W ×C , (14) where eY(∆) 
+
+> A
+
+≜ T∆( eYH ) + P denotes the perturbed HSI with respect to the pixel-shifted HSI, i.e., T∆( eYH ). In practice, however, the exact pixel-shifting is typically unknown, due to the CSI uncertainty. In other words, directly optimizing (14), conditioned on a single-shifting case, is unlikely to yield a robust anti-detection signal. Furthermore, although such uncertainty may be addressed by considering an expectation-based AHAD criterion, such as E∆∼p[L(P|T ∆( eYH ))] (cf. Appendix A), it is not straightforward to optimize the proba-bilistic criterion. The lemma addresses this challenge: 
+
+Lemma 1 Under the imperfect CSI scenario, the induced robust probabilistic AHAD criterion can be cast as the de-terministic optimization, i.e., 
+
+min 
+
+> P
+
+X
+
+> ∆∈S
+
+q(∆)L
+
+
+
+P | T ∆( eYH )
+
+
+
+s.t. eY(∆) 
+
+> A
+
+∈ [0 , 1] H×W ×C , ∀∆ ∈ S , (15) 
+
+for some convex profile, q(∆) ≥ 0, P 
+
+> ∆∈S
+
+q(∆) = 1 , denoting the significance of each pixel-shifting ∆. □9
+
+The deterministic form in Lemma 1 facilitates the subsequent implementation. The probabilistic AHAD criterion and the proof of Lemma 1 are relegated to Appendix A. To complete the robust anti-detection signal P, we prac-tically specify q(∆) before implementing (15). To this end, several discussions regarding the pixel-shifting are presented below. First, eYH is assumed to be obtainable through some high-confidence CSI estimation (i.e., Assumption 1). Building upon this, q(∆)|∆:=(0 ,0) is naturally assigned with the highest weight/significance, as it directly corresponds to the AHAD objective conditioned on eYH [cf. (4)], leading to requirement (R1). Next, when no prior information on the shifting direction is available, assuming a direction-agnostic q(∆) is expected to improve the generalizability. In other words, the assigned weight depends only on the magnitude of ∆, leading to requirement (R2). Finally, under high-confidence CSI estima-tion, a more severe pixel-shifting should naturally be associ-ated with a lower contribution. Together with (R2), q(∆) is expected to be inversely proportional to the magnitude || ∆|| 2,leading to requirement (R3). We mathematically summarize the three premises for defining a reasonable {q(∆)}, i.e., 
+
+
+
+(R1) q(0) ≥ q(∆), ∀∆ ∈ S ;
+
+(R2) ∥∆i∥2 = ∥∆j ∥2 ⇒ q(∆i) = q(∆j ),
+
+∀∆i, ∆j ∈ S ;
+
+(R3) ∥∆i∥2 < ∥∆j ∥2 ⇒ q(∆i) > q (∆j ),
+
+∀∆i, ∆j ∈ S .
+
+(16) Obviously, the weights in Gaussian kernel satisfy (R1)-(R3), as well as the non-negative and sum-to-one constraints in Lemma 1, thereby leading to the natural definition of q(∆), i.e., 
+
+q(∆) =exp 
+
+
+
+− ∥∆∥22
+
+> 2σ2
+
+P 
+
+> ∆′∈S
+
+exp 
+
+
+
+− ∥∆′∥22
+
+> 2σ2
+
+ , ∀∆ ∈ S , (17) where σ > 0 is the standard deviation defined according to the confidence of the CSI estimation. A higher confidence corresponds to a smaller σ for concentrating the significance 
+
+q(∆) on the original estimate. With the explicitly defined 
+
+{q(∆)}, Lemma 1 completes the robust AHAD criterion design via (15), whose implementation will be discussed next. 
+
+D. Implementation and Discussion 
+
+To implement the robust AHAD criterion (15), we introduce an auxiliary variable A ∈ RH×W ×C and employ the element-wise sigmoid function s : RH×W ×C → [0 , 1] H×W ×C [81]. Subsequently, we define the relation between the auxiliary variable and the perturbed HSI as eY(∆) 
+
+> A
+
+≜ s T∆( eYH ) + A.Furthermore, since eY(∆) 
+
+> A
+
+= T∆( eYH ) + P, the anti-detection signal P can be consequently characterized in terms of the auxiliary variable A, i.e., 
+
+P ≡ s T∆( eYH ) + A − T ∆( eYH ). (18) As the sigmoid function guarantees the practically feasible domain for the perturbed HSI, we reformulate the box-constrained optimization problem (15) w.r.t. P into an un-constrained counterpart w.r.t. A based on the relation (18), i.e., 
+
+min 
+
+> A
+
+X
+
+> ∆∈S
+
+q(∆)Ls(T∆( eYH ) + A) − T ∆( eYH ) T∆( eYH ).
+
+(19) After making it unconstrained, the optimization problem (19) remains inherently non-convex and challenging. In this article, we employ the outstanding non-convex optimization adaptive moment estimation (Adam) algorithm [82] to optimize (19) w.r.t. A. Consequently, the obtained optimal solution A⋆ and the predefined surrogate HSI eYH are used to estimate the desired robust anti-detection signal P⋆, i.e., 
+
+P⋆ = X
+
+> ∆∈S
+
+q(∆)s T∆( eYH ) + A⋆ − T ∆( eYH ). (20) Overall, the proposed criterion well incorporates the key characteristics (C1)-(C4) of the challenging AHAD task. The energy term ∥P∥F and box-constraint [cf. (4)] ensure the EE property in (C3), the SSTV regularization [cf. (5)] enhances the RR requirement in (C4), and the ARAB regularization [cf. (11)] strongly promotes the ARAB property in (C2). Subsequent experiments will further show that P⋆ can indeed defend against almost all the mainstream HAD algorithms under different pixel-shifting cases, thereby addressing the black-box detector uncertainty in (C1) and the uncertainty of CSI (cf. Section III-A). In contrast, existing perturbation schemes (cf. Figure 2) inevitably violate at least one of the four characteristics (C1)-(C4). Specifically, the noise effect fails to meet the RR requirement, whereas neither the HAA nor the minus anomaly signal satisfies the ARAB property (cf. Section II), rendering existing perturbation schemes less reliable. IV. E XPERIMENTS 
+
+The section organizations are provided as follows. Initially, Section IV-A describes the experimental settings, including the information of the considered security-critical datasets, the experimental protocol for synthesizing imperfect CSI, and the parameter settings for both the HAD baselines and the proposed AHAD framework. In particular, ten representative and latest HAD methods are incorporated into the evaluations to ensure diversity, thereby providing experimental evidence for addressing the black-box uncertainty in (C1). Section IV-B then systematically establishes the first eval-uation benchmark to assess this pioneering AHAD task. Specifically, the performance of HAD methods is commonly evaluated by the area under the curve (AUC) w.r.t. prob-ability of false alarm (PF) and the probability of detec-tion (PD). In a typical HAD setting, a higher AUC score generally indicates better detection performance. However, AHAD pursues a completely opposite goal, namely ARAB [cf. (C2)]; thus, the resulting anti-detection signal is expected to degrade the performance of HAD methods. Since this paper represents the first AHAD study, no existing evaluation benchmark is available to clearly determine how low the AUC score should be to evidence the effectiveness of an AHAD solution. Accordingly, Section IV-B first carefully evaluates 10 
+
+TABLE I: Detailed information of the five security-critical real-world datasets. In this table, H, C, and A denote the spatial size of H × H pixels, the number of spectral bands, and the number of annotated anomaly pixels, respectively, of the original HSIs. In the evaluations, these datasets are spatially cropped into subimages to synthesize the imperfect CSI, where the false-color compositions for the zero-shifting case are shown in Figure 3. More detailed settings are provided in Section IV-A).                               
+
+> Datasets Location HCResolution A
+> Airport I Los Angeles 100 205 7.1 m 87 Airport II Los Angeles 100 205 17.2 m 170 MUUFL Gulf Park Campus 150 64 1.0 m 259 Urban I Texas Coast 100 204 7.1 m 67 Urban II San Diego 100 205 3.4 m 272
+
+Fig. 3: False-color compositions (bands 37, 18, 8 as RGB) of the unperturbed HSIs and AHAD-perturbed HSIs, together with the corresponding reference maps for the five security-critical real-world scenarios under the zero-shifting case. Ad-ditional data information can be found in Table I. the AUC scores yielded under the unperturbed and AHAD-perturbed scenarios, which are denoted as AUC up and AUC ap ,respectively. Subsequently, the new AHAD metric, termed area missing caused by anti-detection (ArmCBA) 2, is then defined as (1 − AUC ap  
+
+> AUC up
+
+) × 100% (↑)3 to validate the effectiveness of an AHAD solution. This metric represents the relative performance degradation induced by the anti-detection signal; in general, an ArmCBA of around 15% is considered sufficient to evidence the reliability of the anti-detection signal (cf. Section IV-B2). Based on the new metric and evaluation benchmark for AHAD, we can assess the effectiveness of P⋆ under both perfect and imperfect CSI conditions, thereby demonstrating its robustness to CSI uncertainty. Section IV-C further presents a detailed analysis of how each regularizer contributes to the effectiveness of AHAD based on the evaluation benchmark. Finally, Section IV-D experimentally evaluates whether the resulting anti-detection signal satisfies the RR property.            
+
+> 2The demonstration will be available at: https://github.com/IHCLab/AHAD.
+> 3Areliable anti-detection solution is expected to substantially reduce AUC ap relative to AUC up , yielding a smaller ratio of AUC ap
+> AUC up . Hence, by the definition of the ArmCBA metric, a larger ArmCBA score indicates a better AHAD performance.
+
+Fig. 4: Qualitative comparisons of detection maps under the perfect CSI condition. The AUC up and AUC ap denote the AUC scores obtained using unperturbed HSIs and AHAD-perturbed HSIs as inputs, respectively. The results show that the proposed AHAD framework can prevent the target area from exposure under the mainstream HAD methods. More discussions are presented in Section IV-B. 
+
+A. Experimental Settings 
+
+In the subsequent experiments, five widely investigated real-world HAD datasets are incorporated. These datasets across airport, campus, and civilian building areas, which represent security-sensitive facilities, human activities, and infrastructures. Such RS scenarios are commonly regarded as security-critical and hence highly related to the AHAD. The corresponding false-color compositions of the unperturbed and AHAD-perturbed HSIs, together with the reference detection maps, are shown in Figure 3. Although the anti-detection signal may not be completely imperceptible at this stage, our primary goal is to prevent detectors from providing recon-naissance information, while satisfying (C1)-(C4). Moreover, Section IV-D will further show that when the detectors are aware of the anti-detection behavior, and attempt to eliminate the signal via some benchmark restoration technique, these mainstream HAD detectors may experience more severe per-formance drops. From this perspective, the imperceptibility of anti-detection signals may not be necessary, while we still regard this as an important future research line. Among these datasets, the MUUFL dataset was acquired by Compact Airborne Spectrographic Imager (CASI) sensor [83], while the remaining datasets were collected by Airborne Visi-ble/Infrared Imaging Spectrometer (AVIRIS) sensor [12]. This dataset configuration aligns with our discussions in Section I, i.e., the hardware configurations can be reasonably assumed to be a subset of high-standard airborne systems. Configura-tions of these datasets, including the location, resolution, and number of spectral bands, are summarized in Table I. To synthesize the pixel-shifting effect modeled in (13), we first crop a central area from each dataset and regard it as the surrogate HSI eYH . For instance, given an HAD dataset 
+
+Y ∈ RH′  
+
+> ×W′
+> ×C
+
+and the maximum pixel-shifting range r, the 11 
+
+surrogate HSI can be obtained by 
+
+eYH := [ Y](r+1):( H′ −r),(r+1):( W ′ −r),:.
+
+Accordingly, the reserved pixels in the original HSI can be used to fulfill the boundary pixels of the pixel-shifted HSI 
+
+T∆( eYH ), ∀∆ ∈ S. The sub-reference maps are cropped with the same strategy for all ∆ to ensure fair evaluations. In this article, r := 1 is adopted to present a challenging spatial misregistration scenario. Specifically, a registration error of 0.5 pixels or greater would significantly undermine the reliability of real-world RS tasks [84]. In typical cross-sensor RS applications, even a single-pixel shift can lead to substantial performance degradation [22]. These suggest that 
+
+r = 1 represents a challenging setting for imperfect CSI. To assess whether the resulting anti-detection signal satisfies the black-box uncertainty in (C1), we select the HAD baselines by considering both effectiveness and diversity. Specifically, the reconnaissance detector is assumed to be unknown yet highly effective; the evaluations should cover a wide range of representative and SOTA detectors. To this end, SuperRPCA [5] is employed as the RPCA-based method, while LRASR [34], GTVLRR [35], and LARTVAD [40] are adopted as the matrix/tensor-LRR-based approaches. RGAE [23] is incorpo-rated as a robust benchmark to verify whether the resulting anti-detection signal remains effective against a detector robust to typical noise/outlier corruptions. BockNet [8], PUUNet [49], and NL2Net [7] are included as the SOTA blind-spot HAD networks. Finally, the latest transformer-based HAD methods, including GTHAD [85] and OTAD [86], are also considered to further strengthen the evaluations. For the DL-based methods, the default configurations are generally adopted. The parameter settings of the remaining HAD baselines were partially adopted from the paper or official implementations, with slight dataset-specific adjust-ments to improve their effectiveness. For LRASR, the trade-off parameters β and λ are set to 0.01 for the Urban II dataset, while 0.01 and 0.05 are adopted for the remaining datasets. For GTVLRR, the parameters β and γ are set to 0.5 and 0.01, respectively, across all datasets, while λ is selected from 
+
+{2.5E-4, 1E-3, 2E-2 }. For LARTVAD, the parameters ( K, β,
+
+λ) are fixed at (80, 3, 1) for the Airport I dataset, while (80, 3, 6) is adopted for the other scenarios. For SuperRPCA, the parameters ( N , t, S, m λ a, λb) are slightly adjusted based on the settings in the official implementation. The settings of each HAD methods are consistently used for both unperturbed and AHAD-perturbed conditions to ensure fair evaluations. For the proposed AHAD framework, the scaling factor of D2CM is set to p(8E+2 ), where p := max( eZH )−2, while the standard deviation is fixed as σ := 1 across all datasets. Let 
+
+(α′
+
+, β ′
+
+, γ ′
+
+) := (2 , 1, 2) ; the trade-off parameters of the SSTV regularizer can be represented as s(α′
+
+, β ′
+
+, γ ′
+
+). For Airport I and Urban II datasets, s is set to 8E-4, whereas s := 1E-3 is used for the remaining datasets. The parameter λ1 is set to 2.5E-1 for Airport I and Urban I datasets, and 1E-1 for the remaining datasets. Besides, λ2 is set to 2E-1 and 1E-1 for MUUFL and Urban I dataset, respectively, while λ2 := 5E-1 is adopted for the remaining datasets. Based on the above empirical settings, we suggest the default configurations of 
+
+s := 1E-3, λ1 := 1E-1, and λ2 := 5E-1. Although the param-eters require data-specific tuning, their adjustments remain minor relative to the default settings. Therefore, we regard the adaptive parameter selection/unification as an important direction for future work. The learning rate of 0.05, the number of iterations of 500, and all-zero initialization are applied across all scenarios, resulting in sub-minute computation time. For the experimental environments, SuperRPCA is per-formed on a laptop with a 2.50-GHz i7-11700 CPU and 24 GB of RAM. The signal estimation for anti-detection and the detection of remaining HAD methods are conducted on an Ubuntu 22.04.5 LTS-powered server equipped with a GeForce RTX 3090 and a Ryzen 9 5950X 16-core processor with 128 GB of memory. The implementation platforms are MATLAB R2023a, Python 3.10.9, and Torch 2.0.0. 
+
+B. Qualitative, Quantitative, and Robustness Evaluations 1) Evaluation Benchmark for AHAD: Since this paper presents the first AHAD study, the generally accepted evalua-tion benchmark is unavailable, necessitating its establishment. In the AHAD, a reliable anti-detection signal is expected to result in substantial performance (including qualitative and quantitative) degradation for HAD methods. In the RS field, the quantitative performance is commonly evaluated using the AUC(PD, PF) score [1], [4]. Remarkably, to concisely denote the AUC scores obtained under unperturbed and AHAD-perturbed conditions, we denote them as AUC up and AUC ap ,respectively. Together with the corresponding qualitative per-formance, we will establish a criterion for determining whether the observed degradation is sufficient to evidence the effective-ness of the AHAD solution, as detailed below. The following benchmarking establishment is based on the zero-shifting scenario to avoid potential bias from imperfect CSIs. In real-world applications, a reconnaissance detector may correspond to unknown yet effective HAD methods [cf. (C1)]. Building on this, the strongest HAD methods for each dataset, measured by AUC up (cf. Table II), are selected as rep-resentative examples to establish the benchmarking. Besides, we note that some detection maps may achieve promising AUC scores while suffering from intensity over-suppression [4]. In this context, they can still provide meaningful re-connaissance information, while the qualitative performance remains limited. To ensure consistency between qualitative performance and the AUC scores, the detection maps are visually adjusted using a capped-square transform [5], with the threshold selected from {5E-2, 2E-1, 8E-1 }. The discussion for benchmarking establishment is presented as follows. The detection maps and AUC scores are shown in Figure 4. For the two airport datasets, LARTVAD and OTAD achieve the AUC up of 0.9593 and 0.9327, respectively. At these AUC levels, the detection results are expected to highlight the true anomalies (i.e., aircraft) and show slight false detections from the background. Nevertheless, when the customized anti-detection signals are applied, their AUC ap falls below 0.8. At such low AUC levels, false detections become considerably more severe, whereas true anomalies become hardly distin-guishable, as shown in the first and second columns of Figure 12 
+
+4. These observations suggest that detection maps with AUC ap 
+
+scores around or below 0.8 provide limited information for RS detection tasks. Subsequently, SuperRPCA and LARTVAD yield AUC up of approximately 0.99 on the MUUFL and Urban I datasets, respectively. At such effective AUC levels, the true anomalies are well identified in the detection maps, while only very lim-ited background components remain observable. In contrast, their detection performance degraded from 0.99 to around 0.7 and from 0.989 to 0.87, respectively, after applying the anti-detection signal. These observations indicate that even superior detectors can be significantly affected by a customized anti-detection signal. The detection maps with an AUC ap of 0.7 further substantiate our point, namely, an AUC ap of 0.8 or less generally fails to provide meaningful information. For the AUC ap from 0.85 to 0.9, the corresponding detection maps still contain pronounced false detections, whereas the true anomalies can only be weakly distinguishable from them. Finally, for AUC up above 0.995, as shown in the NL2Net detection map in Figure 4, the results are expected to closely match the reference maps. The above observations naturally lead to the following remark: 
+
+Remark 1 When AUC ap is around or below 0.8, the anti-detection signal achieves a reliable protection for the target area. When AUC ap ranges from 0.85 to around 0.9, the detection map still suffers from noticeable false detections, and the real anomalies can only be weakly identified, suggesting an acceptable anti-detection performance. □
+
+On the other hand, observations under the unperturbed condi-tion are also summarized to facilitate subsequent analysis. For AUC up ranging from 0.93 to approximately 0.95, the detection maps become more informative. The real anomalies can be readily distinguished, though false-detection suppression still requires further improvement. The observation indicates that when the AUC ap can only be reduced to this level, the anti-detection signal remains insufficient, providing only limited protection for the target area. When the AUC score reaches around or above 0.99, the detection maps appear highly effective and visually consistent with the manually annotated reference map. 
+
+2) AHAD Evaluation under Perfect CSI: Based on Remark 1, the effectiveness of the proposed AHAD solution can be fairly evaluated. We first examine the perfect CSI condition, and summarize the quantitative results in Table II. For the two challenging airport datasets, most HAD methods achieve AUC up above 0.9. Nevertheless, after applying the anti-detection signal, none of these detectors can achieve an AUC ap 
+
+above 0.8 on the Airport I dataset. Such low AUC levels barely provide discriminative information for RS anomaly detection (cf. Remark 1), substantiating the effectiveness of the proposed AHAD framework. Moreover, the ArmCBA 
+
+(1 − AUC ap  
+
+> AUC up
+
+) × 100% ( ↑) is also provided to more intuitively demonstrate its anti-detection capability, as shown in Table II. In the Airport I dataset, the customized anti-detection signal generally leads to a substantial performance drop of 20%, and particularly around 30% for several HAD methods (e.g., LRASR, GTVLRR, and SuperRPCA). These observed Arm-CBAs indicate that, even when the detectors can achieve an ideal detection under the unperturbed condition (AUC up = 1 ), an ArmCBA of 20% or below (i.e., AUC ap ≤ 0.8) makes the resulting detection maps uninformative for the ground facilities (cf. Remark 1). For the Airport II dataset, all HAD baselines fail to achieve an AUC ap higher than 0.84 when the anti-detection signal is applied. The corresponding performance drops also range from 10% to 20%, mostly, and can exceed 30% in certain methods (e.g., LRASR). Even the robust HAD method, RGAE, shows a drop of over 20%, indicating that the proposed AHAD framework provides reliable anti-detection capability against the RS detection of ground facilities. In the MUUFL dataset, multiple advanced HAD meth-ods, including LRASR, GTVLRR, LARTVAD, SuperRPCA, RGAE, and NL2Net, yield AUC up close to or even above 0.99. These results suggest that their detection maps exhibit promising qualitative performance and can provide highly reliable information for real-world detection tasks (cf. Section IV-B1). However, the non-DL HAD methods are notably sen-sitive to the customized anti-detection signal. For instance, the AUC ap of LRASR, GTVLRR, LARTVAD, and SuperRPCA reduce to 0.7914, 0.7255, 0.7562, and 0.7192, respectively, which corresponds to at least a 19.4% performance drop. For advanced DL-based methods, the anti-detection signal can still reduce their AUC ap to approximately 0.8-0.9, suggesting acceptable anti-detection performance (cf. Remark 1). Similar performance degradations can also be observed on the Ur-ban I and Urban II dataset. Specifically, the top-performing HAD algorithms on these datasets, including LARTVAD, SuperRPCA, RGAE, BockNet, PUUNet, NL2Net, and OTAD, achieve AUC up ranging from around 0.98 to 0.99. Neverthe-less, the customized anti-detection signal generally results in a 10% ArmCBA for these superior methods. Such substantial performance suppression renders their detection maps less reliable, thereby providing protection and enhancing the safety for the target area. In general, under the unperturbed condition, mainstream HAD baselines can effectively detect anomalies, with an aver-age AUC up of approximately 0.95 across these security-critical scenarios, as reported in the last row of Table II. Furthermore, building upon Remark 1, an AUC ap of 0.8 and 0.85 correspond to reliable and acceptable anti-detection results, respectively. Motivated by these observations, the following remark is provided to systematically characterize the ArmCBA: 
+
+Remark 2 The ArmCBA of 10 .5% = (1 − 0.85 0.95 ), 15 .8% = (1 − 0.80 0.95 ), and 20% = (1 − 0.81.0 ) indicates the acceptable, promising, and superior AHAD performance, respectively. □
+
+As reported in the last row of Table II, the resulting anti-detection signal generally induces an average 15% ArmCBA across real-world scenarios under the zero-shifting case. In particular, the ArmCBA can reach close to or exceed 20% for several detectors, such as LRASR, SuperRPCA, and Bock-Net, substantiating the effectiveness of the proposed AHAD framework. Moreover, even if the strongest HAD method (i.e., LARTVAD), which yields an average AUC up of 0.9622, is 13 
+
+adopted, the proposed AHAD framework can significantly reduce its AUC ap to around 0.8, hindering it from providing reconnaissance information for the ground facilities. 
+
+3) Robustness Against Imperfect CSI: As evidenced by the above evaluations (cf. Table II), the proposed robust AHAD solution (cf. Section III-C) successfully achieves the reliable anti-detection protection under the zero-shifting case, thereby fulfilling the primary goal of its non-robust counterpart. This observation is the main reason this paper presents the imple-mentation and evaluation based on the robust AHAD formu-lation, as it provides a more general and practical solution to the real-world anti-detection task. In the following, we fur-ther demonstrate that the robust AHAD solution consistently maintains effectiveness even under imperfect CSIs. Based on the observations summarized in Remark 2, such robustness assessment can be conducted by evaluating the average ArmCBA under various pixel-shifting cases. Specif-ically, for each dataset, the proposed framework estimates a unified anti-detection signal P⋆ via the robust AHAD criterion [cf. (20)]. To assess its robustness aginst imperfect CSI, P⋆
+
+is directly applied to all pixel-shifted HSIs, i.e., eY(∆) 
+
+> A
+
+=
+
+T∆( eYH ) + P⋆, ∀∆ ∈ S . In this context, the corresponding average AUC up and AUC ap under different pixel-shifting cases are first computed, and the corresponding ArmCBA can be derived accordingly. A robust AHAD solution is expected to yield a consistently significant drop in AUC under both perfect and imperfect CSI. As illustrated in Figure 5, the results strongly support the robustness of the proposed AHAD solution against all pixel-shifting scenarios under the settings of r = 1 . Specif-ically, the resulting anti-detection signals P⋆ consistently and substantially degrade the performance of a wide range of mainstream HAD methods. In general, the ArmCBA reaches approximately 15%, and possibly more under different pixel-shifting cases (cf. Figure 5). Building upon Remark 2, the above observations suggest an effective AHAD performance regardless of perfect or imperfect CSI. In a nutshell, based on the above evaluations, the proposed AHAD framework can defend against a wide range of HAD baselines, including DL-based and non-DL-based methods, across different security-critical real-world scenarios, while demonstrating strong ro-bustness even when the CSI remains imperfect. 
+
+C. Ablation Study 
+
+In the following, we analyze the regularization terms in detail to elucidate their respective contributions to the AHAD task. Specifically, in the proposed AHAD criterion, the SSTV regularization [cf. (5)] and ARAB regularization [cf. (11)], are incorporated to yield the reliable and practically feasible anti-detection solution. Since the ARAB regularizer is composed of two components, including Lipschitz-forcing regularization [cf. (9)] and pseudo-anomaly generation (PAG) [cf. (10)]. To clearly investigate their respective contributions, we regard them as two individual regularizers in this ablation study. These settings lead to the four different ablation cases, in-cluding 1) Lipschitz-PAG, 2) SSTV-Lipschitz, 3) SSTV-PAG, and 4) SSTV-Lipschitz-PAG (fully regularized), where the last one corresponds to the proposed framework. These cases correspond to the first through fourth rows of Table III, in which the effect of the unused regularizer is excluded by setting its trade-off parameter to zero. For instance, in the first ablation setting (i.e., Lipschitz-PAG), the SSTV regularizer is removed by setting (α, β, γ ) := (0 , 0, 0) ,while the remaining parametric settings (cf. Section IV-A) are unchanged to ensure a fair evaluation. As the proposed framework has demonstrated strong robustness against imper-fect CSI (cf. Section IV-B3), the subsequent analyses focus on the zero-shifting case and report the corresponding ArmCBA averaged across the security-critical datasets and baselines. For the last row in Table III, we aim to experimentally demonstrate the RR property [cf. (C4)] of the proposed AHAD framework. The corresponding evaluations are provided in Section IV-D. First, as shown in Table III, removing TV regularization on the anti-detection signal appears to yield the most effective AHAD protection, as evidenced by the largest performance degradation of the HAD baselines. In other words, even if a superior HAD baseline can achieve an ideal AUC up of 1, the corresponding AUC ap can be reduced to below 0.7 once an anti-detection signal is applied. However, the SSTV regularizer should still be introduced to ensure a practically feasible solution [cf. (C3)], rather than merely pursuing stronger AHAD performance. Specifically, as detailed in the paragraph following (5), without adopting SSTV, the AHAD-perturbed HSI exhibits severe and noticeable perturbation patterns, as shown in the first row of Figure 6. Such severe perturbations imply the requirement of extremely high energy for an anti-detection signal, which may be difficult to deploy in practice. Consequently, to facilitate real-world application, we should focus on more practical settings, Case 2 to Case 4. As presented in the second through fourth rows of Table III, under a more practical setting (i.e., with SSTV), the Lipschitz-forcing regularizer contributes much more significantly than the PAG regularizer. When only the Lipschitz-forcing regular-izer is used for (C2), the resulting anti-detection signal still induces an ArmCBA of approximately 10%, or even larger, across mainstream HAD baselines (cf. Case 2 in Table III). Based on Remark 2, this result still demonstrates an acceptable AHAD performance. Conversely, when only the individual PAG regularizer is used for (C2), the results suggest a marginal or even negative impact on AHAD performance in terms of ArmCBA (cf. Case 3 in Table III). This may be because real-world anomalies usually deviate from background com-ponents substantially, whereas the generated pseudo-anomaly may introduce insufficiently discriminative anomalous pat-terns (cf. the third row of Figure 6). Accordingly, the PAG and Lipschitz-forcing regularizers should be adopted jointly, namely the ARAB regularizer [cf. (11)]. Once the discrepancy between true anomalies and background components is elimi-nated by the Lipschitz-forcing regularizer, the induced pseudo-anomalies can effectively fool the detectors. This joint effect results in a more substantial ArmCBA improvement, as shown in the fourth row of Table III. Overall, under a more practically feasible setting with SSTV, the ablation studies suggest that all regularizers in the proposed framework play essential roles in achieving a reliable AHAD protection. 14 
+
+TABLE II: Quantitative comparisons, reported in AUC(PD, PF) (↑), on the five representative real-world datasets under the perfect CSI. To clearly distinguish the AUC scores obtained under the unperturbed and AHAD-perturbed conditions, we denote them by AUC up and AUC ap , respectively. The ArmCBA metric is then defined as (1 − AUC ap  
+
+> AUC up
+
+) × 100% ( ↑) to represent the relative performance degradation. As demonstrated, the customized anti-detection signal generally yields an ArmCBA of 15% to 20%, indicating effective AHAD performance (cf. Remark 2) and providing reliable protection for the target area. More analytic discussions are provided in Section IV-B.                                                                                                                                                                                                
+
+> Scenario Metric LRASR GTVLRR LARTVAD SuperRPCA RGAE BockNet PUUNet GTHAD NL2Net OTAD AUC up 0.9012 0.8962 0.9593 0.8559 0.7465 0.9161 0.9204 0.9472 0.7042 0.9347 AUC ap 0.5797 0.5712 0.7978 0.6127 0.6663 0.7151 0.7226 0.7548 0.5573 0.7403 Airport I ArmCBA (%) 35.6747 36.2642 16.8352 28.4145 10.7435 21.9408 21.4907 20.3125 20.8606 20.7981 AUC up 0.8609 0.9038 0.8960 0.9265 0.8881 0.9211 0.9230 0.9259 0.9240 0.9327 AUC ap 0.6021 0.8387 0.7425 0.6237 0.6919 0.7184 0.8098 0.8293 0.7847 0.7855 Airport II ArmCBA (%) 30.0616 7.2029 17.1317 32.6821 22.0921 22.0063 12.2644 10.4331 15.0758 15.7821 AUC up 0.9819 0.9901 0.9728 0.9901 0.9842 0.9377 0.9623 0.8459 0.9875 0.9161 AUC ap 0.7914 0.7255 0.7562 0.7192 0.9061 0.6879 0.8003 0.8561 0.9245 0.8851 MUUFL ArmCBA (%) 19.4012 26.7246 22.2656 27.3609 7.9354 26.6397 16.8347 -1.2058 6.3797 3.3839 AUC up 0.8708 0.9430 0.9896 0.9372 0.9818 0.9792 0.9859 0.9772 0.9837 0.9896 AUC ap 0.8171 0.9389 0.8748 0.8135 0.8468 0.8480 0.8593 0.9297 0.7568 0.9090 Urban I ArmCBA (%) 6.1667 0.4348 11.6006 13.1989 13.7503 13.3987 12.8411 4.8608 23.066 8.1447 AUC up 0.9681 0.9713 0.9931 0.9919 0.9947 0.9683 0.9805 0.9773 0.9966 0.9888 AUC ap 0.6763 0.8845 0.8737 0.7187 0.8169 0.9224 0.8699 0.8938 0.9027 0.9134 Urban II ArmCBA (%) 30.1415 8.9365 12.0230 27.5431 17.8747 4.7403 11.2800 8.5439 9.4220 7.6254 AUC up 0.9166 0.9409 0.9622 0.9403 0.9191 0.9445 0.9544 0.9347 0.9192 0.9524 AUC ap 0.6933 0.7918 0.8090 0.6976 0.7856 0.7784 0.8124 0.8527 0.7852 0.8467 Average ArmCBA (%) 24.3618 15.8465 15.9218 25.8109 14.5251 17.5860 14.8785 8.7729 14.5779 11.0983
+
+TABLE III: Experimental evaluations of the proposed AHAD framework under different ablation settings. In each setting, the ArmCBA (↑) averaged across HAD baselines is adopted as the quantitative metric. The SSTV, Lipschitz, and PAG columns show whether the corresponding regularizers (REGs) are used, while the last Denoising column indicates whether the widely used preprocessing (Pre) step is applied before HAD. More details of the ablation studies and RR evaluations are provided in Section IV-C and Section IV-D, respectively.                                                      
+
+> Ablation Case SSTV (5) Lipschitz (9) PAG (10) Denoising (Pre) Airport I Airport II MUUFL Urban I Urban II Average Case 1 ✓✓39.2840 66.3909 30.6482 21.7317 60.1326 43.5439 Case 2 ✓✓13.1159 10.9921 14.4556 8.8919 8.9140 11.2291 Case 3 ✓✓-1.6933 0.0835 1.1036 1.0127 0.9155 0.3242 Case 4 ✓✓✓23.5023 18.4069 15.8466 10.8332 13.8171 16.3211 Case 5 ✓✓✓✓32.7830 18.8684 14.4352 53.1407 13.0994 26.3964
+
+D. Evaluation of Restoration Resistance 
+
+This section experimentally demonstrates the RR property of the resulting anti-detection signal. As presented in (C4), reliable anti-detection signals should not be easily removable from the perturbed HSI; otherwise, their reliability and prac-ticality would be substantially undermined. In the RS field, well-established denoising techniques are commonly used as a preprocessing step [24], [26] to enhance the reliability of subsequent applications. In practice, reconnaissance detectors may also employ such advanced techniques to mitigate under-lying noise corruption, thereby ensuring effective detection. To evaluate the RR property of the resulting anti-detection signal, we first apply a hyperspectral denoising method on the AHAD-perturbed HSI, followed by performing HAD to investigate whether the restoration technique can reduce the ArmCBA score. In this experiment, the representative global and nonlocal low-rank factorizations (GLF) denoiser [87] is employed as the restoration technique. For the GLF denoiser settings, the subspace dimension is fixed at 8, as suggested in the official implementation, while the perturbation type is set to “additive” based on the relationship between the anti-detection signal and the AHAD-perturbed HSIs eYA = eYH +P⋆. Subsequently, the qualitative comparisons of the AHAD-perturbed HSIs without and with GLF restoration are shown in the fourth and fifth rows of Figure 6, respectively. According to the results, applying this advanced restoration technique not only fails to eliminate the anti-detection effect in perturbed HSIs but may even lead to additional distortions. Specifically, typical noise effects introduce irregular, high-frequency corruption in observations; therefore, denoising methods are generally designed to suppress this unfavorable non-smoothness, thereby yielding smoother image structures. However, the Lipschitz-forcing perturbation, produced via ARAB regularization, is designed to suppress local variants of the HSI, thereby assimilating the real anomalies into the background components. Consequently, applying such an advanced restoration technique on the AHAD-perturbed HSI may produce excessively smoothed image structures (cf. the case 5 in Figure 6), rather than mitigating the anti-detection effect. Furthermore, the induced over-smoothness may render the ArmCBAs more substantial, as presented in the last two rows of Table III. For instance, the ArmCBA metric increases further, from 25.5% to 32.78% on the Airport I dataset and from 10% to 53% on the Urban I dataset, after denoising. According to the above results, this preprocessing step cannot 15 
+
+Fig. 5: Histogram of the ArmCBA (cf. Table II) across all pixel-shifting cases under the setting of r = 1 . The above results suggest that the robust anti-detection signal P⋆ generally leads to an ArmCBA of around 15% across all pixel-shifting cases for mainstream HAD methods, demonstrating the robustness of our AHAD framework in the imperfect CSI scenario (cf. Remark 2). Further discussions are presented in Section IV-B3. remove the anti-detection signal and may even further degrade the performance of reconnaissance detectors. V. C ONCLUSION AND FUTURE WORKS 
+
+HSI has been recognized as a powerful RS information for detecting suspicious or anomalous objects, thereby facilitating the development of a broad range of HAD algorithms. Nev-ertheless, such advanced techniques is a double-edged sword, fully exposing ground facilities within a target area. To address this RS dilemma, this paper, for the first time, explicitly defines the concept of anti-detection against various HAD techniques (cf. Figure 1). We propose novel regularization mathematics to achieve this critical anti-detection mission, without requiring perfect CSI or prior knowledge of the HAD detector. As a side contribution, a new quantitative performance index, ArmCBA, is proposed to evaluate the robustness of an HAD method against our AHAD signal. Specifically, we formally define the AHAD problem char-acteristics (C1)-(C4), i.e., black-box uncertainty, ARAB prop-erty, EE, and RR (cf. Section III-A). However, existing per-turbation/interference strategies (cf. Figure 2) violate at least one of the characteristics (cf. Section III-D), rendering them unreliable for addressing this security-critical problem. To develop unsupervised and robust AHAD method (cf. Lemma 1), we perform anti-detection on the topology-enhanced HSI, rather than the original HSI, because successfully assimilating the anomalies w.r.t. the topology-enhanced case implies a highly effective ARAB procedure (namely, anomalies must also be assimilated w.r.t. the original (non-enhanced) HSI). Comprehensive experiments show that the resulting robust anti-detection signal P⋆ does effectively defend against a wide range of mainstream HAD algorithms. Quantitatively, the anti-detection signal induces a performance drop of approximately 16% or even more in terms of ArmCBA (cf. Table II), which is sufficient to prevent the detectors from collecting meaningful reconnaissance information (cf. Section IV-B). Remarkably, although our anti-detection signal P⋆ is not so weak as to be unobservable, experiments demonstrate that even when the detectors are aware of the anti-detection behavior and hence tries to remove the signal P⋆ via some benchmark restoration technique, these mainstream HAD detectors could suffer from more serious performance drops (cf. Table III). This work demonstrates the technical feasibility of AHAD, inducing numerous important future research lines: 1) Currently, the anti-detection signals still require per-ceptible energy, so designing advanced regularization schemes to further facilitate EE is a problem worth investigating. Since DL networks themselves can be regarded as implicit regularization, leading to the sem-inal concept of deep image prior (DIP). Accordingly, advanced DL techniques, such as QUEENs [24] and quantum DIP [47], [48], may be used to regularize AHAD estimation and suppress energy redundancy. We call this future line as DL-based AHAD solutions. 2) Supervised DL-based methods often enable real-time inference. Also, since the AHAD objective can be com-16 
+
+Fig. 6: Qualitative comparisons of the AHAD-perturbed HSIs under different ablation settings, referred to as Case 1 to Case 5, whose configurations correspond to the first through fifth rows of Table III. Cases 1 to 3 examine the effects of each regularizer, including SSTV [cf. (5)], Lipschitz-forcing [cf. (9)], and PAG [cf. (10)]. Case 4 represents the proposed AHAD, which yields the most practical and effective solution (cf. Section IV-C). Case 5 presents GLF-restored [87] results of Case 4 to investigate the RR property. The results indicate that the commonly used denoising technique may further degrade detection performance, as evaluated in Section IV-D. pletely annotation-free [cf. (15)], general HSI datasets [72] should be sufficient for supervised training. This ad-vantage renders the supervised AHAD learning feasible. Such a strategy may also alleviate the current limitation in parameter tuning, as perturbed HSIs generated under various settings can be treated as training data for supervised learning. 3) Robust AHAD criteria may be further explored. Al-though imperfect CSI has been considered to yield a robust solution, it preliminarily focuses on the single-detector scenario at this stage. Similar to multi-input multi-output (MIMO) systems in wireless communica-tions, multiple detectors may simultaneously traverse the target area while sharing a unified anti-detection signal. In this context, multiple viewing geometries and different spatial misalignments must be considered simultaneously. 4) Importantly, we observe that existing HAD methods are mainly robust against noise/outlier effects. Based on our proposed ArmCBA index, future HAD researches can consider the robustness against anti-detection perturba-tions. This will become essential, echoing the competing relationship between AA and adversarial defense. APPENDIX 
+
+A. Proof of Lemma 1 
+
+In wireless communications, stochastic optimization strate-gies (e.g., minimizing the objective expectation) have been widely adopted to address uncertainty in robust beamforming [28]. This fact motivates the formulation of a robust AHAD criterion in a probabilistic manner to address the CSI uncer-tainty. To this end, we introduce a random variable ∆R with a distribution p to statistically characterize such uncertainty of pixel-shifting. This leads to the following robust AHAD criterion, i.e., 
+
+min  
+
+> P
+
+E∆R∼p
+
+h
+
+L(P|T ∆R ( eYH )) 
+
+i
+
+s.t. eY(∆R) 
+
+> A
+
+∈ [0 , 1] H×W ×C . (21) However, the probabilistic objective function and constraint hinder a straightforward optimization of (21). Hence, the Monte Carlo estimator [88] is adopted to approximate the probabilistic expectation by a deterministic objective, i.e., 
+
+E∆R∼p
+
+h
+
+L(P|T ∆R ( eYH )) 
+
+i
+
+≈ 1
+
+m
+
+> m
+
+X
+
+> i=1
+
+L(P|T ∆(i) ( eYH )) ,
+
+(22) where ∆(i), · · · , ∆(m) denote independent and identically distributed (i.i.d.) shifting cases sampled by p.Nevertheless, the unknown distribution p fails the direct sampling steps using the true distribution. Notably, the consid-ered spatial misalignment is associated with pixel-level shift-ing, rather than uncountable sub-pixel-level misregistration. This stems from the fact that the shifting arising from imper-fect CSI is likely to be closer to cross-sensor misalignments, which are commonly modeled at the pixel level in the RS field [79], [80]. This property leads p to a finite support S [cf. (12)], allowing an explicit enumeration of all candidate samples. Specifically, under m trials, the number of repeated samples across each candidate is the frequency of its occurrences. Accordingly, instead of performing a large number of trials via p, each shifting case in S can be evaluated once with some non-negative integer θ∆ ≥ 0, P 
+
+> ∆∈S
+
+θ∆ = m, i.e., 
+
+1
+
+m
+
+> m
+
+X
+
+> i=1
+
+L(P|T ∆(i) ( eYH )) = 1
+
+m
+
+X
+
+> ∆∈S
+
+θ∆L(P|T ∆( eYH )) . (23) Let q∆ = 1 
+
+> m
+
+θ∆ ≥ 0, P 
+
+> ∆∈S
+
+q∆ = 1 denote the normalized contributions with respect to m. Moreover, the probabilistic box constraint in (21) can be transformed into a deterministic one by considering all candidate shifting cases. Consequently, by ignoring irrelevant constants, the robust AHAD criterion can be expressed as 
+
+min 
+
+> P
+
+X
+
+> ∆∈S
+
+q(∆)L
+
+
+
+P | T ∆( eYH )
+
+
+
+s.t. eY(∆) 
+
+> A
+
+∈ [0 , 1] H×W ×C , ∀∆ ∈ S . (24) Therefore, the proof of Lemma 1 has been completed. ■17 
+
+REFERENCES [1] C.-H. Lin, S.-S. Young, and R. Langari, “Hyperspectral anomaly de-tection using Einstein fuzzy computing and quantum neural network,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 64, pp. 5 513 220–5 513 220, 2026. [2] D. Hong, C. Li, N. Yokoya, B. Zhang, X. Jia, A. Plaza, P. Gamba, J. A. Benediktsson, and J. Chanussot, “Hyperspectral imaging,” Nature Reviews Methods Primers , vol. 6, no. 1, p. 19, 2026. [3] S. Li, W. Song, L. Fang, Y. Chen, P. Ghamisi, and J. A. Benediktsson, “Deep learning for hyperspectral image classification: An overview,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 57, no. 9, pp. 6690–6709, 2019. [4] S.-S. Young, C.-H. Lin, and Z.-C. Leng, “Unsupervised abundance matrix reconstruction transformer-guided fractional attention mechanism for hyperspectral anomaly detection,” IEEE Transactions on Neural Networks and Learning Systems , vol. 36, no. 5, pp. 9150–9164, 2025. [5] J.-T. Lin and C.-H. Lin, “SuperRPCA: A collaborative superpixel representation prior-aided RPCA for hyperspectral anomaly detection,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1– 16, 2024. [6] S. Wang, X. Wang, L. Zhang, and Y. Zhong, “Auto-AD: Autonomous hyperspectral anomaly detection network based on fully convolutional autoencoder,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 60, pp. 1–14, 2021. [7] D. Wang, L. Ren, X. Sun, L. Gao, and J. Chanussot, “Nonlocal and local feature-coupled self-supervised network for hyperspectral anomaly de-tection,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 18, pp. 6981–6993, 2025. [8] D. Wang, L. Zhuang, L. Gao, X. Sun, M. Huang, and A. Plaza, “BockNet: Blind-block reconstruction network with a guard window for hyperspectral anomaly detection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 61, pp. 1–16, 2023. [9] T. Ma, H. Zhao, L. Tang, M. Xue, and J. Liu, “Efficient black-box attack with surrogate models and multiple universal adversarial perturbations,” 
+
+Scientific Reports , vol. 15, no. 1, p. 17372, 2025. [10] L. Liu, Z. Zou, and Z. Shi, “Hyperspectral remote sensing image synthe-sis based on implicit neural spectral mixing models,” IEEE Transactions on Geoscience and Remote Sensing , vol. 61, pp. 1–14, 2023. [11] T. Cocks, R. Jenssen, A. Stewart, I. Wilson, and T. Shields, “The HyMapTM airborne hyperspectral sensor: The system, calibration and performance,” in Proc. The 1st EARSeL Workshop on Imaging Spec-troscopy . EARSeL, 1998, pp. 37–42. [12] “AVIRIS USA hyperspectral data cube,” [Online]. Available: http:// aviris.jpl.nasa.gov/. [13] A. Shetty and G. X. Gao, “UAV pose estimation using cross-view geolocalization with satellite imagery,” in Proc. IEEE International Conference on Robotics and Automation (ICRA) , Montreal, Canada, 2019, pp. 1827–1833. [14] L. Ding, J. Zhou, L. Meng, and Z. Long, “A practical cross-view image matching method between UAV and satellite for UAV-based geo-localization,” Remote Sensing , vol. 13, no. 1, p. 47, 2020. [15] H. Li, W. Yang, F. Xu, H. Tan, H. Zhang, S. Li, and G.-S. Xia, “Unifying UAV cross-view geo-localization via 3D geometric perception,” arXiv preprint arXiv:2604.01747 , 2026. [16] K. Vuong, A. Ghosh, D. Ramanan, S. Narasimhan, and S. Tulsiani, “AerialMegaDepth: Learning aerial-ground reconstruction and view synthesis,” in Proc. IEEE/CVF Conference on Computer Vision and Pattern Recognition , Nashville TN, USA, 2025, pp. 21 674–21 684. [17] C. Lee and J. Bethel, “Georegistration of airborne hyperspectral image data,” IEEE Transactions on Geoscience and Remote Sensing , vol. 39, no. 7, pp. 1347–1351, 2001. [18] C. Toth, J. Oh, and D. Grejner-Brzezinska, “Airborne hyperspectral image georeferencing aided by high-resolution satellite images,” in Proc. ISPRS TC VII Symposium , vol. 38, 2010. [19] C.-H. Lin, C.-Y. Hsieh, and J.-T. Lin, “CODE-IF: A convex/deep image fusion algorithm for efficient hyperspectral super-resolution,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–18, 2024. [20] C.-H. Lin, F. Ma, C.-Y. Chi, and C.-H. Hsieh, “A convex optimization-based coupled nonnegative matrix factorization algorithm for hyperspec-tral and multispectral data fusion,” IEEE Transactions on Geoscience and Remote Sensing , vol. 56, no. 3, pp. 1652–1667, 2018. [21] M. Brell, C. Rogass, K. Segl, B. Bookhagen, and L. Guanter, “Improving sensor fusion: A parametric method for the geometric coalignment of air-borne hyperspectral and Lidar data,” IEEE Transactions on Geoscience and Remote Sensing , vol. 54, no. 6, pp. 3460–3474, 2016. [22] C.-H. Lin, C.-C. Hsu, S.-S. Young, C.-Y. Hsieh, and S.-C. Tai, “QR-CODE: Quasi-residual convex deep network for fusing misaligned hy-perspectral and multispectral images,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–15, 2024. [23] G. Fan, Y. Ma, X. Mei, F. Fan, J. Huang, and J. Ma, “Hyperspectral anomaly detection with robust graph autoencoders,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–14, 2021. [24] C.-H. Lin and S.-S. Young, “HyperKING: Quantum-classical generative adversarial networks for hyperspectral image restoration,” IEEE Trans-actions on Geoscience and Remote Sensing , vol. 63, pp. 1–19, 2025. [25] C.-H. Lin and Y.-Y. Chen, “HyperQUEEN: Hyperspectral quantum deep network for image restoration,” IEEE Transactions on Geoscience and Remote Sensing , vol. 61, pp. 1–20, 2023. [26] Q. Shi, X. Tang, T. Yang, R. Liu, and L. Zhang, “Hyperspectral image denoising using a 3-D attention denoising network,” IEEE Transactions on Geoscience and Remote Sensing , vol. 59, no. 12, pp. 10 348–10 363, 2021. [27] C.-H. Lin and S.-S. Young, “Signal subspace identification for incom-plete hyperspectral image with applications to various inverse problems,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1– 16, 2024. [28] C.-Y. Chi et al. , Convex Optimization for Signal Processing and Com-munications: From Fundamentals to Applications . CRC Press, Boca Raton, FL, 2017. [29] E. J. Cand` es, X. Li, Y. Ma, and J. Wright, “Robust principal component analysis?” Journal of the ACM (JACM) , vol. 58, no. 3, pp. 1–37, 2011. [30] W. Yao, L. Li, H. Ni, W. Li, and R. Tao, “Hyperspectral anomaly detection based on improved RPCA with non-convex regularization,” 
+
+Remote Sensing , vol. 14, no. 6, p. 1343, 2022. [31] J. Xu, W. Jiang, L. Chen, C. Zhang, M. Wildgruber, X. Yang, and X. Ma, “Confidence-weighted prior-guided RPCA for hyperspectral anomaly detection,” IEEE Signal Processing Letters , pp. 1–5, 2026. [32] Y. Xu, Z. Wu, J. Chanussot, and Z. Wei, “Joint reconstruction and anomaly detection from compressive hyperspectral images using Ma-halanobis distance-regularized tensor RPCA,” IEEE Transactions on Geoscience and Remote Sensing , vol. 56, no. 5, pp. 2919–2930, 2018. [33] C.-H. Lin, Y.-C. Lin, and P.-W. Tang, “ADMM-ADAM: A new inverse imaging framework blending the advantages of convex optimization and deep learning,” IEEE Transactions on Geoscience and Remote Sensing ,pp. 1–16, Sep. 2021. [34] Y. Xu, Z. Wu, J. Li, A. Plaza, and Z. Wei, “Anomaly detection in hyperspectral images based on low-rank and sparse representation,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 54, no. 4, pp. 1990–2000, 2016. [35] T. Cheng and B. Wang, “Graph and total variation regularized low-rank representation for hyperspectral anomaly detection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 58, no. 1, pp. 391–406, 2020. [36] X. Fu, S. Jia, L. Zhuang, M. Xu, J. Zhou, and Q. Li, “Hyperspectral anomaly detection via deep plug-and-play denoising CNN regulariza-tion,” IEEE Transactions on Geoscience and Remote Sensing , vol. 59, no. 11, pp. 9553–9568, 2021. [37] Y. Qu, W. Wang, R. Guo, B. Ayhan, C. Kwan, S. Vance, and H. Qi, “Hy-perspectral anomaly detection through spectral unmixing and dictionary-based low-rank decomposition,” IEEE Transactions on Geoscience and Remote Sensing , vol. 56, no. 8, pp. 4391–4405, 2018. [38] N. Huyan, X. Zhang, H. Zhou, and L. Jiao, “Hyperspectral anomaly de-tection via background and potential anomaly dictionaries construction,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 57, no. 4, pp. 2263–2276, 2019. [39] L. Li, W. Li, Y. Qu, C. Zhao, R. Tao, and Q. Du, “Prior-based tensor approximation for anomaly detection in hyperspectral imagery,” IEEE Transactions on Neural Networks and Learning Systems , vol. 33, no. 3, pp. 1037–1050, 2022. [40] S. Sun, J. Liu, X. Chen, W. Li, and H. Li, “Hyperspectral anomaly de-tection with tensor average rank and piecewise smoothness constraints,” 
+
+IEEE Transactions on Neural Networks and Learning Systems , vol. 34, no. 11, pp. 8679–8692, 2023. [41] C.-H. Lin, C.-Y. Chi, Y.-H. Wang, and T.-H. Chan, “A fast hyperplane-based minimum-volume enclosing simplex algorithm for blind hyper-spectral unmixing,” IEEE Transactions on Signal Processing , vol. 64, no. 8, pp. 1946–1961, Apr. 2016. [42] C.-H. Lin, P.-W. Tang, and A. R. Huete, “Quantum feature-empowered deep classification for fast mangrove mapping,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–13, 2025. [43] C.-H. Lin, T.-H. Lin, and J. Chanussot, “Quantum information-empowered graph neural network for hyperspectral change detection,” 18 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1– 15, 2024. [44] J.-F. Hu, T.-Z. Huang, L.-J. Deng, T.-X. Jiang, G. Vivone, and J. Chanus-sot, “Hyperspectral image super-resolution via deep spatiospectral at-tention convolutional neural networks,” IEEE Transactions on Neural Networks and Learning Systems , vol. 33, no. 12, pp. 7251–7265, 2022. [45] D. Hong, B. Zhang, X. Li, Y. Li, C. Li, J. Yao, N. Yokoya, H. Li, P. Ghamisi, X. Jia, A. Plaza, P. Gamba, J. A. Benediktsson, and J. Chanussot, “SpectralGPT: Spectral remote sensing foundation model,” 
+
+IEEE Transactions on Pattern Analysis and Machine Intelligence ,vol. 46, no. 8, pp. 5227–5244, 2024. [46] D. Ulyanov, A. Vedaldi, and V. Lempitsky, “Deep image prior,” in Proc. IEEE Conference on Computer Vision and Pattern Recognition , 2018, pp. 9446–9454. [47] C.-H. Lin and J.-T. Lin, “PRIME: Unsupervised multispectral unmixing using virtual quantum prism and convex geometry,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–15, 2025. [48] C.-H. Lin and S.-S. Young, “Underdetermined blind source separation via weighted simplex shrinkage regularization and quantum deep image prior,” IEEE Transactions on Image Processing , vol. 35, no. 99, pp. 1–1, 2026. [49] D. Wang, L. Zhuang, L. Gao, X. Sun, and X. Zhao, “Global feature-injected blind-spot network for hyperspectral anomaly detection,” IEEE Geoscience and Remote Sensing Letters , vol. 21, pp. 1–5, 2024. [50] M. Cisse, P. Bojanowski, E. Grave, Y. Dauphin, and N. Usunier, “Parseval networks: Improving robustness to adversarial examples,” in 
+
+Proc. International Conference on Machine Learning . PMLR, 2017, pp. 854–863. [51] N. Akhtar, A. Mian, N. Kardan, and M. Shah, “Advances in adversarial attacks and defenses in computer vision: A survey,” IEEE access , vol. 9, pp. 155 161–155 196, 2021. [52] Z. Yuan, J. Zhang, Y. Jia, C. Tan, T. Xue, and S. Shan, “Meta gradient adversarial attack,” in Proc. IEEE/CVF International Conference on Computer Vision , 2021, pp. 7748–7757. [53] I. J. Goodfellow, J. Shlens, and C. Szegedy, “Explaining and harnessing adversarial examples,” arXiv preprint arXiv:1412.6572 , 2014. [54] A. Kurakin, I. Goodfellow, and S. Bengio, “Adversarial machine learning at scale,” arXiv preprint arXiv:1611.01236 , 2016. [55] A. Madry, A. Makelov, L. Schmidt, D. Tsipras, and A. Vladu, “Towards deep learning models resistant to adversarial attacks,” arXiv preprint arXiv:1706.06083 , 2017. [56] Y. Liu, X. Chen, C. Liu, and D. Song, “Delving into transfer-able adversarial examples and black-box attacks,” arXiv preprint arXiv:1611.02770 , 2016. [57] N. Papernot, P. McDaniel, and I. Goodfellow, “Transferability in ma-chine learning: From phenomena to black-box attacks using adversarial samples,” arXiv preprint arXiv:1605.07277 , 2016. [58] C. Shi, Y. Dang, L. Fang, Z. Lv, and M. Zhao, “Hyperspectral image classification with adversarial attack,” IEEE Geoscience and Remote Sensing Letters , vol. 19, pp. 1–5, 2022. [59] C. Shi, M. Zhang, Z. Lv, Q. Miao, and C.-M. Pun, “Universal object-level adversarial attack in hyperspectral image classification,” IEEE Transactions on Geoscience and Remote Sensing , vol. 61, pp. 1–14, 2023. [60] Y. Dong, F. Liao, T. Pang, H. Su, J. Zhu, X. Hu, and J. Li, “Boosting adversarial attacks with momentum,” in Proc. IEEE Conference on Computer Vision and Pattern Recognition , 2018, pp. 9185–9193. [61] X. Wang and K. He, “Enhancing the transferability of adversarial attacks through variance tuning,” in Proc. IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2021, pp. 1924–1933. [62] H. Li, K. Dang, M. Gong, A. K. Qin, Y. Zhou, Y. Wu, and L. Xing, “Sparse unmixing guided adversarial attack for hyperspectral image classification,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 36, no. 2, pp. 2318–2331, 2026. [63] C.-H. Lin and J. M. Bioucas-Dias, “Nonnegative blind source separation for ill-conditioned mixtures via John ellipsoid,” IEEE Transactions on Neural Networks and Learning Systems , vol. 32, no. 5, pp. 2209–2223, 2020. [64] C.-H. Lin, W.-K. Ma, W.-C. Li, C.-Y. Chi, and A. Ambikapathi, “Identifiability of the simplex volume minimization criterion for blind hyperspectral unmixing: The no-pure-pixel case,” IEEE Transactions on Geoscience and Remote Sensing , vol. 53, no. 10, pp. 5530–5546, 2015. [65] C.-H. Lin and T.-H. Lin, “All-addition hyperspectral compressed sensing for metasurface-driven miniaturized satellite,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–15, 2022. [66] W. Lee, M. Kim, and D.-H. Cho, “Deep power control: Transmit power control scheme based on convolutional neural network,” IEEE Communications Letters , vol. 22, no. 6, pp. 1276–1279, 2018. [67] D. Qiao, S. Choi, and K. G. Shin, “Interference analysis and transmit power control in IEEE 802.11 a/h wireless LANs,” IEEE/ACM Trans-actions On Networking , vol. 15, no. 5, pp. 1007–1020, 2007. [68] Y. Zhang, T. Zhang, J. Nie, and Y. Fu, “Real noise decoupling for hyperspectral image denoising,” in Proc. AAAI Conference on Artificial Intelligence , vol. 40, no. 15, 2026, pp. 12 925–12 933. [69] Z. Zhao, N. Xu, S. Jin, P. Li, Y. Zhang, Z. Yang, and Z. Li, “Methods, datasets, and prospects for hyperspectral image denoising: A compre-hensive survey,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 19, pp. 6013–6037, 2026. [70] J. A. Paredes, F. J. ´ Alvarez, M. Hansard, and K. Z. Rajab, “A Gaussian process model for UAV localization using millimetre wave Radar,” 
+
+Expert Systems with Applications , vol. 185, p. 115563, 2021. [71] C.-H. Lin, J.-T. Chen, Z.-C. Leng, and J.-T. Lin, “COS2A: Conversion from Sentinel-2 to AVIRIS hyperspectral data using interpretable algo-rithm with spectral–spatial duality,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–16, 2025. [72] S.-S. Young and C.-H. Lin, “Spectral super-resolution via adversarial unfolding and data-driven spectrum regularization: From multispectral satellite data to NASA hyperspectral image,” in Proc. IEEE/CVF Con-ference on Computer Vision and Pattern Recognition , Denver, Colorado, USA, Jun. 3-7, 2026. [73] C.-H. Lin and Z.-C. Leng, “ExplainS2A: Explainable spectral-spatial duality model for fast transforming Sentinel-2 image to AVIRIS-level hyperspectral image,” IEEE Transactions on Geoscience and Remote Sensing , 2026. [74] T.-H. Chan, W.-K. Ma, C.-Y. Chi, and Y. Wang, “A convex analysis framework for blind separation of non-negative sources,” IEEE Trans-actions on Signal Processing , vol. 56, no. 10, pp. 5120–5134, 2008. [75] D. Burago, Y. Burago, S. Ivanov et al. , A Course in Metric Geometry .American Mathematical Society Providence, 2001, vol. 33. [76] P. Pauli, A. Koch, J. Berberich, P. Kohler, and F. Allg¨ ower, “Training robust neural networks using Lipschitz bounds,” IEEE Control Systems Letters , vol. 6, pp. 121–126, 2022. [77] G. H. Golub, A. Hoffman, and G. W. Stewart, “A generalization of the Eckart-Young-Mirsky matrix approximation theorem,” Linear Algebra and its applications , vol. 88, pp. 317–327, 1987. [78] R. O. Green, M. L. Eastwood, C. M. Sarture, T. G. Chrien, M. Aronsson, B. J. Chippendale, J. A. Faust, B. E. Pavri, C. J. Chovit, M. Solis 
+
+et al. , “Imaging spectroscopy and the airborne visible/infrared imaging spectrometer (AVIRIS),” Remote sensing of environment , vol. 65, no. 3, pp. 227–248, 1998. [79] J. Nie, W. Wei, L. Zhang, C. Ding, and Y. Zhang, “Hybrid pixel-wise registration learning for robust fusion-based hyperspectral image super-resolution,” IEEE Transactions on Computational Imaging , vol. 10, pp. 915–927, 2024. [80] Y. Gao, L. Zhang, X. Sun, Y. Zhang, Q. Li, Y. Cen, and D. Zhang, “Blind hyperspectral–multispectral image fusion robust to spatial mis-registration and spectral range nonoverlap,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 19, pp. 10 804–10 824, 2026. [81] “Torch Sigmoid,” [Online]. Available: https://docs.pytorch.org/docs/2. 12/generated/torch.nn.Sigmoid.html. [82] D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,” in Proc. International Conference for Learning Representations , San Diego, CA, USA, May. 7-9, 2015. [83] P. Gader, A. Zare, R. Close, J. Aitken, and G. Tuell, “MUUFL Gulfport hyperspectral and LiDAR airborne data set,” Univ. Florida, Gainesville, FL, USA, Tech. Rep. REP-2013-570 , 2013. [84] Y. Zhou, A. Rangarajan, and P. D. Gader, “An integrated approach to registration and fusion of hyperspectral and multispectral images,” IEEE Transactions on Geoscience and Remote Sensing , vol. 58, no. 5, pp. 3020–3033, 2020. [85] J. Lian, L. Wang, H. Sun, and H. Huang, “GT-HAD: Gated transformer for hyperspectral anomaly detection,” IEEE Transactions on Neural Networks and Learning Systems , vol. 36, no. 2, pp. 3631–3645, 2025. [86] M. Wang, L. Li, L. Jiao, X. Liu, F. Liu, P. Chen, and S. Yang, “OT-AD: Optimal transport-guided transformer for hyperspectral anomaly detection,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 64, pp. 1–18, 2026. [87] L. Zhuang, X. Fu, M. K. Ng, and J. M. Bioucas-Dias, “Hyperspectral image denoising based on global and nonlocal low-rank factorizations,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 59, no. 12, pp. 10 438–10 454, 2021. 19 
+
+[88] C.-H. Lin, C.-Y. Chi, L. Chen, D. J. Miller, and Y. Wang, “Detection of sources in non-negative blind source separation by minimum description length criterion,” IEEE Transactions on Neural Networks and Learning Systems , vol. 29, no. 9, pp. 4022–4037, 2017. 
+
+Chia-Hsiang Lin (S’10-M’18-SM’24) received the B.S. degree in electrical engineering and the Ph.D. degree in communications engineering from Na-tional Tsing Hua University (NTHU), Taiwan, in 2010 and 2016, respectively. From 2015 to 2016, he was a Visiting Student of Virginia Tech, Arlington, VA, USA. He is currently a Professor with the Department of Electrical Engineering, National Cheng Kung University (NCKU), Taiwan, and also serves as a Technical Director of Smart Sensing & Systems Technology Center, Industrial Technology Research Institute (ITRI). Before joining NCKU, he held research positions with The Chinese University of Hong Kong, HK (2014 and 2017), NTHU (2016-2017), and the University of Lisbon (ULisboa), Lisbon, Portugal (2017-2018). He was an Assistant Professor with the Center for Space and Remote Sensing Research, National Central University, Taiwan, in 2018, a Visiting Professor with ULisboa, in 2019, and a Visiting Professor with Texas A&M University, USA, in 2025. His research interests include network science, quantum computing, convex geometry and optimization, blind signal processing, and imaging science. Dr. Lin received the Emerging Young Scholar Award (The 2030 Cross-Generation Program) from National Science and Technology Council (NSTC), from 2023 to 2027, the Future Technology Award from NSTC, in 2022, the Outstanding Youth Electrical Engineer Award from The Chinese Institute of Electrical Engineering (CIEE), in 2022, the Best Young Professional Member Award from IEEE Tainan Section, in 2021, and the Prize Paper Award from IEEE Geoscience and Remote Sensing Society (GRS-S), in 2020. He received the Ministry of Science and Technology (MOST) Young Scholar Fellowship, together with the EINSTEIN Grant Award, from 2018 to 2023. In 2016, he was a recipient of the Outstanding Doctoral Dissertation Award from the Chinese Image Processing and Pattern Recognition Society and the Best Doctoral Dissertation Award from the IEEE GRS-S. 
+
+Si-Sheng Young (S’23) is currently a Ph.D. stu-dent with the Intelligent Hyperspectral Computing Laboratory (IHCL), Department of Electrical Engi-neering, National Cheng Kung University (NCKU), Tainan, Taiwan. In 2023, he received the Merit Award from The Grand Challenge “Computing for the Future”, Miin Wu School of Computing, NCKU, as well as the highly competitive “Pan Wen Yuan Scholarship” from the Industrial Technology Research Institute (ITRI), Hsinchu, Taiwan. In 2024, he received a highly competitive “Scholarship Pilot Program to Cultivate Outstanding Doc-toral Students” from the National Science and Technology Council (NSTC), Taiwan. His research interests include convex optimization, deep learning, anomaly detection, data fusion, and imaging inverse problems. 
+
+Jon Atli Benediktsson (Life Fellow, IEEE) re-ceived the Cand.Sci. degree in electrical engineering from the University of Iceland, Reykjav´ ık, Iceland, in 1984, and the M.S.E.E. and Ph.D. degrees in electrical engineering from Purdue University, West Lafayette, IN, USA, in 1987 and 1990, respectively. Since 1991, he has been with the University of Iceland and has been a Professor of electrical and computer engineering since 1996. He was the President and a Rector of the University of Iceland from 2015 to 2025 and the President of Aurora Universities from 2020 to 2024. His research interests are in remote sensing, biomedical analysis of signals, pattern recognition, image processing, and signal processing, and he has published extensively in those fields. Dr. Benediktsson is an International Member of the U.S. National Academy of Engineering, a Fellow of SPIE, a member of the Academy of Europe, SigmaXi, and Tau Beta Pi. He was granted the IEEE Third Millennium Medal.

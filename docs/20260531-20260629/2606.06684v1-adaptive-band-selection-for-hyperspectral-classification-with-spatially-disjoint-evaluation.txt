@@ -1,0 +1,449 @@
+Title: Adaptive Band Selection for Hyperspectral Classification with Spatially Disjoint Evaluation
+
+URL Source: https://arxiv.org/pdf/2606.06684v1
+
+Published Time: Mon, 08 Jun 2026 00:10:19 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# ADAPTIVE BAND SELECTION FOR HYPERSPECTRAL CLASSIFICATION WITH SPATIALLY DISJOINT EVALUATION 
+
+# Ikram El-Hajri ⋆ Ouassim Karrakchou ⋆ Alejandro Mousist † 
+
+> ⋆
+
+# International University of Rabat, Rabat, Morocco  
+
+> †
+
+# Thales Alenia Space, Spain 
+
+ABSTRACT 
+
+Hyperspectral band selection methods based on differentiable selec-tors can be sensitive to initialization and to extracting a final discrete subset, while prescribed band counts limit flexibility. We propose SGBR-HC (Spectral-Group Band Ranking with Hard-Concrete ini-tialization), a two-stage method that uses a supervised spectral rank-ing to initialize trainable sparse gates rather than treating ranking as a fixed selection rule, letting the number of selected bands be deter-mined by training. Stage-1 scores candidate bands from training pix-els by class discriminability and spectral diversity; this ranking seeds the gate logits for Stage-2, which trains the sparse gates jointly with a spatial classifier. Under spatially disjoint evaluation on Pavia Uni-versity and Houston 2013, verified by retraining a fresh classifier on the selected bands, SGBR-HC achieves the highest mean overall ac-curacy and Cohen’s κ with approximately twenty bands. Bypassing Stage-1 degrades OA by 8.84 pp on Pavia University and 22.15 pp on Houston 2013, confirming the ranking prior’s role. Random pixel splits inflate OA on Pavia University by 30.56 pp, underscoring spa-tial leakage as a critical evaluation confound. 
+
+Index Terms — Hyperspectral band selection, L0 regularization, hyperspectral image classification, spatial leakage 
+
+1. INTRODUCTION 
+
+Hyperspectral imaging (HSI) acquires hundreds of narrow, contigu-ous spectral channels per scene, producing detailed material signa-tures that benefit remote sensing tasks from urban mapping to crop monitoring [1]. This spectral richness can worsen the Hughes phe-nomenon, where classification performance degrades when the fea-ture dimension grows but labeled training data remain limited [2]. Storage, transmission, and onboard inference costs also scale with the number of retained channels, making compact and interpretable spectral representations essential for practical HSI systems. Dimensionality reduction for HSI follows two complementary strategies: feature extraction (FE) and band selection (BS). FE meth-ods compress spectral vectors into latent components that reduce di-mensionality effectively but produce mixtures of wavelengths and thus lose the original spectral identity; this complicates physical in-terpretability and sensor-level deployment. BS selects a small subset of the original channels, preserving wavelength identity and inform-ing reduced-band acquisition or omission of specific bands. Con-sequently, BS is attractive when interpretability, sensor constraints, or cross-sensor transfer are priorities. The central BS challenge is to find a compact subset that retains discriminative power for the downstream task while respecting the ordered spectral structure. 
+
+> This research has received funding from the European Union’s Horizon research and innovation program under grant agreement No 101070374.
+
+A large body of BS work computes explicit, interpretable scores or groups from spectral statistics and selects representa-tives accordingly. Classical supervised feature-selection criteria, such as max-dependency/min-redundancy (mRMR) [3], motivate relevance–redundancy scoring, while clustering and neighborhood-grouping methods exploit the ordered spectral axis to reduce local redundancy [4–6]. Grouping arises naturally from spectral conti-guity, since adjacent channels are likely redundant; partitioning the spectrum and selecting representatives addresses redundancy while preserving wavelength meaning. Self-representation approaches extend this idea by modeling band dependence explicitly, treating informative bands as those enabling the reconstruction of others; recent work couples self-representation with spatial priors to respect spectral–spatial structure [7]. These external, criterion-driven meth-ods have the virtue of explicit rules and interpretability, but because selection precedes classifier training, the chosen subset optimizes a criterion external to the classification objective used at evaluation. To reduce this proxy mismatch, recent research embeds se-lection into model training, learning neural selectors jointly with reconstruction or task objectives. Reconstruction-driven meth-ods form a well-studied branch. BS-Nets [8] learn band-attention weights jointly with a reconstruction network, Concrete AE [9] uses a Concrete selector with temperature annealing to learn a fixed-size subset, stochastic-gate autoencoders [10] introduce Gaussian-relaxed sparse gates under a reconstruction objective, and Dropout CAE [11] eliminates the post-processing step required to extract a hard subset by embedding variational dropout directly in the selector. Classification-driven embedded selectors address the reconstruction-proxy objective by training selectors under task loss [12, 13]. Nev-ertheless, both reconstruction- and classification-driven embedded selectors rely on continuous relaxations, stochastic gates, or soft selection variables that must eventually be converted into a hard subset. As a result, final selection can be sensitive to initialization, annealing schedules, and the conversion from soft to hard sub-sets, which can destabilize selection and complicate selection-size control. Hybrid methods integrate complementary cues, including graphs, dynamic clustering, reconstruction, classifier feedback, and teacher-guided signals, to better capture spectral structure and task rele-vance [14–16]; further hybrid approaches combine filter preselection with metaheuristic search, such as Fisher–ReliefF preprocessing fol-lowed by improved dwarf-mongoose optimization [17]. However, to our knowledge, spectral structure in these hybrid methods is used either as a final fixed selection rule or as part of a learned repre-sentation, rather than as an explicit supervised prior for initializing trainable sparse-gate parameters. A supervised spectral ranking car-ries interpretable information about discriminability and diversity across wavelength regions, while a trainable sparse gate can still refine the subset during classifier optimization. 
+
+> arXiv:2606.06684v1 [cs.CV] 4 Jun 2026
+
+The method must therefore preserve wavelength identity and structured spectral priors, align selection with the classification loss, stabilize discrete sparse optimization, and avoid prescribing the final number of bands a priori. A direct way to address these requirements is to bias the initialization of trainable sparse gates with a supervised spectral ranking, rather than using ranking as a terminal fixed rule. Hard-Concrete ℓ0-style stochastic gates provide an effective mecha-nism for this strategy because they attach stochastic binary gates to model inputs and optimize a differentiable surrogate for the expected number of active gates [18]. In this work, we introduce SGBR-HC (Spectral-Group Band Ranking with Hard-Concrete initialization), a two-stage hybrid approach. Stage-1 groups bands along the spectral axis and pro-duces a supervised ranking that combines class discriminability with inter-group diversity, computed strictly from training pixels. Stage-2 maps the resulting rank positions into initial logits for Hard-Concrete stochastic gates that are optimized jointly with a classifier under an ℓ0 regularizer. Without prescribing a band count, the sparsity coefficient λ implicitly determines m via the learned gate distribution rather than requiring a fixed subset size or post-hoc thresholding of soft selection scores. For reliable evaluation, we apply leakage-aware hard-subset verification [19, 20]; Pavia University (PU) uses a spatially dis-joint block partition that ensures no patch crosses partitions, while Houston 2013 follows the official Data Fusion Contest (DFC) train/test split. We compare SGBR-HC with published baselines and a random-selection control under these per-scene evaluation protocols. The main contributions of this work are: • We propose SGBR-HC, a two-stage hybrid selector that uses a supervised spectral-group ranking to initialize Hard-Concrete sparse-gate logits for classifier-aligned ℓ0 optimiza-tion and final hard-subset extraction. • We avoid prescribing m directly; instead, the sparsity coeffi-cient λ controls the accuracy–sparsity trade-off, and the real-ized subset size is obtained from the learned gate distribution without an additional post-hoc threshold. • Under spatially disjoint evaluation, we quantify a 30 .56 pp OA gap relative to random pixel splits on PU, showing that evaluation protocol is a critical confound in BS benchmarks. 
+
+2. METHOD 
+
+Let X ∈ RH×W ×B denote a hyperspectral image with H × W
+
+spatial pixels and B spectral bands. The goal is to select a com-pact subset of spectral bands that preserves discriminative spectral information for pixel classification. As illustrated in Fig. 1, SGBR-HC performs this selection in two stages. Stage-1 produces a ranked candidate pool C ⊂ { 1, . . . , B }
+
+with |C| = k by grouping bands according to spectral similarity and scoring them using class discriminability and inter-group diversity computed from training pixels only. Stage-2 learns Hard-Concrete gates over the candidates in C, initialized from the Stage-1 ranks, and optimizes them jointly with the classifier under an ℓ0 regular-izer. The final subset S ⊆ C is then extracted threshold-free from the learned gates, with |S| = m determined by the learned gate dis-tribution rather than fixed in advance. 
+
+2.1. Stage-1: Spectral-Group Band Ranking 
+
+A band’s discriminability measures how well its intensity values sep-arate the target classes; diversity measures how weakly it correlates with bands in other spectral groups. Ranking by discriminability alone concentrates selections in one spectral region, because adja-cent bands are highly correlated. We therefore score each band by a weighted combination of both criteria, so the candidate pool is both class-discriminative and spectrally spread. 
+
+Spectral grouping. For each band, we estimate a marginal intensity histogram from train-fold pixels and interpret it as a discrete prob-ability distribution. Band-to-band dissimilarity is computed with the symmetrized Kullback–Leibler (KL) divergence between per-band empirical intensity distributions, and hierarchical clustering with Ward linkage is applied to the resulting B ×B dissimilarity ma-trix, following information-measure-based HSI band-selection clus-tering [21]. The resulting partition forms G=50 spectral groups, and 
+
+g(b) denotes the group of band b.
+
+Band scoring. For each band, we compute a global discriminability score and an inter-group diversity score. The global discriminability score is 
+
+db = norm g(JM b) · norm g(ReliefF b),
+
+where norm g(·) denotes global min–max normalization over all B
+
+bands, bringing JM b and ReliefF b to a common scale before mul-tiplication. JM b is the sum of Jeffreys-Matusita (JM) divergences computed for band b over all class pairs, and ReliefF b [22] measures local neighborhood discrimination by rewarding bands that separate nearby different-class samples while remaining stable among nearby same-class samples. ReliefF uses up to 500 training pixels and 10 nearest neighbors; JM uses all Stage-1 training pixels. The inter-group diversity score is 
+
+δb = 1
+
+|I b|
+
+X
+
+> b′∈I b
+
+(1 − | cbb ′ |) , Ib = {b′ : g(b′)̸ = g(b)}, (1) where cbb ′ is the Pearson correlation between bands b and b′ com-puted on training pixels. Both db and δb are then min–max normal-ized within each spectral group to make scores comparable across groups, yielding d(g) 
+
+> b
+
+and δ(g) 
+
+> b
+
+. The final Stage-1 score is 
+
+sb = η d (g) 
+
+> b
+
++ (1 − η) δ(g) 
+
+> b
+
+,
+
+with η=0 .7.
+
+Candidate pool. The highest-scoring band from each group is re-tained as that group’s winner, so no single spectral region fills multi-ple pool slots. The G winners are then ranked by their score sb, and the top k form the candidate pool C passed to Stage-2. In the final configuration G=k=50 , so all winners enter the pool; their rank still governs the rank-based logit initialization in Stage-2. 
+
+2.2. Stage-2: Hard-Concrete Gating 
+
+Stage-2 assigns a learnable Hard-Concrete gate zb to each of the k
+
+candidates and trains the gates jointly with the classifier under an ℓ0
+
+regularizer. 
+
+Rank-based initialization. The Stage-1 ranking is converted into initial gate logits before optimization. Let ρb ∈ { 1, . . . , k } be the rank of band b in the Stage-1 list, with rank 1 assigned to the highest-scoring band. The ranking prior qb, defined in (2), maps rank to 
+
+[0 , 1] :
+
+qb = 1 − ρb − 1
+
+k − 1 . (2) B     
+
+> W
+> H
+> (a)
+> Input:
+> 𝑋 ∈ℝ𝐻 ×𝑊 ×𝐵
+> subscript base , d i. s c , , end base , sub b equals subscript base , n o r m open paren cap J cap M , end base , sub b close paren times n o r m open paren subscript base , cap R e l i. e cap F , end
+> base , sub b
+> subscript base , d i. v , end base , sub b equals
+> 1. SPECTRAL GROUPING B →G
+> KL distance →Ward Clustering
+> 2. a. Discriminability
+
+𝑑𝑖𝑠𝑐 𝑏 = 𝑛𝑜𝑟𝑚 (𝐽𝑀 𝑏 )
+
+× 𝑛𝑜𝑟𝑚 (𝑅𝑒𝑙𝑖𝑒𝐹 𝑏 
+
+)
+
+> 2. b. Diversity
+
+𝑑𝑖𝑣 𝑏 =Inter -grp 
+
+correlation distance 
+
+⊕                           
+
+> sb=ηdisc b+(1−η)div b
+> 𝐺 =50 ,𝑘 =50
+> 𝜂 =0.7
+> (b) (c)
+> Final subset:
+> 𝑚 =𝑟𝑜𝑢𝑛𝑑 ෍
+> 𝑏
+> 𝜋 𝑏
+> S=Top m(෤zb)
+> S
+> W
+> H
+> ℒ=ℒCE +λ෍b
+> πb
+> Update 𝑎 𝑏
+
+UNet -DS  
+
+> 𝑏 𝑘
+> 𝑏 1
+> 𝑏 2
+> 𝑏 3
+> 𝑏 4
+> 𝑏 5
+> …
+> 𝑧 𝑏 𝑘
+> 𝑧 𝑏 1
+> 𝑧 𝑏 2
+> 𝑧 𝑏 3
+> 𝑧 𝑏 4
+> 𝑧 𝑏 5
+> …
+> 𝑎 𝑏 1
+> 𝑎 𝑏 2
+> 𝑎 𝑏 3
+> 𝑎 𝑏 4
+> 𝑎 𝑏 5
+> 𝑎 𝑏𝑘
+> Learnable
+> Gate logits 𝑎 𝑏
+> Gated bands  𝑘  × 𝐻  × 𝑊
+> Hard -subset verification
+> UNet -DS
+
+Output: S + OA / AA / 𝜿      
+
+> 𝑔 𝐺 𝑔 1𝑔 2𝑔 3𝑔 4𝑔 5…
+
+After training 
+
+𝜋 𝑏 , 𝑧 𝑏      
+
+> Gate schedule:
+> 5-epoch warm -up:
+> λ= 0→λ* = 0.003
+> HC temp. β: 1.0 →0.1
+> Tr
+> Te
+> V Tr
+> Te
+> V Tr
+> Te
+> V Tr
+> Te
+> V Tr
+> Test
+> V
+
+Leakage 
+
+free split       
+
+> …
+> rank ρb∈1,2,3,…,𝑘
+
+Take top -1 per 
+
+group → rank by 
+
+𝑠 𝑏      
+
+> Rank →Gate Logit
+> (initial values)
+> 𝛒 𝒃 →𝒒 𝒃 →𝒂 𝒃
+
+𝑎 𝑏 Fig. 1 . Overview of SGBR-HC. (a) Stage-1 forms spectral groups using KL-based Ward clustering, scores bands by discriminability and inter-group diversity, and produces a ranked top-k candidate pool from train-fold pixels only. (b) Stage-2 converts the rank position of each candidate into an initial Hard-Concrete gate logit, then jointly trains the gates and a UNet-DS under an ℓ0-regularized loss. (c) The final subset is extracted threshold-free, then verified by training a fresh UNet-DS using only the selected bands. The initial gate logit is set by (3): 
+
+ab = ℓlow + qb(ℓhigh − ℓlow ), (3) where ℓlow =logit(0 .02) and ℓhigh =logit(0 .90) , keeping logits fi-nite and avoiding gradient saturation. All gate logits remain trainable throughout Stage-2. 
+
+Gate parameterization. Hard-Concrete gating [18] provides a dif-ferentiable relaxation of binary include/exclude decisions. During training, each candidate band b is gated by a stochastic value zb ∈
+
+[0 , 1] drawn as: 
+
+rb = σ
+
+ log u − log(1 − u) + ab
+
+β
+
+
+
+, u ∼ U (0 , 1) ,zb = min  1, max(0 , r b(ζ − γ) + γ),
+
+where σ(·) is the sigmoid function, u is a uniform noise sample that makes the gate stochastic and the objective differentiable with re-spect to ab, β > 0 is a temperature parameter, γ= − 0.1, and ζ=1 .1.The parameters γ and ζ stretch the support of rb beyond [0 , 1] ; after clamping, exact zeros and ones occur with positive probability, so the gate can be truly sparse during training. The temperature β is linearly decayed from 1.0 to 0.1 as training progresses, sharpening the gate distribution from soft to near-binary. The probability that gate b is nonzero is 
+
+πb = σ
+
+
+
+ab − β log −γζ
+
+
+
+,
+
+obtained analytically by marginalizing over u. πb is differentiable in 
+
+ab and appears directly in the ℓ0 regularizer. 
+
+Classifier. We use UNet-DS (Deep Supervision), a U-Net-style encoder–decoder with skip connections adapted for center-pixel hy-perspectral classification [23], as the Stage-2 classifier. The input is a 17 ×17 spatial patch in which each spectral channel is multiplied by its gate value zb, so channels with zb=0 are suppressed. Two auxiliary classification heads ( H1, H2) are attached to intermediate encoder stages; the main head ( H3) is attached to the final decoder stage. The auxiliary heads improve gradient flow during training; at inference, only the main head H3 is used. For all three heads, only the center-pixel logit, written (·)c, is used for supervision. The deep-supervision cross-entropy is 
+
+LCE = 0 .2 CE( oc1, y ) + 0 .3 CE( oc2, y ) + 0 .5 CE( oc3, y ),
+
+where (o1, o 2, o 3) are the logit maps from the three heads and y is the ground-truth class label of the center pixel. 
+
+Training objective. The gates and classifier are trained jointly by minimizing the objective in (4): 
+
+L = LCE + λ
+
+kX
+
+b=1 
+
+πb, (4) where λ P
+
+b πb penalizes the expected number of open gates. Both the temperature decay and the λ penalty are delayed by a 5-epoch warm-up, during which gates remain soft and unpenalized so the classifier first becomes informative before gating decisions sharpen and are regularized. 
+
+Final subset extraction. At inference, each gate is replaced by its deterministic value: 
+
+¯zb = min  1, max(0 , σ (ab)( ζ − γ) + γ).
+
+Rather than applying a fixed threshold on ¯zb, which would require choosing an additional hyperparameter, the realized band count is set by (5): 
+
+m = round 
+
+kX
+
+b=1 
+
+πb
+
+!
+
+. (5) The m candidates with the largest ¯zb values form the selected subset 
+
+S.
+
+3. EXPERIMENTS 3.1. Datasets and Evaluation Protocol PU [24]. The ROSIS-03 PU scene contains 610 × 340 pixels, 103 usable bands, and 9 classes. Following the leakage-free block parti-tion (LFBP) of Jia and Ding [25], the image is partitioned into non-overlapping Bs×Bs blocks, each assigned to train, validation, or test; a buffer of h=8 pixels (equal to the patch radius r=( p−1) /2
+
+for patch size p=17 , footprint 17 ×17 ) is excluded at every bound-ary so that all extracted patches lie fully within their assigned block. We use Bs=32 ; the block-to-partition assignment is randomly per-muted across seeds. A class-aware repair step (our extension) re-duces the effective block size (i.e., subdivides blocks) when buffer filtering leaves a class uncovered, yielding effective block sizes of 22–32 pixels. 
+
+Houston 2013 [26]. The DFC 2013 Houston scene contains 
+
+349 × 1905 pixels, 144 bands, and 15 classes. Unlike PU, Hous-ton 2013 provides an official contest train/test partition, with 2,832 
+
+labeled training pixels and 12 ,197 labeled test pixels. We retain this official split to preserve comparability with the standard benchmark, and draw a seed-specific validation subset from the official training mask. The remaining official training pixels are used for training, while the official test mask is never used for model selection. UNet-DS is evaluated on 17 ×17 center-pixel patches using the same patch size and training procedure as PU. 
+
+3.2. Implementation Details 
+
+Stage-1 uses G=50 spectral groups and η=0 .7. The candidate pool size k is chosen from {25 , 50 , B }: k=25 under-supplies Stage-2, while k=B removes the candidate-pool reduction step; both alter-natives reduce OA on both datasets, so we fix k=50 . The sparsity coefficient λ is selected by a 10-point logarithmic grid search over 
+
+λ ∈ [0 .001 , 0.2] ; both datasets select λ∗=0 .003 , with OA stable across λ ∈ [0 .001 , 0.01] before degrading under stronger sparsity (Fig. 2). Temperature β is linearly decayed from 1.0 to 0.1 after a 5-epoch warm-up. All UNet-DS training uses Adam ( lr=10 −3, batch size 32) with StepLR decay (factor 0.1, step 10 epochs). Stage-2 trains for 40 epochs with inverse-class-frequency sample weights to compensate for class imbalance, followed by up to 20 fine-tuning epochs with early stopping (patience 10). 
+
+3.3. Baselines and Metrics 
+
+Random-m draws a deterministic uniform sample of m bands with-out replacement, seeded per run using that seed’s SGBR-HC real-ized band count. Dropout CAE [11] is trained end-to-end for a fixed target band count. CHBS [12] uses the authors’ official architec-ture, trained on the training fold only. DEHF [15] uses the authors’ released code. NGNMF [6] uses only the BS stage, following the original paper. BS-Nets [8], FNGBS [4], ASPS-MN [5], S 4P [7], and mRMR [3] use publicly released implementations. For all BS methods, m is matched to SGBR-HC’s realized count on the same seed ( 20 .0±1.3 bands on PU; 19 .4±0.5 on Hous-ton 2013). We term this hard-subset verification, where selected subsets are frozen and evaluated by retraining a fresh UNet-DS on 
+
+17 ×17 center-pixel patches with dropout 0.1, using the training split only and validation OA for early stopping. We report OA, average accuracy (AA), and Cohen’s κ on the test split. 
+
+3.4. Main Results 
+
+Tables 1 and 2 compare SGBR-HC against nine published BS meth-ods and a random-selection control. On PU, SGBR-HC achieves the highest mean OA ( 69 .35 ±6.55% )and κ, leading the next-best method (BS-Nets, 68 .50% ) by 0.85 pp; SGBR-HC also exceeds the All-bands baseline ( 67 .11% ), confirm-ing that ∼20 bands are sufficient to surpass using all 103. SGBR-HC ranks first in OA across all five seeds, confirming the result is not driven by a single favorable partition. Several embedded selec-tors relying on continuous relaxations, including Dropout CAE (64 .73 ±9.49% ) and DEHF ( 64 .61 ±6.55% ), fall below All-bands on PU; the elevated Dropout CAE variance suggests that soft-to-hard conversion instability is amplified by the variable training-set com-position of the block+buffer protocol. On Houston 2013, SGBR-HC achieves the highest mean OA ( 86 .24 ±1.61% ) and κ, leading the next-best method (Dropout CAE, 86 .08% ) by 0.16 pp; the lower seed variance relative to PU reflects the fixed DFC 2013 test set, in contrast to PU where both training and test composition vary across seeds. SGBR-HC trails the leading AA method by 0.53 pp on PU (ASPS-MN, 66 .57% ) and 0.34 pp on Houston (Dropout CAE, 
+
+Table 1 . PU ( Bs=32 , h=8 , 5 seeds, retrained 17 ×17 -patch UNet-DS). All BS methods use m=20 .0±1.3 bands matched to SGBR-HC per seed. Bold : best.                                        
+
+> Method OA (%) AA (%) κ
+> All bands (103) 67 .11 ±7.13 63 .94 ±5.67 0.566 ±0.075
+> ASPS-MN [5] 68 .17 ±4.16 66 .57 ±5.61 0.580 ±0.040
+> BS-Nets [8] 68 .50 ±4.97 65 .48 ±5.77 0.583 ±0.053
+> CHBS [12] 68 .08 ±6.73 66 .02 ±6.93 0.579 ±0.075
+> DEHF [15] 64 .61 ±6.55 64 .64 ±5.35 0.543 ±0.058
+> Dropout CAE [11] 64 .73 ±9.49 63 .17 ±5.13 0.540 ±0.096
+> FNGBS [4] 66 .03 ±11 .20 65 .01 ±5.48 0.562 ±0.114
+> mRMR [3] 65 .07 ±8.10 63 .51 ±3.60 0.546 ±0.072
+> NGNMF [6] 67 .97 ±8.36 66 .12 ±4.76 0.582 ±0.084
+> S4P [7] 65 .75 ±7.09 66 .11 ±6.59 0.556 ±0.074
+> Random-m67 .60 ±4.86 65 .48 ±4.67 0.574 ±0.049
+> Ours (SGBR-HC) 69 .35 ±6.55 66 .04 ±5.23 0.594 ±0.070
+
+Table 2 . Houston 2013 (official DFC 2013 split, 5 seeds, retrained 
+
+17 ×17 -patch UNet-DS). All BS methods use m=19 .4±0.5 bands matched to SGBR-HC per seed. Bold : best.                                        
+
+> Method OA (%) AA (%) κ
+> All bands (144) 84 .94 ±1.33 84 .42 ±0.99 0.836 ±0.015
+> ASPS-MN [5] 85 .55 ±0.91 86 .40 ±1.13 0.843 ±0.010
+> BS-Nets [8] 85 .54 ±0.42 85 .72 ±0.27 0.843 ±0.004
+> CHBS [12] 84 .92 ±1.38 85 .79 ±0.88 0.836 ±0.015
+> DEHF [15] 84 .66 ±0.83 85 .24 ±0.83 0.833 ±0.009
+> Dropout CAE [11] 86 .08 ±0.74 86 .47 ±0.85 0.849 ±0.008
+> FNGBS [4] 85 .78 ±1.25 86 .40 ±0.94 0.845 ±0.014
+> mRMR [3] 85 .69 ±0.69 85 .56 ±0.75 0.845 ±0.007
+> NGNMF [6] 84 .71 ±0.80 85 .05 ±1.11 0.834 ±0.009
+> S4P [7] 82 .56 ±2.61 82 .18 ±2.92 0.811 ±0.028
+> Random-m85 .65 ±0.67 86 .00 ±1.00 0.844 ±0.007
+> Ours (SGBR-HC) 86 .24 ±1.61 86 .13 ±1.61 0.851 ±0.018
+
+86 .47% ); the ℓ0 regularizer compresses the subset without explicit class-specific band weighting, which may sacrifice wavelengths that primarily benefit minority classes despite inverse-frequency training weights. Across both datasets, SGBR-HC is the only method to rank first on both OA and κ, achieving this at ∼20 bands. 
+
+3.5. Ablation Study 
+
+Table 3 evaluates the contribution of the Stage-1 spectral prior and the Stage-2 sparse-gate refinement. SGBR Stage-1 only evaluates all 50 Stage-1 candidates without Hard-Concrete refinement. Shuffled init keeps the same 50 Stage-1 candidate bands but randomly per-mutes ρb (Eq. 2) before logit initialization (Eq. 3). Uniform init by-passes Stage-1 entirely (Eqs. 2–3) and initializes all gates uniformly over all input bands. No diversity (η=1 , removing δb in Eq. 1) retains Ward clustering and JM ×ReliefF but removes the diversity term. 
+
+JM-only ranking ranks bands using JM divergence alone, removing both Ward grouping and the diversity term (Eq. 1). 
+
+SGBR Stage-1 only establishes Stage-2’s baseline contribution: Hard-Concrete gating improves OA by 1.66 pp on PU and 1.85 pp on Houston 2013 while compressing the subset from 50 to ∼20 
+
+bands. Rank-based initialization contributes a useful but secondary signal: retaining the Stage-1 pool while randomizing logit order (Shuffled init ) reduces OA by 2.51 pp on PU and 1.25 pp on Hous-ton 2013. Shuffled init posts the highest AA on PU ( 66 .36% ), Table 3 . Stage-1 design ablation on PU and Houston 2013 (λ∗=0 .003 , 5 seeds, hard-subset UNet-DS). Bold : best.                                        
+
+> PU
+> Method OA (%) AA (%) κ
+> Ours (SGBR-HC) 69 .35 ±6.55 66 .04 ±5.23 0.594 ±0.070
+> SGBR Stage-1 only 67 .69 ±4.71 64 .11 ±5.36 0.569 ±0.057
+> Shuffled init 66 .84 ±7.08 66 .36 ±6.06 0.569 ±0.075
+> Uniform init (no Stage-1) 60 .51 ±7.94 49 .16 ±6.45 0.470 ±0.084
+> No diversity ( η=1 )66 .64 ±7.23 63 .53 ±6.81 0.563 ±0.078
+> JM-only ranking 69 .22 ±5.35 61 .51 ±9.05 0.581 ±0.069
+> Houston 2013
+> Ours (SGBR-HC) 86 .24 ±1.61 86 .13 ±1.61 0.851 ±0.018
+> SGBR Stage-1 only 84 .39 ±0.59 84 .17 ±0.69 0.830 ±0.006
+> Shuffled init 84 .99 ±2.10 85 .77 ±2.28 0.837 ±0.023
+> Uniform init (no Stage-1) 64 .09 ±0.60 64 .74 ±0.67 0.610 ±0.006
+> No diversity ( η=1 )78 .04 ±1.04 77 .57 ±1.22 0.762 ±0.011
+> JM-only ranking 79 .18 ±0.45 78 .16 ±0.58 0.774 ±0.005
+
+marginally above SGBR-HC ( 66 .04% ); without rank-based initial-ization, Stage-2 selects a more spectrally spread subset that benefits minority classes at the cost of 2.51 pp in OA. In contrast, Uniform init causes much larger drops of 8.84 pp on PU and 22 .15 pp on Houston 2013; near-zero Jaccard overlap between selected band sets (J=|S∩S′|/|S∪S′|; J=0 .083 ±0.056 on PU; J=0 .037 ±0.013 
+
+on Houston) confirms that ℓ0 optimization without the Stage-1 prior converges to a qualitatively different subset. Since this vari-ant removes both the Stage-1 candidate pool and the rank-based initialization, subtracting the Shuffled-init drop isolates the pool contribution at 6.33 pp on PU and 20 .90 pp on Houston, confirming the candidate pool as the dominant factor. The Stage-1 scoring ablations further show the importance of spectral diversity. On Houston 2013, removing the diversity term reduces OA by 8.20 pp, while JM-only ranking reduces OA by 
+
+7.06 pp. These drops are larger than on PU, suggesting that di-versity preservation is more consequential for the 15-class Houston scene, where fine-grained urban classes require wavelengths from distinct spectral regions that a discriminability-only ranking tends to concentrate in a single cluster. On PU, JM-only ranking nearly matches SGBR-HC in OA but trails by 4.53 pp in AA, indicat-ing that grouping and ReliefF may help preserve minority-class performance that OA alone can obscure. 
+
+3.6. Effect of Evaluation Protocol 
+
+Random pixel assignment, the most common HSI evaluation prac-tice, enforces only pixel-level disjointness, but under strong spatial autocorrelation [19] adjacent pixels share nearly identical spectra, so a test pixel neighboring a training pixel is not an independent sample. The index-level partition of Ahmad et al. [20] goes further by enforc-ing strict geographic disjointness ( Train ∩ Val ∩ Test = ∅) at the pixel level, ensuring that training, validation, and test samples come from separate spatial locations, yet applies no patch-radius buffer; center pixels from different splits that happen to be adjacent still produce overlapping patches, so geographically disjoint ̸ = spatially independent for patch-based classifiers. Following Jia and Ding’s LFBP [25], we adopt block+buffer evaluation, which addresses both leakage sources by assigning whole spatial blocks to one partition and excluding a patch-radius buffer at every boundary. On PU, the 36 .91 pp OA gap between the Ahmad et al. split and block+buffer on a per-pixel MLP (no recep-tive field) shows that autocorrelation-driven leakage is not limited 10 −3 10 −2 10 −1 
+
+> λ
+> 60
+> 70
+> OA (%)
+
+Pavia University   
+
+> OA
+> m
+> 10 −3 10 −2 10 −1
+> λ
+> 80
+> 82
+> 84
+> 86
+> 88
+> OA (%)
+
+Houston 2013 
+
+> OA
+> m
+> 10
+> 15
+> 20
+> m (bands)
+> 5
+> 10
+> 15
+> 20
+> m (bands)
+
+Fig. 2 . Validation OA (%) and selected band count m vs. λ on PU (top) and Houston 2013 (bottom); each point is the mean ± std over five seeds and the dotted line marks λ∗=0 .003 . OA remains stable across λ ∈ [0 .001 , 0.01] before degrading under stronger sparsity as 
+
+m continues to shrink. to patch-based classifiers. A separate comparison on the UNet-DS patch classifier using SGBR-HC bands shows a 30 .56 pp gap be-tween random pixel assignment and block+buffer, confirming that patch overlap compounds the effect. The two experiments involve different classifiers and split protocols and are not directly compara-ble in magnitude, but both motivate block+buffer as the evaluation standard throughout this work. 
+
+4. CONCLUSION 
+
+We presented SGBR-HC, a two-stage hyperspectral BS method that uses a supervised spectral-group ranking to initialize Hard-Concrete sparse-gate logits. Under leakage-aware hard-subset verification, SGBR-HC achieves the highest mean OA and κ on PU and ranks first on both OA and κ on Houston 2013 by a narrow margin. Com-pared with SGBR Stage-1 only , SGBR-HC improves OA by 1.66 pp on PU and 1.85 pp on Houston while selecting about 20 bands. Stage-1 is the dominant factor; bypassing it causes up to 22 .15 pp OA degradation with near-zero subset overlap, confirming that ℓ0
+
+optimization is sensitive to the candidate pool supplied by Stage-1; within-pool rank ordering provides a secondary but useful signal (Shuffled init: −2.51 pp PU, −1.25 pp Houston). We further show that random pixel splits inflate OA by 30 .56 pp on PU relative to spatially disjoint evaluation, underscoring that evaluation protocol is a critical confound in BS benchmarks. Both evaluation datasets are urban airborne scenes, and hard-subset verification relies on a sin-gle UNet-DS classifier architecture; future work should test broader scene types, sensor modalities, and classifier families to assess gen-eralization. 
+
+5. REFERENCES 
+
+[1] Weiwei Sun and Qian Du, “Hyperspectral band selection: A review,” IEEE Geoscience and Remote Sensing Magazine , vol. 7, no. 2, pp. 118–139, 2019. [2] G. F. Hughes, “On the mean accuracy of statistical pattern recognizers,” IEEE Transactions on Information Theory , vol. 14, no. 1, pp. 55–63, 1968. [3] Hanchuan Peng, Fuhui Long, and Chris Ding, “Feature selec-tion based on mutual information: Criteria of max-dependency, max-relevance, and min-redundancy,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 27, no. 8, pp. 1226–1238, 2005. [4] Qi Wang, Qiang Li, and Xuelong Li, “A fast neighborhood grouping method for hyperspectral band selection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 59, no. 6, pp. 5028–5039, 2021. [5] Qi Wang, Qiang Li, and Xuelong Li, “Hyperspectral band se-lection via adaptive subspace partition strategy,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 12, no. 12, pp. 4940–4950, 2019. [6] Hang Fu, Aizhu Zhang, Genyun Sun, Jinchang Ren, Xiuping Jia, Zhaojie Pan, and Hongzhang Ma, “A novel band selec-tion and spatial noise reduction method for hyperspectral im-age classification,” IEEE Transactions on Geoscience and Re-mote Sensing , vol. 60, pp. 1–13, 2022. [7] Chang Tang, Jun Wang, Xiao Zheng, Xinwang Liu, Weiying Xie, Xianju Li, and Xinzhong Zhu, “Spatial and spectral struc-ture preserved self-representation for unsupervised hyperspec-tral band selection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 61, pp. 1–13, 2023. [8] Yaoming Cai, Xiaobo Liu, and Zhihua Cai, “BS-Nets: An end-to-end framework for band selection of hyperspectral image,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 58, no. 3, pp. 1969–1984, 2020. [9] He Sun, Jinchang Ren, Huimin Zhao, Peter Yuen, and Julius Tschannerl, “Novel Gumbel-Softmax trick enabled concrete autoencoder with entropy constraints for unsupervised hyper-spectral band selection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–13, 2022. [10] He Sun, Lei Zhang, Lizhi Wang, and Hua Huang, “Stochastic gate-based autoencoder for unsupervised hyperspectral band selection,” Pattern Recognition , vol. 132, pp. 108969, 2022. [11] Lei Xu, Mete Ahishali, and Moncef Gabbouj, “Dropout con-crete autoencoder for band selection on hyperspectral image scenes,” IEEE Geoscience and Remote Sensing Letters , vol. 22, pp. 1–5, 2025. [12] Yaniv Zimmer, Ofir Lindenbaum, and Oren Glickman, “Super-vised embedded methods for hyperspectral band selection,” in 
+
+ECAI 2025 – 28th European Conference on Artificial Intelli-gence, including 14th Conference on Prestigious Applications of Intelligent Systems, PAIS 2025 – Proceedings . Oct. 2025, vol. 413 of Frontiers in Artificial Intelligence and Applications ,pp. 3154–3161, IOS Press. [13] Xiaodi Shang, Chuanyu Cui, Xudong Sun, Xiaopeng Wang, and Jiahua Zhang, “Classification task-driven hyperspectral band selection via interpretability from XGBoost,” IEEE Jour-nal of Selected Topics in Applied Earth Observations and Re-mote Sensing , vol. 18, pp. 13733–13754, 2025. [14] Chunyan Yu, Sijia Zhou, Meiping Song, Baoyu Gong, Enyu Zhao, and Chein-I Chang, “Unsupervised hyperspectral band selection via hybrid graph convolutional network,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–15, 2022. [15] Jiahua Zhang, Jingyuan Wang, Dejie Li, Jun Zhang, Xudong Sun, and Xiaodi Shang, “Hyperspectral band selection with dynamic graph enhancement and hierarchical feature fusion,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 64, pp. 1–16, 2026. [16] Kaixiong Wu, Mingwei Wang, Haipeng Luo, Maolin Chen, Yujie Xu, and Wei Liu, “S 2HGC: An end-to-end spectral– spatial hypergraph convolutional network for unsupervised hy-perspectral band selection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–16, 2025. [17] Huanhuan Lv, Chong Chen, Hui Zhang, Cuiping Shi, and Ruiqin Wang, “A two-stage feature selection method for hy-perspectral image classification: Hybrid filter preprocessing and improved dwarf mongoose optimization,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 18, pp. 29271–29294, 2025. [18] Christos Louizos, Max Welling, and Diederik P. Kingma, “Learning sparse neural networks through L0 regularization,” in International Conference on Learning Representations ,2018. [19] Jie Liang, Jun Zhou, Yuntao Qian, Lian Wen, Xiao Bai, and Yongsheng Gao, “On the sampling strategy for evaluation of spectral-spatial methods in hyperspectral image classification,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 55, no. 2, pp. 862–880, 2017. [20] Muhammad Ahmad, Usman Ghous, Danfeng Hong, Adil Mehmood Khan, Jing Yao, Shaohua Wang, and Jo-celyn Chanussot, “A disjoint samples-based 3D-CNN with active transfer learning for hyperspectral image classification,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–16, 2022. [21] Adolfo Mart´ ınez-Us´ o, Filiberto Pla, Jos´ e Mart´ ınez Sotoca, and Pedro Garc´ ıa-Sevilla, “Clustering-based hyperspectral band selection using information measures,” IEEE Transactions on Geoscience and Remote Sensing , vol. 45, no. 12, pp. 4158– 4171, 2007. [22] Igor Kononenko, “Estimating attributes: Analysis and exten-sions of RELIEF,” in Machine Learning: ECML-94 . 1994, pp. 171–182, Springer. [23] Olaf Ronneberger, Philipp Fischer, and Thomas Brox, “U-net: Convolutional networks for biomedical image segmentation,” in Medical Image Computing and Computer-Assisted Interven-tion – MICCAI 2015 . 2015, pp. 234–241, Springer. [24] Grupo de Inteligencia Computacional, Universidad del Pa´ ıs Vasco, “Hyperspectral remote sensing scenes,” 
+
+https://www.ehu.eus/ccwintco/index.php/ Hyperspectral_Remote_Sensing_Scenes# Pavia_University , Accessed: 2026-03-10. [25] Tong Jia and Haiyong Ding, “Leakage-free evaluation and multi-prototype contrastive learning for hyperspectral classi-fication of vegetation,” Applied Sciences , vol. 16, no. 7, 2026. [26] Christian Debes, Andreas Merentitis, Roel Heremans, J¨ urgen Hahn, Nikolaos Frangiadakis, Tim van Kasteren, Wenzhi Liao, Rik Bellens, Aleksandra Piˇ zurica, Sidharta Gautama, Wilfried Philips, Saurabh Prasad, Qian Du, and Fabio Pacifici, “Hyper-spectral and LiDAR data fusion: Outcome of the 2013 GRSS data fusion contest,” IEEE Journal of Selected Topics in Ap-plied Earth Observations and Remote Sensing , vol. 7, no. 6, pp. 2405–2418, 2014.

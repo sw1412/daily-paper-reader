@@ -1,0 +1,442 @@
+Title: Vision-Language Guided Hyperspectral Object Tracking via Semantics Fusion and Contextual Template Updating
+
+URL Source: https://arxiv.org/pdf/2606.09167v1
+
+Published Time: Tue, 09 Jun 2026 02:26:06 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+> XXXX IEEE TRANSACTIONS ON MULTIMEDIA, VOL. XX, XXXX
+
+# Vision-Language Guided Hyperspectral Object Tracking via Semantics Fusion and Contextual Template Updating 
+
+Rui Yao, Yuhong Zhang, Kunyang Sun, Hancheng Zhu, Jiaqi Zhao, Member, IEEE , Zhiwen Shao, and Abdulmotaleb El Saddik, Fellow, IEEE 
+
+Abstract —Hyperspectral object tracking (HOT) leverages the rich spectral information provided by hyperspectral videos (HSVs), offering substantial potential for object tracking. How-ever, efficiently extracting and exploiting spectral information from redundant spectral bands remains a fundamental challenge, which severely limits model generalization and tracking perfor-mance. Moreover, in dynamic scenes, targets often experience drastic appearance variations due to factors such as occlusion and illumination changes. These variations lead to large deformations between the current frame and the template. Such discrepancies pose major challenges for existing temporal modeling approaches. In this work, we propose VLHTrack, a novel hyperspectral vision-language (VL) joint tracking framework. Specifically, we incorporate language priors to address the fundamental chal-lenge of spectral redundancy by designing a Language-Guided Band Selection Module (LBSM). By leveraging Large Language Model (LLM) descriptions, LBSM establishes a semantic-to-spectral mapping that mitigates redundancy and accentuates discriminative spectral features. A Multi-Modal Vision–Language Fusion Module is then employed to seamlessly integrate vi-sual and linguistic embeddings, harnessing their complementary advantages to learn coherent cross-modal representations. To address target deformation in long-term sequences, we propose a dynamic update template feature strategy implemented via the Dynamic Template Update with Mamba (DTUM) module. By leveraging selective state space modeling, DTUM learns inter-frame dependencies to update template feature, ensuring efficient template feature evolution guided by temporal context. Experi-ments on HOT2023 and HOT2024 demonstrate that VLHTrack outperforms state-of-the-art (SOTA) methods. The source code is available at https://github.com/rayyao/VLHTrack. 
+
+Index Terms —Band selection, dynamic template, hyperspectral object tracking (HOT), vision-language (VL) tracking, Mamba. 
+
+I. I NTRODUCTION 
+
+# VISUAL object tracking (VOT) is a fundamental task in computer vision with broad applications in face tracking [1], autonomous driving [2], [3], robotics [4], and medical imaging. The goal is to estimate the spatial location of a target across frames given its initial state [5]. However, conventional RGB-based trackers are limited by their reliance on only three   
+
+> This work was supported in part by the National Natural Science Foundation of China under Grant 62172417 and 62472424. (Corresponding authors: Kunyang Sun.)
+> Rui Yao, Yuhong Zhang, Kunyang Sun, Hancheng Zhu, Jiaqi Zhao and Zhi-wen Shao are with the School of Computer Science and Technology / School of Artificial Intelligence, and Mine Digitization Engineering Research Center of the Ministry of Education, and Jiangsu Provincial Industrial Technology En-gineering Center for Intelligent Sensing and Emergency IoT in Underground Space, China University of Mining and Technology, Xuzhou 221116, China (E-mail: {ruiyao, ts24170043a31ld, kunyang sun, zhuhancheng, jiaqizhao, zhiwen shao }@cumt.edu.cn). Abdulmotaleb El Saddik is with the School of Electrical Engineering and Computer Science, University of Ottawa, Ottawa, ON K1N 6N5, Canada (E-mail: elsaddik@uottawa.ca).
+
+channels, making them vulnerable to variations in illumination, scale, pose, occlusion, background clutter, and interference from similar objects [6]. These challenges are particularly evi-dent when targets share similar visual characteristics with their surroundings, often leading to tracking failures [7]. Recent advances in hyperspectral snapshot sensors have enabled the acquisition of HSVs [8], which contain rich spatial, spectral, and temporal information. Unlike RGB imagery, hyperspectral data provide continuous spectral bands that enhance material discrimination and enable more precise target localization even in cluttered environments [9]. Despite its considerable potential, HOT remains constrained by the high dimensionality and inter-band redundancy of hy-perspectral images. This limitation severely constrains feature representation and increases model sensitivity to spectral noise and inter-band variations, reducing the stability and gener-alization of tracking models. Early correlation filter–based (CF) methods [10]–[12] primarily relied on handcrafted spec-tral–spatial features and selected bands using statistical criteria such as mutual information, inter-class variance, and inter-band correlation. However, their limited representational ca-pacity leads to degraded performance under complex back-grounds and illumination changes. Recent deep learning–based (DL) trackers [13]–[18] introduce mechanisms such as band attention, spectral unmixing, and prompt learning to achieve adaptive band modeling, improving feature discriminability and cross-modal fusion. Nevertheless, most still rely on fixed or heuristic band selection, making it difficult to adaptively choose suitable spectral bands under varying scene conditions. Recently, studies on VL tracking models [19]–[22] have shown that incorporating textual priors can significantly en-hance visual understanding and representation learning. By in-tegrating linguistic semantics with visual features, they provide additional cues such as object category, material, and color. This cross-modal integration leads to more discriminative and robust representations under appearance variations and occlusions. Although significant progress has been made in the fusion of vision and language for RGB tracking, and recently emerged HOT methods such as CCTrack [23] have begun to leverage class consistency, the potential of natural language for extracting spectral information remains under-utilized. The challenge in transitioning from RGB images to hyperspectral images lies in how to efficiently utilize high-dimensional spectral information. Inspired by these studies, we posit that language priors can guide spectral band selection by introducing scene-level semantic understanding into the model, thereby enabling more adaptive and semantically grounded spectral feature modeling. 1  
+
+> arXiv:2606.09167v1 [cs.CV] 8 Jun 2026 ROY et al. : VISION-LANGUAGE GUIDED HYPERSPECTRAL OBJECT TRACKING XXXX
+
+Fig. 1: Representative HSV sequences with LLM-generated language descriptions. False-color initial frames highlight an-notated target regions. These descriptors serve as stable seman-tic anchors for band selection and multi-modal interaction. To achieve this goal, we propose the vision–language frame-work for HOT. It leverages LLMs [24] to generate natural language descriptions that supply semantic priors for tracking. Existing trackers often lack high-level semantic guidance, struggling to distinguish targets from cluttered backgrounds. To bridge this gap, we leverage language priors as a dis-criminative constraint. As illustrated in Fig. 1, by generating descriptive attributes (e.g., “reflective surface” or “yellow jacket”) from the initial frame, our framework establishes a stable semantic anchor. These linguistic cues equip the model with an explicit understanding of the target, enabling the sub-sequent LBSM to prioritize spectral bands that physically align with the target’s inherent properties. To effectively exploit spectral information, LBSM also combines entropy analysis and redundancy modeling to eliminate inefficient spectral bands while retaining the most discriminative ones. Unlike traditional methods that rely solely on statistical correlations for band selection and lack target-awareness, LBSM aligns hyperspectral and linguistic features in a shared semantic em-bedding space, thereby achieving semantically consistent band selection. This guides the model to focus on spectral bands physically relevant to the target’s attributes. Unlike traditional data-driven methods or implicit attention mechanisms that rely on unsupervised statistical correlations, LBSM functions as a knowledge-driven system. By grounding the selection process in high-level linguistic semantics, it transforms band selection from an unsupervised correlation search into a cross-modal supervised mapping. This ensures the selected bands are not only statistically informative but also physically consistent with the target’s intrinsic attributes. Notably, linguistic infor-mation contributes not only to band selection but also imposes semantic constraints during subsequent tracking, significantly enhancing representation learning and tracking accuracy. Although deep learning has significantly advanced HOT, most existing trackers rely primarily on superficial statistical correlations for band selection, failing to establish a semantic-to-spectral mapping that bridges physical attributes and spec-tral signatures. Consequently, lacking semantic understanding, these data-driven approaches are highly vulnerable to spectral confusion. This is especially problematic when background distractors exhibit similar spectral responses but differ funda-mentally in semantic identity. Furthermore, in long-term tracking, occlusions and illumi-nation variations often cause significant discrepancies between the target’s current appearance and the initial template. Con-sequently, relying solely on a fixed initial template hinders the construction of robust temporal models. To address this, recent works such as HyMamba [25] have pioneered the use of state space models to capture long-range temporal dependencies. However, while effective, current approaches primarily rely on visual feature updates, often overlooking the stability provided by semantic information. Moreover, these challenges often cause significant discrepancies between the target and the initial template feature, and relying solely on the initial template feature makes it difficult to construct reliable temporal modeling. Then we argue that the template feature should be dynamically updated throughout tracking to better adapt to complex and evolving appearance changes [26], [27]. Accordingly, we propose a dynamic template feature update strategy, termed DTUM, which employs selective state space modeling to capture inter-frame dependencies and dynamically update template feature, ensuring temporal coherence in target representation. The contributions of this work are summarized as follows:  
+
+> •
+
+We propose VLHTrack, a task-specific vision-language framework tailored to address the spectral challenges in HOT, which leverages LLM-generated textual descrip-tions to construct an interpretable mapping between the semantic and spectral–physical spaces. Extensive exper-iments demonstrate that VLHTrack achieves superior performance on HOT2023 and HOT2024 datasets.  
+
+> •
+
+We design LBSM, which integrates entropy, structural redundancy, and semantic similarity guided by language embeddings to select discriminative band combinations and facilitate language-informed spectral feature learning.  
+
+> •
+
+We develop DTUM, a selective state-space-based tem-poral modeling module designed to dynamically update template feature by capturing inter-frame dependencies, thereby preserving temporal coherence and enhancing overall tracking stability. II. R ELATED WORK 
+
+A. Hyperspectral Object Tracking 
+
+Hyperspectral object tracking methods can be broadly di-vided into CF-based approaches and DL-based approaches. CF-based methods rely on handcrafted spectral–spatial fea-tures to distinguish targets from the background. Early correlation-filter methods, such as KCF [10], relied on cir-culant matrices and Fourier transforms for efficient train-ing. Later extensions, including MHT [12], CNHT [28], and TSCFW [11], incorporated spectral–spatial priors and regular-ization to enhance robustness. Although CF-based approaches are computationally efficient, their reliance on shallow hand-crafted features limits robustness under large-scale appearance variations and long-term occlusion. 2XXXX IEEE TRANSACTIONS ON MULTIMEDIA, VOL. XX, XXXX 
+
+In contrast, DL-based methods employ end-to-end networks to automatically learn discriminative spectral–spatial represen-tations, demonstrating stronger adaptability in complex envi-ronments. SiamHYPER [29] and SiamBAG [18] transfer pre-trained RGB models into the hyperspectral domain via cross-modal attention and band-grouping, respectively. However, fixed grouping strategies limit adaptability when spectral bands vary. To overcome this, BAE-Net [30] and Hy-Tracker [31] introduced attention-based band selection to dynamically iden-tify discriminative subsets. Transformer-based models, such as TMTNet [32], TFTN [33], and HTACPE [34], advanced multi-modal fusion and alleviated overfitting, but still rely on pixel-level registration with RGB data. More recent works, including HDSP [13] and ProFiT [35], enhance cross-modal adaptability via prompt learning and frequency-domain mod-eling, while SSTtrack [15] and HOPL [14] improve temporal robustness through generative modeling and history-aware prompting. For efficiency, SiamOHOT [36] applies knowledge distillation, HotMoE [37] adopts a sparse Mixture-of-Experts framework, and MMF-Net [17] aligns spectral features with physical material attributes under occlusion. Despite these ad-vances, hyperspectral trackers still face challenges in spectral adaptability, temporal modeling, and cross-modal alignment. In addition to traditional statistical methods, learnable band selection has gained significant attention. Recent works such as BCR-Net [38] focus on joint band and context refinement, and supervised embedded methods [39] integrate band pruning directly into the feature embedding process. Recently, CC-Track [23] leveraged inter-frame category consistency to sta-bilize tracking. However, such coarse label-based approaches lack the granularity required to handle diverse environmental interferences. Distinct from these, VLHTrack introduces a semantic-to-spectral mapping that goes beyond simple clas-sification labels, aligning high-level semantics directly with low-level spectral-physical properties to enable target-specific band selection. Furthermore, traditional band selection paradigms are inher-ently data-driven and rely on internal statistical regularities, which often fail to distinguish the target from semantically irrelevant background clutter. While attention mechanisms assign weights across all bands and frequently preserve re-dundant noise, LBSM utilizes natural language as an external supervision signal. This synergy of entropy-based filtering and semantic-guided clustering achieves a sparse selection, providing much stronger constraints for spectral redundancy reduction than implicit or self-supervised weighting methods. 
+
+B. Vision-Language Tracking 
+
+Vision–Language (VL) tracking [19]–[22] integrates natural language descriptions with visual inputs to enhance target discrimination, reduce ambiguities, and improve generalization across diverse scenes. SNLT [22] fused static word embed-dings with Siamese features but lacked contextual modeling. Later, CTVLT [40] introduced zero-shot language grounding via Grounding DINO for open-vocabulary localization, though temporal consistency remained insufficient. With the rise of large VL models, research has shifted toward parameter-efficient and scalable cross-modal modulation paradigms. CPIPTrack [41] employs CLIP [42] as a frozen backbone using interactive prompts, improving semantic guidance while reduc-ing parameters. MemVLT [43] leverages memory-augmented prompts for long-term robustness, while DTVLT [44] ana-lyzed the role of description update frequency in temporal consistency. VLTVerse [45] explored the complementarity of multi-granularity language inputs, CiteTracker [46] introduced adaptive text weighting to mitigate noisy descriptions, and MAVLT [47] adopted state space modeling for efficient cross-modal fusion. Furthermore, while text-guided learning has been explored to enhance category discriminability in static hyperspectral image classification (e.g., LDGnet [48], TASA-Net [49]), its application in dynamic tracking remains scarce. In particular, few methods attempt to establish a mapping from textual descriptions to spectral band selection, leaving this connection largely unexplored. Distinct from these works, our VLHTrack does not merely use language for spatial prompt-ing. Instead, it addresses the unique hyperspectral challenge of band redundancy by establishing a mapping between high-level semantics and low-level spectral-physical properties. This allows the model to select discriminative bands based on the physical characteristics of the target class. 
+
+C. State Space Models 
+
+State Space Models (SSMs) [50] have recently emerged as a highly efficient and scalable paradigm for temporal se-quence modeling. The early structured S4 model [51] enabled long-range dependency modeling through linear time-invariant systems but was limited under dynamic conditions. Mamba [52] addressed this by introducing selective input-dependent parameters, enhancing adaptability and efficiency, and mak-ing it well-suited for template updating in visual tracking. Extensions such as VideoMamba [53], LocalMamba [54], and VMamba [55] expanded applications to video and multi-object tracking. Despite these advances, existing SSM-based trackers remain largely focused on RGB videos, with limited exploration of spectral redundancy, material-specific attributes, and multi-modal coupling in hyperspectral scenarios. Recently, the emergence of SSMs has opened new avenues for HOT. For instance, HyMamba [25] establishes a unified framework for efficient spectral-temporal dependency modeling, while the Prompt-based Mamba [56] utilizes spectral-temporal tokens to guide adaptive feature learning. Our VLHTrack differs from these works by incorporating linguistic semantics as a guide to prune spectral redundancy before employing state-space modeling. III. M ETHOD 
+
+A. Overall Architecture 
+
+As illustrated in Fig. 2, VLHTrack is an advanced vi-sion–language hyperspectral tracking framework composed of three major functional modules: LBSM, multi-modal feature fusion, and DTUM, followed by a prediction head. At each time step t, the network receives two comple-mentary inputs: hyperspectral images Ht ∈ RN ×H×W and false-color images Ft ∈ R3×H×W , where N is the number of spectral bands, H and W are the height and width. Ft
+
+3ROY et al. : VISION-LANGUAGE GUIDED HYPERSPECTRAL OBJECT TRACKING XXXX 
+
+Fig. 2: The overall architecture of VLHTrack. VLHTrack consists of LBSM, multi-modal vision–language fusion, Dynamic Template Update with Mamba (DTUM), and the prediction head for final localization. LBSM selects discriminative bands guided by structure analysis, and language semantics to form a pseudo-color image Pt. Vision and language tokens are subsequently fused to achieve multi-modal representation learning, while DTUM models temporal dependencies and updates templates over time. The prediction head then outputs the final target state estimation. is generated from Ht using CIE CMFs [30], providing a perceptually meaningful mapping to RGB space. Specifically, during training and testing, we crop F0 using the ground-truth bounding box from the first frame, retaining only the target region and minimal context. This cropped image is fed into the LLM with a task-specific prompt: “Please focus on the main target object in the image, and describe its color, shape, and texture in detail, within 20 words.” As shown in Fig. 1, the LLM generates fine-grained attribute descriptions (e.g., “reflective surface”) that naturally correlate with unique hyperspectral responses. It must be emphasized that this LLM functions strictly as an offline, zero-shot inference tool during initialization. This description remains fixed throughout the tracking process to prevent semantic drift from intermediate er-rors, ensuring that the generation process incurs zero additional training complexity. The language description T guides band selection in LBSM and provides semantic cues for tracking, coupling spectral–physical and semantic information. Subsequently, the LBSM selects three representative bands from Ht, forming the pseudo-color image Pt ∈ R3×H×W .Then Pt, Ht, and T are input separately into the patch embedding layer and text tokenizer. These inputs are projected and flattened into a shared latent feature space, generating the corresponding token representations: visual tokens ( eP0 
+
+> t
+
+,
+
+eF0 
+
+> t
+
+) and language tokens T 0. Formally, the initial token representations are given by: 
+
+eP0 
+
+> t
+
+= PatchEmbed (Pt),
+
+eF0 
+
+> t
+
+= PatchEmbed (Ft),T 0 = Tokenizer ([CLS] , T ).
+
+(1) Here, we denote the initial tokens generated from Ft, Pt and 
+
+T as eF0 
+
+> t
+
+, eP0 
+
+> t
+
+and T 0. T 0 consists of T , [CLS] and [SEP], where [CLS] serves as the start token and [SEP] as the end token of the description. The [CLS] token represents the global semantic information of the description T . To leverage broad semantic priors while avoiding overfitting and preserving computational fairness, we adopt a parameter-efficient fine-tuning strategy. The deep Transformer layers of the BERT [57] encoder are strictly frozen to retain pre-trained semantic extraction capabilities. Conversely, the shallow embedding layers (i.e., Token, Position, and Segment embeddings) are tunable, enabling the language tokens to adaptively align with the hyperspectral tracking task space. The text tokens T 0
+
+are then processed by this language encoder to extract the semantic feature eT 0.These tokens are then passed through the multi-modal alignment module to achieve modality alignment. Well-aligned visual and language embeddings facilitate multi-modal repre-sentation learning and interaction. The aligned embeddings are still denoted as fMpt and fMFt for subsequent processing. Subsequently, we employ DTUM to update the template feature. Specifically, the Mamba-based DTUM module ef-fectively captures temporal dependencies between the current search frame St and the previous template feature Tt−1 (see Section III-D). Through this mechanism, DTUM adaptively models the temporal evolution of the target’s appearance and updates the template feature through a dynamic state update process. Furthermore, a weighted fusion between the template feature Tt−1 and the predicted feature is performed to generate the updated template feature Tt.After that, fMpt and fMFt are concatenated as a sequence and fed to a L-layer transformer encoder. The concatenated embeddings are then processed within the transformer back-bone, where language embeddings guide the refinement of visual features and vice versa. Each transformer encoder layer contains multi-head self-attention (MHSA) and a feed-forward network (FFN) with residual connections and layer normalization (LN). The features from the final transformer 4XXXX IEEE TRANSACTIONS ON MULTIMEDIA, VOL. XX, XXXX 
+
+Fig. 3: Detailed design of the proposed LBSM. encoder layer are then used as the input to the tracking head for subsequent prediction. This bidirectional flow enables semantic-aware fusion, ensuring that the learned representa-tions remain highly target-aware. 
+
+B. Language-Guided Band Selection Module (LBSM) 
+
+Hyperspectral images capture fine-grained spectral signa-tures that are intrinsically linked to a target’s physical prop-erties, such as material composition and surface reflectivity. However, isolating discriminative features is often hampered by severe spectral redundancy and inter-class spectral similar-ity. To overcome this, we conceptualize natural language as a high-level abstraction of these physical traits. For instance, the semantic prompt “green metallic vehicle” implicitly constrains both color reflectivity and material properties. Motivated by this inherent mapping, LBSM utilizes linguistic semantics not merely as auxiliary labels, but as physical priors. This mechanism guides the network to focus strictly on spectral bands consistent with the target’s material properties, effec-tively filtering out spectrally similar yet semantically irrelevant background clutter. At time t, the information content of the i-th spectral band Bi ∈ RH×W of the hyperspectral image Ht, where 
+
+i ∈ { 1, . . . , N }, is measured by its entropy Ei:
+
+Ei = − X
+
+> r
+
+pi,r log 2 pi,r . (2) Here, pi,r denotes the probability density of the gray-level at pixel r in Bi, obtained by normalizing its intensity histogram. This normalization is performed independently within each individual band to ensure that the entropy reflects the internal statistical information of Bi without being biased by global intensity variations across the spectral range. Specifically, 
+
+r ∈ { 0, 1, . . . , 255 } denotes the discrete intensity levels, where the continuous spectral reflectance is quantized into 256 bins for robust entropy estimation. A larger Ei implies higher information content. To further suppress redundancy, each band is represented by its normalized entropy ˆEi. To ensure proper feature scaling and prevent the raw band index i from dominating the Euclidean metric, the discrete band index is strictly normalized as ˆi = i/N ∈ (0 , 1] . Consequently, a pairwise distance matrix D = [ Dij ]N ×N is constructed, where 
+
+Dij denotes the Euclidean distance between bands i and j in the (i, ˆEi) space. This ensures both proximity and information content are equally weighted in density calculation. For each band i, the local density ρi and the minimum distance to higher-density bands δi are defined as 
+
+ρi = X
+
+> j
+
+exp 
+
+"
+
+−
+
+ Dij 
+
+τ
+
+2#
+
+, δi = min  
+
+> j:ρj>ρ i
+
+Dij , (3) where τ is a cutoff threshold controlling neighborhood size, determined as the 1–2% quantile of all pairwise distances [58], to balance locality and robustness. The structural redundancy score si is then computed as 
+
+si = ρi · δi
+
+max k(ρk · δk) . (4) A higher si indicates that the band is more representative and less redundant. Finally, each band is represented by a feature vector vi = [ ˆEi, s i]⊤, jointly encoding information richness and structural distinctiveness. Spectral clustering is applied to 
+
+{vi}Ni=1 , dividing all bands into K clusters. Each cluster is defined as Gc = {Bu | u ∈ Λc}, where Λc denotes the index set of the c-th cluster and c ∈ { 1, . . . , K }. From each cluster 
+
+Gc, the band with the highest redundancy score si is selected as its representative, indexed by q = arg max i∈Λc si. All representatives are then aggregated to form the redundancy-suppressed candidate set G = {Bq | q ∈ Γ}, where Γ denotes the index set of the selected bands. Note that u and q take values in {1, . . . , N }. It is worth noting that relying solely on heuristic statistical assumptions—such as high entropy and spectral proximity—may inadvertently retain high-entropy background noise or discard informative bands. Therefore, the preceding clustering stage serves strictly as a coarse spatial-spectral deredundancy step to ensure candidate diversity. The core of LBSM lies in this subsequent language-guided ranking. Serving as a semantic verification mechanism, it leverages physical-property-derived priors to suppress non-target high-entropy noise, rigorously assigning higher weights to bands that authentically encapsulate the target’s semantic identity. For semantic alignment, each candidate band Bq is encoded as a low-dimensional descriptor bq ∈ Rv by a linear layer, where v denotes the dimension of spectral statistical features. These are linearly projected into the shared semantic space: 
+
+zq = Linear (bq ), (5) where zq ∈ RV and V denotes the dimension of the textual embedding space. The projected feature zq and the language embedding eT 0 ∈ RV , extracted from the language encoder, share the same dimension to ensure cross-modal consistency. The semantic relevance between each band and the language description is evaluated via cosine similarity: Sim q = z⊤ 
+
+> q
+
+eT 0
+
+∥zq ∥∥ eT 0∥ . (6) Bands are ranked by Sim q , and the top m bands are retained: 
+
+S = TopK  {Sim q : q ∈ Γ}, m . (7) 5ROY et al. : VISION-LANGUAGE GUIDED HYPERSPECTRAL OBJECT TRACKING XXXX 
+
+In implementation, the top m = 3 bands are fused into a three-channel pseudo-color image Pt, preserving the most informative spectral–spatial cues while maintaining semantic coherence with the language description. It is worth noting that the linguistic prompt remains fixed during tracking. This design leverages the physical consistency of the target’s intrinsic attributes (e.g., material and spectral signatures), which are invariant to geometric deformations or localized illumination changes. A fixed semantic anchor en-sures a stable spectral feature space for subsequent matching. Moreover, updating the prompt frame-by-frame would not only incur substantial computational overhead but also risk severe semantic drift by erroneously incorporating temporary occlusions or background distractors. 
+
+C. Multi-Modal Vision-Language Feature Fusion 
+
+The Multi-Modal Vision-Language Feature Fusion module aligns hyperspectral visual features with semantic language features in a unified latent space, enabling coherent cross-modal interaction. To align modalities efficiently, we extract only the global [CLS] token embedding, denoted as eT 0, from the encoded language sequence T 0 in Eqs. (1). Unlike the full sequence, which introduces linguistic noise, the [CLS] embed-ding compactly aggregates holistic target attributes and ensures semantic consistency with the band selection in Eq. (6). Sub-sequently, eT 0 is spatially broadcast to match the visual token layout, acting as a channel-wise semantic modulation prompt. This mechanism avoids the heavy computational overhead of cross-attention while robustly injecting language priors into the visual representation. The fusion process is formulated as: 
+
+fMPt = eP0 
+
+> t
+
+⊙ eT 0 + eP0 
+
+> t
+
+,
+
+fMFt = eF0 
+
+> t
+
+⊙ eT 0 + eF0 
+
+> t
+
+, (8) where ⊙ denotes element-wise multiplication. In this manner, the language information is seamlessly integrated into the visual embeddings through the modality alignment opera-tion. Furthermore, since we strictly adopt the global [CLS] feature here, which is identical to that in Eq. (6) above. Moreover, Eqs. (8) [59] establish a bidirectional information flow between the visual and language modalities, thereby enabling mutual guidance for multi-modal feature extraction and interaction. By constructing such bidirectional information exchange within the Transformer backbone, the framework mitigates information dilution and enforces semantic-aware enhancement, thereby preserving strong target-awareness in the learned representations. For the first transformer encoder layer, the fused token sequence eFfusion is constructed by strictly concatenating the aligned vision-language embeddings along the sequence di-mension: eFfusion = Concat (fMPt , fMFt ). (9) It is then projected into the query ( Q), key ( K), and value (V) spaces for self-attention computation: 
+
+Attention( Q, K, V) = softmax 
+
+ QK ⊤
+
+√d
+
+
+
+V,
+
+eElt = FFN l
+
+ Attention( Q, K, V),
+
+(10) Concat 
+
+> Mamba Layer
+> Projection
+> 1
+
+Tt − 
+
+> …
+> St
+> …
+
+Tt 
+
+> …
+> Projection
+> Norm
+> Conv
+> SSM  ×＋
+> Linear
+> ＋
+> σ
+> σ
+> Linear
+> Linear
+
+Fig. 4: Detailed design of the proposed DTUM. where FFN l(·) denotes the feed-forward sublayer in the l-th transformer encoder block, and eElt represents its output. For subsequent layers, the encoder takes eEl−1 
+
+> t
+
+as input, enabling hierarchical refinement of cross-modal representations across depth. This design effectively captures both spectral and semantic cues, ensuring stable and effective synergy between visual and language information. 
+
+D. Dynamic Template Update with Mamba (DTUM) 
+
+To complement the static spectral prior provided by LBSM, the Dynamic Temporal Update Module (DTUM) is designed to handle dynamic challenges in long-term tracking. By leveraging Mamba’s selective scanning mechanism, DTUM adaptively updates template features to capture rapid ap-pearance variations, such as occlusions and deformations. This decoupling strategy enables VLHTrack to balance robust physical identity preservation with agile temporal adaptability. Specifically, as shown in Fig. 4, DTUM is designed to model the temporal evolution of templates through selective state space modeling, thereby ensuring stable feature adaptation under drastic target appearance changes, fast motion, and long-term occlusions. Let the previous template feature be denoted as Tt−1 ∈ RC×H×W and the current search feature as 
+
+St ∈ RC×H×W . Both features are then flattened into vectors: 
+
+tt−1 = Flatten( Tt−1) ∈ RM ,
+
+st = Flatten( St) ∈ RM , (11) where M = C · H · W . These two vectors are concatenated to form a sequence: 
+
+Xt = [ tt−1, st] ∈ R2×M . (12) Direct state space modeling in the original high-dimensional space is computationally expensive and prone to overfitting. To address this, DTUM employs a learnable input projection that maps the sequence into a lower-dimensional latent space of size M ′:
+
+X′ 
+
+> t
+
+= ϕ(Xt) ∈ R2×M ′
+
+, (13) where ϕ(·) denotes the projection function implemented via linear layers with normalization and activation. Within this latent space, stacked Mamba layers are applied for temporal modeling. For each temporal token in the projected sequence 
+
+X′ 
+
+> t
+
+= [ xt−1, xt], where each xt ∈ RM ′
+
+represents a feature 6XXXX IEEE TRANSACTIONS ON MULTIMEDIA, VOL. XX, XXXX 
+
+embedding at time step t, Mamba performs the following selective state space update: 
+
+ht = Ah t−1 + Bx t,
+
+yt = Ch t + Ex t, (14) where xt is the input, ht is the hidden state, yt is the output, and A, B, C, E are learnable parameter matrices. In practice, Mamba incorporates one-dimensional convolutional filters and gating mechanisms to enhance nonlinearity and local spatial aggregation while maintaining the stability and efficiency of linear SSMs. In contrast to conventional attention mechanisms, Mamba exhibits linear complexity in sequence length, rendering it particularly amenable to long-sequence hyperspectral modeling. Stacking multiple layers further im-proves its ability to capture cross-frame dependencies while ensuring computational efficiency. The stacked Mamba layers process the input X′ 
+
+> t
+
+and produce the temporally modeled feature sequence, denoted as 
+
+Zt = Mamba (X′
+
+> t
+
+) ∈ R2×M ′
+
+. (15) After temporal modeling, the resulting sequence Zt is pro-jected back to the original flattened feature dimension through an output mapping function: 
+
+bYt = ψ(Zt) ∈ R2×M , (16) where ψ(·) denotes the output mapping function. The token in bYt is taken as the predicted updated template feature: 
+
+btt = bYt[−1, :] ∈ RM . (17) To achieve smooth temporal adaptation, DTUM fuses the up-dated prediction with the previous template using a weighting strategy: 
+
+tt = α · tt−1 + (1 − α) · btt, (18) where we set α to 0.7. The fused vector tt ∈ RM is reshaped back to the spatial domain for subsequent tracking: 
+
+Tt = Reshape( tt) ∈ RC×H×W . (19) DTUM dynamically updates the template feature to adapt to continuous appearance variations caused by occlusions, illumination changes, and long-term motion. By employing selective state-space modeling, DTUM captures inter-frame dependencies and adaptively refines the template representa-tion, thereby maintaining temporal coherence and robustness in dynamic tracking scenarios. 
+
+E. Training of VLHTrack 
+
+VLHTrack is initialized with parameters from the pretrained OSTrack [60]. To enable efficient modality adaptation, we employ the Low-Rank Adaptation (LoRA) [61] technique exclusively within the vision backbone. Specifically, LoRA adapters are integrated into the output projection of the Multi-Head Attention module across all transformer blocks of the ViT. During fine-tuning, the original pretrained weights of the ViT remain completely frozen, ensuring highly parameter-efficient learning. The overall loss function of VLHTrack extends the base model by introducing a modality alignment loss Lvlma , which enforces consistency between visual and language features. This auxiliary regularization strengthens cross-modal correspondence and improves feature coherence under spectral noise and large appearance variations. 
+
+Ltrack = Lcls + λiou Liou + λL1 L1 + Lvlma , (20) where Lcls denotes the weighted focal loss for classification, while L1 and generalized IoU loss Liou are used for bounding box regression. Lvlma represents the modality alignment loss [59]. Following [60], the regularization parameters λiou and 
+
+λL1 are set to 2 and 5, respectively. IV. E XPERIMENTS 
+
+A. Experiment Settings 1) Dataset: Our primary experiments are conducted on the HOT2024 dataset from the Hyperspectral Object Tracking Challenge 1. To comprehensively evaluate the model’s general-ization ability, we perform supplementary experiments on the HOT2023 dataset. Both datasets were acquired with XIMEA snapshot hyperspectral cameras, covering VIS (16 bands), NIR (25 bands), and RedNIR (15 bands). The HOT2023 training set consists of 110 hyperspectral video sequences, including 40 NIR, 15 RedNIR, and 55 VIS sequences. The validation set includes 87 sequences with 30 NIR, 11 RedNIR, and 46 VIS samples. Each sequence is annotated with 11 challenge attributes such as illumination and scale variation, occlusion, deformation, motion blur, rota-tion, out-of-view, background clutter, and low resolution, with corresponding false-color videos. The HOT2024 dataset is an extended version of HOT2023, with significantly increased data volume and attribute cover-age. It comprises a total of 217 training videos (70 NIR, 36 RedNIR and 111 VIS) and 117 validation videos (30 NIR, 20 RedNIR and 67 VIS), while adopting the same detailed attribute annotation scheme as HOT2023. 
+
+2) Evaluation Metrics: We adopt four standard tracking metrics: success plot, precision plot, area under the curve (AUC), and distance precision (DP). The success plot mea-sures the proportion of frames with intersection over union (IoU) above a threshold, while AUC summarizes the overall success. The precision plot reports the proportion of frames within a distance threshold, with DP@20 pixels indicating precision at 20 pixels. All evaluations follow the One-Pass Evaluation (OPE) protocol, where the tracker is initialized on the first frame and runs through the entire sequence. 
+
+3) Implementation Details: The proposed method was im-plemented using PyTorch. The batch size is set to 16, and the optimizer is AdamW with a weight decay of 10 −4. The initial learning rate is set to 4 × 10 −4. We trained the network for a total of 60 epochs. The backbone is initialized with a pretrained OSTrack [60] model, while all remaining trainable parameters are initialized using Xavier uniform distribution. 
+
+> 1https://www.hsitracking.com/contest
+
+7ROY et al. : VISION-LANGUAGE GUIDED HYPERSPECTRAL OBJECT TRACKING XXXX 
+
+TABLE I PERFORMANCE COMPARISON OF VLHTRACK AND SOTA TRACKERS ON DIFFERENT BANDS IN HOT 2023 DATASET . T HE BEST RESULTS ARE MARKED IN BOLD .                                                                                                                      
+
+> Video Evaluation index False-color Videos Hyperspectral Videos
+> MCITrack TransT SiamGAT HOPL SSTtrack MMF-Net SPIRIT Trans-DAT PHTrack HyperTrack SUIT HotMoE VLHTrack 25 channels (NIR) AUC 0.681 0.595 0.620 0.725 0.660 0.666 0.623 0.681 0.440 0.738 --0.740
+> DP 0.870 0.830 0.858 0.954 0.854 0.910 0.838 0.900 0.558 0.940 --0.942 16 channels (VIS) AUC 0.580 0.634 0.553 0.641 0.654 0.612 0.605 0.512 0.580 0.643 -0.648 0.621 DP 0.790 0.847 0.760 0.854 0.871 0.815 0.820 0.721 0.794 0.864 -0.851 0.850 15 channels (RedNIR) AUC 0.443 0.393 0.449 0.448 0.395 0.316 0.371 0.537 0.412 0.421 --0.552
+> DP 0.550 0.527 0.571 0.558 0.499 0.410 0.501 0.715 0.515 0.583 --0.707
+> ALL channels (NIR, VIS, RedNIR) AUC 0.624 0.568 0.568 0.645 0.623 0.593 0.582 0.573 0.544 0.648 0.616 -0.653
+> DP 0.819 0.777 0.770 0.848 0.818 0.796 0.786 0.782 0.754 0.849 0.841 -0.864
+
+Fig. 5: Precision and success plots comparison with SOTA Trackers on the HOT2023 dataset. 
+
+Fig. 6: Precision and success plots comparison with SOTA Trackers on the HOT2024 dataset. 
+
+B. Quantitative Comparison with SOTA Trackers 1) Comparison on HOT2024 and HOT2023 Dataset: We compare VLHTrack with representative hyperspectral and RGB-based trackers on HOT2024. Hyperspectral trackers in-clude PHTrack [62], SENSE [63], SPIRIT [27], Trans-DAT [64], SSTtrack [15], MMF-Net [17], and UBSTrack [65], and CHP [66], while RGB trackers such as AQATrack [67] and EVPTrack [68] are evaluated on pseudo-color sequences. Fig. 6 presents the success and precision plots, where VL-HTrack achieves the best results, highlighting its robustness and accuracy. We further evaluate on HOT2023 to verify generalization. As shown in Fig. 5, VLHTrack consistently outperforms previous methods in both success and precision, clearly confirming its adaptability to varying data distributions. 
+
+2) Comparison on Dataset with Different Bands: Consider-ing the different numbers of spectral bands across modalities, we evaluate tracker performance on three spectral settings: NIR, VIS, and RedNIR. On HOT2024, nine representative hyperspectral and RGB trackers are rigorously tested on each modality. As shown in Tab. II, VLHTrack achieves the best overall performance, with an AUC of 0.596 and a DP of 0.763, while UBSTrack [65] performs slightly better on RedNIR. This is mainly due to the limited spectral information in RedNIR, where VLHTrack’s semantic guidance becomes less effective, whereas UBSTrack’s [65] redundancy compression favors low-dimensional spectral settings. Similarly, on HOT2023, we compare VLHTrack with twelve methods, including HOPL [14], MCITrack [69], and SSTtrack [15], HyperTrack [70], SUIT [71], HotMoE [37], as shown in Tab. I. On HOT2023, VLHTrack achieves an AUC of 0.653 and a DP of 0.864, outperforming most competing methods. Specifically, in the NIR spectral range, while VLHTrack yields a slightly lower DP score compared to HOPL [14], it maintains the superior AUC performance, demonstrating a better balance between tracking and overall robustness. However, SSTtrack [15] shows superior performance on VIS sequences, likely due to its stronger RGB-domain pretraining and resolution-aware feature modeling, which aligns better with VIS data distribu-tion compared to the more semantically-focused VLHTrack. Despite fierce competition in specific spectral bands—for example, SSTtrack [15] performs well on HOT2023-VIS and CHP [66] on HOT2024-RedNIR—VLHTrack demonstrates a superior overall stability. While these hyperspectral trackers excel in specific band scenarios, their performance often fluctuates when the spectral distribution changes. In contrast, VLHTrack, utilizing stable semantic anchors from frozen LLMs, achieves the highest overall score across all channels on both the HOT2023 and HOT2024 datasets. This confirms that our vision-language multi-modal model provides a more general and robust solution for practical hyperspectral tracking than methods relying solely on low-level visual features. 
+
+3) Attribute-based Comparison on the HOT2024 Dataset: 
+
+To comprehensively evaluate VLHTrack’s robustness, we an-alyze its performance across 11 challenge attributes in the HOT2024 benchmark. Fig. 7 visualizes the success and pre-cision trends, while Tab. III provides the detailed quantitative AUC scores. As shown in Tab. III, VLHTrack achieves the best per-formance in 8 out of 11 categories. Notably, in extreme scenarios like Low Resolution (LR) and Motion Blur (MB), 8XXXX IEEE TRANSACTIONS ON MULTIMEDIA, VOL. XX, XXXX 
+
+TABLE II PERFORMANCE COMPARISON OF VLHTRACK AND SOTA TRACKERS ON DIFFERENT BANDS IN HOT 2024 DATASET . T HE BEST RESULTS ARE MARKED IN BOLD .                                                                                                             
+
+> Video Evaluation index False-color Videos Hyperspectral Videos
+> AQATrack EVPTrack UBSTrack MMF-Net SSTtrack Trans-DAT SPIRIT SENSE PHTrack HyperTrack CHP VLHTrack 25 channels (NIR) AUC 0.712 0.592 0.725 0.701 0.712 0.587 0.655 0.561 0.527 0.755 -0.760
+> DP 0.885 0.745 0.861 0.876 0.888 0.753 0.823 0.766 0.732 0.913 -0.920
+> 16 channels (VIS) AUC 0.551 0.530 0.527 0.482 0.380 0.397 0.319 0.298 0.303 0.535 0.506 0.557
+> DP 0.700 0.658 0.681 0.645 0.482 0.524 0.409 0.398 0.41 0.709 0.664 0.735
+> 15 channels (RedNIR) AUC 0.471 0.413 0.486 0.388 0.504 0.423 0.377 0.364 0.262 0.480 0.554 0.478 DP 0.600 0.521 0.627 0.521 0.659 0.547 0.516 0.465 0.364 0.621 0.709 0.618 ALL channels (NIR, VIS, RedNIR) AUC 0.578 0.526 0.574 0.522 0.486 0.450 0.415 0.377 0.353 0.582 -0.596
+> DP 0.730 0.657 0.725 0.683 0.616 0.587 0.534 0.504 0.485 0.746 -0.763
+
+TABLE III ATTRIBUTE -BASED COMPARISON ON THE HOT2024 DATASET . (E VALUATION METRIC : AUC). T HE BEST RESULTS ARE MARKED IN BOLD .                                                                                                                                  
+
+> Attribute VLHTrack AQATrack UBSTrack MMF-Net EVPTrack SSTtrack Trans-DAT SPIRIT SENSE PHTrack BC 0.443 0.453 0.441 0.365 0.420 0.446 0.356 0.321 0.293 0.264 DEF 0.470 0.584 0.456 0.444 0.554 0.514 0.469 0.246 0.221 0.198 FM 0.733 0.688 0.729 0.653 0.549 0.667 0.538 0.641 0.571 0.545 IV 0.623 0.574 0.596 0.506 0.514 0.466 0.406 0.443 0.307 0.170 IPR 0.579 0.666 0.608 0.558 0.671 0.427 0.432 0.312 0.361 0.374 LR 0.383 0.316 0.319 0.170 0.229 0.291 0.239 0.210 0.160 0.191 MB 0.514 0.485 0.317 0.202 0.381 0.413 0.312 0.275 0.227 0.215 OCC 0.578 0.569 0.578 0.502 0.509 0.479 0.426 0.384 0.357 0.344 OPR 0.640 0.579 0.619 0.553 0.632 0.555 0.501 0.441 0.382 0.279 OV 0.657 0.616 0.610 0.508 0.636 0.554 0.470 0.559 0.531 0.435 SV 0.720 0.699 0.731 0.697 0.610 0.632 0.572 0.596 0.526 0.480 ALL 0.596 0.578 0.574 0.522 0.526 0.486 0.450 0.415 0.377 0.353
+
+Fig. 7: The precision and success of VLHTrack and other SOTA trackers are compared on a subset of the HOT2024 dataset with 11 attributes. our method secures the top rank. Specifically, in LR, VLH-Track outperforms the second-best tracker by a 20.1% relative margin. Although absolute scores in MB are lower for all models due to spectral-spatial aliasing, VLHTrack’s leading AUC demonstrates that LBSM effectively mitigates texture loss via robust semantic priors. Furthermore, for dynamic challenges like Fast Motion (FM) and Scale Variation (SV), the proposed DTUM provides crucial temporal consistency, yielding peak AUC scores of 0.733 and 0.720. However, there are performance gaps in geometry-sensitive attributes such as In-Plane Rotation (IPR) and Deformation (DEF), where VLHTrack performs slightly worse than models like AQATrack [67]. While our semantic-guided module excels at maintaining spectral-physical consistency, it is inherently less sensitive to instantaneous spatial transformations than methods utilizing specialized structural modeling or geometric augmentations. This represents a reasonable trade-off between semantic stability and geometric agility within the current vision-language fusion paradigm. Nonetheless, VLHTrack’s consistent superiority across the majority of challenge at-tributes solidifies its reliability for long-sequence tracking. 
+
+C. Qualitative Tracking Results 
+
+To better illustrate the advantages of VLHTrack, we present qualitative comparisons in Fig. 8, involving AQATrack [67], UBSTrack [65], EVPTrack [68], MMF-Net [17], SSTtrack [15], Trans-DAT [64], SPIRIT [27], SENSE [63], and PHTrack [62]. Selected frames represent challenging scenarios with occlusion, out-of-plane rotation, and scale variation. Each row corresponds to a temporal sequence, showing prediction results over time. Ground truth boxes are shown in blue, predictions from VLHTrack in red, and other trackers in distinct colors. As illustrated in Fig. 8, VLHTrack demonstrates superior robustness compared to other methods. For instance, in the nir-rider15 sequence, where the target undergoes drastic scaling 9ROY et al. : VISION-LANGUAGE GUIDED HYPERSPECTRAL OBJECT TRACKING XXXX 
+
+Fig. 8: Our proposed VLHTrack is qualitatively compared with PHTrack, SENSE, SPIRIT, Trans-DAT, SSTtrack, EVPTrack, MMF-Net, UBSTrack, AQATrack on 6 video sequences (HOT2024 dataset): nir-rider15, nir-pedestrian6, rednir-football1, rednir-leaves5, vis-dice3 and vis-whitecup2 . The proposed method performs well for these trackers. (For better illustration, we display the results in chronological order of video frames for each row, The red number in the top left corner of each image is the frame index.) TABLE IV PERFORMANCE COMPARISON IN TERMS OF FPS, P ARAMS , AND FLOPS . T HE TOP TWO VALUES ARE BOLDED AND 
+
+UNDERLINED .                                      
+
+> Videos False-color Videos Hyperspectral Videos Method AQATrack EVPTrack UBSTrack MMF-Net SSTtrack Trans-DAT SENSE PHTrack VLHTrack FPS 15.50 13.35 15.70 6.11 15.40 27.16 12.15 11.60 25.50 Params(M) 72 73 -45.08 72.56 27.98 53.19 51.57 224.92 FLOPs(G) 58.3 65 -352.6 124.95 30.28 288.06 464.54 23.82
+
+amidst dense background clutter, competitive trackers like SSTtrack [15] and MMF-Net [17] experience significant drift. Conversely, VLHTrack maintains accurate localization, con-firming that the semantic priors in LBSM effectively suppress background distractors. Furthermore, in the vis-whitecup2 se-quence featuring high-speed motion and severe appearance distortion, purely visual trackers (e.g., AQATrack [67]) com-pletely lose the target, whereas our method remains stable. Overall, VLHTrack maintains stable target localization with minimal drift and distortion, particularly under occlusion or low contrast. This performance is attributed to the language-guided multi-modal fusion module and the context-aware template updating mechanism empowered by Mamba. 
+
+D. Performance Comparison of FPS, Params and FLOPs 
+
+Tab. IV reports the FPS, Params, and FLOPs for all eval-uation methods under different video inputs. All algorithms were tested on a machine equipped with an NVIDIA RTX 2080Ti GPU. VLHTrack, MMF-Net [17], SSTtrack [15], Trans-DAT [64], SENSE [63], and PHTrack [62] directly process hyperspectral video input; while AQATrack [67] and EVPTrack [68] track on corresponding pseudo-color videos. As shown in Tab. IV, VLHTrack achieves an excellent balance between tracking performance and computational efficiency. Specifically, our model achieves the lowest FLOPs among all deep learning-based hyperspectral trackers, significantly lower than models such as SENSE [63] and PHTrack [62]. However, VLHTrack has a larger number of parameters compared to other methods, primarily due to the BERT language en-coder [57] and Mamba’s high-dimensional projection matrices. Furthermore, since most of the parameters in the language encoder are frozen, no extra training burden is incurred. Regarding practical deployment, the LLM-generated prior 10 XXXX IEEE TRANSACTIONS ON MULTIMEDIA, VOL. XX, XXXX 
+
+TABLE V ABLATION STUDY ON HOT 2024 D ATASET : E VALUATION OF VLHTRACK VARIANTS . T HE BEST RESULTS ARE HIGHLIGHTED IN BOLD .                             
+
+> Components Metrics Language LBSM DTUM AUC DP@20
+> 0.580 0.751
+> ✓0.584 0.746
+> ✓✓0.590 0.749
+> ✓0.592 0.753
+> ✓✓0.592 0.756
+> ✓∗✓0.588 0.751
+> ✓†✓✓0.593 0.757
+> ✓✓✓0.596 0.763
+> ∗The LBSM is incomplete as it lacks linguistic information guidance.
+> †The entire language encoder (including embeddings) is strictly frozen.
+
+operates strictly as a one-time initialization at the first frame. To quantify this overhead, our tests on the 217 hyperspectral sequences in the HOT2024 training set show that the average generation time per sequence is just 0.60 seconds, with an average of 65.54 tokens consumed per request. When amor-tized over long-term tracking sequences involving hundreds of frames, this initial temporal cost is negligible. Furthermore, the LLM can be immediately unloaded from GPU memory post-initialization, imposing zero computational burden during continuous tracking. This demonstrates that by introducing LBSM, we effectively bypass the computationally expensive spatial-spectral interaction modeling inherent in pure visual trackers. Furthermore, DTUM leverages Mamba’s selective scanning to avoid GPU memory bandwidth bottlenecks, main-taining a high inference rate of 25.50 FPS despite VLHTrack’s large parameter capacity. 
+
+E. Ablation Study 
+
+We conduct a series of ablation studies on HOT2024 dataset to evaluate the individual and synergistic contributions of each proposed component, including the language modality, LBSM, and DTUM. To ensure a fair comparison, in all variants where our proposed LBSM is excluded, we employ the SE-Block [72] as a standard alternative for band selection. The results are summarized in Tab. V. As shown in Tab. VI, we also compare LBSM with several other band selection methods. 
+
+1) Impact of Language Modality and LBSM: We first evaluate the fundamental contribution of language priors and the LBSM module. As shown in Tab. V, baseline yields an AUC of 0.580. The introduction of linguistic descriptions increased the AUC to 0.584, at which point we employed the SE-Block [72] method for band selection. This gains further momentum with the introduction of LBSM, where the AUC and DP reach 0.590 and 0.749, respectively. These results indicate that semantic features effectively compensate for the limitations of pure visual representations, while LBSM successfully aligns linguistic attributes with physical spectral properties to enhance target discriminability. TABLE VI PERFORMANCE COMPARISON OF DIFFERENT BAND 
+
+SELECTION METHODS . A LL VARIANTS ARE BASED ON THE 
+
+“B ASELINE + DTUM + VL F USION ” ARCHITECTURE . T HE BEST RESULTS ARE HIGHLIGHTED IN BOLD .          
+
+> BS Method AUC DP@20
+> Random Selection 0.590 0.755 Max-Variance [73] 0.590 0.753 SE-Block [72] 0.592 0.756
+> LBSM (Ours) 0.596 0.763
+
+To further demonstrate the indispensability of linguistic information, we evaluate a “purely visual” variant that retains the advanced DTUM but removes all language-related com-ponents. In this configuration, LBSM degenerates into a basic clustering-based selection relying solely on low-level struc-tural cues. Despite the presence of DTUM, this variant only achieves an AUC of 0.588, which is significantly lower than the 0.596 achieved by the full VLHTrack. This performance gap powerfully underscores that in complex hyperspectral scenarios, language priors are crucial for resolving target ambiguity and maintaining stable tracking. Furthermore, we justify our language encoder fine-tuning strategy. Completely freezing the BERT [57] encoder (in-cluding embedding layers) results in an AUC drop to 0.593 compared to the full model. This validates that tuning shallow embeddings is a parameter-efficient necessity to bridge the cross-modal gap between natural language and hyperspectral data without incurring heavy computational overhead. 
+
+2) Effectiveness of LBSM: To further quantify the supe-riority of LBSM, We retained the language modalities and DTUM module used for tracking on top of the baseline model, and conducted comparative experiments using different band selection strategies. Specifically, we compared LBSM with three representative paradigms: Random Selection, Max-Variance [73], and SE-Block [72]. In hyperspectral images, bands that are far apart in the spectral sequence tend to have weak correlations. We used a random selection method to select bands that are far apart in the spectrum (e.g., bands 1, 5, and 15) to generate pseudo-color representations. As shown in Tab. V, when we replaced LBSM with a random band selection strategy, the AUC reached only 0.590 despite retaining the language modality and DTUM. Compared to the full VLHTrack model, its AUC and DP metrics decreased by 0.6% and 0.8%, respectively. Specifically, for Max-Variance [73], we rank the channels based on their independent spatial variance and extract the top 3 bands to construct the false-color input. For the data-driven SE-Block [72], we retain the top 3 bands corresponding to the highest learned attention weights. As shown in Tab. VI, while Max-Variance [73] and SE-Block [72] outperform random selection by utilizing statistical entropy and visual attention respectively, both fall short of LBSM. Max-Variance [73] often excessively retains high-variance background noise, and SE-Block, lacking physical constraints, is prone to overfitting spectral shortcuts, making it difficult to distinguish the target from salient yet seman-11 ROY et al. : VISION-LANGUAGE GUIDED HYPERSPECTRAL OBJECT TRACKING XXXX 
+
+TABLE VII PERFORMANCE COMPARISON OF DIFFERENT TEMPLATE 
+
+UPDATE MECHANISMS . A LL VARIANTS ARE BASED ON THE 
+
+“B ASELINE + LBSM + VL F USION ” ARCHITECTURE . T HE BEST TRACKING PERFORMANCE (AUC, DP@20, FPS) 
+
+AND THE MINIMAL PARAMS /FLOP S ARE HIGHLIGHTED IN 
+
+BOLD .                         
+
+> Mechanism AUC DP@20 Params(M) FLOPs(G) FPS
+> Linear Weighted 0.588 0.752 167.79 22.91 21.40 LSTM 0.583 0.743 228.40 24.59 19.80 Transformer 0.587 0.750 235.96 25.83 18.60
+> DTUM (Ours) 0.596 0.763 224.92 23.82 25.50
+
+tically irrelevant clutter. In contrast, by leveraging linguistic knowledge as supervision, LBSM effectively addresses high-dimensional redundancy and achieves a significantly more ro-bust physical-semantic alignment than implicit, self-supervised weighting. These results demonstrate that LBSM effectively aligns spectral channels with semantic relevance, thereby reducing redundant spectral information. 
+
+3) Role of DTUM: We further evaluated the contribution of DTUM. As shown in Tab. V, after incorporating DTUM into the model based on LBSM and language modality guided tracking, the AUC improved from 0.590 to 0.596, and the DP increased from 0.749 to 0.763. Secondly, even in configura-tions employing weaker SE-Block [72], adding DTUM still delivers stable performance gains: AUC increased from 0.584 to 0.592, and DP rose from 0.746 to 0.756. This underscores the necessity of Mamba-based temporal context modeling for capturing the evolution of target appearance. Furthermore, to validate DTUM’s superiority, we compared it against LSTM and Transformer variants under identical settings, as shown in Tab. VII. While traditional linear weight-ing is computationally efficient, its limited capacity for non-linear modeling yields a subpar AUC of 0.588. Transformer-based modeling, despite its global receptive field, suffers from quadratic complexity O(L2), which leads to an increase in FLOPs to 25.83G and a reduction in inference speed to 18.60 FPS. Notably, both LSTM and Transformer variants under-perform even the standard linear weighted template update method in AUC, likely due to template contamination where self-attention mechanisms aggregate irrelevant background noise. In contrast, DTUM achieves a peak AUC of 0.596 and 25.50 FPS. Remarkably, although DTUM has higher param-eters than standard linear weighted template update method, it is significantly faster. This efficiency stems from Mamba’s hardware-aware selective scan mechanism, which optimizes GPU utilization by performing SRAM-resident computations and mitigating memory bandwidth bottlenecks. By balancing 
+
+O(L) complexity with input-dependent gating, DTUM effec-tively preserves temporal consistency without sacrificing real-time performance. V. C ONCLUSION 
+
+We present VLHTrack, a vision–language hyperspectral tracking framework that effectively integrates natural lan-guage into HOT. The proposed LBSM establishes a semantic-to-spectral mapping that aligns linguistic semantics with spectral–physical properties, thereby enhancing feature dis-criminability and reducing spectral redundancy. Meanwhile, DTUM leverages selective state space modeling to capture inter-frame dependencies and update templates under dy-namic conditions. Extensive experiments on the HOT2023 and HOT2024 datasets demonstrate that VLHTrack achieves superior performance and strong generalization capability. REFERENCES [1] Y. Qi, S. Zhang, F. Jiang, H. Zhou, D. Tao, and X. Li, “Siamese local and global networks for robust face tracking,” IEEE Transactions on Image Processing , vol. 29, pp. 9152–9164, 2020. [2] D. Roy, Y. Li, T. Jian, P. Tian, K. Chowdhury, and S. Ioannidis, “Multi-modality sensing and data fusion for multi-vehicle detection,” IEEE Transactions on Multimedia , vol. 25, pp. 2280–2295, 2023. [3] R. Yao, A. Zhang, Y. Zhou, J. Zhao, B. Liu, and A. El Saddik, “Adversarial geometric attacks for 3d point cloud object tracking,” IEEE Transactions on Multimedia , 2025. [4] Y. Guo, H. Wang, Q. Hu, H. Liu, L. Liu, and M. Bennamoun, “Deep learning for 3d point clouds: A survey,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 43, no. 12, pp. 4338–4364, 2021. [5] A. W. M. Smeulders, D. M. Chu, R. Cucchiara, S. Calderara, A. De-hghan, and M. Shah, “Visual tracking: An experimental survey,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 36, no. 7, pp. 1442–1468, 2014. [6] Y. Wang, X. Li, X. Yang, F. Ge, B. Wei, L. Li, and S. Yue, “Deep feature-based hyperspectral object tracking: An experimental survey and outlook,” Remote Sensing , vol. 17, no. 4, p. 645, 2025. [7] H. Wang, W. Li, X.-G. Xia, Q. Du, and J. Tian, “Ssf-net: Spatial-spectral fusion network with spectral angle awareness for hyperspectral object tracking,” IEEE Transactions on Image Processing , 2025. [8] H. V. Nguyen, A. Banerjee, and R. Chellappa, “Tracking via object reflectance using a hyperspectral video camera,” in 2010 IEEE Computer Society Conference on Computer Vision and Pattern Recognition -Workshops , 2010, pp. 44–51. [9] U. B. Gewali, S. T. Monteiro, and E. Saber, “Machine learning based hy-perspectral image analysis: a survey,” arXiv preprint arXiv:1802.08701 ,2018. [10] J. F. Henriques, R. Caseiro, P. Martins, and J. Batista, “High-speed tracking with kernelized correlation filters,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 37, no. 3, pp. 583–596, 2015. [11] Z. Hou, W. Li, J. Zhou, and R. Tao, “Spatial–spectral weighted and regularized tensor sparse correlation filter for object tracking in hyper-spectral videos,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 60, pp. 1–12, 2022. [12] F. Xiong, J. Zhou, and Y. Qian, “Material based object tracking in hyperspectral videos,” IEEE Transactions on Image Processing , vol. 29, pp. 3719–3733, 2020. [13] R. Yao, L. Zhang, Y. Zhou, H. Zhu, J. Zhao, and Z. Shao, “Hyper-spectral object tracking with dual-stream prompt,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–12, 2025. [14] L. Zhang, R. Yao, Y. Zhang, Y. Zhou, F. Hu, J. Zhao, and Z. Shao, “Historical object-aware prompt learning for universal hyperspectral object tracking,” ACM Transactions on Multimedia Computing, Com-munications and Applications , 2025. [15] Y. Chen, Q. Yuan, Y. Tang, Y. Xiao, J. He, T. Han, Z. Liu, and L. Zhang, “Ssttrack: A unified hyperspectral video tracking framework via modeling spectral-spatial-temporal conditions,” Information Fusion ,vol. 114, p. 102658, 2025. [16] Z. Li, F. Xiong, J. Zhou, J. Lu, and Y. Qian, “Learning a deep ensemble network with band importance for hyperspectral object tracking,” IEEE Transactions on Image Processing , vol. 32, pp. 2901–2914, 2023. [17] Z. Li, F. Xiong, J. Zhou, J. Lu, Z. Zhao, and Y. Qian, “Material-guided multiview fusion network for hyperspectral object tracking,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–15, 2024. [18] W. Li, Z. Hou, J. Zhou, and R. Tao, “Siambag: Band attention grouping-based siamese object tracking network for hyperspectral videos,” IEEE Transactions on Geoscience and Remote Sensing , vol. 61, pp. 1–12, 2023. 
+
+12 XXXX IEEE TRANSACTIONS ON MULTIMEDIA, VOL. XX, XXXX [19] J. Yu, Z. Cai, Y. Li, L. Wang, F. Gao, and Y. Yu, “Language-guided dual-modal local correspondence for single object tracking,” IEEE Transactions on Multimedia , vol. 26, pp. 10 637–10 650, 2024. [20] H. Zhang, J. Wang, J. Zhang, T. Zhang, and B. Zhong, “One-stream vision-language memory network for object tracking,” IEEE Transac-tions on Multimedia , vol. 26, pp. 1720–1730, 2024. [21] M. Guo, Z. Zhang, H. Fan, and L. Jing, “Divert more attention to vision-language tracking,” Advances in Neural Information Processing Systems ,vol. 35, pp. 4446–4460, 2022. [22] Q. Feng, V. Ablavsky, Q. Bai, and S. Sclaroff, “Siamese natural language tracker: Tracking by natural language descriptions with siamese track-ers,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition , 2021, pp. 5851–5860. [23] Y. Wang, S. Mei, M. Ma, Y. Liu, T. Gao, and H. Han, “Hyperspectral object tracking with context-aware learning and category consistency,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , 2025. [24] J. Achiam, S. Adler, S. Agarwal, L. Ahmad, I. Akkaya, F. L. Aleman, D. Almeida, J. Altenschmidt, S. Altman, S. Anadkat et al. , “Gpt-4 technical report,” arXiv preprint arXiv:2303.08774 , 2023. [25] L. Gao, Y. Zhang, Y. Jiang, W. Xie, and Y. Li, “Hyperspectral mamba for hyperspectral object tracking,” 2025. [Online]. Available: https://arxiv.org/abs/2509.08265 [26] S.-F. Chen, J.-C. Chen, I.-H. Jhuo, and Y.-Y. Lin, “Improving visual object tracking through visual prompting,” IEEE Transactions on Mul-timedia , 2025. [27] Y. Chen, Q. Yuan, Y. Tang, Y. Xiao, J. He, and L. Zhang, “Spirit: Spectral awareness interaction network with dynamic template for hyperspectral object tracking,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 62, pp. 1–16, 2024. [28] K. Qian, J. Zhou, F. Xiong, H. Zhou, and J. Du, “Object tracking in hyperspectral videos with convolutional features and kernelized correla-tion filter,” in International conference on smart multimedia . Springer, 2018, pp. 308–319. [29] Z. Liu, X. Wang, Y. Zhong, M. Shu, and C. Sun, “Siamhyper: Learning a hyperspectral object tracker from an rgb-based tracker,” IEEE Trans-actions on Image Processing , vol. 31, pp. 7116–7129, 2022. [30] Z. Li, F. Xiong, J. Zhou, J. Wang, J. Lu, and Y. Qian, “Bae-net: A band attention aware ensemble network for hyperspectral object tracking,” in 
+
+2020 IEEE International Conference on Image Processing (ICIP) , 2020, pp. 2106–2110. [31] M. A. Islam, W. Xing, J. Zhou, Y. Gao, and K. K. Paliwal, “Hy-tracker: A novel framework for enhancing efficiency and accuracy of object tracking in hyperspectral videos,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–14, 2024. [32] C. Zhao, H. Liu, N. Su, C. Xu, Y. Yan, and S. Feng, “Tmtnet: A transformer-based multimodality information transfer network for hyperspectral object tracking,” Remote Sensing , vol. 15, no. 4, p. 1107, 2023. [33] C. Zhao, H. Liu, N. Su, and Y. Yan, “Tftn: A transformer-based fusion tracking framework of hyperspectral and rgb,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–15, 2022. [34] Y. Wang, S. Mei, M. Ma, Y. Liu, and Y. Su, “Htacpe: A hybrid transformer with adaptive content and position embedding for sample learning efficiency of hyperspectral tracker,” IEEE Transactions on Multimedia , vol. 27, pp. 2384–2398, 2025. [35] Y. Chen, Q. Yuan, Y. Tang, X. Wang, Y. Xiao, J. He, Z. Lihe, and X. Jin, “Profit: A prompt-guided frequency-aware filtering and template-enhanced interaction framework for hyperspectral video tracking,” IS-PRS Journal of Photogrammetry and Remote Sensing , vol. 226, pp. 164– 186, 2025. [36] C. Sun, X. Wang, Z. Liu, Y. Wan, L. Zhang, and Y. Zhong, “Siamohot: A lightweight dual siamese network for onboard hyperspectral object tracking via joint spatial-spectral knowledge distillation,” IEEE Trans-actions on Geoscience and Remote Sensing , vol. 61, pp. 1–12, 2023. [37] W. Sun, Y. Tan, J. Li, S. Hou, X. Li, Y. Shao, Z. Wang, and B. Song, “Hotmoe: Exploring sparse mixture-of-experts for hyperspectral object tracking,” IEEE Transactions on Multimedia , vol. 27, pp. 4072–4083, 2025. [38] J. Zhang, Z. Zheng, K. Ni, N. Huang, Q. Liu, and P. Liu, “Hyperspectral object tracking via band and context refinement network,” Remote Sensing , vol. 17, no. 22, 2025. [39] Y. Zimmer, O. Lindenbaum, and O. Glickman, “Supervised embedded methods for hyperspectral band selection,” 2025. [Online]. Available: https://arxiv.org/abs/2401.11420 [40] X. Feng, D. Zhang, S. Hu, X. Li, M. Wu, J. Zhang, X. Chen, and K. Huang, “Enhancing vision-language tracking by effectively con-verting textual cues into visual cues,” in ICASSP 2025-2025 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP) . IEEE, 2025, pp. 1–5. [41] H. Zhu, Q. Lu, L. Xue, P. Zhang, and G. Yuan, “Vision-language tracking with clip and interactive prompt learning,” IEEE Transactions on Intelligent Transportation Systems , vol. 26, no. 3, pp. 3659–3670, 2025. [42] A. Radford, J. W. Kim, C. Hallacy, A. Ramesh, G. Goh, S. Agarwal, G. Sastry, A. Askell, P. Mishkin, J. Clark et al. , “Learning transferable visual models from natural language supervision,” in International Conference on Machine Learning . PmLR, 2021, pp. 8748–8763. [43] X. Feng, X. Li, S. Hu, D. Zhang, J. Zhang, X. Chen, K. Huang 
+
+et al. , “Memvlt: Vision-language tracking with adaptive memory-based prompts,” Advances in Neural Information Processing Systems , vol. 37, pp. 14 903–14 933, 2024. [44] X. Li, S. Hu, X. Feng, D. Zhang, M. Wu, J. Zhang, and K. Huang, “Dtvlt: A multi-modal diverse text benchmark for visual language tracking based on llm,” arXiv preprint arXiv:2410.02492 , 2024. [45] Li, Xuchen and Hu, Shiyu and Feng, Xiaokun and Zhang, Dailing and Wu, Meiqi and Zhang, Jing and Huang, Kaiqi, “How texts help? a fine-grained evaluation to reveal the role of language in vision-language tracking,” arXiv preprint arXiv:2411.15600 , 2024. [46] X. Li, Y. Huang, Z. He, Y. Wang, H. Lu, and M.-H. Yang, “Citetracker: Correlating image and text for visual tracking,” in 2023 IEEE/CVF International Conference on Computer Vision (ICCV) , 2023, pp. 9940– 9949. [47] L. Shi, B. Zhong, Q. Liang, X. Hu, Z. Mo, and S. Song, “Mamba adapter: Efficient multi-modal fusion for vision-language tracking,” 
+
+IEEE Transactions on Circuits and Systems for Video Technology ,vol. 35, no. 9, pp. 9300–9311, 2025. [48] Y. Zhang, M. Zhang, W. Li, S. Wang, and R. Tao, “Language-aware domain generalization network for cross-scene hyperspectral image classification,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 61, pp. 1–12, 2023. [49] W. Wang, F. Liu, H. Zhu, and L. Xiao, “Text-driven adaptive semantic alignment network for cross-scene hyperspectral image classification,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , 2025. [50] A. Gu, K. Goel, and C. R´ e, “Efficiently modeling long sequences with structured state spaces,” arXiv preprint arXiv:2111.00396 , 2021. [51] A. Gu, K. Goel, A. Gupta, and C. R´ e, “On the parameterization and initialization of diagonal state space models,” Advances in Neural Information Processing Systems , vol. 35, pp. 35 971–35 983, 2022. [52] A. Gu and T. Dao, “Mamba: Linear-time sequence modeling with selective state spaces,” arXiv preprint arXiv:2312.00752 , 2023. [53] K. Li, X. Li, Y. Wang, Y. He, Y. Wang, L. Wang, and Y. Qiao, “Videomamba: State space model for efficient video understanding,” in 
+
+European Conference on Computer Vision , 2024, pp. 237–255. [54] T. Huang, X. Pei, S. You, F. Wang, C. Qian, and C. Xu, “Localmamba: Visual state space model with windowed selective scan,” in European Conference on Computer Vision . Springer, 2024, pp. 12–22. [55] Y. Liu, Y. Tian, Y. Zhao, H. Yu, L. Xie, Y. Wang, Q. Ye, J. Jiao, and Y. Liu, “Vmamba: Visual state space model,” Advances in Neural Information Processing Systems , vol. 37, pp. 103 031–103 063, 2024. [56] H. Wang, Y. Li, and W. Li, “Spectral-temporal token-guided prompt mamba for hyperspectral object tracking,” in 2024 14th Workshop on Hyperspectral Imaging and Signal Processing: Evolution in Remote Sensing (WHISPERS) , 2024, pp. 1–5. [57] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, “Bert: Pre-training of deep bidirectional transformers for language understanding,” in Pro-ceedings of NAACL-HLT , pp. 4171–4186. [58] A. Rodriguez and A. Laio, “Clustering by fast search and find of density peaks,” science , vol. 344, no. 6191, pp. 1492–1496, 2014. [59] C. Zhang, X. Sun, Y. Yang, L. Liu, Q. Liu, X. Zhou, and Y. Wang, “All in one: Exploring unified vision-language tracking with multi-modal alignment,” in Proceedings of the 31st ACM International Conference on Multimedia , 2023, pp. 5552–5561. [60] B. Ye, H. Chang, B. Ma, S. Shan, and X. Chen, “Joint feature learning and relation modeling for tracking: A one-stream framework,” in European Conference on Computer Vision . Springer, 2022, pp. 341– 357. [61] E. J. Hu, Y. Shen, P. Wallis, Z. Allen-Zhu, Y. Li, S. Wang, L. Wang, W. Chen et al. , “Lora: Low-rank adaptation of large language models.” 
+
+ICLR , vol. 1, no. 2, p. 3, 2022. [62] Y. Chen, Y. Tang, X. Su, J. Li, Y. Xiao, J. He, and Q. Yuan, “Phtrack: Prompting for hyperspectral video tracking,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–18, 2024. 
+
+13 ROY et al. : VISION-LANGUAGE GUIDED HYPERSPECTRAL OBJECT TRACKING XXXX [63] Y. Chen, Q. Yuan, Y. Tang, Y. Xiao, J. He, and Z. Liu, “Sense: Hyperspectral video object tracker via fusing material and motion cues,” 
+
+Information Fusion , vol. 109, p. 102395, 2024. [64] Y. Wu, L. Jiao, X. Liu, F. Liu, S. Yang, and L. Li, “Domain adaptation-aware transformer for hyperspectral object tracking,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 34, no. 9, pp. 8041– 8052, 2024. [65] M. A. Islam, J. Zhou, W. Xing, Y. Gao, and K. K. Paliwal, “Ubstrack: Unified band selection and multimodel ensemble for hyperspectral object tracking,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 63, pp. 1–15, 2025. [66] H. Wang, W. Li, X.-G. Xia, and Q. Du, “Causal hyperprompter: A framework for unbiased hyperspectral camouflaged object tracking,” 
+
+IEEE Transactions on Pattern Analysis and Machine Intelligence , pp. 1–18, 2025. [67] J. Xie, B. Zhong, Z. Mo, S. Zhang, L. Shi, S. Song, and R. Ji, “Autoregressive queries for adaptive tracking with spatio-temporal trans-formers,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2024, pp. 19 300–19 309. [68] L. Shi, B. Zhong, Q. Liang, N. Li, S. Zhang, and X. Li, “Explicit visual prompts for visual object tracking,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 38, no. 5, 2024, pp. 4838– 4846. [69] B. Kang, X. Chen, S. Lai, Y. Liu, Y. Liu, and D. Wang, “Exploring enhanced contextual information for video-level object tracking,” in 
+
+Proceedings of the AAAI Conference on Artificial Intelligence , vol. 39, no. 4, 2025, pp. 4194–4202. [70] Y. Tan, W. Sun, J. Li, S. Hou, X. Li, Z. Wang, and B. Song, “Hyper-track: A unified network for hyperspectral video object tracking,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 36, no. 1, pp. 1015–1028, 2026. [71] F. Xiong, Z. Wu, J. Zhou, S. Jia, and Y. Qian, “Suit: Spatial-spectral union-intersection interaction network for hyperspectral object tracking,” 
+
+IEEE Transactions on Image Processing , vol. 34, pp. 7786–7800, 2025. [72] J. Hu, L. Shen, and G. Sun, “Squeeze-and-excitation networks,” in 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2018, pp. 7132–7141. [73] L. Zhao, L. Wang, and D. Liu, “Hyperspectral imagery band selection based on maximal standard deviation,” in 2015 8th International Sympo-sium on Computational Intelligence and Design (ISCID) , vol. 2, 2015, pp. 59–62. 
+
+14

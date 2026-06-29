@@ -1,0 +1,409 @@
+Title: Quantum Enchanced Multi-Scale CNN with Bi-directional Mamba for Crop Field Analysis
+
+URL Source: https://arxiv.org/pdf/2606.17222v1
+
+Published Time: Wed, 17 Jun 2026 00:16:06 GMT
+
+Number of Pages: 19
+
+Markdown Content:
+# QUANTUM ENHANCED MULTI -S CALE CNN WITH 
+
+# BI-D IRECTIONAL MAMBA FOR CROP FIELD ANALYSIS 
+
+Mohammad Salman Khan 
+
+Department of Computer Science Lakehead University Thunder Bay, ON P7B5E1, Canada 
+
+Ehsan Atoofian 
+
+Department of Electrical and Computer Engineering Lakehead University Thunder Bay, ON P7B5E1, Canada 
+
+Saad B. Ahmed* 
+
+Department of Computer Science Lakehead University Thunder Bay, ON P7B5E1, Canada *Corresponding author {sbinahm@lakeheadu.ca} 
+
+June 17, 2026 
+
+# ABSTRACT 
+
+Hyperspectral image (HSI) crop analysis plays a vital role in precision agriculture due to its ability to capture rich spectral and spatial information for accurate crop monitoring and assessment. However, effective HSI classification remains challenging because of high spectral dimensionality, spatial complexity, class imbalance, and limited labeled samples. To address these challenges, this work proposes a BiSpectral Mamba-based framework for HSI crop analysis that integrates multi-scale convolutional feature extraction, spectral attention, bidirectional state-space modeling, and quantum-inspired learning. The proposed architecture first employs a multi-scale CNN backbone to extract hierarchical spatial–spectral representations through feature fusion across multiple resolutions. A spectral channel attention mechanism is then utilized to emphasize informative spectral bands while suppressing redundant and noisy channels. The refined features are subsequently processed using a BiSpectral Mamba module, which models long-range dependencies in both directions by treating hyperspectral feature maps as sequential tokens. Furthermore, class-weighted optimization strategies and carefully designed fusion mechanisms are incorporated to improve training stability and classification performance under class imbalance conditions. Experimental results on the UAV-HSI-Crop dataset demonstrate that the proposed framework achieves an overall accuracy (OA) of 84 .83% , validating the effectiveness of the architectural fusion for robust hyperspectral crop classification. The study further indicates that future performance improvements may be achieved by increasing the number of quantum qubits and integrating dynamic, class-aware spatial priors during the final bilinear upsampling stage. The proposed framework provides a promising foundation for advanced agricultural applications, including crop disease analysis, crop yield prediction, and soil moisture estimation, while also demonstrating the broader potential of structured state-space and quantum-inspired architectures for remote sensing and computer vision tasks. 
+
+Keywords Spectral Signature · Mamba Model · Quantum Computing · Crop Field Analysis · Multi-Scale CNN 
+
+# 1 Introduction 
+
+The rapid proliferation of Unmanned Aerial Vehicles (UAV) technology has transformed the field of remote sensing, allowing us to capture Hyperspectral Images (HSI) which have much more spectral data than the traditional RGB images. HSI provides a contiguous spectrum for every pixel, typically spanning hundreds of narrow spectral bands. 
+
+> arXiv:2606.17222v1 [cs.CV] 15 Jun 2026
+
+A PREPRINT - J UNE 17, 2026 These dense data cubes can be used for the precision identification of materials and biological states, as each emits unique spectral information, and helps us to better understand crop health, soil moisture and mineral composition. Hyperspectral imaging (HSI) serves as a highly advanced tool for precision agriculture and remote sensing. This technology captures detailed spectral-spatial information across hundreds of contiguous wavelengths. Each material within an agricultural landscape exhibits a unique spectral signature. HSI encodes these fine-grained reflectance characteristics to reveal subtle physiological differences in vegetation that remain invisible to standard RGB sensors. The combination of high spectral resolution and precise spatial detail fundamentally transforms our ability to monitor food security, assess crop health, and optimize land use. High-resolution hyperspectral UAV imagery accurately captures both the spectral and spatial heterogeneity of these complex agricultural environments. Analyzing these rich hyperspectral datasets introduces significant computational and mathematical challenges. UAV-based hyperspectral data inherently exhibit extreme high dimensionality, often containing up to 200 distinct spectral bands. Agricultural datasets frequently suffer from a severe lack of labeled samples and display strong class imbalances. Deep learning architectures provide powerful mechanisms for processing this complex spectral-spatial information. Convolutional neural networks extract hierarchical spatial features, whereas transformer encoder-decoder models successfully capture global dependencies across the image. State-of-the-art models achieve strong classification accuracy by combining spectral-attention modules with transformer blocks. These purely classical deep learning models require massive computational resources and carry exceptionally high parameter counts, sometimes approaching 
+
+100 million parameters. Standard convolutional networks and transformers face significant difficulties in efficiently extracting meaningful structural information under the constraints of limited data and high dimensionality. This work proposes the development and evaluation of highly efficient hybrid deep learning frameworks to overcome these computational barriers. The research explores the integration of multi-scale convolutional neural networks [ 1], bidirectional Mamba state-space models, and variational quantum circuit [ 2] [ 3]. Multi-scale CNNs perform rapid, localized feature extraction, while bidirectional Mamba blocks enable efficient sequence-based modeling of the spectral data. Variational quantum circuits act as global feature enhancement heads to model non-linear global dependencies across the image patches. This hybrid quantum-classical approach significantly reduces the overall parameter count while maintaining highly competitive classification accuracy. The primary objective is to validate these lightweight architectures in crop datasets. The training methodology employs a robust hybrid Cross-Entropy and Log-Cosh Dice loss function [ 4] to directly combat the extreme class imbalances inherent in the data. This specialized loss function optimizes the intersection-over-union for minority classes and stabilizes the gradient flow during training. Ultimately, this research establishes a scalable, computationally efficient paradigm for advanced crop field analysis in precision agriculture. 
+
+# 2 Literature Review 
+
+In this section, we will look at some of the recent research that has been done in deep learning applications for HSI images in crop analysis, and we will also look closely at how advanced neural network architectures like CNN, Mamba, and Quantum models work with HSI crop analysis datasets and what are their drawbacks. 
+
+2.1 CNN for HSI Crop Analysis 
+
+This section explains some of the recent works in CNN architecture for HSI crop analysis and identifies some of the gaps exhibited by CNN architecture in processing hyperspectral imagery. Some benchmark HSI datasets for crop analysis are available, which feature a variety of objects in the scenes they capture. CMTNet [ 5], a CNN-Transformer hybrid, excels in UAV multi-crop classification and achieved 99 .58% overall accuracy on the WHU-Hi-LongKou dataset, using CNN branches for local spectral-spatial extraction fused with transformer global context—surpassing pure CNNs by 
+
+0.19 − − 2.52% across three UAV datasets. Ablin et al. [ 6 ] proposed a lightweight ensemble architecture with additional quantum-inspired optimization. Their method reports strong performance on UAV-HSI-Crop of around 89% OA. HRS-UNET [ 7] uses a U-Net style encoder–decoder with convolutional blocks that also combines Multiscale Spectral Aggregation (MSA) module to compress spectral dimension while enhancing features and reducing computation, reporting OA of 89 .96% and kappa score of 0.8814 .There are also reported some comparison scores on basic CNN models like SegNet and UNet [4] which reported accuracies of 43 .61% and 76 .07% respectively. A 3D-CNN for for soybean disease [ 8] used Pure 3D CNN taking full HSI cube (spatial + spectral) as input and several 3D conv + pooling layers, followed by FC classification for “healthy vs diseased” soybean (charcoal rot) on a dataset of Hypsectral cubes of soybean stems and reported accruacies of OA 95 .73% and infected class F-1 score of 0.87 .In MLVI-CNN [ 9] HSI is preprocessed using Savitzky–Golay, normalization and band selection is done via RFE to derive 2A PREPRINT - J UNE 17, 2026 MLVI and H-VSI indices which are processed using 1D CNN on index sequences on a dataset of HSI Crop stress experiment reporting accuracies of 83 .40% OA. 
+
+2.2 Transformers for HSI Crop Analysis 
+
+This section compiles recent work on the Transformer architecture for HSI crop analysis and identifies some gaps in the architecture. Vision transformers and HSI specialized variants of them, have proved to be good for crop analysis as they can effectively capture spectral-spatial dependencies through self-attention, addressing CNNs fixed receptive field limitations. Recent works demonstrate competitive accuracies on agricultural benchmarks while capturing long-range crop-field relationships. Niu et al. [ 4] introduced HSI-TransUNet, a transformer-based encoder-decoder for crop mapping on UAV-HSI-Crop, reporting OA of 86 .05% and kappa of 0.8347 . Hossain et al. [ 10 ] studied transformer-UNet adaptation for UAV agricultural HSI and reported OA of 76 .6% with kappa of 0.532 .The BandWiseTransformer [ 11 ] architecture is a one-dimensional self-attention network featuring an embedding layer, four transformer encoder blocks with multi-head attention, and an adaptive average pooling layer tailored to capture fine-grained spectral dependencies.It was evaluated on a custom UAV hyperspectral library of 3, 105 plot-level wheat spectra representing five different diseases, achieving a reported overall test accuracy of 97 .9% .The Semantic-Guided Transformer Network (SGTN) [ 12 ] introduces semantic guidance to reduce background in-terference and emphasize crop regions in HSI, achieving OA 98% on Indian Pines, Pavia University, and Salinas. HyperSFormer [ 13 ] uses an end-to-end transformer that treats HSI pixels as tokens, with multi-head self-attention over spectral–spatial features and an adaptive min-log sampling (AMLS) strategy and Dice+focal loss to handle insufficient and imbalanced samples and reports accuracies of 98 .4% OA on the Indian Pines Dataset. MSA-LWFormer [ 14 ] uses multi-scale spectral attention and FFT-based frequency domain Transformer that reduces complexity and reported OAs of 98 .87% , 99 .79% and 99 .96% on Indian Pines , Pavia University and Salinas datasets respectively. SSSAT-Net [ 15 ]integrates PCA for dimensionality reduction, a Convolutional Block Attention Module, Spectral and Spatial attention modules, and a Transformer to comprehensively extract local and global spectral-spatial features.It was evaluated on the Indian Pines, Kennedy Space Center, Pavia University, Houston 2013, and Salinas datasets,achieving overall accuracies of 98 .75% , 99 .42% , 99 .92% , 99 .42% , and 99 .91% , respectively. A locally enhanced transformer network featuring a multibranch spatial–spectral tokenization module [ 16 ] for shallow feature extraction and a dual-branch transformer encoder to capture both local and global spatial dependencies.It was evaluated on the Pavia University, University of Houston, WHU-Hi-LongKou, and ShanDongFeiCheng datasets, achieving reported overall accuracies of 96 .66% , 90 .12% , 98 .24% , and 61 .29% ,respectively. The Efficient Attention Transformer Network (EATN) [ 17 ]utilizes a Self-Similarity Feature Enhancement (SSFE) module combined with Spectral Interactive Transformer (SIT) and Spatial Conv-Attention (SCA) modules to efficiently extract local and global spatial-spectral features. It was evaluated on the Houston 2013, achieving a reported overall accuracy of 95 .96% on the Houston 2013 dataset. The Low-rank Transformer Network (LRTN) [ 18 ] utilizes a U-shaped architecture featuring dual encoding branches with spectral cross attention and spatial low rank cross attention, combined with a spatial-spectral priors guided fusion module achieving 78 .1% OA on Houston Dataset. While a transformer has many advantages, it relies heavily on global self-attention, and that has quadratic complexity based on the number of tokens. For HSI data that is high in dimensions, this presents issues related to computational efficiency and larger memory requirements. Additionally, Transformers treats inputs as sequences of tokens and may not preserve the inherent spatial topology of agricultural scenes. 
+
+2.3 Quantum Methods for HSI Crop Analysis 
+
+This section presents the recent works in quantum-based architecture for HSI crop analysis and identifies some of the gaps in them. Quantum models possess a fundamental architectural advantage for processing highly complex agricultural data. Hyperspectral imagery generates massively high-dimensional datasets requiring extensive computational power to map global dependencies across an entire farm field. Variational quantum circuits natively model these complex feature interactions through the quantum mechanical principles of superposition and entanglement. This specialized quantum mechanics enables the highly efficient representation of non-linear global dependencies across all spatial patches of the hyperspectral image. The quantum circuit forces the neural network to evaluate holistic relationships simultaneously. This simultaneous processing capability drastically improves the model’s ability to recognize the incredibly subtle spectral differences between highly similar crop classes A hybrid model architecture using a MobileNetV2 backbone for classical feature extraction with a quantum-inspired processing layer that simulates variational quantum circuits was evaluated on a custom dataset of approximately 
+
+5, 000 labeled fruit crop leaf images (categorized as healthy, wilt-affected, and nematode-infested), the hybrid model 3A PREPRINT - J UNE 17, 2026 achieved a reported overall accuracy of 98 .8% [ 19 ]. A model [ 20 ] which utilizes a D-Wave quantum annealer for Mutual Information (MI)-based spectral band selection ( followed by quantum boosting algorithms (Qboost and Qboost-Plus) that use Error-Correcting Output Codes for multi-label classification was evaluated on the AVIRIS Indian Pine hyperspectral dataset, the quantum classifiers reportedly achieved high accuracies that outperformed conventional baselines such as Adaboost and SVM, although specific overall accuracy percentages are not provided. An architecture that resolves the multispectral unmixing problem by first generating a virtual hyperspectral image, and then performing unmixing utilizing a Weighted Simplex Shrinkage (WSS) regularizer alongside a Quantum Deep Image Prior (QDIP) module was evaluated on AVIRIS (Boulder, Ottawa, Hawaii) and Sentinel-2 remote sensing datasets, the algorithm unmixing performance with reported average error of 8.193 for RMSE [ 21 ]. The QSSPN [ 22 ] architecture cascades multiple QSSN blocks—each containing a phase-prediction module and a measurement-like fusion module—to dynamically extract and jointly fuse spectral-spatial features. It was evaluated on the Indian Pines, Pavia University, and Salinas hyperspectral datasets with overall accuracies of 95 .87% , 99 .71% , and 99 .66% , respectively. Liu et al. [ 23 ]explored quantum-assisted HSI classification with a quantum annealing SVM on limited-label datasets. Lin and Young [ 24 ] introduced a hybrid quantum-classical GAN for hyperspectral restoration. Overall, quantum methods in remote sensing are promising but remain underexplored for UAV crop-field classification. Current quantum machine learning research exhibits critical limitations regarding hyperspectral agricultural classification. Existing studies primarily apply quantum algorithms to scarcely labeled generic remote sensing datasets or large-scale satellite imagery rather than specialized agricultural data. The exploration of hybrid quantum models for highly imbalanced, real-world crop field datasets has not been addressed. No research has been done on combining advanced spatial modeling techniques such as graph-attention networks with these quantum implementations within agricultural contexts. 
+
+2.4 Mamba and State-Space Models for HSI Crop Analysis 
+
+This section explains the Mamba-based architecture for HSI crop analysis. Mamba state-space models deliver incredibly fast sequence processing for high-dimensional hyperspectral data. The architecture structurally treats the extracted multi-scale spatial features and continuous spectral bands as an extended, flattened data sequence. This advanced sequence-based feature extraction provides deep contextual understanding without triggering the massive quadratic memory bottlenecks inherent to standard Transformers. The model scales linearly with sequence length, establishing it as a highly efficient and structurally superior engine for parsing dense, multi-band agricultural environments. The SS-Mamba [ 25 ] architecture consists of a token generation module and stacked dual-branch Mamba blocks equipped with a feature enhancement module to efficiently extract and fuse long-range spatial and spectral sequences. It was evaluated on the Indian Pines, Pavia University, Houston, and Chikusei hyperspectral datasets, achieving reported overall accuracies of 91 .59% , 96 .40% , 94 .30% , and 94 .97% ,respectively. The HyperspectralMamba [ 26 ] architecture features a dual stream design that combines a State Space Model(SSM) to capture global spectral dependencies with a parallel 1D convolutional path to extract local features, which are then integrated using a band-adaptive feature recalibration mechanism. It was evaluated on the Indian Pines, Pavia University, and Salinas Valley datasets, and it achieved reported overall accuracies of 95 .31% , 98 .60% , and 96 .40% , respectively. The BiMambaHSI architecture is a bidirectional state-space framework that integrates a joint spectral-spatial gated Mamba(JGM) encoder and a dual-branch spatial-spectral Mamba block(SSMB) to explicitly capture forward-backward long-range dependencies while maintaining linear complexity.It was evaluated on the Pavia University, Houston, Indian Pines, WHU-Hi-HanChuan, and WHU-Hi-LongKou hyperspectral datasets, achieving reported overall accuracies of 97 .90% , 97 .92% , 99 .02% , 97 .92% ,and 99 .54% ,respectively. The EchoMamba [ 27 ] combines a Random Forest SMOTE(RFMS) data preprocessing strategy with a novel LSTMS6 network, which cascades an LSTM layer to extract local temporal dependencies and a Mamba(S6) module to encode global spectral context. It was evaluated on the Augsburg, Salinas, Pavia Centre scene, Pavia University, Indian Pines, and Houston 2013 hyperspectral datasets; it achieved reported overall test accuracies of 99 .70% , 98 .65% , 95 .44% , 99 .72% , 99 .03% , and 98 .40% , respectively. MorpMamba integrates [ 28 ]morphological operations to generate spatial-spectral tokens, refines them using multihead self-attention, and processes them through a linear-complexity State Space Model(SSM) for efficient hyperspectral image classification. It was evaluated on the WHU-Hi-LongKou, Pavia University, Pavia Centre, Salinas, and University of Houston datasets, its optimal spatial-spectral variant (SSMM) achieved reported overall accuracies of 99 .70% , 97 .67% , 99 .71% , 98 .52% ,and 98 .28% , respectively. The S2Mamba [ 29 ] uses two linear-complexity selective structured state space models, a Patch Cross Scanning module for spatial features and a Bi-directional Spectral Scanning module for spectral features dynamically fused via a Spatial-spectral Mixture Gate. It was evaluated on the Indian Pines, Pavia University, and Houston 2013 datasets, it achieved reported overall accuracies of 97 .92% , 97 .81% , and 93 .36% ,respectively. The MambaMoE [ 30 ] is an encoder-decoder framework featuring a Mixture of Mamba Expert Blocks, which uses spatial routed and spectral shared experts combined 4A PREPRINT - J UNE 17, 2026 with an uncertainty-guided corrective learning strategy to dynamically extract joint spectral-spatial features. It was evaluated on the Pavia University, Houston, and Whu-HanChuan hyperspectral datasets, and it achieved reported overall accuracies of 95 .20% , 91 .18% , and 92 .67% , respectively. The SSUMamba [ 31 ] is an encoder-decoder framework designed for hyperspectral image denoising that utilizes Spatial-Spectral Continuous Scan (SSCS) Mamba blocks combining bidirectional State Space Models with 3D residual convolutions to efficiently capture both local textures and long-range spatial-spectral dependencies. It was evaluated on the ICVL, Houston 2018, Pavia City Center, Gaofen-5 Wuhan, and Earth Observing-1 datasets. The model is measured on denoising performance rather than classification accuracy, achieving noise ratios (PSNR) of 43 .07 , 34 .74 , and 35 .70 under mixture noise conditions on the synthetic datasets, respectively. Mamba models fundamentally struggle to preserve the native spatial geometry of agricultural fields. State-space architectures require flattening the three-dimensional hyperspectral data cube into a single, one-dimensional sequence for processing. This aggressive unrolling process actively destroys the critical local boundaries between distinct crop rows and adjacent diseased zones. Mamba systems aggressively prioritize tracking spectral signatures across sequential bands at the direct expense of spatial awareness. Pure sequential state-space modeling forces the network to lose vital localized context and easily misclassifies small, isolated pathogen outbreaks 
+
+2.5 Gaps Identified 
+
+A comprehensive review of the current literature reveals specific, critical failures across every major deep learning architecture when applied to hyperspectral crop analysis. • Convolutional Neural Networks (CNNs) : Standard convolutional models rapidly exhaust computational limits when scaled to process high-volume hyperspectral data. Lightweight CNN variants completely fail to capture the holistic, global structural dependencies required to differentiate spectrally similar crop species. Traditional local receptive fields consistently struggle to maintain precise boundary delineations between dense, overlapping vegetation rows. • Transformers : Vision transformers introduce absolutely unsustainable parameter overheads, such as the 99.33 million parameters required by the HSI-TransUNet. These heavy classical architectures demand massive volumes of explicitly labeled data to converge properly, a resource entirely absent in real-world agricultural environments. Deep transformer networks consistently over-smooth localized, high-frequency spatial textures crucial for identifying small, isolated crop clusters • Quantum Based Model : Current quantum machine learning applications strictly analyze low-resolution satellite imagery or simplified, generic benchmark datasets Existing studies completely fail to fuse quantum global feature extractors with advanced localized spatial modeling techniques. • Mamba Model : Standard state-space models aggressively flatten three-dimensional hyperspectral cubes into rigid one-dimensional sequences. This forced unrolling mechanism mathematically destroys the native spatial geometry and vital structural boundaries of the agricultural field. Pure sequential modeling completely sacrifices critical local neighborhood context to prioritize tracking continuous spectral signatures. This work systematically addresses these precise architectural bottlenecks to deliver a highly functional and field-ready classification system. This work presents the CNN-BiSpectralMamba-Quantum model to completely bypass standard parameter bloat. Integrating a 4-qubit variational quantum circuit explicitly replaces massive classical fully-connected layers. This specific structural swap drops the total trainable parameter count to a remarkably lightweight. This work brought quantum machine learning directly into the precision agriculture domain by validating these hybrid structures on the complex, 30-class UAV-HSI-Crop dataset. To eliminate the Mamba architecture’s spatial destruction, the work fused the bidirectional state-space blocks directly atop a multi-scale CNN feature extractor. The multi-scale convolutions strictly anchor the spatial geometry before the Mamba blocks process the complex spectral sequences. Finally, the work uses an optimization pipeline to survive the dataset’s extreme class imbalances. by implementing a hybrid Cross-Entropy and Log-Cosh Dice loss function to force the network to stabilize gradients and aggressively optimize the intersection-over-union metric for rare, minority crop classes. 
+
+# 3 Dataset Overview 
+
+This section provides a detailed analysis of the dataset utilized in this study. The UAV-HSI-Crop dataset serves as the primary foundation of the proposed work. This large-scale hyperspectral dataset was developed by researchers at China Agricultural University [ 4] and contains rich spectral and spatial information collected from real agricultural environments, making it well-suited for evaluating advanced hyperspectral image classification frameworks. They flew 5A PREPRINT - J UNE 17, 2026 specialized drones directly over dense agricultural fields located in Majiakou Village and Xijingmeng Village within Shenzhou City, Hebei Province, China. The collection team mounted a high-performance Resonon Pika-L hyperspectral sensor on the UAVs to capture the imagery. This sensor actively recorded spectral reflectance information across the precise 400 to 1000 nm wavelength range. Consequently, the hardware generated a massive, high-dimensional data cube containing 200 contiguous spectral bands for every single flight. The resulting imagery boasts a razor-sharp spatial resolution of approximately 0.1 meters per pixel. The detail is provided in Table 1, which perfectly captures the complex structural variations and spatial heterogeneity of the actual crop fields. Table 1: Summary of the UAV-HSI-Crop dataset used in this work.             
+
+> Property Value Samples 433
+> Spatial size per sample 96 ×96
+> Spectral bands 200
+> Sensor wavelength range 400 − − 1000 nm
+> Spatial resolution ∼0.1m/pixel Number of classes 27
+
+This dataset provides an incredibly rigorous testing ground for deep learning architectures. The complete repository delivers 433 distinct hyperspectral image samples. Each sample consists of a highly detailed 96 × 96 pixel spatial grid packed with all 200 spectral channels. The dataset meticulously categorizes 30 distinct crop classes as seen in Fig 1 and land cover types. The ground truth labels explicitly identify complex, overlapping categories including bare soil, invasive weeds, Chinese cabbage, corn, millet, and a wide variety of other specific vegetation classes as seen in Fig 2. 
+
+Figure 1: Classes in UAV-HSI-Crop Dataset as shown in [4] 6A PREPRINT - J UNE 17, 2026 
+
+Figure 2: Examples from UAV-HSI-Crop: selected spectral bands, RGB composite, and ground-truth labels. Real-world agricultural data inherently contains massive structural biases, and this dataset accurately reflects that reality through a brutally severe class imbalance. Dominant staple crops flood the pixel counts, while rare vegetation types barely register in the localized ground truth maps. This exact combination of extreme high-dimensionality, rich spatial resolution, and severe class imbalance makes the UAV-HSI-Crop dataset a good base to test our models on agricultural applications. 
+
+# 4 Methodology 
+
+In this section we will look at the architecture of the Quantum Enhanced Multi-Scale CNN with BiDirectional Mamba as show in Fig 3 and the mathematical formulations behind its working. The CNN-BiSpectralMamba-Quantum architecture establishes a high-speed, parameter-efficient pipeline for hyper-spectral crop classification. This framework actively fuses multi-scale spatial convolutions, bidirectional state-space sequence modeling, and a variational quantum circuit. 
+
+4.1 Data Normalization Pipeline 
+
+The data pipeline aggressively standardizes the raw hyperspectral tensor X ∈ RB×C×H×W prior to any deep learning operations . The algorithm computes the precise mean μc and standard deviation σc across the spatial dimensions for every single spectral band c . The mathematical standardization strictly enforces a minimum standard deviation floor of 
+
+10 −6 to guarantee absolute numerical stability. 
+
+X(c) 
+
+> norm
+
+= X(c) − μ(c)
+
+max( σ(c), 10 −6) (1) Rest of the preprocessing is similar the QPGF architecture and follow the same guidelines. 7A PREPRINT - J UNE 17, 2026 
+
+Figure 3: Methodology of Quantum Enhanced Multi-Scale CNN with Bi-Directional Mamba 
+
+4.2 Vanilla Mamba 
+
+The Mamba model (as shown in Fig 5) was introduced as a model to tackle text problems in deep learning and it works by breaking down text sequences into individual tokens. The model transforms these discrete words into dense vector representations [32]. An embedding layer converts these IDs into an initial input matrix X. Let xt represent the vector for the token at position t.
+
+Root Mean Square Normalization stabilizes the learning process by scaling the features before they enter the main branches. 
+
+unorm = u
+
+q 1
+
+> d
+
+Pdi=1 u2 
+
+> i
+
++ ϵ
+
+⊙ γ (2) This normalized data splits into two parallel pathways. Left path, which handles local context and sequence modeling, and the right path, which acts as a gate to remember important context In the left path, the projection, which is a linear transformation, expands the feature dimension of the input, which is denoted by z1 = W1unorm , and this is then followed by a 1D causal convolution that mixes local sequential information across adjacent tokens, creating a convolved sequence c. The Sigmoid Linear Unit introduces non-linearity. SiLU (x) = x · σ(x) = x
+
+1 + e−x (3) The Selective State Space Model acts as the core reasoning engine. It dynamically filters information based on the input context. The parameters B, C, and the step size ∆ are derived from the input data, making the model selective. The 8A PREPRINT - J UNE 17, 2026 
+
+Figure 4: Multi-Scale CNN 
+
+Figure 5: Vanilla Mamba [32] 9A PREPRINT - J UNE 17, 2026 continuous equations are discretized to process the sequence step-by-step 
+
+ht = ¯Ah t−1 + ¯Bx t (4) 
+
+yt = Ch t (5) where ¯A and ¯B are discretized versions of the continuous state parameters, and ht is the hidden state.Let the output of this layer be y.In the right path, the data passes through another SiLU function to create a gating signal. Let this be 
+
+g = SiLU (z2) (6) Element-wise multiplication merges the two branches. The right branch acts as a multiplicative gate, regulating the signals from the Selective SSM. 
+
+m = y ⊙ g (7) A linear layer projects the gated matrix back to the original block dimension. Let this be 
+
+o = W3m (8) Addition (+): A residual connection adds the original block input u to the final projection, allowing gradients to flow easily during training. 
+
+unext = u + o (9) This output can be passed to output heads such as softmax or a custom output head to get the predictions. 
+
+4.3 Multi-Scale Convolutional Feature Extraction 
+
+The normalized tensor passes directly into a Multi-Scale Convolutional Neural Network as shown in Fig 4. The initial encoder block extracts foundational spatial textures using two sequential 3 × 3 convolutions, coupled with Batch Normalization and ReLU activations, to produce a 32-channel feature map E1.
+
+E1 = ReLU (BN (Conv 3×3(ReLU (BN (Conv 3×3(Xnorm )))))) (10) The second encoder block explicitly halves the spatial resolution via a strided convolution (stride 2) and expands the feature depth to dmodel = 64 to generate E2 .
+
+E2 = ReLU (BN (Conv 3×3(ReLU (BN (Conv 3×3,s =2 (E1)))))) (11) The decoder pathway formally upsamples E2 using deterministic bilinear interpolation to match the spatial dimensions of E1. The network securely concatenates these multi-scale tensors along the channel dimension and applies a final convolution to yield the fused spatial map Fdec .
+
+Fdec = ReLU (BN (Conv 3×3([ E1 ∥ BilinearUp (E2)]))) (12) 
+
+4.4 Spectral Squeeze-and-Excitation 
+
+A Spectral Squeeze-and-Excitation block dynamically recalibrates the channel-wise feature responses. An Adaptive Average Pooling operation compresses the spatial grid into a 1 × 1 global descriptor. A two-layer fully connected network computes the excitation weights utilizing a reduction ratio of 16 . A Sigmoid activation function σsig scales the input tensor Fdec through direct element-wise multiplication. 
+
+FSE = Fdec ⊗ σsig (W2 · ReLU (W1 · AdaptiveAvgPool (Fdec ))) (13) 10 A PREPRINT - J UNE 17, 2026 
+
+Figure 6: Quantum circuit diagram generated with help of the PennyLane Library 
+
+4.5 Bidirectional Mamba State-Space Mechanics 
+
+The architecture perfectly flattens the refined spatial tensor FSE into a continuous one-dimensional token sequence to enable high-speed state-space modeling as referenced in Fig 7. This permutation reshapes the spatial axes into a sequence length L = H × W , generating the tensor T ∈ RB×L×64 . Two independent Mamba blocks process this sequence to capture complex long-range spectral correlations. The forward block analyzes the sequence in its native spatial order. The backward block processes a mathematically inverted sequence. The system flips the backward output back to its original orientation and explicitly sums both representations to construct the fused tensor Hf used .⃗H = Mamba f wd (T ) (14) 
+
+←−
+
+H = Flip (Mamba bwd (Flip (T ))) (15) 
+
+Hf used =⃗ H + ←−
+
+H (16) 
+
+4.6 Quantum Global Head Formulations 
+
+The network explicitly splits the fused sequence into dual classification pathways. The quantum pathway begins by executing a global average pooling operation across the sequence dimension to extract a single holistic feature token 
+
+zglobal .
+
+zglobal = 1
+
+L
+
+> L
+
+X
+
+> i=1
+
+H(i) 
+
+> f used
+
+(17) A CPU-pinned linear layer reduces this 64-dimensional token to exactly 4 dimensions, applying a hyperbolic tangent activation function to constrain the values. 
+
+xred = tanh( Wreduce zglobal + breduce ) (18) The 4-qubit parameterized quantum circuit, as shown in Fig 6 receives this dense vector. The circuit securely embeds the classical data via Angle Embedding across all four computational wires. Two successive Basic Entangler Layers process the embedded quantum states to model highly complex, non-linear global interactions. 
+
+|ψin ⟩ =
+
+> 4
+
+O
+
+> i=1
+
+Rx(x(i)
+
+> red
+
+)|0⟩ (19) 
+
+|ψout ⟩ = Uentangle (θ)|ψin ⟩ (20) 11 A PREPRINT - J UNE 17, 2026 
+
+Figure 7: BiSpectral Mamba 
+
+Uentangle (θ) is a learnable unitary operator that processes compressed global features through rotation and entangling gates within a variational quantum circuit. It leverages superposition and entanglement to model complex, non-linear dependencies across the hyperspectral landscape that classical layers struggle to capture. This creates a quantum-enhanced global context that, when fused with local features, ensures high accuracy while maintaining parameter efficiency. The circuit calculates the precise Pauli-Z expectation values for each independent qubit to extract the final quantum state representation q.
+
+qi = ⟨ψout |σ(i) 
+
+> z
+
+|ψout ⟩ (21) A final CPU-based linear layer formally projects these 4 quantum features into the target crop classes. 
+
+Yquantum = Wq q + bq (22) 
+
+Hybrid Feature Fusion :The classical pathway processes Hf used through a LayerNorm and linear projection to generate a two-dimensional spatial classification map Yclassical . The architecture expands the singular quantum logit vector 
+
+Yquantum to perfectly match these spatial dimensions. A learnable parameter α dynamically regulates the structural contribution of the quantum features. 
+
+Ylogits = Yclassical + tanh( α)Yquantum (23) The system executes a final bilinear interpolation to scale the logits flawlessly back to the original ground truth spatial dimensions 
+
+# 5 Empirical Analysis 
+
+Algorithm : This is the experimental setup for the Quantum Enhanced Multi-Scale CNN with BiDirectional Mamba explained in the algorithm form as seen in Algorithm 1. 12 A PREPRINT - J UNE 17, 2026 Table 2: Training and architectural parameters for the CNN-BiSpectralMamba-Quantum model on UAV-HSI-Crop. 
+
+Parameter Value Optimizer AdamW Classical backbone learning rate 3 × 10 −4
+
+Quantum head learning rate 5 × 10 −5
+
+Epochs 100 
+
+Weight decay 1 × 10 −4
+
+Batch size 8
+
+Feature embedding dimension ( dmodel ) 64 
+
+SE block reduction ratio 16 
+
+Initial quantum weight parameter α 0.0 (Learnable) 
+
+λ 0.5
+
+Class frequency power scaling 0.7
+
+Normalization variance floor 10 −6
+
+Dice loss smoothing factor ϵ 10 −5
+
+Algorithm 1 CNN-BiSpectralMamba-Quantum Execution 
+
+Require: Raw hyperspectral data cube X ∈ RB×C×H×W , Target spatial maps Y
+
+1: Standardization: Calculate per-band mean and standard deviation. Normalize X using a strict 10 −6 minimum variance floor 2: Multi-Scale Extraction: Process the normalized tensor through two CNN encoder blocks to generate spatial feature maps E1
+
+and E2
+
+3: Decoder Fusion: Bilinearly upsample E2, concatenate with E1, and apply a final convolution to yield the fused map Fdec 
+
+4: Spectral Attention: Apply the Spectral Squeeze-and-Excitation module to generate the recalibrated tensor FSE 
+
+5: Sequence Flattening: Permute and flatten the spatial dimensions of FSE into a 1D token sequence T
+
+6: Bidirectional Mamba: Process T through a forward Mamba block and a flipped T through a backward Mamba block.Un-flip the backward output and sum both representations to yield Hf used 
+
+7: Classical Pathway: Apply LayerNorm and a linear projection to Hf used to generate the 2D classical spatial map Yclassical 
+
+8: Quantum Pathway: Compute the sequence mean to extract a global token, reduce to 4 dimensions, and execute the 4-qubit variational quantum circuit on the CPU to generate the global logit vector Yquantum 
+
+9: Fusion: Expand Yquantum to match spatial dimensions and merge pathways using a learnable parameter α:
+
+Ylogits = Yclassical + tanh( α) Yquantum 
+
+10: Interpolation & Optimization: Bilinearly interpolate Ylogits to the original ground truth dimensions. Compute the class-weighted Hybrid Cross-Entropy and Log-Cosh Dice Loss and update network weights 
+
+HyperParameters : The training engine strictly utilizes the AdamW optimizer to drive the network updates across exactly 
+
+100 training epochs as seen in Table 2. The dataloader feeds the network using a fixed batch size of 8 to maintain steady gradient flows without exceeding GPU memory constraints. The classical backbone and the quantum head operate on entirely decoupled learning rates to prevent massive classical gradients from destabilizing the sensitive quantum parameters. The classical multi-scale CNN and Mamba blocks update using a primary base learning rate of 3 × 10 −4.The quantum circuit processes its gradient updates at a drastically reduced learning rate of 5 × 10 −5. A universal weight decay penalty of 1 × 10 −4 permanently suppresses network overfitting across all training phases. The structural architecture strictly sets the core feature embedding dimension ( dmodel ) to 64 and utilizes a Squeeze-and-Excitation reduction ratio of 16 . The network initializes the dynamic quantum fusion parameter α exactly at 0.0, allowing the model to learn the optimal quantum contribution dynamically through backpropagation. The hybrid loss function perfectly balances the weighted Cross-Entropy and Log-Cosh Dice metrics using a static weighting factor λ of 0.5.Finally, the data pipeline applies a 0.7 power scaling to the inverse square root of the static class frequencies to generate the exact class weights required to penalize dominant vegetation types. 
+
+Hardware Requirements : This work was run on the Compute Canada NiBi cluster. This work provisioned the high-performance training environment using exactly 5 cutting-edge NVIDIA H100 GPUs to aggressively accelerate the heavy multi-scale tensor convolutions and the Mamba sequence modeling. We were able to get a massive 1 Terabyte of system memory alongside 25 dedicated CPU cores to support the massive data pipelines. These robust, multi-threaded CPU resources directly handle the highly sensitive PennyLane quantum circuit calculations to permanently prevent GPU memory overflow during the complex state-vector simulations. The architecture successfully utilized this massive computing power to execute the complete convergence cycle within strict, highly efficient 8-hour continuous allocation windows. 13 A PREPRINT - J UNE 17, 2026 
+
+5.1 Loss Function 
+
+We used a fusion of Class-Weighted Cross-Entropy and Log-Cosh Dice Loss proposed by Niu. et al. [ 4]. This dual formulation perfectly balances pixel-level classification accuracy with the strict topological mapping of agricultural boundaries. 
+
+Class-Weighted Cross-Entropy ( LCE ): The dataset inherently floods the network with dominant staple crops, masking the critical signatures of rare invasive weeds or diseased zones. I mathematically neutralized this severe data skew by actively calculating inverse-frequency class weights. The dataloader defines Nc as the absolute pixel count for a specific class c. The algorithm applies a 0.7 power scaling to the inverse square root of these static counts, injecting a strict variance floor ( 10 −6) to permanently prevent zero-division errors during initialization: 
+
+Wc = 1(√Nc + 10 −6)0.7 (24) The pipeline applies these aggressive penalty weights directly to the standard Cross-Entropy computation. For a true label y and predicted probability ˆy, the network calculates the globally weighted pixel loss: 
+
+LCE = −
+
+> C
+
+X
+
+> i=1
+
+Wiyi log(ˆ yi) (25) 
+
+Log-Cosh Dice Loss ( LLCD ): While Cross-Entropy optimizes individual pixels, it actively destroys the holistic geometry of overlapping vegetation rows. To permanently eliminate these boundary artifacts, the Dice coefficient was integrated to directly optimize the exact intersection-over-union metric. The formulation isolates the predictive overlap using distinct one-hot encoded target tensors Yonehot and prediction tensors P , strictly applying a smoothing factor 
+
+ϵ = 10 −5 to maintain structural stability: 
+
+LDICE = 1 − 2 P(P · Yonehot ) + ϵ
+
+P P + P Yonehot + ϵ (26) Standard Dice loss notoriously generates highly aggressive, unstable gradients when evaluating tiny, minority crop patches. To force mathematical convergence, the system wraps the absolute Dice error in a logarithmic hyperbolic cosine operation. This non-linear transformation actively smooths the error surface, protecting the highly sensitive parameterized quantum circuit from gradient shock: 
+
+LLCD = log(cosh( LDICE )) (27) 
+
+Total Hybrid Fusion: The optimization engine cleanly fuses these two distinct mathematical penalties into a single, cohesive gradient update. The pipeline utilizes a static weighting parameter λ set exactly to 0.5 to balance the classical pixel accuracy with the structural boundary mapping equally: 
+
+Ltotal = (1 − λ)LCE + λL LCD (28) 
+
+5.2 Evaluation Metrics 
+
+Overall Accuracy (OA): Overall Accuracy establishes the fundamental baseline of the model’s global predictive power [ 4]. The metric mathematically divides the exact number of correctly classified pixels by the absolute total pixel population across the entire spatial grid. We define C as the total number of classes (30), nii as the exact count of true-positive pixels for a specific class, and N as the total spatial pixel count: 
+
+OA =
+
+PCi=1 nii 
+
+N (29) 
+
+Cohen’s Kappa Coefficient ( κ): Because the UAV-HSI-Crop dataset possesses massive class imbalances, a model could simply guess the dominant crop class and achieve a deceivingly high Overall Accuracy [ 4]. Cohen’s Kappa ruthlessly mathematically purifies the performance score by factoring out any expected agreement caused by pure random chance. This provides an unbreakable statistical reliability score for the entire framework.The formula requires the observed agreement po (which directly equals the calculated OA) and the statistically expected chance agreement 
+
+pe : κ = po − pe
+
+1 − pe
+
+(30) 14 A PREPRINT - J UNE 17, 2026 
+
+Figure 8: Quantum Enhanced Multi-Scale CNN with BiDirectional Mamba Training Loss To strictly calculate pe, the algorithm explicitly cross-multiplies the total ground truth pixels ng,i with the total predicted pixels np,i for every single class i, completely neutralizing the statistical skew of dominant vegetation types before dividing by the squared total pixel count: 
+
+pe =
+
+PCi=1 (ng,i · np,i )
+
+N 2 (31) The empirical framework detailed above guarantees that our recorded performance gains are structurally legitimate, rather than statistical illusions generated by extreme dataset skew. By mathematically forcing the networks to respect and map minority crop boundaries via the Log-Cosh Dice loss, and by rigorously purifying the final accuracy scores through Cohen’s Kappa, we eliminated the deceptive metric inflation that plagues standard agricultural deep learning research and with these experimental baseline firmly established, the subsequent results definitively prove exactly how these lightweight hybrid architectures can match and overtake traditional, parameter-heavy classical models while being more efficient. 
+
+# 6 Experimental Results 
+
+In this section, we will go over the results of the experimental setup and compare our model with different models that followed similar loss and evaluation metrics, and see how our models stack up in comparison with them. 
+
+6.1 Comparison with Existing Models 
+
+In this section, we compare the proposed CNN-BiSpectralMamba-Quantum architecture against established UAV-HSI-Crop baselines, incorporating the results from our preceding QPGF framework for direct evolutionary comparison. Table 3 provides the numbers behind this comparison. The loss function for the main training is referenced in Fig 8. Table 3: Performance comparison on UAV-HSI-Crop.                                       
+
+> Model Epochs Parameters(Millions) OA (%) ↑Kappa ( κ×100 )↑
+> SegNet [4] 200 29 M43 .61 54 .15
+> SETR [4] 200 43 M69 .47 72 .67
+> UNet [4] 200 8M76 .07 71 .31
+> TransUNet [4] 200 105 M78 .64 74 .56
+> HSI-TransUNet [4] 200 110 M86 .05 83 .47
+> HRS-UNet [7] 200 Not Reported 89 .96 88 .14
+> QPGF (ours) 200 4.1M 81.92 78.41
+> Quantum Enhanced CNN with Mamba(Ours) 200 0.24M 84.83 82.07
+
+The results demonstrate a massive evolutionary leap from our initial graph-based approach. By utilizing an optimal quantum fusion parameter of α = 0 .2, the CNN-BiSpectralMamba-Quantum model decisively outperforms standard 15 A PREPRINT - J UNE 17, 2026 transformer architectures like TransUNet and eclipses our own QPGF baseline by nearly 3% . Although it does not mathematically exceed the peak OA of the massive HSI-TransUNet or HRS-UNet models, it reaches a highly competitive threshold in way lesser parameters of 246 , 793 . The comparison highlights an important trade-off: we actively bypassed the unsustainable parameter bloat inherent to those purely classical networks, opting instead for a highly optimized operating point. The model delivers aggressive sequence modeling for high spatial-spectral fidelity, perfectly stabilized by a lightweight quantum global head. 
+
+6.2 Ablation Study 
+
+To rigorously validate the individual architectural components, we executed four targeted ablation settings against our final proposed model. Ablation 1 (No Quantum) removes the 4-qubit variational quantum circuit. Ablation 2 (No BiMamba) removes the bidirectional state-space sequence modeling blocks entirely. Ablation 3 (Plain CE) disables the hybrid Log-Cosh Dice boundary loss, relying strictly on standard Cross-Entropy. Ablation 4 (No SE) removes the Spectral Squeeze-and-Excitation channel recalibration module.Training losses are referenced in Fig 9. Table 4: Ablation results for CNN-BiSpectralMamba-Quantum on UAV-HSI-Crop.             
+
+> Model Variant OA (%) ↑Kappa ( κ×100 )↑
+> No Quantum (Ablation 1) 83 .51 80 .65
+> No BiMamba (Ablation 2) 79 .50 75 .59
+> Plain CE (Ablation 3) 85 .24 82 .64
+> No SE (Ablation 4) 84 .37 81 .56
+
+The ablation trend in Table 4 provides a highly illuminating structural interpretation. The catastrophic drop observed in Ablation 2 ( −5.33% OA ) definitively proves that bidirectional Mamba sequence modeling forms the absolute critical core of the architecture’s feature extraction capability. Reintroducing the quantum global head (Proposed vs. Ablation 1) actively pushes the OA from 83 .51% to 84 .83% , mathematically validating our hypothesis that the parameterized entanglement circuit successfully captures holistic field geometry that the classical backbone misses. The Squeeze-and-Excitation block (Ablation 4) provides a smaller structural refinement ( +0 .46% OA ). The unique data point within the ablation study is Ablation 3 (Plain CE), which achieves a numerically higher global Overall Accuracy ( 85 .24% ). Rather than a failure of the proposed loss function, this highlights a critical behavioral trade-off inherent to severely imbalanced agricultural datasets. Plain Cross-Entropy easily inflates the global pixel-counting metric by aggressively optimizing for massive, dominant crop classes, often sacrificing the precise topological mapping of rare vegetation. Our Proposed model ( 84 .83% ) enforces the Hybrid Log-Cosh Dice loss to actively penalize dominant classes and strictly enforce boundary intersection-over-union. We sacrifice a marginal 0.41% of skewed global accuracy to guarantee a highly equitable, structurally robust mapping of the entire minority crop landscape. 
+
+6.3 Error Analysis 
+
+Similar to the QPGF framework, the model performs exceptionally well on major crop categories while exhibiting expected sensitivities at complex boundary regions. Because the bidirectional Mamba sequence aggressively tracks contiguous spectral signatures as seen in the Fig 10, slight misclassifications still occur where phenologically similar crops drastically overlap in physical space. However, the integration of the multi-scale CNN successfully prevents the Mamba blocks from completely destroying local spatial geometry, a massive improvement over pure state-space models. While the 84 .83% OA proves the architectural fusion is highly successful, future gains will likely emerge from increasing the quantum qubit count and utilizing dynamic, class-aware spatial priors during the final bilinear upsampling phase. 
+
+# 7 Conclusion 
+
+In this work, we outlined a BiSpectral Mamba-based architecture for HSI crop analysis. This framework begins with a multi-scale CNN backbone that extracts spatial-spectral features using a hierarchy of convolutional layers and feature fusion across resolutions. A spectral channel attention mechanism refines these features by emphasizing bands and suppressing redundant or noisy channels. The refined features are then fed into a Mamba module that treats spatial-spectral feature maps as sequences of tokens and models long-range dependencies in both directions along the sequence. We can also conclude from this work that. First HSI crop analysis benefits from architectures that explicitly structure the data, such as state-space formulations, rather than treating hyperspectral cubes as flat images or generic 16 A PREPRINT - J UNE 17, 2026   
+
+> (a) Ablation-1 (b) Ablation-2
+> (c) Ablation-3 (d) Ablation-4
+
+Figure 9: Training loss curves across all ablation variants. sequences. Second, combining approaches at multiple levels appears to be more effective and practical than trying to replace entire pipelines with a single paradigm. Third, optimization and loss design in the presence of class imbalance and limited labels can have effects on performance comparable to those of architectural modifications. The combination of loss-class-weighted strategies and carefully tuned fusion coefficients played a central role in stabilizing training and improving final metrics. Finally, while quantum and quantum-inspired components are still being explored, their integration as global-context modules in otherwise classical models is a promising way to test their utility without incurring high costs. The use of BiSpectral Mamba architecture for HSI crop analysis shows that this approach can be effective and efficient. The proposed framework can be used for agricultural applications, including crop disease analysis, crop yield prediction, and soil moisture estimation. The architecture can be further improved by incorporating advanced graph-based models, state-space formulations, and quantum-inspired components. The results of this work can be used to develop accurate and efficient models for HSI crop analysis, which can help farmers and agricultural professionals make better decisions and improve crop yields. The use of architectures and quantum-inspired components can also be applied to other areas of remote sensing and computer vision. Overall, this work demonstrates the potential of deep learning architecture for HSI crop analysis and highlights the importance of structuring the data by combining different approaches and optimizing the models for better performance. The proposed frameworks can be used as a starting point for research and development in this area. 
+
+# References 
+
+[1] Li S, Zhu X, and Bao J. Hierarchical multi-scale convolutional neural networks for hyperspectral image classifica-tion. Sensors (Basel) , 2019. [2] Sun M, Zhang J, He X, and Zhong Y. Bidirectional mamba with dual-branch feature extraction for hyperspectral image classification. Sensors (Basel). , 2024. [3] Peiyong Wang, Casey. R. Myers, Lloyd C. L. Hollenberg, and Udaya Parampalli. Let the quantum creep in: Designing quantum neural network models by gradually swapping out classical components, 2024. [4] Bowen Niu, Quanlong Feng, Boan Chen, Cong Ou, Yiming Liu, and Jianyu Yang. Hsi-transunet: A transformer based semantic segmentation model for crop mapping from uav hyperspectral imagery. Computers and Electronics in Agriculture , October 2022. 17 A PREPRINT - J UNE 17, 2026 
+
+Figure 10: Confusion Matrix For Quantum Enhanced CNN with Mamba [5] X. Guo, Q. Feng, and F. Guo. Cmtnet: a hybrid cnn-transformer network for uav-based hyperspectral crop classification in precision agriculture. Sci Rep 15, 12383 , 2025. [6] R.Ablin and G.Prabin. An optimal model using hybrid lcnn- gru for efficient hyperspectral image classification. 
+
+International Journal of Information Technology , 15, 2023. [7] Zhiyu Yang, Lei Zou, and Yuhuai Lin. Hrs-unet: A semantic segmentation model for precise crop classification in hyperspectral remote sensing image. In Proceedings of the 21st International Conference on Intelligent Computing (ICIC 2025) , pages 2129–2140, Ningbo, China, July 2025. Poster Volume II. [8] Koushik Nagasubramanian, Sarah Jones, Asheesh K. Singh, Arti Singh, Baskar Ganapathysubramanian, and Soumik Sarkar. Explaining hyperspectral imaging based plant disease identification: 3d cnn and saliency maps, 2018. [9] S P and Shirly Edward A. Mlvi-cnn: a hyperspectral stress detection framework using machine learning-optimized indices and deep learning for precision agriculture. Front. Plant Sci , 2025. [10] Mazharul Hossain, Aaron Robinson, Lan Wang, and Chrysanthe Preza. Improving semantic segmentation through task adaptation for UAV hyperspectral agricultural imagery. In J. Alex Thomasson and Christoph Bauer, editors, 
+
+Autonomous Air and Ground Sensing Systems for Agricultural Optimization and Phenotyping X , volume 13475, page 1347507. International Society for Optics and Photonics, SPIE, 2025. 18 A PREPRINT - J UNE 17, 2026 [11] Alireza Sanaeifar, Shahryar Kianian, Ruth Dill-Macky, Susan Reynolds, Matthew J Moscou, Rebecca D. Curland, James Anderson, Matthew N. Rouse, and Ce Yang. Transformer-based and band-selected models for uav hyperspectral wheat disease classification. Smart Agricultural Technology , 2026. [12] Pi W, Zhang T, Wang R, Ma G, Wang Y, and Du J. Semantic-guided transformer network for crop classification in hyperspectral images. J Imaging. , 2025. [13] Xie J, Hua J, Chen S, Wu P, Gao P, Sun D, Lyu Z, Lyu S, Xue X, and Lu J. Hypersformer: A transformer-based end-to-end hyperspectral image classification method for crop classification. Remote Sensing , 2023. [14] Gu Q, Luan H, Huang K, and Sun Y. Hyperspectral image classification using multi-scale lightweight transformer. 
+
+Electronics , 2024. [15] Linsheng Huang, Lu Zhang, Chao Ruan, and Jinling Zhao. Sssat-net: Spectral-spatial self-attention-based transformer network. Optics and Lasers in Engineering , 2025. [16] Shaoguang Huang, Wei Xiao, Hongyu Chen, Siti Khairunniza Bejo, and Hongyan Zhang. Hyperspectral image classification based on a locally enhanced transformer network. IEEE Transactions on Geoscience and Remote Sensing , 63:1–17, 2025. [17] Yuyang Wang, Zhenqiu Shu, and Zhengtao Yu. Efficient attention transformer network with self-similarity feature enhancement for hyperspectral image classification. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , 18:11469–11486, 2025. [18] Y. Liu, R. Dian, and S. Li. Low-rank transformer for high-resolution hyperspectral computational imaging. Int J Comput Vis 133 , 2025. [19] Abhishek Chandrakant Nikam, Rahul Borate, Masira Kulkarni, Aayush Patil, and Sadaf Shaikh. Fruit crop disease classification using quantum machine learning: A pilot study. Quantum Journal of Engineering, Science and Technology, , 2025. [20] Soronzonbold Otgonbaatar and Mihai Datcu. A quantum annealer for subset feature selection and the classification of hyperspectral images. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing ,14:7057–7065, 2021. [21] Chia-Hsiang Lin and Si-Sheng Young. Underdetermined blind source separation via weighted simplex shrinkage regularization and quantum deep image prior. IEEE Transactions on Image Processing , 35:3069–3084, 2026. [22] Jie Zhang, Yongshan Zhang, and Yicong Zhou1. Quantum-inspired spectral-spatial pyramid network for hyper-spectral imageclassification. IEEE , 2023. [23] Yi Liu, Wendy Wang, Haibo Wang, and Bahram Alidaee. Quantum machine learning on remote sensing data classification. Journal of Engineering Research and Sciences , 2(12):23–33, 2023. [24] Chia-Hsiang Lin and Si-Sheng Young. Hyperking: Quantum-classical generative adversarial networks for hyperspectral image restoration, 2025. [25] Huang L, Chen Y, and He X. Spectral-spatial mamba for hyperspectral image classification. Remote Sensing. ,2024. [26] Liao J and Wang L. Hyperspectralmamba: A novel state space model architecture for hyperspectral image classification. Remote Sensing. , 2025. [27] Zhang Y, Jin X, Zhang X, Wu Y, and Tu L. Echomamba: A new mamba model for fast and efficient hyperspectral image classification.echomamba: A new mamba model for fast and efficient hyperspectral image classification. 
+
+PLoS One , 2025. [28] Muhammad Ahmad, Muhammad Hassaan Farooq Butt, Adil Mehmood Khan, Manuel Mazzara, Salvatore Distefano, Muhammad Usama, Swalpa Kumar Roy, Jocelyn Chanussot, and Danfeng Hong. Spatial–spectral morphological mamba for hyperspectral image classification. Neurocomputing , 636:129995, July 2025. [29] Guanchun Wang, Xiangrong Zhang, Zelin Peng, Tianyang Zhang, and Licheng Jiao. S2mamba: A spatial–spectral state space model for hyperspectral image classification. IEEE Transactions on Geoscience and Remote Sensing ,63:1–13, 2025. [30] Yichu Xu, Di Wang, Hongzan Jiao, Lefei Zhang, and Liangpei Zhang. Mambamoe: Mixture-of-spectral-spatial-experts state space model for hyperspectral image classification, 2025. [31] Guanyiman Fu, Fengchao Xiong, Jianfeng Lu, and Jun Zhou. Ssumamba: Spatial-spectral selective state space model for hyperspectral image denoising, 2024. [32] Anish Bhardwaj. What is a mamba model. Available at: https://www.geeksforgeeks.org/ artificial-intelligence/what-is-a-mamba-model/ (accessed 2026-02-01). 19

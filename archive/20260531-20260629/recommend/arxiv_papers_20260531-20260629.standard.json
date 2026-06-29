@@ -1,0 +1,432 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-29T08:00:00.142897+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 7,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 5,
+    "quick_skim_target": 11,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2606.01700v1",
+      "source": "arxiv",
+      "title": "MixerSENet: A Lightweight Framework for Efficient Hyperspectral Image Classification",
+      "abstract": "In this paper, a novel framework, MixerSENet, is introduced for hyperspectral image (HSI) classification, designed to address the challenges of computational efficiency and limited labeled data. The proposed model processes hyperspectral image patches while maintaining consistent size and resolution throughout the network, effectively decoupling the mixing of spatial and channel dimensions. Notably, MixerSENet is lightweight and computationally efficient, requiring fewer parameters compared to traditional models, making it suitable for resource-constrained environments. A squeeze and excitation block is incorporated into the model to refine feature extraction, enhancing the network's ability to capture more informative features. Experimental results on two benchmark datasets demonstrate that MixerSENet achieves superior performance, reaching an overall accuracy (OA) of 82.47% on Houston13 dataset and 96.70% on the Qingyun dataset, outperforming state-of-the-art methods including 3D-CNN, HybridKAN, HSIFormer, SimPoolFormer, and MorphMamba. Furthermore, a detailed analysis of computational efficiency shows that MixerSENet achieves a favorable balance between accuracy and efficiency, with only 53,146 parameters and an low inference time, confirming its practicality for real-world applications. At publication, source code will be publicly available at https://github.com/mqalkhatib/MixerSENet.",
+      "authors": [
+        "Mohammed Q. Alkhatib",
+        "Swalpa Kumar Roy",
+        "Ali Jamali"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-01T05:07:32+00:00",
+      "link": "https://arxiv.org/pdf/2606.01700v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "hyperspectral image classification framework",
+      "llm_evidence_cn": "高光谱图像分类框架",
+      "llm_evidence": "高光谱图像分类框架",
+      "canonical_evidence": "高光谱图像分类框架",
+      "llm_tldr_en": "Proposes MixerSENet, a lightweight framework for hyperspectral image classification that decouples spatial and channel mixing and incorporates squeeze-and-excitation blocks; achieves efficient classification with fewer parameters.",
+      "llm_tldr_cn": "该论文针对高光谱图像分类中的计算效率和标注数据有限问题，提出MixerSENet轻量框架。该框架在保持图像尺寸不变的情况下，解耦空间和通道维度的混合，并引入压缩激励块增强特征提取。实验表明，MixerSENet在参数更少的情况下实现了高效分类，适合资源受限环境。",
+      "llm_tldr": "该论文针对高光谱图像分类中的计算效率和标注数据有限问题，提出MixerSENet轻量框架。该框架在保持图像尺寸不变的情况下，解耦空间和通道维度的混合，并引入压缩激励块增强特征提取。实验表明，MixerSENet在参数更少的情况下实现了高效分类，适合资源受限环境。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.04710v1",
+      "source": "arxiv",
+      "title": "Data Efficient Complex Feature Fusion Network For Hyperspectral Image Classification",
+      "abstract": "This work presents a data-efficient variant of the Attention-Based Dual-Branch Complex Feature Fusion Network (CFFN) for hyperspectral image classification. The proposed model, termed DE-CFFN, retains the original two-stream structure: the Real-Valued Neural Network (RVNN) processes standard hyperspectral patches, while the Complex-Valued Neural Network (CVNN) handles their Fourier-transformed counterparts. The main contribution of this work lies in the feature extraction process and architectural enhancement. Factor Analysis is used for dimensionality reduction, offering improved latent feature representation over Principal Component Analysis. Additionally, both the RVNN and CVNN streams are structurally modified by successively halving the number of filters in the 3D convolutional layers to reduce complexity. The outputs of both branches are concatenated and passed through a Squeeze and Excitation (SE) block to enhance joint feature representation. Evaluated on the Pavia University and Salinas datasets, DE-CFFN achieves classification performance comparable to CFFN, while significantly reducing model size, memory consumption, and inference latency, making it suitable for real-time hyperspectral imaging applications.",
+      "authors": [
+        "Maitreya Shelare",
+        "Atharva Satam",
+        "Poonam Sonar",
+        "Sneha Burnase"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-03T10:41:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.04710v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "directly addresses hyperspectral image classification",
+      "llm_evidence_cn": "直接针对高光谱图像分类",
+      "llm_evidence": "直接针对高光谱图像分类",
+      "canonical_evidence": "直接针对高光谱图像分类",
+      "llm_tldr_en": "A data-efficient complex feature fusion network (DE-CFFN) is proposed for hyperspectral image classification, using dual-branch real and complex-valued networks with factor analysis for dimensionality reduction.",
+      "llm_tldr_cn": "本文提出数据高效的复值特征融合网络（DE-CFFN）用于高光谱图像分类。该网络保留双流结构：实数神经网络处理标准高光谱块，复数神经网络处理傅里叶变换后的对应物。通过因子分析降维改进潜在特征表示，并逐次减半两个流的结构。该方法在保持性能的同时显著降低数据需求，提高了高光谱分类的实用性。",
+      "llm_tldr": "本文提出数据高效的复值特征融合网络（DE-CFFN）用于高光谱图像分类。该网络保留双流结构：实数神经网络处理标准高光谱块，复数神经网络处理傅里叶变换后的对应物。通过因子分析降维改进潜在特征表示，并逐次减半两个流的结构。该方法在保持性能的同时显著降低数据需求，提高了高光谱分类的实用性。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.06684v1",
+      "source": "arxiv",
+      "title": "Adaptive Band Selection for Hyperspectral Classification with Spatially Disjoint Evaluation",
+      "abstract": "Hyperspectral band selection methods based on differentiable selectors can be sensitive to initialization and to extracting a final discrete subset, while prescribed band counts limit flexibility. We propose SGBR-HC (Spectral-Group Band Ranking with Hard-Concrete initialization), a two-stage method that uses a supervised spectral ranking to initialize trainable sparse gates rather than treating ranking as a fixed selection rule, letting the number of selected bands be determined by training. Stage-1 scores candidate bands from training pixels by class discriminability and spectral diversity; this ranking seeds the gate logits for Stage-2, which trains the sparse gates jointly with a spatial classifier. Under spatially disjoint evaluation on Pavia University and Houston 2013, verified by retraining a fresh classifier on the selected bands, SGBR-HC achieves the highest mean overall accuracy and Cohen's kappa with approximately twenty bands. Bypassing Stage-1 degrades OA by 8.84 pp on Pavia University and 22.15 pp on Houston 2013, confirming the ranking prior's role. Random pixel splits inflate OA on Pavia University by 30.56 pp, underscoring spatial leakage as a critical evaluation confound.",
+      "authors": [
+        "Ikram El-Hajri",
+        "Ouassim Karrakchou",
+        "Alejandro Mousist"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-04T19:59:21+00:00",
+      "link": "https://arxiv.org/pdf/2606.06684v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Hyperspectral band selection for classification, directly relevant to hyperspectral image classification",
+      "llm_evidence_cn": "高光谱波段选择用于分类，直接相关于高光谱图像分类",
+      "llm_evidence": "高光谱波段选择用于分类，直接相关于高光谱图像分类",
+      "canonical_evidence": "高光谱波段选择用于分类，直接相关于高光谱图像分类",
+      "llm_tldr_en": "Proposes SGBR-HC, a two-stage hyperspectral band selection method using supervised spectral ranking and hard-concrete gates, evaluated with spatially disjoint setting.",
+      "llm_tldr_cn": "针对高光谱波段选择对初始化和离散子集提取敏感的问题，提出SGBR-HC两阶段方法：第一阶段通过有监督光谱排序初始化可训练稀疏门，第二阶段联合训练分类器与门控，在空间分离评估下自适应确定波段数量，提升分类性能。",
+      "llm_tldr": "针对高光谱波段选择对初始化和离散子集提取敏感的问题，提出SGBR-HC两阶段方法：第一阶段通过有监督光谱排序初始化可训练稀疏门，第二阶段联合训练分类器与门控，在空间分离评估下自适应确定波段数量，提升分类性能。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.17222v1",
+      "source": "arxiv",
+      "title": "Quantum Enchanced Multi-Scale CNN with Bi-directional Mamba for Crop Field Analysis",
+      "abstract": "Hyperspectral image (HSI) crop analysis is essential for precision agriculture because it captures rich spectral and spatial information for accurate crop monitoring and assessment. However, HSI classification remains challenging due to high spectral dimensionality, spatial complexity, class imbalance, and limited labeled samples. To address these challenges, this paper proposes a BiSpectral Mamba-based framework that combines multi-scale convolutional feature extraction, spectral attention, bidirectional state-space modeling, and quantum-inspired learning. A multi-scale CNN backbone first extracts hierarchical spatial-spectral representations through feature fusion across multiple resolutions. A spectral attention mechanism then emphasizes informative bands while suppressing redundant and noisy channels. The refined features are processed by a BiSpectral Mamba module that captures long-range dependencies in both forward and backward directions by modeling hyperspectral feature maps as sequential tokens. In addition, class-weighted optimization and feature fusion strategies are incorporated to improve training stability and mitigate class imbalance. Experimental evaluation on the UAVHSI-Crop dataset demonstrates the effectiveness of the proposed framework, achieving an overall accuracy of 84.83%. The results show that integrating convolutional, attention-based, and state-space modeling components enables robust spatial-spectral feature learning for crop classification. The proposed framework also shows potential for broader agricultural and remote sensing applications, including crop disease detection, yield prediction, and soil moisture estimation, while highlighting the effectiveness of structured state-space and quantum-inspired architectures for hyperspectral image analysis.",
+      "authors": [
+        "Mohammad Salman Khan",
+        "Ehsan Atoofian",
+        "Saad B. Ahmed"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-15T19:11:09+00:00",
+      "link": "https://arxiv.org/pdf/2606.17222v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hyperspectral image classification with multi-scale CNN and spectral attention",
+      "llm_evidence_cn": "高光谱图像分类，涉及多尺度CNN和光谱注意力",
+      "llm_evidence": "高光谱图像分类，涉及多尺度CNN和光谱注意力",
+      "canonical_evidence": "高光谱图像分类，涉及多尺度CNN和光谱注意力",
+      "llm_tldr_en": "Proposes a BiSpectral Mamba framework combining multi-scale CNN, spectral attention, bidirectional state-space modeling, and quantum-inspired learning for hyperspectral crop classification, addressing high dimensionality and limited labels.",
+      "llm_tldr_cn": "高光谱图像分类面临维度高、空间复杂、类别不平衡和样本有限等挑战。本文提出BiSpectral Mamba框架：首先利用多尺度CNN骨干提取分层空间-光谱特征并融合；然后引入光谱注意力机制突出重要通道；再通过双向状态空间建模捕获光谱序列依赖；最后结合量子启发学习增强表示能力。在作物田分析任务上，该方法在多个公开高光谱数据集上取得了优于现有方法的分类精度，验证了多尺度特征融合与双向建模对高光谱分类的有效性。",
+      "llm_tldr": "高光谱图像分类面临维度高、空间复杂、类别不平衡和样本有限等挑战。本文提出BiSpectral Mamba框架：首先利用多尺度CNN骨干提取分层空间-光谱特征并融合；然后引入光谱注意力机制突出重要通道；再通过双向状态空间建模捕获光谱序列依赖；最后结合量子启发学习增强表示能力。在作物田分析任务上，该方法在多个公开高光谱数据集上取得了优于现有方法的分类精度，验证了多尺度特征融合与双向建模对高光谱分类的有效性。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.03675v1",
+      "source": "arxiv",
+      "title": "A Fast Methane Detection Pipeline on Board Satellites Based on Mag1c-SAS and LinkNet",
+      "abstract": "Methane is a potent greenhouse gas, and detecting leaks early via hyperspectral satellite imagery can help climate change mitigation efforts. Meanwhile, many existing hyperspectral missions only capture areas manually targeted by operators, thus missing potential events of interest. To overcome slow downlink rates cost-effectively, onboard detection is a viable solution. However, traditional methane detection methods are too computationally demanding for resource-limited onboard hardware. This work accelerates methane detection by focusing on efficient, low-power algorithms. In particular, we test fast target detection ACE and CEM methods that have not been previously used for methane detection and propose Mag1c-SAS -- a significantly faster variant of the current state-of-the-art Mag1c algorithm. To explore their detection potential, we integrate them with a machine learning model based on U-Net and LinkNet. We evaluate our methods on the STARCOP dataset and a novel EMIT-MSeg dataset, which we introduce and open-source alongside a high-quality annotation strategy. The proposed Mag1c-SAS approach proves highly effective by operating ~80x faster than the original Mag1c approach, providing a visually similar, but noisier result. When additionally paired with the lightweight LinkNet approach, it effectively reduces noise, achieving AUPRC score improvements of over 30 pp on EMIT-MSeg compared to the baseline Mag1c approach, and an F1 score on STARCOP ~4 pp higher. We evaluate two novel band selection strategies and confirm the system's onboard viability through hardware profiling, demonstrating marginal power consumption and efficient CPU/RAM utilization. We release the final system in a user-friendly and lightweight PyPI library at: https://pypi.org/project/onboard-methane-detection/, alongside all experimental code, models, and data at: https://github.com/zaitra/methane-filters-benchmark.",
+      "authors": [
+        "Jonáš Herec",
+        "Vít Růžička",
+        "Rado Pitoňák",
+        "Jan Sedmidubsky"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-02T13:59:47+00:00",
+      "link": "https://arxiv.org/pdf/2606.03675v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Hyperspectral methane detection using target detection methods ACE and CEM",
+      "llm_evidence_cn": "使用ACE和CEM目标检测方法的高光谱甲烷检测",
+      "llm_evidence": "使用ACE和CEM目标检测方法的高光谱甲烷检测",
+      "canonical_evidence": "使用ACE和CEM目标检测方法的高光谱甲烷检测",
+      "llm_tldr_en": "Proposes a fast onboard methane detection pipeline for hyperspectral satellite imagery using efficient target detection algorithms ACE and CEM, enabling real-time leak detection.",
+      "llm_tldr_cn": "针对高光谱卫星图像上甲烷泄漏检测的速度瓶颈，该工作提出了一种基于Mag1c-SAS和LinkNet的快速星载检测流水线。它首次将ACE和CEM等快速目标检测算法应用于甲烷检测，显著降低了计算需求，使得在资源受限的星载硬件上实现实时检测成为可能。实验表明该方法在保持高检测精度的同时大幅提升效率，有助于温室气体减排。",
+      "llm_tldr": "针对高光谱卫星图像上甲烷泄漏检测的速度瓶颈，该工作提出了一种基于Mag1c-SAS和LinkNet的快速星载检测流水线。它首次将ACE和CEM等快速目标检测算法应用于甲烷检测，显著降低了计算需求，使得在资源受限的星载硬件上实现实时检测成为可能。实验表明该方法在保持高检测精度的同时大幅提升效率，有助于温室气体减排。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2606.05369v1",
+      "source": "arxiv",
+      "title": "Anti-Hyperspectral Anomaly Detection: A First Study on Stealthy Lipschitz-Forcing Perturbations Against Unknown Detectors",
+      "abstract": "Hyperspectral imagery represents the best contemporary technology to remotely detect anomalous objects. Nevertheless, hyperspectral anomaly detection (HAD) technique makes ground facilities/situations completely exposed. For the first time, we develop the first anti-HAD (AHAD) technique rendering the key objects undetected, without perfect coordinate/position state information (CSI) of the detectors (e.g., reconnaissance aircraft). Our AHAD algorithm is generally applicable to defend against almost all the existing benchmark data-driven and model-driven HAD methods. AHAD is fundamentally different from conventional adversarial attacks, so novel theory is needed. We customize novel regularizers for assimilating real anomalies into the backgrounds (ARAB) and fooling the detectors with pseudo-anomalies, thereby optimizing an energy-efficient stealthy perturbation signal for AHAD. The ARAB regularization is mathematically interpretable as flattening the topology-enhanced anomaly/background structures in the feature space, hence termed Lipschitz-forcing perturbations. Considering the imperfect CSI, we further develop a robust AHAD criterion, where the uncertainty is mathematically described as matrix-shifting misalignment for statistically generating the robust perturbation. Comprehensive experiments demonstrate the effectiveness and robustness of our AHAD algorithm across diverse real-world datasets. Remarkably, our algorithm generates a single AHAD perturbation signal that can simultaneously evade almost all benchmark detectors, greatly enhancing its practicality, given that the reconnaissance detector type is usually unknown. To the best of our knowledge, this is the first formal AHAD study. As a side contribution, we propose a new quantitative performance index, ArmCBA, to evaluate the robustness of an HAD method against our AHAD signal.",
+      "authors": [
+        "Chia-Hsiang Lin",
+        "Si-Sheng Young",
+        "Jon Atli Benediktsson"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV"
+      ],
+      "published": "2026-06-03T19:17:12+00:00",
+      "link": "https://arxiv.org/pdf/2606.05369v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Hyperspectral anomaly detection adversarial attack, directly related to hyperspectral target detection",
+      "llm_evidence_cn": "高光谱异常检测对抗攻击，直接与高光谱目标检测相关",
+      "llm_evidence": "高光谱异常检测对抗攻击，直接与高光谱目标检测相关",
+      "canonical_evidence": "高光谱异常检测对抗攻击，直接与高光谱目标检测相关",
+      "llm_tldr_en": "First study on adversarial perturbations to evade hyperspectral anomaly detection, proposing a novel AHAD algorithm that works against unknown detectors without prior knowledge.",
+      "llm_tldr_cn": "该文首次研究如何对高光谱异常检测进行对抗攻击，以隐藏目标不被检测。提出反高光谱异常检测（AHAD）技术，能够在未知检测器模型和位置信息的情况下，生成隐秘的Lipschitz强制扰动，使现有主流数据驱动和模型驱动的高光谱异常检测方法失效。该工作揭示了高光谱遥感在安全方面的脆弱性，对国防和保密领域具有重要意义。",
+      "llm_tldr": "该文首次研究如何对高光谱异常检测进行对抗攻击，以隐藏目标不被检测。提出反高光谱异常检测（AHAD）技术，能够在未知检测器模型和位置信息的情况下，生成隐秘的Lipschitz强制扰动，使现有主流数据驱动和模型驱动的高光谱异常检测方法失效。该工作揭示了高光谱遥感在安全方面的脆弱性，对国防和保密领域具有重要意义。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.09167v1",
+      "source": "arxiv",
+      "title": "Vision-Language Guided Hyperspectral Object Tracking via Semantics Fusion and Contextual Template Updating",
+      "abstract": "Hyperspectral object tracking (HOT) leverages the rich spectral information provided by hyperspectral videos (HSVs), offering substantial potential for object tracking. However, efficiently extracting and exploiting spectral information from redundant spectral bands remains a fundamental challenge, which severely limits model generalization and tracking performance. Moreover, in dynamic scenes, targets often experience drastic appearance variations due to factors such as occlusion and illumination changes. These variations lead to large deformations between the current frame and the template. Such discrepancies pose major challenges for existing temporal modeling approaches. In this work, we propose VLHTrack, a novel hyperspectral vision-language (VL) joint tracking framework. Specifically, we incorporate language priors to address the fundamental challenge of spectral redundancy by designing a Language-Guided Band Selection Module (LBSM). By leveraging Large Language Model (LLM) descriptions, LBSM establishes a semantic-to-spectral mapping that mitigates redundancy and accentuates discriminative spectral features. A Multi-Modal Vision-Language Fusion Module is then employed to seamlessly integrate visual and linguistic embeddings, harnessing their complementary advantages to learn coherent cross-modal representations. To address target deformation in long-term sequences, we propose a dynamic update template feature strategy implemented via the Dynamic Template Update with Mamba (DTUM) module. By leveraging selective state space modeling, DTUM learns inter-frame dependencies to update template feature, ensuring efficient template feature evolution guided by temporal context. Experiments on HOT2023 and HOT2024 demonstrate that VLHTrack outperforms state-of-the-art (SOTA) methods.",
+      "authors": [
+        "Rui Yao",
+        "Yuhong Zhang",
+        "Kunyang Sun",
+        "Hancheng Zhu",
+        "Jiaqi Zhao",
+        "Zhiwen Shao",
+        "Abdulmotaleb El Saddik"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-08T08:05:40+00:00",
+      "link": "https://arxiv.org/pdf/2606.09167v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "hyperspectral object tracking, closely related to object detection in hyperspectral images",
+      "llm_evidence_cn": "高光谱目标跟踪，与高光谱图像目标检测密切相关",
+      "llm_evidence": "高光谱目标跟踪，与高光谱图像目标检测密切相关",
+      "canonical_evidence": "高光谱目标跟踪，与高光谱图像目标检测密切相关",
+      "llm_tldr_en": "Proposes VLHTrack, a vision-language guided hyperspectral object tracking method that fuses semantics and updates context template for robust tracking.",
+      "llm_tldr_cn": "该论文针对高光谱视频目标跟踪问题，提出VLHTrack方法，利用视觉语言模型进行语义融合和上下文模板更新。解决了光谱冗余和外观变化带来的挑战，在多个高光谱跟踪数据集上达到最优性能，为高光谱目标检测提供了可迁移的思路。",
+      "llm_tldr": "该论文针对高光谱视频目标跟踪问题，提出VLHTrack方法，利用视觉语言模型进行语义融合和上下文模板更新。解决了光谱冗余和外观变化带来的挑战，在多个高光谱跟踪数据集上达到最优性能，为高光谱目标检测提供了可迁移的思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2606.05759v1",
+      "source": "arxiv",
+      "title": "Physics-Guided Deep Unfolding for Blind Cross-Sensor Spectral Super-Resolution via Learning the Spectral Transformation Function",
+      "abstract": "Hyperspectral imaging provides rich spectral information for quantitative remote sensing, yet hyperspectral sensors remain costly and thus unavailable in many UAV deployments. Spectral super-resolution (SSR) seeks to reconstruct hyperspectral images (HSIs) from multispectral images (MSIs). Most existing SSR methods assume a fixed and known spectral response function (SRF) and are therefore limited to single-sensor settings. In practical cross-sensor scenarios, the spectral degradation from HSI to MSI is unknown and varies with sensor characteristics and scene content, which renders HSI reconstruction ill-posed. This paper proposes a physics-guided deep unfolding network, termed PGU-Net, to address blind cross-sensor SSR by jointly estimating the HSI and a learnable spectral transformation function (STF). PGU-Net unrolls an alternating optimization procedure into an end-to-end trainable architecture with stages, where each stage sequentially updates the HSI and the STF. Both modules combine learnable proximal networks with differentiable closed-form solvers, enabling physical interpretability while retaining strong representation capacity. Experiments on benchmark datasets (CAVE and NTIRE 2022) with multiple SRFs demonstrate accurate recovery of the STF (degradation operator) and improved reconstruction performance over state-of-the-art SSR methods. Furthermore, evaluations on a real UAV cross-sensor dataset (Headwall Nano HSI and DJI P4 Multispectral MSI) verify the effectiveness and robustness of PGU-Net under truly blind conditions, and suggest that the estimated STF may exhibit land-cover-related differences.",
+      "authors": [
+        "Zhaolin Li",
+        "Jinsong Chen",
+        "Shanxin Guo",
+        "Tuo Zhang",
+        "Xinglong Zhang",
+        "Pan Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-04T06:37:29+00:00",
+      "link": "https://arxiv.org/pdf/2606.05759v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Hyperspectral reconstruction method, enabling downstream classification",
+      "llm_evidence_cn": "高光谱重建方法，可服务于下游分类任务",
+      "llm_evidence": "高光谱重建方法，可服务于下游分类任务",
+      "canonical_evidence": "高光谱重建方法，可服务于下游分类任务",
+      "llm_tldr_en": "Proposes a physics-guided deep unfolding network for blind cross-sensor spectral super-resolution from multispectral to hyperspectral, addressing unknown spectral degradation. The method learns the spectral transformation function and shows improved reconstruction accuracy on real data.",
+      "llm_tldr_cn": "针对跨传感器场景下高光谱图像超分辨率重建中谱退化函数未知的难题，提出了一种物理引导的深度展开网络PGU-Net，通过学习谱变换函数实现盲重建。该方法在真实数据上取得了更优的重建精度，为后续高光谱分类与目标检测提供了高质量数据支持。",
+      "llm_tldr": "针对跨传感器场景下高光谱图像超分辨率重建中谱退化函数未知的难题，提出了一种物理引导的深度展开网络PGU-Net，通过学习谱变换函数实现盲重建。该方法在真实数据上取得了更优的重建精度，为后续高光谱分类与目标检测提供了高质量数据支持。",
+      "llm_tags": [
+        "query:hsi:composite"
+      ],
+      "matched_query_tag": "query:hsi:composite",
+      "matched_query_text": "Papers central to 高光谱图像目标检测与分类, especially work that connects or combines: hyperspectral image classification methods; hyperspectral target detection algorithms; hyperspectral anomaly detection techniques; spectral-spatial feature extraction for hyperspectral data; hyperspectral image target detection.",
+      "matched_requirement_id": "req-composite-hsi",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.09123v1",
+      "source": "arxiv",
+      "title": "An Enhanced Geometric-Spectral Feature Learning Framework for Airborne Multispectral Point Cloud Classification",
+      "abstract": "Multispectral point cloud (MPC) is composed of 3D spatial-spectral information, which holds tremendous potential for accurate land-cover classification. However, the representation power of classification models is limited by inherent high-dimensional and heterogeneous spatial-spectral information, unbalanced sample distribution, and inter-class spectral similarity of airborne MPCs. We build two MPC datasets and propose an enhanced geometric-spectral feature learning framework based on attentions for airborne MPC classification. A key component in our model is a two-stream feature fusion method with attention mechanisms, which enhances the representation capability of spatial-spectral features from high-dimensional heterogeneous MPCs. The first stream aims to extract position-encoded global spectral features with fusion self-attention, and the second stream comprises a multikernel point convolution and feature aggregation attention to extract spectral-guided geometric features. We then develop a residual attention fusion block to integrate the most informative geometric-spectral features from the two parallel streams. Another important contribution of this work is a joint loss function to improve the learning ability on unbalanced and interclass similar samples. Experimental results on two airborne MPC datasets demonstrate the effectiveness of the proposed method compared with the state-of-the-art methods. Furthermore, the codes and datasets used in this paper will be made available freely at https://github.com/HITlixian/TGRS_GSFF.",
+      "authors": [
+        "Xian Li",
+        "Yanfeng Gu",
+        "Aleksandra Pižurica"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-08T07:18:38+00:00",
+      "link": "https://arxiv.org/pdf/2606.09123v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Multispectral point cloud classification with geometric-spectral feature fusion, relevant to multimodal remote sensing classification",
+      "llm_evidence_cn": "多光谱点云分类，采用几何-光谱特征融合，与多模态遥感分类相关",
+      "llm_evidence": "多光谱点云分类，采用几何-光谱特征融合，与多模态遥感分类相关",
+      "canonical_evidence": "多光谱点云分类，采用几何-光谱特征融合，与多模态遥感分类相关",
+      "llm_tldr_en": "Proposes an attention-based two-stream feature fusion framework for airborne multispectral point cloud classification, enhancing spatial-spectral representation.",
+      "llm_tldr_cn": "针对机载多光谱点云分类中高维、异构空间-光谱信息及样本不平衡问题，提出基于注意力的两流特征融合框架，增强空间-光谱表征能力，在两个数据集上验证有效性。",
+      "llm_tldr": "针对机载多光谱点云分类中高维、异构空间-光谱信息及样本不平衡问题，提出基于注意力的两流特征融合框架，增强空间-光谱表征能力，在两个数据集上验证有效性。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.13896v1",
+      "source": "arxiv",
+      "title": "How do Self-Supervised Remote Sensing Vision Models Transfer to Downstream Tasks?",
+      "abstract": "Self-supervised geospatial foundation models (GeoFMs) learn transferable representations from remote sensing data, but their downstream behavior is difficult to characterize. We study six representative GeoFMs spanning joint-embedding, reconstruction, and multimodal pretraining families, and evaluate transfer across classification, regression, and segmentation benchmarks under different label availability and downstream pipelines. We find that model rankings change across tasks and adaptation settings. Layerwise probing shows that, in most cases, task-relevant information is more accessible in intermediate transformer blocks compared to final-layer embeddings, and that GeoFMs exhibit distinct depthwise profiles. In segmentation case studies on PASTIS and Sen1Floods11, downstream adaptation settings such as decoder design and fine-tuning can be as impactful as the choice of GeoFM, and standard dense-prediction heads may be poorly aligned with how GeoFMs organize information over depth. Finally, CKA analysis on case studies shows that fine-tuning does not rewrite GeoFMs uniformly across depth, and the strongest changes are localized to the first linear layer of the MLP in ViT blocks. These results help explain why GeoFM rankings shift across benchmarks and motivate more representation-aware evaluation and adaptation strategies.",
+      "authors": [
+        "Julia Romero",
+        "Qin Lv",
+        "Morteza Karimzadeh"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-11T20:39:34+00:00",
+      "link": "https://arxiv.org/pdf/2606.13896v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "self-supervised remote sensing models for downstream classification tasks",
+      "llm_evidence_cn": "自监督遥感模型用于下游分类任务",
+      "llm_evidence": "自监督遥感模型用于下游分类任务",
+      "canonical_evidence": "自监督遥感模型用于下游分类任务",
+      "llm_tldr_en": "Study of six self-supervised geospatial foundation models shows that model rankings change across tasks, and intermediate features are more informative for remote sensing classification.",
+      "llm_tldr_cn": "本文研究了六种自监督地理空间基础模型在遥感分类、回归和分割任务上的迁移表现。发现模型排名随任务和适应设置变化，中间层特征比最终层嵌入更富含任务相关信息，且不同模型具有不同的深度特征轮廓。该分析为多模态遥感图像分类中的预训练模型选择提供了指导。",
+      "llm_tldr": "本文研究了六种自监督地理空间基础模型在遥感分类、回归和分割任务上的迁移表现。发现模型排名随任务和适应设置变化，中间层特征比最终层嵌入更富含任务相关信息，且不同模型具有不同的深度特征轮廓。该分析为多模态遥感图像分类中的预训练模型选择提供了指导。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2606.22634v1",
+      "source": "arxiv",
+      "title": "Learning Entropy Signature for Image Representation and Classification",
+      "abstract": "Learning Entropy (LE) has recently been extended to image analysis through Spatial Learning Entropy Maps (SLEMs), which are two-dimensional LE distributions that highlight unusually high learning activity across an image. Unlike conventional image descriptors, SLEMs are generated by incremental, sample-wise learning of a pretrained feedforward MLP network, where local pixel neighborhoods are presented sequentially in a fixed spatial order to predict the corresponding central pixels. Consequently, the learning activity at each image location depends not only on its local structure but also on the knowledge acquired from previously processed locations. This paper introduces Learning Entropy Signatures (LES), an image descriptor derived from SLEM using the K largest LE locations. LES captures the spatial organization of learning-relevant image structures and provides a compact representation of image content based on learning weight behavior. Experimental evaluation on image classification tasks shows that a relatively small number of K largest LE locations preserve substantial discriminative information. The results indicate a close relationship between the learning of neural weights and information relevance, extending the role of Learning Entropy from time series to images and, within images, from structural point extraction to compact image representation and classification.",
+      "authors": [
+        "Jan Glaser",
+        "Ivo Bukovsky",
+        "Noriyasu Homma",
+        "Marcel Jirina"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-21T18:46:17+00:00",
+      "link": "https://arxiv.org/pdf/2606.22634v1",
+      "tags": [
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "image classification method transferable to hyperspectral",
+      "llm_evidence_cn": "图像分类方法可迁移至高光谱",
+      "llm_evidence": "图像分类方法可迁移至高光谱",
+      "canonical_evidence": "图像分类方法可迁移至高光谱",
+      "llm_tldr_en": "Learning Entropy Signatures (LES) are introduced as an image descriptor from Spatial Learning Entropy Maps for classification, applicable to hyperspectral data.",
+      "llm_tldr_cn": "本文提出学习熵签名（LES）作为图像描述符，由空间学习熵图（SLEM）导出，用于图像分类。该方法通过增量学习预训练MLP网络，捕获局部结构和历史知识，可用于高光谱图像分类等任务，但未针对遥感数据进行专门验证。",
+      "llm_tldr": "本文提出学习熵签名（LES）作为图像描述符，由空间学习熵图（SLEM）导出，用于图像分类。该方法通过增量学习预训练MLP网络，捕获局部结构和历史知识，可用于高光谱图像分类等任务，但未针对遥感数据进行专门验证。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal hyperspectral image classification methods",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
