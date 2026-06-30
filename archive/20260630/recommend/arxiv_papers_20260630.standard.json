@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-06-30T21:51:44.235355+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.29261v1",
+      "source": "arxiv",
+      "title": "Nonlinear mixture model motivated subspace clustering",
+      "abstract": "We derive the linear union-of-subspaces (UoS) model for subspace clustering (SC) from the nonlinear mixture model (NMM) used in blind source separation (BSS) to represent a D-dimensional observation vector as an unknown multivariate nonlinear mapping of C latent variables. Assuming the mapping is differentiable up to an unknown order K, we approximate NMM by a K-th order Taylor expansion, yielding a model equivalent to the linear UoS framework underlying SC. This establishes that: (i) the smoothness order K corresponds to the unknown subspace dimension d; (ii) KC equals the number of anchors; and (iii) the sparsity of the representation vector equals K (i.e., d). These relationships enable estimation of bounds on subspace dimension, and that is validated on six benchmark datasets using five established SC algorithms. Established theoretical results are important for post-processing of self-representation matrices estimated by SC algorithms.",
+      "authors": [
+        "Ivica Kopriva"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-06-28T08:16:50+00:00",
+      "link": "https://arxiv.org/pdf/2606.29261v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "subspace clustering for spectral-spatial feature extraction",
+      "llm_evidence_cn": "子空间聚类用于光谱-空间特征提取",
+      "llm_evidence": "子空间聚类用于光谱-空间特征提取",
+      "canonical_evidence": "子空间聚类用于光谱-空间特征提取",
+      "llm_tldr_en": "Derives linear union-of-subspaces model from nonlinear mixture model, enabling subspace dimension estimation, relevant for spectral-spatial representation.",
+      "llm_tldr_cn": "子空间聚类是高光谱数据分析中常用技术。本文从非线性混合模型推导出线性子空间并集模型，建立了平滑度阶数与子空间维度的对应关系，可估计子空间维度边界。该方法为高光谱数据的光谱-空间特征提取提供了理论依据。",
+      "llm_tldr": "子空间聚类是高光谱数据分析中常用技术。本文从非线性混合模型推导出线性子空间并集模型，建立了平滑度阶数与子空间维度的对应关系，可估计子空间维度边界。该方法为高光谱数据的光谱-空间特征提取提供了理论依据。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "spectral-spatial feature extraction for hyperspectral data",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

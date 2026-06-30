@@ -1,0 +1,24 @@
+{
+  "label": "2026-06-30",
+  "date": "2026-06-30",
+  "generated_at": "2026-06-30T21:52:17",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202606/30/2606.29261v1-nonlinear-mixture-model-motivated-subspace-clustering",
+      "section": "quick",
+      "title_en": "Nonlinear mixture model motivated subspace clustering",
+      "authors": "Ivica Kopriva",
+      "date": "2026-06-28",
+      "pdf": "https://arxiv.org/pdf/2606.29261v1",
+      "score": "6.0",
+      "evidence": "子空间聚类用于光谱-空间特征提取",
+      "tldr": "子空间聚类通常基于线性子空间并集模型，但其与非线性混合模型的联系尚未明确。本文从盲源分离中的非线性混合模型出发，通过可微映射的K阶泰勒展开，推导出等价于线性子空间并集的模型，并揭示了平滑阶数对应子空间维度、锚点数量等于KC、表示向量稀疏性等于K等关系。在六个基准数据集上，利用五种子空间聚类算法验证了子空间维度界限的估计。该理论为子空间聚类算法的自表示矩阵后处理提供了重要依据。",
+      "tags": "query:hsi",
+      "abstract_en": "We derive the linear union-of-subspaces (UoS) model for subspace clustering (SC) from the nonlinear mixture model (NMM) used in blind source separation (BSS) to represent a D-dimensional observation vector as an unknown multivariate nonlinear mapping of C latent variables. Assuming the mapping is differentiable up to an unknown order K, we approximate NMM by a K-th order Taylor expansion, yielding a model equivalent to the linear UoS framework underlying SC. This establishes that: (i) the smoothness order K corresponds to the unknown subspace dimension d; (ii) KC equals the number of anchors; and (iii) the sparsity of the representation vector equals K (i.e., d). These relationships enable estimation of bounds on subspace dimension, and that is validated on six benchmark datasets using five established SC algorithms. Established theoretical results are important for post-processing of self-representation matrices estimated by SC algorithms.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
