@@ -1,0 +1,101 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-01T20:29:29.428391+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2606.30937v1",
+      "source": "arxiv",
+      "title": "No Adaptation Without Observation: Observability-Constrained Test-Time Prompt Tuning for LiDAR Semantic Segmentation",
+      "abstract": "LiDAR semantic segmentation often degrades under real-world deployment due to evolving sensing conditions, while collecting new annotations for retraining is impractical. Test-time adaptation (TTA) updates model parameters online using pseudo-label supervision, but directly applying standard TTA strategies to LiDAR data is challenging. Because pseudo-label reliability is spatially heteroscedastic under range-dependent sparsity and occlusion, uniform updates on globally shared parameters can inject unstable gradients and destabilize adaptation. We propose a geometry-constrained test-time prompt tuning framework for LiDAR semantic segmentation. Our method estimates per-location sensing reliability from depth-consistent beam terminations and neighborhood support, and uses it to reweight spatial supervision. Adaptation is confined to lightweight prompt adapters inserted into a frozen backbone, with spatial gating to prevent unreliable regions from perturbing globally shared representations. A temporally smoothed prototype alignment strategy further stabilizes online updates by accumulating reliable semantic evidence over time. Experiments on standard LiDAR benchmarks demonstrate improved adaptation stability and segmentation performance under deployment variations without additional annotations.",
+      "authors": [
+        "Linlian Jiang",
+        "Wentao Ju",
+        "Sadman Rakib Pinon",
+        "Jianwei Xian",
+        "Zhixiang Chi",
+        "Xinxin Zuo",
+        "Yang Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-29T21:40:10+00:00",
+      "link": "https://arxiv.org/pdf/2606.30937v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "LiDAR semantic segmentation, a form of LiDAR image classification",
+      "llm_evidence_cn": "激光雷达语义分割，属于激光雷达图像分类",
+      "llm_evidence": "激光雷达语义分割，属于激光雷达图像分类",
+      "canonical_evidence": "激光雷达语义分割，属于激光雷达图像分类",
+      "llm_tldr_en": "Proposes a geometry-constrained test-time prompt tuning framework for LiDAR semantic segmentation that adapts to changing conditions by estimating per-location sensing reliability and using prompt tuning instead of full parameter updates.",
+      "llm_tldr_cn": "该论文针对激光雷达语义分割在部署时因传感条件变化导致的性能下降问题，提出了一种可观测性约束的测试时提示调优框架。该方法通过估计每个位置的空间感知可靠性，在共享参数上只更新轻量级提示，避免了伪标签不均匀导致的梯度不稳定。在多个数据集上验证了该方法能够有效适应新场景，显著提升分割精度，为激光雷达在线自适应分割提供了新思路。",
+      "llm_tldr": "该论文针对激光雷达语义分割在部署时因传感条件变化导致的性能下降问题，提出了一种可观测性约束的测试时提示调优框架。该方法通过估计每个位置的空间感知可靠性，在共享参数上只更新轻量级提示，避免了伪标签不均匀导致的梯度不稳定。在多个数据集上验证了该方法能够有效适应新场景，显著提升分割精度，为激光雷达在线自适应分割提供了新思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2606.31015v1",
+      "source": "arxiv",
+      "title": "Dual Sparse Aggregation Transformer for Multispectral Object Detection",
+      "abstract": "Transformer-based approaches have obtained excellent performance in multispectral object detection tasks due to their ability to model long-range dependencies and capture complementary information. However, previous transformer-based multispectral detection methods tend to use all available tokens for similarity calculation, which results in redundant information interaction from irrelevant areas, leading to degraded detection performance. To overcome this challenge, we propose a novel Dual Sparse Aggregation Transformer (DSAFormer) for multispectral object detection, which consists of a Dual Sparse Transformer (DSFormer) and a Learnable Addition Fusion Block (LAFB). Specifically, the DSFormer is designed to exploit and boost cross-modal complementary information, thereby improving detection performance. It incorporates three key components: A Spatial Sparse Multi-Head Cross-Attention (SSMHCA) mechanism selectively captures cross-modal relationships at the spatial level by reserving only the high query-key similarity scores, eliminating irrelevant interactions. A Channel Sparse Multi-Head Cross-Attention (CSMHCA) mechanism performs similar sparse calculations at the channel level to enhance feature representation and filter out low matching query-key. A Multi-Scale Feature Refinement Layer (MSFRL) is developed to aggregate hierarchical features and suppress redundant information. To effectively fuse multimodal features, the LAFB is introduced to aggregate intramodal and intermodal feature information by feature reweighting. Extensive experimental results have demonstrated that our proposed DSAFormer achieves better detection performance against state-of-the-art methods on four public datasets, including the MFAD, FLIR, M$^3$FD, and LLVIP. The source code of our DSAFormer will be released at https://github.com/WenCongWu/DSAFormer.",
+      "authors": [
+        "Wencong Wu",
+        "Xiuwei Zhang",
+        "Hanlin Yin",
+        "Hongxi Zhang",
+        "Yanning Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T01:05:24+00:00",
+      "link": "https://arxiv.org/pdf/2606.31015v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multispectral object detection with fusion transformer",
+      "llm_evidence_cn": "多光谱目标检测与融合Transformer",
+      "llm_evidence": "多光谱目标检测与融合Transformer",
+      "canonical_evidence": "多光谱目标检测与融合Transformer",
+      "llm_tldr_en": "Proposes a Dual Sparse Aggregation Transformer for multispectral object detection, using sparse attention and learnable fusion to enhance cross-modal complementarity.",
+      "llm_tldr_cn": "该论文针对多光谱目标检测中冗余信息交互导致性能下降的问题，提出了双稀疏聚合Transformer（DSAFormer），通过双稀疏Transformer和可学习加法融合模块充分挖掘跨模态互补信息，实验表明该方法在多个数据集上取得了优异的检测性能，为多模态目标检测提供了新思路。",
+      "llm_tldr": "该论文针对多光谱目标检测中冗余信息交互导致性能下降的问题，提出了双稀疏聚合Transformer（DSAFormer），通过双稀疏Transformer和可学习加法融合模块充分挖掘跨模态互补信息，实验表明该方法在多个数据集上取得了优异的检测性能，为多模态目标检测提供了新思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

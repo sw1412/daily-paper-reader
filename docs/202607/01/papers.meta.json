@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-01",
+  "date": "2026-07-01",
+  "generated_at": "2026-07-01T20:31:27",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/01/2606.30937v1-no-adaptation-without-observation-observability-constrained-test-time-prompt-tuning-for-lidar-semantic-segmentation",
+      "section": "deep",
+      "title_en": "No Adaptation Without Observation: Observability-Constrained Test-Time Prompt Tuning for LiDAR Semantic Segmentation",
+      "authors": "Linlian Jiang, Wentao Ju, Sadman Rakib Pinon, Jianwei Xian, Zhixiang Chi, Xinxin Zuo, Yang Wang",
+      "date": "2026-06-29",
+      "pdf": "https://arxiv.org/pdf/2606.30937v1",
+      "score": "9.0",
+      "evidence": "激光雷达语义分割，属于激光雷达图像分类",
+      "tldr": "部署时LiDAR语义分割因传感条件变化而性能下降，重新标注不现实。现有测试时适应直接应用于LiDAR数据时，伪标签可靠性受空间稀疏性和遮挡影响，导致不稳定。提出几何约束的测试时提示调优框架，通过深度一致性估计感知可靠性，加权空间监督并限制适配范围。在标准基准上，方法提升了适应稳定性和分割性能，无需额外标注即可应对部署变化。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "LiDAR semantic segmentation often degrades under real-world deployment due to evolving sensing conditions, while collecting new annotations for retraining is impractical. Test-time adaptation (TTA) updates model parameters online using pseudo-label supervision, but directly applying standard TTA strategies to LiDAR data is challenging. Because pseudo-label reliability is spatially heteroscedastic under range-dependent sparsity and occlusion, uniform updates on globally shared parameters can inject unstable gradients and destabilize adaptation. We propose a geometry-constrained test-time prompt tuning framework for LiDAR semantic segmentation. Our method estimates per-location sensing reliability from depth-consistent beam terminations and neighborhood support, and uses it to reweight spatial supervision. Adaptation is confined to lightweight prompt adapters inserted into a frozen backbone, with spatial gating to prevent unreliable regions from perturbing globally shared representations. A temporally smoothed prototype alignment strategy further stabilizes online updates by accumulating reliable semantic evidence over time. Experiments on standard LiDAR benchmarks demonstrate improved adaptation stability and segmentation performance under deployment variations without additional annotations.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/01/2606.31015v1-dual-sparse-aggregation-transformer-for-multispectral-object-detection",
+      "section": "quick",
+      "title_en": "Dual Sparse Aggregation Transformer for Multispectral Object Detection",
+      "authors": "Wencong Wu, Xiuwei Zhang, Hanlin Yin, Hongxi Zhang, Yanning Zhang",
+      "date": "2026-06-30",
+      "pdf": "https://arxiv.org/pdf/2606.31015v1",
+      "score": "6.0",
+      "evidence": "多光谱目标检测与融合Transformer",
+      "tldr": "多光谱目标检测中，现有Transformer方法使用所有token进行注意力计算，导致冗余信息交互和性能下降。本文提出DSAFormer，包含双稀疏Transformer（DSFormer）和可学习加法融合模块（LAFB）。DSFormer通过空间和通道稀疏交叉注意力选择性保留高匹配token，结合多尺度特征细化层抑制冗余；LAFB通过特征重加权融合模态内和模态间信息。在MFAD、FLIR、M3FD、LLVIP四个数据集上达到最优性能。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Transformer-based approaches have obtained excellent performance in multispectral object detection tasks due to their ability to model long-range dependencies and capture complementary information. However, previous transformer-based multispectral detection methods tend to use all available tokens for similarity calculation, which results in redundant information interaction from irrelevant areas, leading to degraded detection performance. To overcome this challenge, we propose a novel Dual Sparse Aggregation Transformer (DSAFormer) for multispectral object detection, which consists of a Dual Sparse Transformer (DSFormer) and a Learnable Addition Fusion Block (LAFB). Specifically, the DSFormer is designed to exploit and boost cross-modal complementary information, thereby improving detection performance. It incorporates three key components: A Spatial Sparse Multi-Head Cross-Attention (SSMHCA) mechanism selectively captures cross-modal relationships at the spatial level by reserving only the high query-key similarity scores, eliminating irrelevant interactions. A Channel Sparse Multi-Head Cross-Attention (CSMHCA) mechanism performs similar sparse calculations at the channel level to enhance feature representation and filter out low matching query-key. A Multi-Scale Feature Refinement Layer (MSFRL) is developed to aggregate hierarchical features and suppress redundant information. To effectively fuse multimodal features, the LAFB is introduced to aggregate intramodal and intermodal feature information by feature reweighting. Extensive experimental results have demonstrated that our proposed DSAFormer achieves better detection performance against state-of-the-art methods on four public datasets, including the MFAD, FLIR, M$^3$FD, and LLVIP. The source code of our DSAFormer will be released at https://github.com/WenCongWu/DSAFormer.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

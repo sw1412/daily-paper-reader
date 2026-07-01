@@ -6,26 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-06-30
-- 运行时间：2026-06-30 21:52:11 UTC
+- 最新运行日期：2026-07-01
+- 运行时间：2026-07-01 20:31:16 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：0
+- 本次总论文数：2
+- 精读区：1
 - 速读区：1
 
 ### 今日简报（AI）
-1) 今日速读1篇论文：非线性混合模型驱动的子空间聚类，评分6.0。  
-2) 核心方向：利用非线性混合模型改进子空间聚类，应对高维数据的复杂结构。  
-3) 建议：后续可结合实际数据集验证其效果，并与线性方法对比优劣。
-- 详情：[/202606/30/README](/202606/30/README)
+今日精读1篇高分论文与1篇速读，聚焦LiDAR语义分割的测试时适应及多光谱目标检测。  
+最值得关注的是精读《No Adaptation Without Observation》（9.0/10），其提出的可观测性约束测试时提示调优在LiDAR分割中极具创新性。  
+建议优先深入理解该文“无观测无适应”的核心思想，并留意多光谱检测中Dual Sparse Aggregation Transformer的稀疏注意力机制。
+- 详情：[/202607/01/README](/202607/01/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [No Adaptation Without Observation: Observability-Constrained Test-Time Prompt Tuning for LiDAR Semantic Segmentation](/202607/01/2606.30937v1-no-adaptation-without-observation-observability-constrained-test-time-prompt-tuning-for-lidar-semantic-segmentation)  
+   标签：评分：9.0/10、query:hsi-lidar
+   evidence：激光雷达语义分割，属于激光雷达图像分类
 
 ### 速读区论文标签
-1. [Nonlinear mixture model motivated subspace clustering](/202606/30/2606.29261v1-nonlinear-mixture-model-motivated-subspace-clustering)  
-   标签：评分：6.0/10、query:hsi
-   evidence：子空间聚类用于光谱-空间特征提取
+1. [Dual Sparse Aggregation Transformer for Multispectral Object Detection](/202607/01/2606.31015v1-dual-sparse-aggregation-transformer-for-multispectral-object-detection)  
+   标签：评分：6.0/10、query:hsi-lidar
+   evidence：多光谱目标检测与融合Transformer
 
 
 <div class="dpr-home-promo-card">
