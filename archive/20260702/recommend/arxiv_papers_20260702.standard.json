@@ -1,0 +1,54 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-02T21:06:08.528618+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.31136v1",
+      "source": "arxiv",
+      "title": "FROST: Training-Free Few-Shot Segmentation with Frozen Features and Nonparametric Statistics",
+      "abstract": "Few-shot segmentation asks a model to delineate a target class in a query image from only a handful of annotated examples, a setting most acute in remote sensing, where labels are scarce and the imagery departs sharply from the natural images on which vision backbones are pretrained. Prevailing approaches either train a segmenter on labelled episodes, which raises accuracy within the training distribution but binds the model to it, or reduce each class to a lossy summary of frozen features, a single prototype, a few cluster prototypes, or a discrete clustering, none of which preserves the internal structure of a multimodal class. We argue that a class is better described by a distribution than by a point, and that frozen self-supervised features already carry enough structure to estimate that distribution directly. We introduce FROST, a training-free few-shot segmenter that treats the reference foreground and background as two point clouds on the unit sphere of frozen DINOv3 features and labels each query token by a nonparametric density ratio, with a threshold the Bayes rule fixes at zero under equal priors. Because the variance of a density estimate shrinks as its sample grows, the decision sharpens as references accumulate, and every remaining quantity from the kernel bandwidth to the spatial gate is read from the support set rather than tuned. We develop FROST for overhead imagery, where a class is typically a scatter of many small and dissimilar instances that a density tracks but a lossy summary blurs. Across seventeen remote-sensing benchmarks FROST surpasses both training-free and learning-based methods, leading by 5.6 mIoU from a single annotated example and widening its lead as the support set grows, all while remaining among the smallest models compared. Code is available at https://github.com/jhpark-ai/FROST.",
+      "authors": [
+        "Junghwan Park"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T05:06:06+00:00",
+      "link": "https://arxiv.org/pdf/2606.31136v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "few-shot segmentation method applicable to hyperspectral image classification",
+      "llm_evidence_cn": "小样本分割方法可应用于高光谱图像分类",
+      "llm_evidence": "小样本分割方法可应用于高光谱图像分类",
+      "canonical_evidence": "小样本分割方法可应用于高光谱图像分类",
+      "llm_tldr_en": "Proposes a training-free few-shot segmentation method using frozen features and nonparametric statistics, achieving strong performance on remote sensing imagery without fine-tuning.",
+      "llm_tldr_cn": "针对遥感小样本分割中标签稀缺且预训练模型与遥感图像分布差异大的问题，提出一种无训练方法FROST，利用冻结的自监督特征和非参数统计描述类别分布，无需微调即可在遥感图像上实现精确分割，为小样本分割提供了新思路。",
+      "llm_tldr": "针对遥感小样本分割中标签稀缺且预训练模型与遥感图像分布差异大的问题，提出一种无训练方法FROST，利用冻结的自监督特征和非参数统计描述类别分布，无需微调即可在遥感图像上实现精确分割，为小样本分割提供了新思路。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

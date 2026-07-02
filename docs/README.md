@@ -6,28 +6,24 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-01
-- 运行时间：2026-07-01 20:31:16 UTC
+- 最新运行日期：2026-07-02
+- 运行时间：2026-07-02 21:07:15 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：1
+- 本次总论文数：1
+- 精读区：0
 - 速读区：1
 
 ### 今日简报（AI）
-今日精读1篇高分论文与1篇速读，聚焦LiDAR语义分割的测试时适应及多光谱目标检测。  
-最值得关注的是精读《No Adaptation Without Observation》（9.0/10），其提出的可观测性约束测试时提示调优在LiDAR分割中极具创新性。  
-建议优先深入理解该文“无观测无适应”的核心思想，并留意多光谱检测中Dual Sparse Aggregation Transformer的稀疏注意力机制。
-- 详情：[/202607/01/README](/202607/01/README)
+今日速读1篇论文，聚焦无训练少样本分割新方法。值得关注《FROST》利用冻结特征与非参数统计实现高效分割（7.0/10）。建议进一步了解其冻结特征+非参数思路在小样本场景下的潜力。
+- 详情：[/202607/02/README](/202607/02/README)
 
 ### 精读区论文标签
-1. [No Adaptation Without Observation: Observability-Constrained Test-Time Prompt Tuning for LiDAR Semantic Segmentation](/202607/01/2606.30937v1-no-adaptation-without-observation-observability-constrained-test-time-prompt-tuning-for-lidar-semantic-segmentation)  
-   标签：评分：9.0/10、query:hsi-lidar
-   evidence：激光雷达语义分割，属于激光雷达图像分类
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Dual Sparse Aggregation Transformer for Multispectral Object Detection](/202607/01/2606.31015v1-dual-sparse-aggregation-transformer-for-multispectral-object-detection)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：多光谱目标检测与融合Transformer
+1. [FROST: Training-Free Few-Shot Segmentation with Frozen Features and Nonparametric Statistics](/202607/02/2606.31136v1-frost-training-free-few-shot-segmentation-with-frozen-features-and-nonparametric-statistics)  
+   标签：评分：7.0/10、query:hsi
+   evidence：小样本分割方法可应用于高光谱图像分类
 
 
 <div class="dpr-home-promo-card">
