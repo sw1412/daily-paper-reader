@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-03",
+  "date": "2026-07-03",
+  "generated_at": "2026-07-03T21:52:27",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/03/2606.31385v1-reconfigurable-wavelength-encoded-stochastic-illumination-for-active-hyperspectral-imaging",
+      "section": "quick",
+      "title_en": "Reconfigurable wavelength-encoded stochastic illumination for active hyperspectral imaging",
+      "authors": "Yi-Jing Chen, Bao-Lei Liu, Ze-Yuan Dong, Zhi-Hao Zhao, Yi-Ying Zhang, Chun-Min Yu, Zhi-Hua Xu, Yuan-Jin Yu, Zhao-Hua Yang",
+      "date": "2026-06-30",
+      "pdf": "https://arxiv.org/pdf/2606.31385v1",
+      "score": "6.0",
+      "evidence": "高光谱成像硬件方法，实现自适应压缩高光谱成像，为分类方法提供基础",
+      "tldr": "传统高光谱成像依赖复杂顺序扫描硬件，时间分辨率低而成本高。本文提出可重构光学随机编码（ROSE）框架，通过LED阵列合成随机光谱图案，使用单色相机实现压缩感知。实验重建60个光谱波段（400-700 nm），空间分辨率2048×1536。该框架支持自适应照明优化，提升重构精度与任务性能，并成功应用于防伪检测和口腔成像，可作为即插即用模块升级现有成像系统。",
+      "tags": "query:hsi",
+      "abstract_en": "Traditional hyperspectral imaging (HSI) relies on sequential scanning with complex and bulky hardware, inherently limiting its temporal resolution while increasing system complexity and cost. Computational HSI offers cost-effective alternatives with simplified hardware. However, most existing computational methods rely on fixed spectral encoding units, which lack adaptability for different spectral tasks. Here, we present a reconfigurable optical stochastic encoding (ROSE) framework with programmable illumination, which can be adaptively optimized for different spectral tasks, for high-throughput, compressive HSI. By leveraging an array of monochromatic light-emitting diodes (LEDs), we synthesize stochastic spectral patterns that enable compressive acquisition using a standard monochrome camera. The proposed framework allows dynamic reconfiguration of illumination patterns, making it adaptable to diverse imaging requirements. We experimentally validate the proposed method and achieve HSI with a spatial resolution of 2048 by 1536, reconstructing 60 spectral bands across the spectral range of 400-700 nm. Furthermore, we introduce an automatic optimization strategy to search for optimal illuminations tailored to specific tasks, improving both reconstruction accuracy and task-oriented performance. We demonstrate the effectiveness of our approach in applications including anti-counterfeiting inspection and oral imaging, and further validate its compatibility with standard microscope and endoscope systems. The developed ROSE illumination module could serve as a universal, plug-and-play add-on for conventional cameras and existing optical systems, providing a cost-effective pathway to upgrade them into high-performance, task-adaptive HSI systems.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/03/2607.02404v1-object-centric-lejepa",
+      "section": "quick",
+      "title_en": "Object-centric LeJEPA",
+      "authors": "Jakob Geusen, Ender Konukoglu",
+      "date": "2026-07-02",
+      "pdf": "https://arxiv.org/pdf/2607.02404v1",
+      "score": "6.0",
+      "evidence": "面向特征提取的目标级表示学习",
+      "tldr": "图像级自监督学习方法如LeJEPA在大规模数据集上表现良好，但数据效率低。本文提出对象级LeJEPA，利用SAM提供的对象掩码将对比学习从图像级扩展到对象级，并加入实例分离损失使不同对象区分。在COCO上训练，仅用10-100%数据即在DAVIS跟踪、ImageNet分类、ADE20k分割和NAVI重识别任务上超越图像级方法。该方法打破了对象分割与表示之间的循环依赖，实现了更数据高效的自监督学习。",
+      "tags": "query:hsi",
+      "abstract_en": "Image encoders trained with LeJEPA can deliver strong features for downstream tasks, but, like other image-level self-supervised methods, typically require large training datasets. Aligning representations at the level of objects rather than whole scenes promises greater data efficiency, but doing this in a completely self-supervised way, effectively jointly partitioning a scene and representing its objects, is unstable: the two are locked in a cyclic dependency, partitioning requires meaningful representations, while meaningful representations require consistent partitioning. We sidestep this instability by taking object masks as given during training, using cheap, off-the-shelf SAM proposals. We extend LeJEPA - whose distributional anti-collapse objective ports naturally from whole images to variable-sized sets of objects - to align object-centric representations rather than whole images. An additional instance-separating loss, which treats other objects in the same scene as negatives, further boosts downstream performance. Across two model scales and 10-100% of COCO, object-level LeJEPA outperforms image-level LeJEPA on tracking (DAVIS), classification (ImageNet-1k), segmentation (ADE20k), and re-identification (NAVI).",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
