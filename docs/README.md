@@ -6,27 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-03
-- 运行时间：2026-07-03 21:52:21 UTC
+- 最新运行日期：2026-07-04
+- 运行时间：2026-07-04 21:24:51 UTC
 - 运行状态：成功
-- 本次总论文数：2
+- 本次总论文数：1
 - 精读区：0
-- 速读区：2
+- 速读区：1
 
 ### 今日简报（AI）
-今日速读两篇论文，覆盖主动高光谱成像与以对象为中心的自监督学习。值得关注可重构波长编码随机照明技术，以及LeJEPA框架在对象级表征学习上的创新。建议进一步了解这两项技术在实际场景中的实现与效果。
-- 详情：[/202607/03/README](/202607/03/README)
+今日浏览1篇论文，聚焦稀疏跨模态融合提升RGB-T目标检测效率。  
+该工作通过稀疏策略降低计算开销，验证了轻量化融合的可行性。  
+可进一步探索稀疏机制在边缘设备上的实时检测应用。
+- 详情：[/202607/04/README](/202607/04/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Reconfigurable wavelength-encoded stochastic illumination for active hyperspectral imaging](/202607/03/2606.31385v1-reconfigurable-wavelength-encoded-stochastic-illumination-for-active-hyperspectral-imaging)  
-   标签：评分：6.0/10、query:hsi
-   evidence：高光谱成像硬件方法，实现自适应压缩高光谱成像，为分类方法提供基础
-2. [Object-centric LeJEPA](/202607/03/2607.02404v1-object-centric-lejepa)  
-   标签：评分：6.0/10、query:hsi
-   evidence：面向特征提取的目标级表示学习
+1. [Efficient RGB-T Object Detection via Sparse Cross-Modality Fusion](/202607/04/2606.30215v1-efficient-rgb-t-object-detection-via-sparse-cross-modality-fusion)  
+   标签：评分：6.0/10、query:hsi-lidar
+   evidence：RGB-T多模态目标检测与稀疏跨模态融合，与多模态遥感检测相关
 
 
 <div class="dpr-home-promo-card">
