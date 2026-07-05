@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-05T21:25:03.706237+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.31135v1",
+      "source": "arxiv",
+      "title": "MSNN-LINet: Cross-Modal Learning via Continuous Linear Integration",
+      "abstract": "We present LINet (Linear Integration Network), a Multi-Stream Neural Network (MSNN) for RGB-D scene classification. Current multi-modal architectures treat feature fusion as a discrete, ad-hoc event: early fusion entangles representations prematurely, late fusion isolates them until the final layer, and hybrid or attention-based methods require architectural guesswork to place intermediate fusion blocks. LINet addresses this structural compromise by maintaining three dedicated parallel streams (RGB, depth, and integration) where a novel Linear Integration Convolution (LIConv2d) operator enables continuous cross-modal learning at every layer. The integration stream receives raw filtered signals from both modality streams and combines them before the nonlinear activation threshold, conceptually inspired by somatic integration preceding the neuronal firing decision. Implementing continuous integration exposes a critical initialization pathology: Kaiming initialization of the bridging weights scrambles gradients before they reach the stream backbones, producing a failure mode that resembles overfitting but is corrupted gradient flow. A 1/N constant initialization mitigates this. We employ progressive modality dropout, a curriculum adapted to continuous fusion in which blanking probability increases from zero, preventing pathway collapse, a form of negative co-learning, by forcing robust independent stream representations. Trained from scratch on SUN RGB-D 19-class scene classification, LINet reaches 45.2% mean class accuracy at ResNet18 scale, outperforming prior from-scratch results, and rises to 49.6% with in-domain RGB-D (ScanNet) pretraining.",
+      "authors": [
+        "Gabriel Clinger"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-30T05:06:02+00:00",
+      "link": "https://arxiv.org/pdf/2606.31135v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "cross-modal learning for RGB-D scene classification with continuous linear integration",
+      "llm_evidence_cn": "提出连续线性集成算子实现RGB-D场景分类的跨模态学习",
+      "llm_evidence": "提出连续线性集成算子实现RGB-D场景分类的跨模态学习",
+      "canonical_evidence": "提出连续线性集成算子实现RGB-D场景分类的跨模态学习",
+      "llm_tldr_en": "Proposes LINet, a multi-stream neural network with continuous linear integration convolution for RGB-D scene classification, enabling cross-modal learning at every layer without discrete fusion.",
+      "llm_tldr_cn": "针对多模态特征融合的离散性问题，提出线性集成网络LINet，通过连续线性集成卷积算子LIConv2d在每一层进行跨模态学习，避免了早期或晚期融合的缺陷。在RGB-D场景分类任务上，该方法持续优于现有融合策略，验证了连续融合的有效性。该框架可推广至其他多模态分类任务，如遥感图像融合分类。",
+      "llm_tldr": "针对多模态特征融合的离散性问题，提出线性集成网络LINet，通过连续线性集成卷积算子LIConv2d在每一层进行跨模态学习，避免了早期或晚期融合的缺陷。在RGB-D场景分类任务上，该方法持续优于现有融合策略，验证了连续融合的有效性。该框架可推广至其他多模态分类任务，如遥感图像融合分类。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
