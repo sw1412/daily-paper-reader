@@ -1,0 +1,101 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-06T21:19:30.672406+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 12,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2606.31688v1",
+      "source": "arxiv",
+      "title": "Semantic Occupancy Prediction with Dual Range-Voxel Representation",
+      "abstract": "LiDAR-based 3D semantic occupancy prediction, which aims to provide accurate and comprehensive scene representation, is crucial for autonomous driving systems. As point clouds suffer from sparsity and incompleteness, leading to insufficient semantic learning and difficult occupancy perception, existing methods often stack multi-sweep point clouds to obtain dense spatial information. However, such a naive strategy also results in efficiency (e.g., additional computational burden) and robustness (e.g., pose transformation noise) concerns, which hinder their practical applications. In this work, we propose a Dual Range-Voxel Representation (DRVR) that leverages the range-view context and voxel-view geometry of single-sweep point clouds for 3D semantic occupancy prediction, eliminating the concerns associated with the multi-sweeps. Specifically, we use the range-view encoder to extract the compact context of the scene. To fully exploit the spatial information, we design a geometry-aware voxel-view encoder that extracts multi-scale voxel-view features separately and combines them for better geometric occupancy prediction. Moreover, we propose a range-voxel fusion module to cooperate range- and voxel-view features via voxel-to-range and range-to-voxel fusions. Extensive experiments on nuScenes-Occupancy, SemanticKITTI and SemanticPOSS show the superiority of our method. Especially on nuScenes-Occupancy, our single-sweep DRVR achieves 5.4% improvement in mIoU and 2.1x acceleration compared to the multi-sweep method.",
+      "authors": [
+        "Sitao Chen",
+        "Zhuangwei Zhuang",
+        "Hui Luo",
+        "Lizhao Liu",
+        "Qingyao Wu",
+        "Mingkui Tan"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-06-30T14:01:52+00:00",
+      "link": "https://arxiv.org/pdf/2606.31688v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LiDAR-based 3D semantic occupancy prediction with dual representation",
+      "llm_evidence_cn": "基于LiDAR的3D语义占用预测，使用双表示",
+      "llm_evidence": "基于LiDAR的3D语义占用预测，使用双表示",
+      "canonical_evidence": "基于LiDAR的3D语义占用预测，使用双表示",
+      "llm_tldr_en": "The paper proposes Dual Range-Voxel Representation for LiDAR-based semantic occupancy prediction, leveraging range-view context and voxel-view geometry from single-sweep point clouds.",
+      "llm_tldr_cn": "该论文针对LiDAR点云稀疏导致语义占用预测困难的问题，提出双范围-体素表示，利用单帧点云的体素几何和范围上下文进行语义占用预测。方法避免了多帧堆叠的效率与鲁棒性问题，在自动驾驶数据集上取得了良好效果。虽然任务为占用预测，但本质是3D语义分类，与LiDAR分类任务相近。",
+      "llm_tldr": "该论文针对LiDAR点云稀疏导致语义占用预测困难的问题，提出双范围-体素表示，利用单帧点云的体素几何和范围上下文进行语义占用预测。方法避免了多帧堆叠的效率与鲁棒性问题，在自动驾驶数据集上取得了良好效果。虽然任务为占用预测，但本质是3D语义分类，与LiDAR分类任务相近。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.29136v1",
+      "source": "arxiv",
+      "title": "CMTFormer: Marrying Transformer with Hierarchical Information Interaction for RGB-Event Object Detection",
+      "abstract": "Event cameras capture sparse brightness changes with high temporal resolution and high dynamic range, compensating for the deficiencies of the conventional RGB frames. However, previous multi-modal fusion techniques typically fail to handle the inherent heterogeneity between RGB frames and event streams, thus easily leading to noise amplification or redundant feature integration during cross-modal fusion. In this paper, we propose a Cross-Modal information inTeraction transFormer, coined as CMTFormer, which hierarchically integrates RGB and event information to achieve efficient and stable multimodal collaboration. Specifically, we design a shallow-to-deep information interaction scheme. In the shallow stage, we present the Shallow Alignment Module (SAM) to achieve an efficient fusion of RGB and event low-level features, which mitigates attribute disparities and prevents noisy information. In the middle stage, we devise the Cross-modal Enhancement Module (CEM) that utilizes texture and edge information to produce mutually reinforced middle-level features. In the deep stage, we present the Learnable Deep Fusion Module (LDFM) which performs high-level information aggregation through learnable weights, thus enabling the network to adaptively fuse RGB and event clues. A Spatial Prior Module is further designed to utilize global spatial information to enhance localization accuracy. Extensive experiments are conducted on two prevalent event-based object detection benchmarks, i.e., DSEC-Detection and PKU-DAVIS-SOD. Our CMTFormer consistently surpasses the detection counterparts in both uni-modal and multi-modal settings, strongly demonstrating the effectiveness of our paradigm. Codes will be available upon publication.",
+      "authors": [
+        "Yu Li",
+        "Yuenan Hou",
+        "Yingmei Wei",
+        "Jiangming Chen",
+        "Yanming Guo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-06-28T00:49:05+00:00",
+      "link": "https://arxiv.org/pdf/2606.29136v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "hierarchical multi-modal fusion for RGB-Event object detection",
+      "llm_evidence_cn": "RGB-事件相机目标检测中的分层多模态融合",
+      "llm_evidence": "RGB-事件相机目标检测中的分层多模态融合",
+      "canonical_evidence": "RGB-事件相机目标检测中的分层多模态融合",
+      "llm_tldr_en": "CMTFormer uses hierarchical information interaction to fuse RGB and event data for object detection, providing a transferable multi-modal fusion approach for HSI+LiDAR tasks.",
+      "llm_tldr_cn": "RGB帧与事件流之间存在异质性，传统多模态融合易放大噪声或冗余。CMTFormer设计浅层到深层的信息交互方案，逐步融合RGB和事件特征。在检测任务上实现稳定高效的多模态协作。该方法的分层融合策略可迁移至高光谱与LiDAR数据的联合目标检测。",
+      "llm_tldr": "RGB帧与事件流之间存在异质性，传统多模态融合易放大噪声或冗余。CMTFormer设计浅层到深层的信息交互方案，逐步融合RGB和事件特征。在检测任务上实现稳定高效的多模态协作。该方法的分层融合策略可迁移至高光谱与LiDAR数据的联合目标检测。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
