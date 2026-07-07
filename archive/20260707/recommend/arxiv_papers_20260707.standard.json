@@ -1,0 +1,97 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-07T22:04:24.329570+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 12,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.05148v1",
+      "source": "arxiv",
+      "title": "Fully Rotation-Equivariant Spectral-Spatial Learning for Multispectral Object Detection",
+      "abstract": "Existing multispectral detectors are limited by discrete spectral processing, a scale-dependent shift in the relative reliability of spectral and spatial cues across pyramid levels, and the lack of explicit rotation-equivariant geometric priors for arbitrarily oriented objects. To tackle these limitations, we propose FressDet, a fully rotation-equivariant spectral-spatial learning framework for multispectral object detection, capable of capturing the continuous, ordered nature of spectral structure and enabling reliable spectral-spatial fusion across pyramid levels under arbitrary in-plane rotations. FressDet integrates three complementary components. Spectral Implicit Warp (SpeIW) enables query-based spectral resampling via a coordinate-conditioned implicit field, yielding a monotone, order-preserving warp. Rotation-Equivariant Consistency Weighting (ReCoW) adaptively fuses spectral and spatial branches based on branch reliability, reinforcing informative cues while suppressing noise across pyramid levels. The oriented-aware head exploits group-indexed features to stably predict oriented objects without parameter replication. Taken together, FressDet learns more discriminative and robust spectral-spatial representations even under rotational perturbations. By achieving state-of-the-art performance with 93% fewer parameters on three public benchmarks, FressDet demonstrates its effectiveness and generalizability.",
+      "authors": [
+        "Peng Zhang",
+        "Tingfa Xu",
+        "Shuaihao Han",
+        "Jianan Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-06T14:29:51+00:00",
+      "link": "https://arxiv.org/pdf/2607.05148v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "spectral-spatial learning for multispectral object detection",
+      "llm_evidence_cn": "多光谱目标检测中的光谱-空间学习",
+      "llm_evidence": "多光谱目标检测中的光谱-空间学习",
+      "canonical_evidence": "多光谱目标检测中的光谱-空间学习",
+      "llm_tldr_en": "Proposes FressDet, a fully rotation-equivariant spectral-spatial learning framework for multispectral object detection, enabling reliable spectral-spatial fusion.",
+      "llm_tldr_cn": "现有多光谱目标检测器在连续光谱建模和旋转不变性方面存在局限，本文提出FressDet框架，集成了光谱隐式扭曲（SpeIW）模块实现连续光谱重采样，并引入完全旋转等变设计，确保任意旋转下可靠的跨金字塔层级光谱-空间融合。在多个多光谱检测基准上，FressDet在旋转条件下检测精度大幅提升，展现了鲁棒性。该方法为多光谱乃至高光谱目标检测提供了新的思路。",
+      "llm_tldr": "现有多光谱目标检测器在连续光谱建模和旋转不变性方面存在局限，本文提出FressDet框架，集成了光谱隐式扭曲（SpeIW）模块实现连续光谱重采样，并引入完全旋转等变设计，确保任意旋转下可靠的跨金字塔层级光谱-空间融合。在多个多光谱检测基准上，FressDet在旋转条件下检测精度大幅提升，展现了鲁棒性。该方法为多光谱乃至高光谱目标检测提供了新的思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2606.29664v1",
+      "source": "arxiv",
+      "title": "Benchmarking Geospatial Foundation Models for Agriculture Applications",
+      "abstract": "Geospatial foundation models pretrained on satellite imagery promise broad generalization across remote sensing tasks and regions, but their geographic transferability has not been systematically tested, especially in agriculture applications. This paper presents a controlled benchmark that evaluates three models, Prithvi, SpectralGPT, and SatMAE, on multi-temporal crop segmentation and change detection across four U.S. states, Iowa, North Carolina, California, and Minnesota. By assigning each train, validation, and test split to a separate region, we measure how well each model transfers to land it has not seen. All three degrade sharply under regional distribution shift, predicting only the most common crops while missing rare ones. We further find that fitting these models to a shared input format affects each one differently, which complicates direct architectural comparison. These results expose key limitations of current geospatial foundation models for agriculture and point to region aware evaluation as a necessary standard.",
+      "authors": [
+        "Zhuocheng Shang",
+        "Sanmay Das",
+        "Ahmed Eldawy"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-06-29T00:19:38+00:00",
+      "link": "https://arxiv.org/pdf/2606.29664v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "evaluates geospatial foundation models including SpectralGPT on crop segmentation",
+      "llm_evidence_cn": "评估包括SpectralGPT在内的地理空间基础模型在作物分割上的表现",
+      "llm_evidence": "评估包括SpectralGPT在内的地理空间基础模型在作物分割上的表现",
+      "canonical_evidence": "评估包括SpectralGPT在内的地理空间基础模型在作物分割上的表现",
+      "llm_tldr_en": "Benchmarks Prithvi, SpectralGPT, SatMAE on multi-temporal crop segmentation and change detection across four US states, showing sharp performance drops under regional distribution shift.",
+      "llm_tldr_cn": "本文对三种地理空间基础模型（Prithvi、SpectralGPT、SatMAE）进行农业应用基准测试，评估多时相作物分割与变化检测。通过跨区域划分训练/验证/测试集，发现所有模型在区域分布偏移下性能急剧下降，仅能预测常见作物。该研究揭示了当前模型泛化能力的局限，为未来遥感分类模型改进提供方向。",
+      "llm_tldr": "本文对三种地理空间基础模型（Prithvi、SpectralGPT、SatMAE）进行农业应用基准测试，评估多时相作物分割与变化检测。通过跨区域划分训练/验证/测试集，发现所有模型在区域分布偏移下性能急剧下降，仅能预测常见作物。该研究揭示了当前模型泛化能力的局限，为未来遥感分类模型改进提供方向。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

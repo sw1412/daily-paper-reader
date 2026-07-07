@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-07",
+  "date": "2026-07-07",
+  "generated_at": "2026-07-07T22:05:31",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/07/2607.05148v1-fully-rotation-equivariant-spectral-spatial-learning-for-multispectral-object-detection",
+      "section": "quick",
+      "title_en": "Fully Rotation-Equivariant Spectral-Spatial Learning for Multispectral Object Detection",
+      "authors": "Peng Zhang, Tingfa Xu, Shuaihao Han, Jianan Li",
+      "date": "2026-07-06",
+      "pdf": "https://arxiv.org/pdf/2607.05148v1",
+      "score": "7.0",
+      "evidence": "多光谱目标检测中的光谱-空间学习",
+      "tldr": "现有多光谱探测器受限于离散光谱处理、金字塔层级间光谱与空间线索的尺度依赖可靠性变化以及缺乏旋转等变几何先验。为此提出FressDet框架，通过光谱隐式扭曲实现连续有序的光谱重采样，借助旋转等变一致性加权自适应融合光谱与空间分支，并利用方向感知头稳定预测任意方向目标。在三个公开基准上以减少93%参数取得最先进结果，证明了旋转等变光谱-空间学习的有效性和泛化性。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Existing multispectral detectors are limited by discrete spectral processing, a scale-dependent shift in the relative reliability of spectral and spatial cues across pyramid levels, and the lack of explicit rotation-equivariant geometric priors for arbitrarily oriented objects. To tackle these limitations, we propose FressDet, a fully rotation-equivariant spectral-spatial learning framework for multispectral object detection, capable of capturing the continuous, ordered nature of spectral structure and enabling reliable spectral-spatial fusion across pyramid levels under arbitrary in-plane rotations. FressDet integrates three complementary components. Spectral Implicit Warp (SpeIW) enables query-based spectral resampling via a coordinate-conditioned implicit field, yielding a monotone, order-preserving warp. Rotation-Equivariant Consistency Weighting (ReCoW) adaptively fuses spectral and spatial branches based on branch reliability, reinforcing informative cues while suppressing noise across pyramid levels. The oriented-aware head exploits group-indexed features to stably predict oriented objects without parameter replication. Taken together, FressDet learns more discriminative and robust spectral-spatial representations even under rotational perturbations. By achieving state-of-the-art performance with 93% fewer parameters on three public benchmarks, FressDet demonstrates its effectiveness and generalizability.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/07/2606.29664v1-benchmarking-geospatial-foundation-models-for-agriculture-applications",
+      "section": "quick",
+      "title_en": "Benchmarking Geospatial Foundation Models for Agriculture Applications",
+      "authors": "Zhuocheng Shang, Sanmay Das, Ahmed Eldawy",
+      "date": "2026-06-29",
+      "pdf": "https://arxiv.org/pdf/2606.29664v1",
+      "score": "6.0",
+      "evidence": "评估包括SpectralGPT在内的地理空间基础模型在作物分割上的表现",
+      "tldr": "地理空间基础模型在农业应用中的区域迁移性尚未系统测试。本文在四个美国州对Prithvi、SpectralGPT和SatMAE进行多时相作物分割与变化检测的跨区域基准。结果显示所有模型在区域分布偏移下性能锐减，仅预测常见作物，且输入格式调整对不同模型影响各异。这揭示了当前模型的关键局限，强调区域感知评估的必要性。",
+      "tags": "query:hsi",
+      "abstract_en": "Geospatial foundation models pretrained on satellite imagery promise broad generalization across remote sensing tasks and regions, but their geographic transferability has not been systematically tested, especially in agriculture applications. This paper presents a controlled benchmark that evaluates three models, Prithvi, SpectralGPT, and SatMAE, on multi-temporal crop segmentation and change detection across four U.S. states, Iowa, North Carolina, California, and Minnesota. By assigning each train, validation, and test split to a separate region, we measure how well each model transfers to land it has not seen. All three degrade sharply under regional distribution shift, predicting only the most common crops while missing rare ones. We further find that fitting these models to a shared input format affects each one differently, which complicates direct architectural comparison. These results expose key limitations of current geospatial foundation models for agriculture and point to region aware evaluation as a necessary standard.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
