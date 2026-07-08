@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-08",
+  "date": "2026-07-08",
+  "generated_at": "2026-07-08T21:52:09",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/08/2607.05988v1-spectrack-spectral-prompt-guided-adaptive-experts-for-multispectral-object-tracking",
+      "section": "deep",
+      "title_en": "SpecTrack: Spectral Prompt Guided Adaptive Experts for Multispectral Object Tracking",
+      "authors": "Xingyu Tan, Yunrong Qin, Mengjie Hu",
+      "date": "2026-07-07",
+      "pdf": "https://arxiv.org/pdf/2607.05988v1",
+      "score": "9.0",
+      "evidence": "多光谱与高光谱目标跟踪，采用光谱-空间复杂度感知方法",
+      "tldr": "多光谱目标跟踪中，现有方法对所有搜索区域采用固定容量处理，忽略了帧间难度差异。本文提出SpecTrack，通过频谱自适应混合专家模块实现容量自适应分配，由频谱提示路由器根据语义、边界及通道变化线索选择专家子集。在MUST、MSITrack、HOTC20上达到先进精度，平衡版本在MUST上以43.7 FPS取得62.4% AUC。该方法还展示了RGB域泛化能力，体现了良好的精度与效率权衡。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Multispectral image(MSI) and hyperspectral image(HSI) object tracking object tracking exploits recorded band-wise observations to improve target--background discrimination under similar RGB appearance, mixed pixels, illumination variation, occlusion, and clutter. However, existing trackers commonly process all search regions through a fixed capacity spectral--spatial path, ignoring that tracking difficulty varies substantially across frames and target states. Clear regions may require only lightweight local discrimination, whereas ambiguous boundaries and spectrally similar distractors often demand stronger contextual reasoning. To address this limitation, we propose SpecTrack, a spectral--spatial complexity-aware tracker that formulates MSI tracking as search-region-level adaptive capacity allocation. Its core component, the Spectral Adaptive Mixture-of-Experts (SAMoE) module, provides a capacity-ordered expert pool with progressively increasing latent rank, receptive field, and depth. Expert selection is guided by a Spectral Prompt Router, which fuses semantic context, spatial boundary cues, and a latent channel-variation cue computed after multispectral patch embedding to activate a sparse subset of SAMoE experts for each search region. In parallel, a Shared Global Expert supplies common latent spectral--spatial context to reduce fragmented sparse-routing decisions. Experiments on MUST, MSITrack, and HOTC20 demonstrate a favorable accuracy--efficiency trade-off. The accuracy-oriented SpecTrack-L384 achieves state-of-the-art or highly competitive AUCs of 65.2\\%, 51.9\\%, and 72.6\\% on the three benchmarks, while the balanced SpecTrack-B224 reaches 62.4\\% AUC at 43.7 FPS on MUST. An additional GOT-10k evaluation indicates RGB-domain architectural generalization, with SpecTrack-L384 achieving 79.3\\% AO.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

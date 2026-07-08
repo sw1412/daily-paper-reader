@@ -6,29 +6,26 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-07
-- 运行时间：2026-07-07 22:05:23 UTC
+- 最新运行日期：2026-07-08
+- 运行时间：2026-07-08 21:52:02 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：0
-- 速读区：2
+- 本次总论文数：1
+- 精读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读2篇论文，聚焦多光谱目标检测与地理空间基础模型农业应用。
-最值得关注的是《Fully Rotation-Equivariant Spectral-Spatial Learning》，提出了旋转等变谱空学习思路，对多光谱检测精度提升显著。
-建议优先精读该7.0分论文，把握旋转等变设计如何适应多光谱目标的空间方向变化。
-- 详情：[/202607/07/README](/202607/07/README)
+今日精读1篇高分论文，聚焦多光谱目标跟踪突破。  
+《SpecTrack》提出频谱提示引导的自适应专家模型，显著提升复杂场景跟踪精度。  
+建议关注频谱特征融合技术，对多模态视觉任务启发很大。
+- 详情：[/202607/08/README](/202607/08/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [SpecTrack: Spectral Prompt Guided Adaptive Experts for Multispectral Object Tracking](/202607/08/2607.05988v1-spectrack-spectral-prompt-guided-adaptive-experts-for-multispectral-object-tracking)  
+   标签：评分：9.0/10、query:hsi-lidar
+   evidence：多光谱与高光谱目标跟踪，采用光谱-空间复杂度感知方法
 
 ### 速读区论文标签
-1. [Fully Rotation-Equivariant Spectral-Spatial Learning for Multispectral Object Detection](/202607/07/2607.05148v1-fully-rotation-equivariant-spectral-spatial-learning-for-multispectral-object-detection)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：多光谱目标检测中的光谱-空间学习
-2. [Benchmarking Geospatial Foundation Models for Agriculture Applications](/202607/07/2606.29664v1-benchmarking-geospatial-foundation-models-for-agriculture-applications)  
-   标签：评分：6.0/10、query:hsi
-   evidence：评估包括SpectralGPT在内的地理空间基础模型在作物分割上的表现
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
