@@ -1,0 +1,1004 @@
+Title: CuBAS: Information Geometric Curvature-Based Adaptive Sampling for Supervised Classification
+
+URL Source: https://arxiv.org/pdf/2607.03145v1
+
+Published Time: Tue, 07 Jul 2026 00:45:16 GMT
+
+Number of Pages: 30
+
+Markdown Content:
+# CUBAS: I NFORMATION GEOMETRIC CURVATURE -B ASED 
+
+# ADAPTIVE SAMPLING FOR SUPERVISED CLASSIFICATION 
+
+Alexandre Luis Magalhães Levada 
+
+Federal University of São Carlos 13565-905, São Carlos-SP, Brazil 
+
+alexandre.levada@ufscar.br 
+
+July 7, 2026 
+
+# ABSTRACT 
+
+The informativeness of a training set is as consequential as its size, yet most sampling strategies remain agnostic to the intrinsic geometry of the data distribution. We address this gap by introducing CuBAS (Curvature-Based Adaptive Sampling), an information-geometric framework for adaptive data selection in supervised classification, grounded in the q-state Potts Markov random field (MRF) model. The central insight is that a labeled dataset can be viewed as a statistical manifold, on which local curvature, estimated via the ratio of second- to first-order observed Fisher information, faithfully encodes the geometric complexity of the underlying data distribution. Concretely, we construct a k-nearest-neighbor graph over the labeled data and derive a closed-form curvature score at each vertex from the Potts sufficient statistics, avoiding costly eigendecompositions or kernel density estimates. This curvature signal naturally partitions the graph into two complementary regimes: low-curvature regions, corresponding to smooth, homogeneous clusters that are efficiently represented by a small number of prototypical samples, and high-curvature regions, concentrated around decision boundaries and topologically complex structures that are disproportionately informative for classification. By selecting nodes from both regimes in a principled, geometry-aware manner, CuBAS constructs compact yet maximally informative training subsets. Extensive empirical evaluation across 30 benchmark datasets, spanning tabular, image, and biological domains, demonstrates consistent and statistically significant improvements in classification accuracy over random sampling and uncertainty-based baselines, across a wide range of labeling budgets and classifier architectures. Our method is computationally efficient (linear in the number of edges of the k-NN graph), theoretically grounded in the differential geometry of statistical manifolds, and directly interpretable in terms of the local shape operator of the data manifold. CuBAS thus offers a principled, scalable, and geometry-aware alternative to heuristic sampling for supervised learning. 
+
+# 1 Introduction 
+
+The remarkable success of modern supervised learning has been driven not only by increasingly sophisticated learning algorithms, but also by the availability of large annotated datasets. Nevertheless, the effectiveness of a classifier depends far more on the quality and representativeness of its training samples than on their sheer quantity. Large datasets often contain substantial redundancy, noisy observations, class imbalance, and numerous samples that contribute little to defining the underlying decision boundaries. This observation naturally motivates a fundamental question: how can we identify the most informative samples in a labeled dataset for classification? 
+
+Addressing this question is becoming increasingly important as datasets continue to grow in size and complexity. Although considerable effort has been devoted to designing more expressive classifiers, comparatively less attention has been paid to principled mechanisms for selecting informative training samples in a way that reflects the intrinsic geometric organization of the data Wilson [1972]. Traditional sampling and instance reduction techniques, including random subsampling, prototype selection, and instance weighting, are typically heuristic and operate primarily in the input space, making limited use of the statistical relationships among neighboring samples Garcia et al. [2012]. As a 
+
+> arXiv:2607.03145v1 [cs.LG] 3 Jul 2026
+
+PREPRINT - J ULY 7, 2026 consequence, they often fail to distinguish truly informative boundary samples from redundant observations located in homogeneous regions. Recent advances in graph-based learning have demonstrated that representing datasets as graphs provides a powerful framework for capturing local and global relationships among samples Zhu et al. [2003], Belkin et al. [2006]. Graph representations naturally encode neighborhood interactions and have become fundamental tools in manifold learning, semi-supervised learning, graph neural networks, and spectral methods. From this perspective, the informative content of a sample is not solely determined by its individual attributes, but also by its structural role within the graph topology. In particular, vertices located near class transitions or heterogeneous neighborhoods frequently carry substantially more discriminative information than vertices embedded in homogeneous regions. Despite these advances, existing graph-based sampling strategies rarely exploit the differential geometry induced by statistical interactions on the graph, relying instead on fixed similarity measures or purely combinatorial criteria. Geometric Machine Learning has recently emerged as a unifying paradigm that exploits the geometric structure of data to design learning algorithms that are more robust, interpretable, and statistically efficient Bronstein et al. [2017]. Rather than treating observations as isolated points in a Euclidean feature space, geometric learning represents data through manifolds, graphs, or other non-Euclidean domains, allowing algorithms to explicitly leverage neighborhood relationships, topology, and curvature Papillon et al. [2025]. This perspective has driven significant advances in manifold learning, graph neural networks, geometric deep learning, and information geometry, demonstrating that incorporating geometric priors often leads to improved generalization and more faithful representations of complex data Weber [2025]. In contrast to most existing geometric learning methods, which primarily focus on learning feature representations or graph embeddings, the proposed approach employs geometry to address a different but equally fundamental problem: identifying the most informative training samples. By modeling labeled k-NN graphs as statistical manifolds induced by a Potts Markov random field and quantifying local geometric complexity through Fisher-information-based curvature, CuBAS transforms adaptive sampling into a geometric inference problem. Consequently, the proposed method extends the scope of geometric machine learning beyond representation learning, showing that differential-geometric quantities can also provide principled criteria for sample selection, redundancy reduction, and classifier training. Information geometry offers a natural mathematical framework to bridge this gap. By viewing a statistical model as a Riemannian manifold endowed with the Fisher information metric, it becomes possible to characterize the local geometry of probability distributions through curvature and other differential-geometric quantities Amari [2016], Nielsen [2020]. Curvature provides a quantitative measure of how rapidly the statistical model changes locally, making it a natural descriptor of sample informativeness. Surprisingly, despite its strong theoretical foundations, information geometry has received relatively little attention as a mechanism for adaptive sampling and data reduction in supervised learning. The problem of selecting informative samples has been extensively investigated under several paradigms, including active learning, curriculum learning, and instance or prototype selection. Active learning seeks to minimize labeling effort by querying informative unlabeled samples according to uncertainty, margin, or expected model change criteria Tong and Koller [2002], Settles [2010]. While highly effective in interactive settings, these methods are inherently classifier-dependent and primarily designed for scenarios in which labels are unavailable. Curriculum learning adopts a complementary perspective by progressively presenting training samples according to a predefined notion of difficulty Bengio et al. [2009]. Although successful in many deep learning applications, curriculum strategies generally rely on heuristic measures of sample complexity and lack a rigorous geometric interpretation. Instance and prototype selection methods attempt to reduce dataset redundancy through distance-based, density-based, or boundary-preserving criteria Wilson [1972], Garcia et al. [2012], Liu and Motoda [2002], Aggarwal [2014], Olvera-López et al. [2010], de Haro-García et al. [2019]. However, these approaches typically operate in the original feature space using fixed metrics and do not explicitly account for the statistical geometry induced by class interactions. Likewise, graph-based approaches incorporate neighborhood information but seldom provide a principled characterization of local statistical complexity or boundary sharpness Zhou et al. [2003], Belkin et al. [2006], Zhang et al. [2022]. This paper introduces a fundamentally different perspective. Rather than measuring sample importance through classifier uncertainty, local density, or heuristic boundary estimates, we define informativeness as an intrinsic geometric property of a statistical manifold induced by a labeled graph. Specifically, we model the graph using a q-state Potts Markov random field, whose local interactions define a probabilistic manifold parameterized by the inverse temperature. Within this framework, first- and second-order Fisher information naturally induce the metric and curvature of the manifold, enabling the construction of a local shape operator that quantifies the geometric complexity surrounding each vertex. Consequently, sample selection becomes a problem of identifying regions of high statistical curvature, where class interactions are strongest and the information content is maximal. Building upon this geometric formulation, we propose the Curvature-Based Adaptive Sampling (CuBAS) algorithm, a graph-based, model-agnostic sampling strategy that decomposes a labeled dataset into complementary subsets according 2PREPRINT - J ULY 7, 2026 to their local information curvature. Samples exhibiting high curvature are predominantly located near decision boundaries and heterogeneous neighborhoods, whereas low-curvature samples correspond to smooth, homogeneous regions of the data manifold. Unlike existing sampling techniques, CuBAS derives its selection criterion directly from the geometry of the underlying statistical model, providing a unified framework that simultaneously captures boundary awareness, redundancy reduction, and noise filtering. The main contributions of this work are summarized as follows: • We introduce a novel graph-based information-geometric framework that models labeled datasets as statistical manifolds induced by a q-state Potts Markov random field, providing a rigorous connection between graph topology and differential geometry. • We derive closed-form expressions for the first- and second-order Fisher information of the Potts model and show how they induce a local shape operator that quantifies the statistical curvature associated with each graph vertex. • We propose CuBAS, a computationally efficient curvature-driven adaptive sampling algorithm that identifies informative samples through local geometric analysis rather than heuristic or classifier-dependent criteria. • We demonstrate experimentally, using a diverse collection of benchmark datasets and multiple classification algorithms, that CuBAS consistently produces graph decompositions with stronger community structure and yields higher classification accuracy than conventional random sampling. The remainder of this paper is organized as follows. Section 2 reviews the q-state Potts Markov random field and the maximum pseudo-likelihood procedure used for parameter estimation. Section 3 develops the proposed information-geometric framework, derives the Fisher information tensors, and introduces the curvature-based adaptive sampling methodology. Section 4 presents an extensive experimental evaluation on benchmark datasets and analyzes both the geometric and classification performance of the proposed approach. Finally, Section 5 concludes the paper and discusses promising directions for future research. 
+
+# 2 Theoretical Background 
+
+This section introduces the theoretical foundations underlying the proposed Curvature-Based Adaptive Sampling 
+
+(CuBAS) framework. Our approach builds upon three complementary mathematical components that establish the connection between graph-based statistical modeling and differential geometry. First, we review the isotropic q-state Potts Markov Random Field (MRF), which provides a probabilistic model for describing the interactions among neighboring labels in a k-nearest neighbor graph. Next, we present the maximum pseudo-likelihood (MPL) estimation procedure used to efficiently estimate the inverse temperature parameter governing the Potts model. Finally, we summarize the differential geometric concepts that form the basis of our information-geometric analysis, including the metric tensor, the curvature tensor, and the shape operator. These concepts provide the mathematical tools required to characterize the local geometry of the statistical manifold induced by the Potts model and ultimately define the curvature-based criterion employed by CuBAS to identify informative samples. The proposed framework emerges from the integration of probabilistic graphical models and information geometry. The Potts MRF captures local statistical dependencies on labeled graphs, maximum pseudo-likelihood provides an efficient parameter estimation procedure, and differential geometry supplies the geometric descriptors that quantify the statistical complexity of each neighborhood. 
+
+2.1 The isotropic Potts Markov random field 
+
+The Potts model is a discrete Markov random field (MRF) in which each random variable assumes one of a finite number of states C = {1, 2, . . . , q }. Originally introduced to study interacting spin systems, the Potts model has since evolved into a general-purpose probabilistic framework for modeling contextual dependence among discrete variables. Its defining characteristic is the explicit encoding of pairwise interactions that favor state agreement between neighboring sites, allowing complex global structures to emerge from simple local rules. As a result, the Potts model naturally captures phenomena such as clustering, spatial coherence, and phase transitions, which are central to many problems involving structured data. Due to this expressive yet interpretable formulation, the model has been widely adopted across mathematics Ge et al. [1996], Adams [2000], Jin and Zhang [2004], statistical physics Montroll [1941], Enting and Guttmann [2003], Mauri et al. [2023], computational biology Ouchi et al. [2003], Merks and Glazier [2005], Belousov et al. [2024], and pattern recognition and computer vision Storath et al. [2015], Galanis et al. [2022], where it serves as a canonical model for interaction-driven dynamics on graphs and lattices. From a probabilistic standpoint, the Hammersley-Clifford theorem Hammersley and Clifford [1971] guarantees that the Potts model admits an equivalent representation either as a global Gibbs distribution or as a collection of local 3PREPRINT - J ULY 7, 2026 conditional distributions defining a Markov random field. In this work, we adopt the local conditional formulation, which is particularly well suited for graph-based learning settings. This choice enables direct evaluation of node-level conditional probabilities given their neighborhoods, while avoiding the intractable partition function associated with the global Gibbs measure. Let ηi denote the neighborhood of node i. The local conditional distribution of the isotropic pairwise q-state Potts model is then given by Levada et al. [2010] 
+
+p (xi = m | ηi, β ) = exp( β U i(m)) 
+
+Pqℓ=1 exp( β U i(ℓ)) , (1) where Ui(m) denotes the number of neighbors of node i whose labels equal m, q is the total number of states, and 
+
+β is the inverse temperature parameter controlling the strength of contextual dependence. The parameter β governs the smoothness of the resulting label configurations: larger values promote strong agreement among neighboring nodes, leading to homogeneous regions and well-defined clusters, whereas β = 0 yields a degenerate case of statistical independence in which all labels are equiprobable and contextual structure vanishes. This explicit control over interaction strength makes the Potts model particularly attractive for studying how local label interactions shape the geometry and structure of labeled graphs, a property that is central to the curvature-based analysis developed in this work. 
+
+2.2 Estimation of the inverse temperature parameter 
+
+Estimating coupling parameters in Markov random field (MRF) models is a well-known challenge due to the presence of the partition function in the joint Gibbs distribution, which makes maximum likelihood (ML) estimation computationally prohibitive for large-scale systems Besag [1977]. This difficulty is particularly acute in graph-based settings, where the number of configurations grows exponentially with the number of nodes. A widely adopted and theoretically sound alternative is the maximum pseudo-likelihood (MPL) method Besag [1977], which approximates the global likelihood by a product of local conditional probabilities defined over node neighborhoods. By replacing the joint distribution with these local factors, the MPL approach eliminates the need to compute the partition function, thereby yielding a tractable optimization problem while retaining essential statistical dependencies. Beyond its computational appeal, the MPL estimator enjoys strong asymptotic properties, including consistency and asymptotic normality under mild regularity conditions Jensen and Künsh [1994]. These guarantees make pseudo-likelihood-based estimation a robust and interpretable choice for parameter inference in structured probabilistic models, including Potts and Ising-type MRFs. For the isotropic Potts model considered in this work, the pseudo-likelihood function is defined as 
+
+P L (β) = 
+
+> n
+
+Y
+
+> i=1
+
+p (xi | ηi, β ) = 
+
+> n
+
+Y
+
+> i=1
+
+ exp( β U i(xi)) 
+
+Pqℓ=1 exp( β U i(ℓ)) 
+
+
+
+, (2) where n denotes the number of nodes in the graph, Ui(xi) is the number of neighbors of node i sharing the same label as xi, q is the number of possible states, and β is the inverse temperature parameter controlling the strength of spatial coupling. In practice, it is more convenient to maximize the log-pseudo-likelihood, which transforms the product of local terms into a summation and improves numerical stability. The log-pseudo-likelihood is given by 
+
+log P L (β) = 
+
+> n
+
+X
+
+> i=1
+
+"
+
+β U i(xi) − log 
+
+> q
+
+X
+
+> ℓ=1
+
+exp( β U i(ℓ)) 
+
+!# 
+
+. (3) The first term measures the contribution of the observed configuration, while the second term accounts for normalization over all possible neighborhood label assignments. Differentiating this expression with respect to β and setting the derivative to zero yields the MPL estimating equation 
+
+> n
+
+X
+
+> i=1
+
+Ui(xi) −
+
+> n
+
+X
+
+> i=1
+
+ P qℓ=1 Ui(ℓ) exp( β U i(ℓ)) 
+
+Pqℓ=1 exp( β U i(ℓ)) 
+
+
+
+= 0 . (4) Looking carefully to the pseudo-likeilhood equation, we see that the first term is the observed energy of the system, whereas the second one represents the expected energy under the model conditioned on the current value of β.Intuitively, the MPL estimate of the inverse temperature parameter is obtained when the empirical and model-predicted neighborhood agreement are in balance. The resulting nonlinear equation does not admit a closed-form solution and must be solved numerically. In this work, we employ the secant method Burden and Faires [2015], a derivative-free root-finding algorithm that offers a favorable 4PREPRINT - J ULY 7, 2026 trade-off between computational simplicity and convergence speed. Let f (β) denote the left-hand side of the MPL estimating equation. Given two initial estimates β0 and β1, the secant method generates a sequence {βk} according to 
+
+βk+1 = βk − f (βk) βk − βk−1
+
+f (βk) − f (βk−1) . (5) At each iteration, the derivative of f is approximated by a finite difference between successive iterates, and the next estimate is obtained from the intersection of the corresponding secant line with the horizontal axis. Under standard smoothness assumptions, the secant method achieves superlinear convergence and typically outperforms bisection-based approaches, while avoiding the explicit computation of derivatives required by Newton-Raphson methods. These properties make it particularly suitable for efficient estimation of the inverse temperature parameter in large-scale Potts models. 
+
+Computational complexity and scalability. From a computational perspective, the MPL-based estimation of the inverse temperature parameter scales linearly with the number of nodes in the graph. For each evaluation of the objective function f (β), the dominant cost arises from computing the neighborhood agreement terms Ui(ℓ) for all nodes i and labels ℓ ∈ { 1, . . . , q }, resulting in a complexity of O(n q ¯d), where n is the number of nodes and ¯d denotes the average node degree. In typical pattern recognition applications, both q and ¯d are small constants, making the overall cost effectively linear in n. Moreover, the secant method converges in a small number of iterations, as only a single scalar parameter is estimated. Consequently, the entire parameter estimation procedure introduces negligible overhead relative to graph construction or classifier training. This favorable scaling behavior allows the proposed framework to be applied to moderately large datasets and dense graph representations without compromising computational efficiency. 
+
+2.3 Differential geometry basics 
+
+Differential geometry provides a rigorous mathematical framework for analyzing the local and global structure of smooth manifolds. In recent years, geometric concepts have become increasingly important in machine learning, where high-dimensional datasets are often modeled as samples lying on low-dimensional manifolds embedded in ambient spaces. Within this perspective, geometric quantities such as distances, metric tensors, and curvature provide principled measures of local complexity, enabling the characterization of regions with distinct statistical and structural properties [Spivak, 1999, O’Neill, 2006, do Carmo, 2016, Tu, 2017, Needham, 2021]. The proposed CuBAS framework adopts this viewpoint by interpreting the parameter space of the isotropic q-state Potts Markov random field as a statistical manifold endowed with a Riemannian structure induced by Fisher information. Rather than studying the geometry of the feature space directly, we analyze the geometry of the probabilistic model governing the labeled k-NN graph. In this setting, curvature becomes an intrinsic descriptor of how rapidly the statistical model changes with respect to its parameters, providing a natural measure of sample informativeness. This section briefly reviews the differential-geometric concepts required throughout the remainder of the paper. In particular, we introduce the first and second fundamental forms, the metric tensor, the curvature tensor, and the shape operator, which constitute the mathematical foundation of the proposed curvature-based adaptive sampling strategy. 
+
+2.3.1 Metric Tensor and First Fundamental Form 
+
+Let M be a smooth manifold parameterized by local coordinates θ = ( θ1, . . . , θ m) through a differentiable mapping 
+
+X(θ) : Rm → Rn. (6) The first fundamental form defines the intrinsic geometry of the manifold by measuring infinitesimal distances between neighboring points. It is represented by the metric tensor 
+
+gij (θ) = 
+
+ ∂X
+
+∂θ i
+
+, ∂X
+
+∂θ j
+
+
+
+, (7) where ⟨· , ·⟩ denotes the Euclidean inner product. The corresponding matrix 
+
+G(θ) = [ gij (θ)] 
+
+encodes all intrinsic geometric information, including distances, angles, and local volumes. 5PREPRINT - J ULY 7, 2026 In information geometry, the role of the metric tensor is naturally played by the Fisher Information Matrix (FIM), which equips the statistical manifold with a Riemannian structure Amari [2016], Nielsen [2020]. Consequently, nearby probability distributions become points on a curved manifold, whose geometry reflects the sensitivity of the underlying probabilistic model to parameter perturbations. 
+
+2.3.2 Second Fundamental Form 
+
+While the metric tensor characterizes intrinsic geometry, it does not describe how the manifold bends within its embedding space. This extrinsic behavior is captured by the second fundamental form. Let N(θ) denote the unit normal vector field of the manifold. The coefficients of the second fundamental form are defined as 
+
+bij (θ) = 
+
+ ∂2X
+
+∂θ i∂θ j
+
+, N
+
+
+
+, (8) forming the symmetric matrix 
+
+B(θ) = [ bij (θ)] .
+
+Whereas the first fundamental form measures infinitesimal distances along the manifold, the second fundamental form quantifies how rapidly the tangent plane changes from one point to another. Therefore, it provides direct information about local bending and curvature. Within the proposed framework, this distinction has an important statistical interpretation. The first-order Fisher information measures the local sensitivity of the likelihood function, whereas the second-order Fisher information describes how this sensitivity itself varies over the parameter space. Their combination ultimately determines the local geometric complexity of the statistical manifold associated with the Potts model. 
+
+2.3.3 Shape Operator 
+
+The shape operator establishes the relationship between the intrinsic and extrinsic geometries of a manifold by combining the first and second fundamental forms into a single linear operator. It is one of the central objects in classical differential geometry because its spectral properties completely characterize local curvature. 
+
+Definition 1 (Shape Operator) . Let M be a regular manifold endowed with the first and second fundamental forms, 
+
+G(θ) and B(θ), respectively. The shape operator is defined as 
+
+S(θ) = −B(θ)G(θ)−1. (9) Geometrically, the shape operator measures how the unit normal vector changes when moving along tangent directions on the manifold. Equivalently, it quantifies the local rate at which the manifold bends in each direction. The eigenvectors of S define the principal curvature directions, while its eigenvalues correspond to the principal curvatures. Consequently, several classical curvature measures are obtained directly from S, including the Gaussian curvature (determinant), the mean curvature (half the trace), and the principal curvatures (eigenvalues) do Carmo [2017]. Figure 1 illustrates the geometric interpretation of the shape operator. As one moves along a tangent direction, the operator measures the directional variation of the unit normal vector, thereby quantifying the local bending of the surface. The proposed CuBAS method exploits this geometric interpretation in the context of statistical learning. Rather than computing curvature on a geometric surface embedded in Euclidean space, we evaluate the shape operator on the statistical manifold induced by the Potts Markov random field. Since the isotropic Potts model is parameterized solely by the inverse temperature parameter β, the statistical manifold is one-dimensional, causing the shape operator to reduce to a scalar quantity. This scalar curvature serves as a direct measure of local statistical complexity, allowing samples to be ranked according to the geometric information encoded in their neighborhood configurations. As demonstrated in the following sections, this curvature measure naturally separates homogeneous regions from decision boundaries, providing the theoretical foundation for the proposed curvature-based adaptive sampling strategy. 6PREPRINT - J ULY 7, 2026 
+
+Figure 1: Geometric interpretation of the shape operator. As one moves along a tangent direction v, the shape operator measures the directional variation of the unit normal vector, providing a quantitative description of the local bending of the manifold. 
+
+# 3 CuBAS: curvature-based adaptive sampling 
+
+The proposed CuBAS framework is grounded in the principles of information geometry, where statistical models are interpreted as smooth manifolds endowed with a Riemannian structure induced by the Fisher information. In this setting, the notion of sample informativeness is no longer purely heuristic or model-dependent, but instead arises from intrinsic geometric properties of the underlying probability distributions. Intuitively, regions of the statistical manifold exhibiting high curvature correspond to parameter configurations where small perturbations induce large changes in the likelihood, signaling increased sensitivity, reduced redundancy, and greater discriminative potential. Conversely, flat regions indicate statistical homogeneity, where samples are largely interchangeable and contribute limited additional information. This geometric viewpoint provides a principled foundation for adaptive sampling, directly linking information content, boundary complexity, and learning efficiency. Formally, the Fisher information quantifies the sensitivity of the likelihood function to infinitesimal perturbations of the model parameters. From a geometric perspective, this sensitivity induces a Riemannian metric on the statistical manifold associated with a parametric family of probability distributions. Within this framework, first-order Fisher information characterizes the local metric structure, determining how distances between neighboring distributions are measured, while second-order Fisher information captures curvature effects, reflecting how this metric varies across the manifold. These curvature effects play a central role in distinguishing statistically homogeneous regions from structurally complex regions, such as class boundaries, which are precisely the regions of interest for adaptive sampling. 
+
+Definition 2 (First-order Fisher information) . Let p(X; θ) be a probability density (or mass) function parameterized by θ ∈ Θ ⊂ R. The first-order Fisher information measures the expected sensitivity of the log-likelihood function to infinitesimal changes in θ and is defined as Lehmann and Casella [2011] 
+
+I(θ) = E
+
+" ∂∂θ log p(X; θ)
+
+2#
+
+. (10) 
+
+Definition 3 (Second-order Fisher information) . Let p(X; θ) be a probability density (or mass) function parameterized by θ ∈ Θ. The second-order Fisher information captures the curvature of the log-likelihood function with respect to the parameter θ and is given by Lehmann and Casella [2011] 
+
+II (θ) = − E
+
+ ∂2
+
+∂θ 2 log p(X; θ)
+
+
+
+. (11) From the standpoint of information geometry, the first-order Fisher information defines the metric tensor of the statistical manifold, endowing the parameter space with a notion of local distance and volume. The second-order Fisher information, in turn, characterizes how this metric varies locally, encoding curvature properties that reflect higher-order statistical interactions (curvature tensor). Together, these quantities enable a differential-geometric analysis of statistical models, in which notions such as geodesics, curvature, and shape operators become well defined. In the context of CuBAS, this geometric structure is exploited to identify regions of high information curvature on labeled graphs, providing the theoretical basis for distinguishing low-information, redundant samples from high-information 7PREPRINT - J ULY 7, 2026 samples concentrated near decision boundaries. The explicit derivation of the Fisher information tensors for the Potts model and their role in curvature-based adaptive sampling are detailed in the subsequent sections. 
+
+3.1 Fisher information in the q-state Potts model 
+
+The Fisher information associated with the q-state Potts model provides a principled and geometrically grounded mechanism for characterizing statistical dependencies in labeled Markov random fields. From the perspective of information geometry, the Potts model induces a parametric statistical manifold whose geometry is governed by the sensitivity of the Gibbs distribution to perturbations in its coupling parameter, β. In this setting, the Fisher information plays a dual role: its first-order term defines a Riemannian metric on the parameter space, while its second-order term captures intrinsic curvature properties of the induced manifold. Together, these quantities encode how local label configurations respond to variations in interaction strength, thereby offering a natural notion of informational saliency within the field. Let p(xi | ηi, β ) denote the local conditional distribution of the isotropic pairwise Potts model, where xi is the label at node i and ηi denotes its neighborhood. The (scalar) Fisher information with respect to β is defined as 
+
+I(β) = E
+
+" ∂∂β log p(xi | ηi, β )
+
+2#
+
+, (12) while the second-order Fisher information is given by 
+
+II (β) = −E
+
+ ∂2
+
+∂β 2 log p(xi | ηi, β )
+
+
+
+. (13) Under standard regularity conditions, both quantities can be interpreted as local descriptors of the curvature of the log-likelihood surface induced by the Potts model. In practice, the expectations above are intractable due to the combinatorial nature of the Potts field. Following the law of large numbers Cao and Spall [2009], we approximate these expectations empirically using observed samples drawn from the labeled graph. Let ˆβ denote the maximum pseudo-likelihood estimate of the coupling parameter. The first-order Fisher information can then be approximated as 
+
+I(β) ≈ Φ( β) = 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+ ∂∂β log p(xi | ηi, ˆβ)
+
+2
+
+, (14) while the second-order Fisher information is estimated by 
+
+II (β) ≈ Ψ( β) = − 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+∂2
+
+∂β 2 log p(xi | ηi, ˆβ). (15) A key advantage of this formulation is that the global Fisher information naturally decomposes into local contributions associated with individual nodes of the labeled k-NN graph. Specifically, we define the node-wise first- and second-order Fisher information as 
+
+Φi(β) = 
+
+ ∂∂β log p(xi | ηi, ˆβ)
+
+2
+
+, (16) 
+
+Ψi(β) = − ∂2
+
+∂β 2 log p(xi | ηi, ˆβ), (17) where each term quantifies the local contribution of node i to the overall information geometry of the field. These local estimators form the basis for defining curvature-driven operators, such as the shape operator employed in the proposed CuBAS framework. Substituting the conditional distribution of the Potts model into the definition of Φi(β) yields 
+
+Φi(β) = 
+
+
+
+Ui(xi) −
+
+Pqℓ=1 Ui(ℓ) exp {βU i(ℓ)}
+
+Pqℓ=1 exp {βU i(ℓ)}
+
+2
+
+, (18) where Ui(ℓ) denotes the local energy associated with assigning label ℓ to node i. The first term corresponds to the observed local energy, while the second term represents its expectation under the model’s conditional distribution. 8PREPRINT - J ULY 7, 2026 This expression can be rewritten in a more compact and interpretable form as 
+
+Φi(β) = 
+
+" P qℓ=1 
+
+ Ui(xi) − Ui(ℓ) exp {βU i(ℓ)}
+
+Pqℓ=1 exp {βU i(ℓ)}
+
+#2
+
+, (19) which makes explicit how Φi(β) measures the sensitivity of the local energy landscape to perturbations in β.Expanding the squared term leads to a symmetric formulation 
+
+Φi(β) = 
+
+Pqℓ=1 
+
+Pqk=1 ¯Ui(ℓ, k ) exp {β(Ui(ℓ) + Ui(k)) }
+
+Pqℓ=1 
+
+Pqk=1 exp {β(Ui(ℓ) + Ui(k)) } , (20) where ¯Ui(ℓ, k ) =  Ui(xi) − Ui(ℓ)  Ui(xi) − Ui(k).
+
+This formulation highlights the role of Φi(β) as a local dispersion measure of energy deviations, capturing the degree of statistical variability and curvature around node i. Such curvature-sensitive quantities are central to the decomposition of the graph into low- and high-information regions, as explored in the subsequent sections. 
+
+3.2 Second-order Fisher information and curvature characterization 
+
+We now derive the local second-order Fisher information associated with the q-state Potts model, which captures curvature properties of the induced statistical manifold. Starting from the conditional log-likelihood and taking the second derivative with respect to the coupling parameter β, the local second-order Fisher information at node i is given by 
+
+Ψi(β) = − ∂2
+
+∂β 2 log p(xi | ηi, β ). (21) Evaluating this derivative yields 
+
+Ψi(β) = 
+
+P qℓ=1 Ui(ℓ)2 exp {βU i(ℓ)} [Pqℓ=1 exp {βU i(ℓ)}][Pqℓ=1 exp {βU i(ℓ)}]2
+
+− [Pqℓ=1 Ui(ℓ) exp {βU i(ℓ)}]2
+
+[Pqℓ=1 exp {βU i(ℓ)}]2 . (22) This expression admits a direct probabilistic interpretation: it corresponds to the conditional variance of the local energy function Ui(·) under the Gibbs distribution parameterized by β. As such, Ψi(β) quantifies the local stability of the energy landscape and provides a curvature-sensitive measure complementary to the first-order Fisher information. By straightforward algebraic manipulation, the above expression can be rewritten in a pairwise summation form, 
+
+Ψi(β) = 
+
+Pqℓ=1 
+
+Pqk=1 Ui(ℓ)2 exp {β(Ui(ℓ) + Ui(k)) }
+
+[Pqℓ=1 exp {βU i(ℓ)}]2
+
+−
+
+Pqℓ=1 
+
+Pqk=1 Ui(ℓ)Ui(k) exp {β(Ui(ℓ) + Ui(k)) }
+
+[Pqℓ=1 exp {βU i(ℓ)}]2 . (23) Grouping common exponential terms leads to the compact and symmetric representation 
+
+Ψi(β) = 
+
+Pqℓ=1 
+
+Pqk=1 ˆUi(ℓ, k ) exp {β(Ui(ℓ) + Ui(k)) }
+
+Pqℓ=1 
+
+Pqk=1 exp {β(Ui(ℓ) + Ui(k)) } , (24) where ˆUi(ℓ, k ) = Ui(ℓ)2 − Ui(ℓ)Ui(k). (25) This formulation makes explicit that Ψi(β) captures second-order interactions between alternative label assignments in the local neighborhood of node i, thereby encoding curvature information of the statistical manifold induced by the Potts model. Together, the quantities Φi(β) and Ψi(β) describe complementary aspects of the local information geometry: while 
+
+Φi(β) reflects the sensitivity of the log-likelihood to infinitesimal perturbations in β (metric structure), Ψi(β) char-acterizes the local curvature and stability of the induced energy landscape. This dual description is central to the curvature-based decomposition and adaptive sampling strategy proposed in this work. 9PREPRINT - J ULY 7, 2026 
+
+Tensorial formulation and computational aspects. To enable efficient computation and facilitate matrix-based implementations, we express both Fisher information terms using tensorial operations. Define the vectors ⃗v i =
+
+
+
+Ui(xi) − Ui(1) 
+
+Ui(xi) − Ui(2) 
+
+...
+
+Ui(xi) − Ui(q)
+
+ ,⃗ w i =
+
+
+
+exp {βU i(1) }
+
+exp {βU i(2) }
+
+...
+
+exp {βU i(q)}
+
+ . (26) We further introduce the q × q matrices 
+
+Ai =
+
+
+
+Ui(1) · · · Ui(1) 
+
+Ui(2) · · · Ui(2) 
+
+... . . . ...
+
+Ui(q) · · · Ui(q)
+
+ , Bi =
+
+
+
+0 · · · Ui(1) − Ui(q)
+
+... . . . ...
+
+Ui(q) − Ui(1) · · · 0
+
+ , (27) and let Λi = Ai ⊙ Bi, where ⊙ denotes the Hadamard (elementwise) product. Using the Kronecker product ⊗, the local first- and second-order Fisher information terms can be compactly expressed as 
+
+Φi(β) = 
+
+(⃗v i ⊙⃗w i) ⊗ (⃗v i ⊙⃗w i)T
+
+> +
+
+∥⃗w i ⊗⃗w i∥+
+
+, (28) 
+
+Ψi(β) = ∥Λi ⊙ (⃗w i ⊗⃗w i)∥+
+
+∥⃗w i ⊗⃗w i∥+
+
+, (29) where ∥·∥ + denotes the sum of all elements of its argument. This tensorial representation not only reduces computational complexity through vectorized operations but also provides a natural algebraic structure for subsequent curvature-based analysis and sampling decisions. 
+
+Shape operator To assess the local geometric structure induced by the Potts model at each labeled sample, we construct the local shape operator , a fundamental object in differential geometry that encodes both intrinsic and extrinsic curvature properties of a manifold. The shape operator provides direct access to classical curvature measures: its determinant, trace, and eigenvalues correspond to the Gaussian curvature, mean curvature, and principal curvatures, respectively do Carmo [2017]. In the present setting, this operator establishes a rigorous link between local statistical interactions in the Markov random field and the global geometric behavior of the associated statistical manifold. 
+
+Definition 4 (Shape Operator) . Let M be a regular surface endowed with the first fundamental form I and the second fundamental form II . The shape operator P is the linear map that relates variations of the unit normal vector field to the local surface geometry, and is defined as do Carmo [2017] 
+
+P = − II (θ) I(θ)−1. (30) At an intuitive level, it quantifies how the manifold’s orientation varies when one moves along tangent directions, namely how the unit normal vector bends locally. This viewpoint is especially attractive in computational and machine learning contexts, since the shape operator encodes second-order geometric information as a linear map acting on the tangent space. In the context of the q-state Potts model considered in this work, the associated statistical manifold is one-dimensional , being parameterized solely by the inverse temperature β. As a consequence, the shape operator reduces to a scalar quantity, which directly measures the local curvature of the statistical manifold at a given value of β. This scalar curvature captures how rapidly the local geometry of the likelihood surface bends in response to perturbations of the coupling parameter, thereby providing an intrinsic and interpretable measure of local information concentration. Motivated by this observation, we define the local scalar shape operator at node i as 
+
+Si(β) = − Ψi(β)Φi(β) + λ = − ∥Λi ⊙ (⃗w i ⊗⃗w i)∥+
+
+(⃗v i ⊙⃗w i) ⊗ (⃗v i ⊙⃗w i)T
+
+> +
+
++ λ, (31) where λ = 10 −4 is a small regularization constant introduced to ensure numerical stability and to prevent division by zero in degenerate configurations. The resulting quantity Si(β) quantifies the local curvature contribution of node i within the labeled graph. High absolute values of Si(β) correspond to regions of pronounced curvature, indicating neighborhoods where the local statistical 10 PREPRINT - J ULY 7, 2026 structure changes rapidly and where the information content is highly concentrated. Conversely, near-zero curvature values are associated with flatter regions of the statistical manifold, reflecting redundancy or limited discriminative power. This curvature-driven characterization forms the cornerstone of the proposed dataset filtering and decomposition strategy. 
+
+Curvature-Based Adaptive Sampling (CuBAS) Building upon the above geometric formulation, we introduce the 
+
+Curvature-Based Adaptive Sampling (CuBAS) strategy, a principled mechanism for selecting informative samples from labeled datasets through the lens of information geometry. By interpreting the data distribution as a statistical surface induced by the Potts model, CuBAS exploits curvature information derived from the local shape operator to identify regions of high and low information density. In essence, the method adaptively decomposes the dataset into complementary subsets that reflect distinct geometric regimes of the underlying information field. The complete procedure consists of six main steps, summarized in Algorithm 1. 
+
+Algorithm 1 CuBAS: Curvature-Based Adaptive Data Decomposition 
+
+Require: Labeled dataset D = {(xi, y i)}ni=1 ; distance function d(·, ·); number of neighbors k; information threshold 
+
+T ∈ [0 , 1] percentage of samples in training set p
+
+Ensure: Low-information node set L and high-information node set H 
+
+> 1:
+
+Graph construction: Construct a k-nearest neighbors (k-NN) graph G = ( V, E) from D using distance d(·, ·). 
+
+> 2:
+
+Parameter estimation: Estimate the inverse temperature parameter β of the Potts model on G via maximum pseudo-likelihood (MPL).  
+
+> 3:
+
+Local curvature estimation:  
+
+> 4:
+
+for each node i ∈ V do  
+
+> 5:
+
+Compute the local first-order Fisher information Φi(β). 
+
+> 6:
+
+Compute the local second-order Fisher information Ψi(β). 
+
+> 7:
+
+Compute the local scalar shape operator: 
+
+Si(β) ← − Ψi(β)Φi(β) + λ . 
+
+> 8:
+
+end for  
+
+> 9:
+
+Curvature normalization: Normalize {Si(β)}ni=1 to the interval [0 , 1] . 
+
+> 10:
+
+Information-based partitioning: Define the low and high information samples  
+
+> 11:
+
+Partition the graph into 
+
+L = {i : Si(β) < T }, H = {i : Si(β) ≥ T }. 
+
+> 12:
+
+Sampling strategy: Choose samples from L and H 
+
+> 13:
+
+Compute the number of samples required from L and H:
+
+NL = ⌊p|L|⌋ NH = ⌊p|H|⌋  
+
+> 14:
+
+Randomly sample NL nodes from L without replacement to create XL. 
+
+> 15:
+
+Randomly sample NH nodes from H without replacement to create XH . 
+
+> 16:
+
+Dtrain ← [XL, XH ] ▷ Training set with pn samples  
+
+> 17:
+
+Dtest ← [L \ X L, H \ X H ] ▷ Testing set with (1 − p) n samples  
+
+> 18:
+
+return (Dtrain , Dtest )The resulting decomposition induces a geometrically grounded criterion for adaptive sampling. In particular, the subset H isolates regions of high structural and informational relevance, such as class boundaries and heterogeneous neighborhoods, whereas L corresponds to smooth and largely redundant regions of the data manifold. By explicitly sep-arating these two regimes, the proposed curvature-driven strategy achieves a favorable trade-off between representation compactness and information diversity, thereby improving the efficiency and robustness of subsequent learning stages. The core principle underlying the proposed Curvature-Based Adaptive Sampling (CuBAS) framework is the selective 
+
+filtering of labeled samples according to the information content encoded in their local neighborhood configurations. This mechanism admits a natural analogy with classical low-pass and high-pass filtering in signal and image processing. In regions exhibiting smooth label transitions, commonly observed in supervised classification settings with moderate to large inverse temperature values β, the L-nodes act as a low-pass component, yielding a smoothed approximation of the original k-NN graph that preserves dominant cluster structures and intra-class coherence. In contrast, the H-nodes function as a high-pass component, selectively highlighting high-curvature regions associated with abrupt changes 11 PREPRINT - J ULY 7, 2026 
+
+Figure 2: Visualization of high-curvature nodes ( H-nodes) identified by CuBAS in the digits , mfeat_karhunen , semeion 
+
+and wine datasets. High-curvature samples are highlighted in black and concentrate around class boundaries, where inter-class interactions are most prominent. in the local label configuration. These regions typically correspond to class interfaces and decision boundaries, and therefore capture the most discriminative interactions in the data. By explicitly focusing on these high-curvature nodes, CuBAS identifies samples that are critical for defining inter-class relationships, while suppressing redundant samples that contribute little to the decision structure. This geometric filtering perspective not only provides an intuitive interpretation of the proposed method, but also explains its empirical effectiveness in enhancing classification performance under constrained sampling budgets. Figure 2 illustrates the proposed decomposition on two representative datasets. The labeled k-NN graphs are shown with high-curvature nodes ( H-nodes) highlighted in black. As can be observed, these nodes are predominantly concentrated in the vicinity of decision boundaries, confirming that the proposed curvature measure successfully identifies samples responsible for inter-class connectivity in the graph. 
+
+3.3 Adaptive Information Threshold Estimation 
+
+A critical design choice in our framework is the threshold T that partitions the normalized curvature scores K =
+
+{Ki}ni=1 , Ki ∈ [0 , 1] , into low-curvature and high-curvature populations. A fixed quantile threshold, while simple, fails to account for the heterogeneous shape of the curvature distribution across datasets: some labeled graphs exhibit a clearly bimodal curvature profile, with a dense low-curvature mode corresponding to homogeneous clusters and a separated high-curvature mode concentrated near decision boundaries, while others exhibit a unimodal, right-skewed profile in which only a small outlier tail is genuinely informative. We therefore propose an adaptive threshold estimator that selects between two complementary criteria based on a quantitative bimodality diagnostic, rather than committing a priori to either regime. 12 PREPRINT - J ULY 7, 2026 
+
+3.3.1 Otsu’s Criterion for Bimodal Curvature Distributions 
+
+When the curvature distribution is bimodal, the threshold separating the two populations can be estimated by maximizing the between-class variance of the induced partition, following the classical criterion of Otsu [1979]. Given a histogram of K with B bins and bin centers {κb}Bb=1 , a candidate threshold T induces a low-curvature class L(T ) = {i : Ki < T }
+
+and a high-curvature class H(T ) = {i : Ki ≥ T } with population fractions wL(T ) and wH (T ) = 1 − wL(T ), and class means μL(T ) and μH (T ). The optimal threshold maximizes the inter-class variance 
+
+T ∗ 
+
+> Otsu
+
+= arg max  
+
+> T∈[0 ,1]
+
+σ2 
+
+> B
+
+(T ), σ2 
+
+> B
+
+(T ) = wL(T ) wH (T ) [ μL(T ) − μH (T )] 2 . (32) We compute σ2 
+
+> B
+
+(T ) efficiently over all candidate bin boundaries using cumulative sums of the histogram counts and weighted counts, yielding an exact O(B) evaluation rather than the naive O(B2) search over class pairs. If the curvature histogram is degenerate (i.e., max T σ2 
+
+> B
+
+(T ) ≈ 0, indicating no discriminative bin boundary exists), the Otsu criterion is flagged as unreliable and the fallback procedure described in Section 3.3.3 is invoked. 
+
+3.3.2 Bimodality Validation via Ashman’s D Coefficient 
+
+Because Otsu’s criterion always returns some threshold regardless of whether the underlying distribution is genuinely bimodal, we validate its applicability using Ashman’s D statistic [Ashman et al., 1994], a standard measure of separation between two Gaussian components. We fit a two-component Gaussian mixture model (GMM) to K,
+
+p(Ki) = π1 N (Ki | μ1, σ 21 ) + π2 N (Ki | μ2, σ 22 ), (33) via expectation-maximization with multiple random restarts, and compute 
+
+D =
+
+√2 |μ1 − μ2|
+
+pσ21 + σ22
+
+. (34) The coefficient D quantifies the separation between the two estimated modes relative to their dispersion: D ≥ 2
+
+is the classical threshold in the mixture-modeling literature for well-separated, unimodally-resolvable components, below which the two-component fit cannot be reliably distinguished from a single mode [Ashman et al., 1994]. In our implementation we adopt a slightly more conservative threshold, Dmin = 2 .6, to reduce the risk of spuriously invoking the bimodal regime on curvature distributions with heavy but unimodal tails. Additionally, since a two-component GMM can in principle converge to two modes that are both concentrated near zero curvature (i.e., μ2 < 0.1, indicating the “high-curvature” component is itself an artifact of noise in a predominantly homogeneous graph), we treat this configuration as a degenerate case and revert to the fallback criterion even when D ≥ Dmin .We note that Ashman’s D statistic, as originally formulated, implicitly assumes comparable dispersion between the two mixture components. When the two curvature modes are markedly heteroscedastic ( σ1̸ = σ2), the asymptotic χ2
+
+behavior underlying related likelihood-ratio bimodality tests breaks down for small or moderate sample sizes, and a parametric bootstrap is recommended instead [Lo, 2008]. In our setting, the curvature populations induced by L and H
+
+are not assumed homoscedastic; we therefore treat D ≥ Dmin as a practical screening criterion rather than a formal hypothesis test, consistent with its standard usage in the mixture-modeling literature [Ashman et al., 1994, Lo, 2008]. 
+
+3.3.3 Tukey-Fence Fallback for Unimodal Distributions 
+
+When the bimodality test fails ( D < D min ) or the Otsu criterion itself is degenerate, the curvature distribution is treated as effectively unimodal, and only the upper outlier tail is considered genuinely high-information. We adopt a quantile-based threshold informed by the interquartile range (IQR), 
+
+TIQR =
+
+(Q3(K), if IQR( K) > 0,Q0.95 (K), if IQR( K) = 0 , (35) where Q3(K) is the third quartile and IQR( K) = Q3(K) − Q1(K). The degenerate case IQR( K) = 0 arises when the curvature distribution is heavily concentrated (e.g., more than 75% of nodes share an identical curvature value, typically Ki = 0 after normalization), in which case the 75 th -percentile threshold collapses and the 95 th -percentile is used instead to preserve a non-trivial high-curvature subset. 13 PREPRINT - J ULY 7, 2026 
+
+Algorithm 2 Adaptive Threshold Estimation 
+
+Require: Normalized curvature scores K ∈ [0 , 1] n, number of histogram bins B, bimodality threshold Dmin 
+
+Ensure: Threshold T ∗, selection method tag ∈ { OTSU , IQR , DEGENERATE } 
+
+> 1:
+
+if max( K) − min( K) < ϵ then  
+
+> 2:
+
+return Q0.95 (K), D EGENERATE  
+
+> 3:
+
+end if  
+
+> 4:
+
+Compute TOtsu via Eq. equation 32 using cumulative-sum histogram evaluation  
+
+> 5:
+
+Fit two-component GMM to K; compute D, μ1, μ2 via Eqs. equation 33–equation 34  
+
+> 6:
+
+if TOtsu is defined and D ≥ Dmin then  
+
+> 7:
+
+if min( μ1, μ 2)’s high-curvature component μ2 < 0.1 then  
+
+> 8:
+
+T ∗ ← TIQR via Eq. equation 35 ▷ spurious bimodal fit; revert to fallback  
+
+> 9:
+
+return T ∗, D EGENERATE  
+
+> 10:
+
+else  
+
+> 11:
+
+return TOtsu , O TSU  
+
+> 12:
+
+end if  
+
+> 13:
+
+else  
+
+> 14:
+
+T ∗ ← TIQR via Eq. equation 35  
+
+> 15:
+
+return T ∗, IQR  
+
+> 16:
+
+end if 3.3.4 Decision Cascade 
+
+The complete adaptive threshold estimator is summarized as a decision cascade in Algorithm 2. The procedure first attempts the bimodal (Otsu) criterion and accepts it only if both (i) the inter-class variance is non-degenerate and (ii) Ashman’s D statistic confirms genuine separation between the two curvature modes with the high-curvature mode being non-trivial ( μ2 ≥ 0.1). Otherwise, the method falls back to the Tukey-fence quantile rule of Eq. equation 35. This cascade allows T to adapt not only to the dataset at hand, but implicitly to the local geometry and class overlap structure encoded in the Potts-derived curvature field, without requiring any dataset-specific tuning. Once T ∗ is determined, the high- and low-information partitions used throughout Section 3 are obtained directly as 
+
+H = {i : Ki ≥ T ∗}, L = {i : Ki < T ∗}, (36) replacing the fixed-quantile rule used in our preliminary experiments with a threshold that responds to the empirical shape of the curvature field on a per-dataset basis. 
+
+3.4 Computational Complexity 
+
+We analyze the computational complexity of CuBAS by decomposing the algorithm into its constituent stages: k-NN graph construction, label-count matrix computation, maximum pseudo-likelihood (MPL) estimation of β, Fisher information computation, adaptive threshold estimation, and graph partitioning. 
+
+k-NN graph construction. Given a dataset of n samples in Rm, constructing the k-nearest-neighbor graph requires computing pairwise distances and retrieving the k closest neighbors for each point. Using a k-d tree or ball tree index, this step runs in O(nm log n) for low-to-moderate dimensions and degrades to O(n2m) in the high-dimensional regime where tree-based acceleration is ineffective. The resulting graph has nk edges and is stored as a sparse n × n matrix in compressed sparse row (CSR) format, requiring O(nk ) memory. 
+
+Label-count matrix. The label-count matrix U ∈ Zn×c, where Uij counts the number of neighbors of node i carrying label j, is computed in a single pass over the nk edges of the graph. This step is O(nk ) in time and O(nc ) in memory, and constitutes a one-time precomputation shared by all subsequent stages. 
+
+Maximum pseudo-likelihood estimation. The MPL estimator βMPL is obtained as the root of the scalar equation 
+
+∂ℓ PL /∂β = 0 , solved via the secant method. Each evaluation of the pseudo-likelihood gradient requires computing, for each of the n nodes, a softmax-like normalization over c classes, yielding a per-iteration cost of O(nc ). The secant method converges superlinearly and requires a small number of iterations in practice (typically fewer than 20), so the total cost of MPL estimation is O(Tβ nc ), where Tβ denotes the number of root-finder iterations. 14 PREPRINT - J ULY 7, 2026 Table 1: Per-stage time complexity of CuBAS. n: number of samples; m: number of features; k: number of nearest neighbors; c: number of classes; Tβ : root-finder iterations (typically < 20 ); B: histogram bins for Otsu (default 256 ). 
+
+Stage Time complexity Dominant regime 
+
+k-NN graph construction O(nm log n) Low/moderate mO(n2m) High m (HDLSS) Label-count matrix U O(nk ) Always MPL estimation ( β) O(Tβ nc ) Always Fisher information O(nc ) Always Curvature scores O(n) Always Adaptive threshold O(n + B) Always Graph partitioning O(n) Always 
+
+Total O(nm log n + Tβ nc ) Low/moderate m
+
+Fisher information. Given βMPL and the precomputed matrix U, the first- and second-order local Fisher information scores Φi and Ψi are computed for all n nodes simultaneously via vectorized NumPy operations over the (n × c) arrays 
+
+U, W = exp( βU), and their elementwise products. Each of the required reductions (row-wise sums, squared sums, and weighted sums) is O(nc ), so the total cost of this stage is O(nc ). The curvature scores Ki = −Ψi/(Φ i + ε) are then obtained in O(n).
+
+Adaptive threshold estimation. The Otsu criterion is evaluated over a histogram of K with B bins using cumulative sums, at a cost of O(n + B). Fitting the two-component GMM for the Ashman D diagnostic requires O(TEM nc GMM ),where TEM is the number of EM iterations and cGMM = 2 is fixed. Both costs are negligible relative to the preceding stages for typical values of n and B.
+
+Graph partitioning and subset selection. Thresholding the curvature scores to obtain H and L is O(n). Sampling 
+
+⌊ρ|H|⌋ nodes from H and ⌊ρ|L|⌋ nodes from L at a given training fraction ρ ∈ (0 , 1) is O(n) via reservoir sampling. 
+
+Overall complexity. Summing over all stages, the dominant costs are k-NN graph construction and Fisher information computation. The total time complexity of CuBAS is 
+
+O(nm log n + nk + Tβ nc ) , (37) which reduces to O(nm log n) when k, c, and Tβ are treated as constants relative to n and m, the typical regime in supervised classification benchmarks. Crucially, once the k-NN graph is constructed and βMPL is estimated, the Fisher information, curvature scores, and graph partition are computed in O(nc ), i.e., linear in the number of samples and classes . This means that the curvature decomposition itself, the distinguishing computational contribution of CuBAS relative to graph construction, which is shared with any k-NN-based method, adds only a linear overhead to the pipeline. Table 1 summarizes the per-stage complexity. 
+
+Comparison with baseline methods. Random sampling incurs no preprocessing cost beyond O(n) for index generation. Entropy-based uncertainty sampling requires fitting an auxiliary classifier on the seed set and evaluating its posterior over the unlabeled pool; for a k-NN classifier this costs O(nsmk s + npks), where ns and np are the seed and pool sizes and ks the number of neighbors of the auxiliary classifier. The one-time, model-free preprocessing profile makes CuBAS particularly attractive in settings where repeated querying or auxiliary model training would be prohibitively expensive. 
+
+# 4 Computational Experiments and Results 
+
+This section presents a comprehensive empirical evaluation of CuBAS, designed to address three research questions. We begin by describing the experimental protocol, then compare CuBAS against random sampling and a representative classical uncertainty-based baseline (entropy-based sampling) across multiple real datasets. Finally, discuss the conditions under which curvature-aware sampling yields the largest gains over geometry-agnostic alternatives. Taken together, these experiments provide consistent evidence that exploiting the local geometry of the labeled data manifold, as captured by the observed Fisher information under the Potts model, leads to more informative and more compact 15 PREPRINT - J ULY 7, 2026 training subsets than purely uncertainty-driven or random selection strategies. In this work, we seek to answer three fundamental questions: 1. Does curvature-aware sampling via CuBAS select training subsets that are more informative than those obtained by classical uncertainty-based and geometry-agnostic sampling strategies? 2. How does the benefit of curvature-aware sampling scale with training set size, number of features and classes? 3. Does the adaptive threshold estimation strategy for T handle the robustness and performance of CuBAS across datasets with heterogeneous curvature distributions? Experiments were conducted on a diverse collection of more than 60 publicly available datasets obtained from OpenML [Vanschoren et al., 2013, Bischl et al., 2021]. The benchmark spans a broad range of sample sizes, numbers of attributes, and numbers of classes, encompassing both balanced and imbalanced classification problems as well as datasets with varying degrees of class overlap and cluster structure. This diversity enables the evaluation of CuBAS across the wide range of conditions encountered in modern supervised classification tasks. All datasets, preprocessing scripts, and experimental results are publicly available to support reproducibility. Tables 2, 3 and 4 show the datasets divided in three categories: small ( n < 1100 ), large ( n > 2000 ) and high-dimensional ( m > 1000 ). The benchmark suite was deliberately assembled to encompass a broad range of classification scenarios, including problems with different sample sizes, feature dimensionalities, numbers of classes, and application domains. Such diversity is essential for assessing whether the proposed curvature-based sampling strategy generalizes across distinct data distributions rather than being tailored to a particular family of datasets. Tables 2–4 summarize the datasets employed in the experimental evaluation. For convenience, they are grouped into three categories according to their scale and dimensionality. Table 2 contains 20 small and medium-sized datasets, comprising up to approximately one thousand samples. These datasets cover classical benchmark problems frequently used in the machine learning literature, including medical diagnosis, bioinformatics, pattern recognition, industrial monitoring, and game-related classification. Although relatively modest in size, they exhibit substantial variability in their intrinsic complexity, with the number of attributes ranging from only 4 to 856 and the number of classes varying from binary to multiclass problems with up to 13 categories. The second group, reported in Table 3, consists of 32 large-scale datasets containing between approximately 1.2 ×
+
+10 3 and 1.5 × 10 4 instances. These datasets include several well-established image recognition, remote sensing, handwriting recognition, speech processing, human activity recognition, hyperspectral imaging, and tabular classification benchmarks. Their feature dimensionality ranges from as few as 5 variables ( phoneme ) to 784 features ( MNIST , Fashion-MNIST , and Kuzushiji-MNIST ), while the number of classes varies from binary classification to problems involving 26 
+
+distinct categories ( isolet ). This collection enables the evaluation of CuBAS under realistic large-scale settings where both computational efficiency and sample selection become particularly important. Finally, Table 4 presents 16 high-dimensional datasets, many of which correspond to gene-expression analysis, face recognition, mass spectrometry, and text categorization. These datasets represent particularly challenging learning scenarios due to the well-known “large-p, small-n” regime, where the number of features substantially exceeds the number of available observations. The dimensionality reaches more than 22 000 attributes ( GLI ), while several datasets contain fewer than one hundred samples. Such settings are especially relevant for evaluating CuBAS because redundant or uninformative observations may significantly affect classifier generalization, making the identification of informative samples considerably more valuable than in conventional low-dimensional problems. Overall, the benchmark suite spans sample sizes from only 60 observations ( CNS ) to nearly 15 000 instances ( eeg-eye-state ), feature dimensionalities ranging from 4 to 22 283 , and classification tasks involving between 2 and 40 classes. This considerable heterogeneity provides a rigorous experimental protocol for assessing both the robustness and the generalization capability of the proposed curvature-driven sampling strategy across problems exhibiting markedly different statistical and geometric characteristics. As a strong baseline for comparison, we also considered entropy-based uncertainty sampling , one of the most widely adopted strategies in active learning Roy and McCallum [2001], Settles [2009], Ren et al. [2021]. Unlike random sampling, uncertainty sampling explicitly seeks the most informative training instances by selecting those for which a reference classifier exhibits the highest predictive uncertainty. Among the various uncertainty measures proposed in the literature, predictive entropy is arguably the most principled and broadly applicable, as it quantifies the dispersion of the posterior class distribution and reaches its maximum when the classifier is maximally uncertain about the correct label Shannon [1948], Settles [2009], Ren et al. [2021]. This criterion has demonstrated competitive performance across a wide range of classification tasks and has become a standard benchmark in active learning research due to its simplicity, effectiveness, and model-agnostic formulation Settles [2009], Ren et al. [2021]. Comparing CuBAS against entropy-based sampling is therefore particularly informative, since both methods aim to prioritize informative samples, but rely on fundamentally different principles. Whereas entropy sampling estimates informativeness from the 16 PREPRINT - J ULY 7, 2026 Table 2: Summary of the small datasets (less than 1100 samples) used in the computational experiments. Reported are the number of samples ( n), number of features ( m), and number of classes ( c). 
+
+# Dataset n m c
+
+1 iris 150 4 32 wine 178 13 33 breast_cancer 569 30 24 Engine1 383 5 35 monks-problem-1 556 6 26 credit-g 1000 20 27 seeds 210 7 38 user-knowledge 403 5 59 tic-tac-toe 958 9 210 parkinsons 195 22 211 diabetes 768 8 212 anneal 898 38 513 vehicle 846 18 414 sonar 208 60 215 blood-transfusion-service-center 748 4 216 tecator 240 124 217 qsar-biodeg 1055 41 218 arrhythmia 452 279 13 19 parkinson-speech-uci 756 753 220 cnae-9 1080 856 9predictions of a trained classifier, making it inherently model-dependent, CuBAS derives informativeness directly from the geometric structure of the labeled data through curvature analysis on the induced graph. This comparison allows us to assess whether a geometry-driven, classifier-independent sampling strategy can match or surpass one of the most established uncertainty-based approaches in the active learning literature. Hence, CuBAS is not competing with weak random sampling alone, but with one of the strongest and most widely accepted information-driven sampling strategy. The experimental protocol was designed to provide a statistically robust evaluation of the proposed sampling strategy under different levels of training data availability. For each dataset, we considered 15 training set proportions ranging from 10% to 80% of the available samples, using increments of 5% . For every training set size, three sampling strategies were evaluated: conventional random sampling, entropy-based uncertainty sampling, and the proposed Curvature-Based Adaptive Sampling (CuBAS) with k = 15 for the k-NN graph. To account for the variability induced by the sampling process, each strategy was independently repeated 100 times, yielding 100 distinct training–testing partitions for every dataset and training set size. A k-nearest neighbor classifier (k = 5 ) was then trained and evaluated on each partition using balanced accuracy as the performance metric. For each sampling strategy, the balanced accuracies obtained over the 100 repetitions were averaged to produce a reliable performance estimate for the corresponding training set size. Finally, to provide a global comparison between sampling strategies, we computed the mean and standard deviation of the balanced accuracy across the 15 training set sizes. Consequently, each reported result summarizes the classifier performance over a total of 1, 500 independent training and evaluation runs per dataset and sampling strategy. The corresponding experimental results are presented in Tables 5–7. The results admit a clear and consistent reading: CuBAS achieves the highest balanced accuracy on every single dataset in the benchmark, with an average of 0.8556 against 0.7416 for entropy sampling and 0.7202 for random sampling, corresponding to absolute improvements of +11 .4 and +13 .5 percentage points, respectively. The median balanced accuracy tells an even stronger story: 0.8944 for CuBAS versus 0.7412 for entropy sampling and 0.7238 for random sampling, confirming that the superiority of the proposed method is not driven by a small number of outlier datasets but reflects a systematic shift in the distribution of performance across the benchmark. The gains are particularly pronounced on datasets where the underlying class structure exhibits well-defined geometric boundaries. On breast_cancer , CuBAS achieves a near-perfect average balanced accuracy of 0.9996 ± 0.0007 ,compared to 0.9752 for entropy sampling and 0.9469 for random sampling, a result consistent with the expectation that the Potts curvature field identifies the narrow, geometrically coherent decision boundary between malignant and benign tissue descriptors with high fidelity. Similarly large gains are observed on parkinson-speech-uci (0.9991 
+
+17 PREPRINT - J ULY 7, 2026 Table 3: Summary of the large datasets (more than 2000 samples) used in the computational experiments. Reported are the number of samples ( n), number of features ( m), and number of classes ( c). 
+
+# Dataset n m c
+
+1 digits 1797 64 10 2 semeion 1593 256 10 3 texture 5500 40 11 4 segment 2310 19 75 mfeat-morphological 2000 6 10 6 mfeat-fourier 2000 76 10 7 mfeat-factors 2000 216 10 8 mfeat-pixel 2000 240 10 9 satimage 6430 36 610 MNIST_784 (20%) 14000 784 10 11 Fashion-MNIST (20%) 14000 784 10 12 Kuzushiji-MNIST (20%) 14000 784 10 13 madelon 2600 500 214 page-blocks 5473 10 515 Indian_pines 9144 220 816 phoneme 5404 5 217 sylvine 5124 20 218 eye_movements 10936 27 319 GesturePhaseSegmentationProcessed 9873 32 520 splice 3190 60 321 hill-valley 1212 100 222 thyroid-dis 2800 26 523 wine-quality-white 4898 11 724 wine-quality-red 1599 11 625 eeg-eye-state 14980 14 226 spambase 4601 57 227 scene 2407 299 228 har 10299 561 629 nursery 12960 8 530 isolet 7797 617 26 31 ipums_la_99-small 8844 60 732 waveform-5000 5000 40 3Table 4: Summary of the high-dimensional datasets (more than 1000 features) used in the computational experiments. Reported are the number of samples ( n), number of features ( m), and number of classes ( c). 
+
+# Dataset n m c
+
+1 micro-mass 360 1300 10 2 UMIST_Faces_Cropped 575 10304 20 3 Olivetti_Faces 400 4096 40 4 AP_Lung_Kidney 386 10935 25 AP_Omentum_Kidney 337 10935 26 AP_Breast_Uterus 468 10935 27 AP_Ovary_Lung 324 10935 28 AP_Ovary_Kidney 458 10935 29 leukemia 72 7129 210 GLI 85 22283 211 MLL 72 12582 312 CNS 60 7129 213 arcene 200 10000 214 tr11.wc 414 6429 915 DLBCL 77 5469 216 OVA_Breast 1545 10935 218 PREPRINT - J ULY 7, 2026 Table 5: Average balanced accuracies achieved by the k-NN classifier under random sampling, entropy-based uncertainty sampling, and the proposed CuBAS method. The evaluation was performed over 15 training set sizes (10%–80%, with 5% increments). For each training size, 100 independent experiments were conducted using different train-test partitions. The reported results represent the average over the 100 repetitions and all training set sizes. 
+
+Datasets Random Entropy CuBAS 
+
+iris 0.9256 ± 0.0414 0.9387 ± 0.0874 0.9858 ± 0.0326 
+
+wine 0.9501 ± 0.0310 0.9752 ± 0.0281 0.9929 ± 0.0199 
+
+breast_cancer 0.9469 ± 0.0110 0.9752 ± 0.0148 0.9996 ± 0.0007 
+
+Engine1 0.7149 ± 0.0850 0.9170 ± 0.0570 0.9868 ± 0.0178 
+
+monks-problem-1 0.7743 ± 0.0826 0.7682 ± 0.0979 0.8713 ± 0.0744 
+
+credit-g 0.5960 ± 0.0160 0.5854 ± 0.0118 0.7940 ± 0.0616 
+
+seeds 0.9139 ± 0.0131 0.9527 ± 0.0376 0.9823 ± 0.0045 
+
+user-knowledge 0.5382 ± 0.0538 0.5337 ± 0.0820 0.6455 ± 0.0932 
+
+tic-tac-toe 0.7097 ± 0.0642 0.6839 ± 0.0831 0.9062 ± 0.0861 
+
+parkinsons 0.7713 ± 0.0784 0.8155 ± 0.1273 0.9575 ± 0.0699 
+
+diabetes 0.6740 ± 0.0117 0.6882 ± 0.0162 0.8599 ± 0.0360 
+
+anneal 0.6676 ± 0.1066 0.6800 ± 0.1021 0.8261 ± 0.0991 
+
+sonar 0.6735 ± 0.0385 0.7066 ± 0.0657 0.7568 ± 0.0488 
+
+vehicle 0.7326 ± 0.0538 0.7118 ± 0.1292 0.8825 ± 0.0730 
+
+blood-transfusion 0.6088 ± 0.0075 0.5777 ± 0.0262 0.6805 ± 0.0144 
+
+tecator 0.7756 ± 0.0592 0.8042 ± 0.0883 0.9762 ± 0.0521 
+
+qsar-biodeg 0.8263 ± 0.0165 0.8640 ± 0.0426 0.9948 ± 0.0101 
+
+arrhythmia 0.1439 ± 0.0356 0.1227 ± 0.0109 0.1724 ± 0.0434 
+
+parkinson-speech-uci 0.7099 ± 0.0429 0.7142 ± 0.0358 0.9991 ± 0.0018 
+
+cnae-9 0.7499 ± 0.1054 0.8162 ± 0.1459 0.8406 ± 0.1167 
+
+Average 0.7202 0.7416 0.8556 
+
+Median 0.7238 0.7412 0.8944 
+
+vs. 0.7142 and 0.7099 ), qsar-biodeg (0.9948 vs. 0.8640 and 0.8263 ), Engine1 (0.9868 vs. 0.9170 and 0.7149 ), and 
+
+tecator (0.9762 vs. 0.8042 and 0.7756 ). In these cases, the entropy-based baseline already improves over random sampling, suggesting that informative samples do concentrate near the decision boundary; however, CuBAS further exploits the global geometric structure of the labeled graph, simultaneously capturing low-curvature prototype regions and high-curvature boundary regions, yielding substantially more compact and representative training subsets. A second noteworthy pattern emerges on datasets characterized by high class overlap or intrinsic difficulty. On 
+
+credit-g , diabetes , tic-tac-toe , anneal , and blood-transfusion , both random sampling and entropy sam-pling yield relatively low balanced accuracies (below 0.70 ), yet CuBAS recovers meaningful structure in all cases, with gains ranging from +7 .2 percentage points ( blood-transfusion ) to +19 .8 percentage points ( credit-g ). This behavior is consistent with the theoretical motivation of our framework: in regions of high class overlap, the curvature of the statistical manifold induced by the Potts model is elevated precisely at the samples that straddle class boundaries, and their selective inclusion in the training set provides the classifier with the most discriminative geometric signal available. The arrhythmia dataset stands as the single notable exception to the general trend: all three methods yield low balanced accuracies (below 0.18 ), with CuBAS achieving 0.1724 against 0.1439 for random sampling and 0.1227 
+
+for entropy sampling. This dataset is well known in the benchmark literature for its extreme class imbalance, 13 classes with heavily skewed frequencies, and its high ambient dimensionality relative to the number of samples, which renders the k-NN graph geometry unreliable and the curvature signal noisy. The modest but consistent improvement of CuBAS over the two baselines even in this adversarial setting suggests that the geometric decomposition retains some discriminative value, though the overall performance ceiling for all methods is severely limited by the dataset’s intrinsic difficulty. Regarding the comparison between entropy sampling and random sampling, the former achieves a marginally higher average balanced accuracy ( 0.7416 vs. 0.7202 ), but the difference is modest and inconsistent across datasets: entropy sampling underperforms random sampling on monks-problem-1 , credit-g , tic-tac-toe , blood-transfusion ,and vehicle , suggesting that uncertainty scores derived from a k-NN posterior trained on a small seed set can be unreliable when the initial labeled pool is insufficient to accurately characterize the class boundary. CuBAS, by contrast, operates directly on the graph topology and the Potts sufficient statistics without requiring an auxiliary classifier for 19 PREPRINT - J ULY 7, 2026 Table 6: Average balanced accuracies achieved by the k-NN classifier under random sampling, entropy-based uncertainty sampling, and the proposed CuBAS method. The evaluation was performed over 15 training set sizes (10%–80%, with 5% increments). For each training size, 100 independent experiments were conducted using different train-test partitions. The reported results represent the average over the 100 repetitions and all training set sizes. 
+
+Datasets Random Entropy CuBAS 
+
+digits 0.9534 ± 0.0249 0.9776 ± 0.0269 0.9913 ± 0.0114 
+
+semeion 0.8677 ± 0.0430 0.9191 ± 0.0612 0.9488 ± 0.0364 
+
+texture 0.9684 ± 0.0148 0.9870 ± 0.0147 0.9970 ± 0.0056 
+
+segment 0.9167 ± 0.0247 0.9589 ± 0.0433 0.9854 ± 0.0116 
+
+mfeat-morphological 0.7077 ± 0.0090 0.7525 ± 0.0340 0.7985 ± 0.0101 
+
+mfeat-fourier 0.7651 ± 0.0351 0.8108 ± 0.0584 0.8526 ± 0.0402 
+
+mfeat-factors 0.9515 ± 0.0160 0.9812 ± 0.0215 0.9946 ± 0.0046 
+
+mfeat-pixel 0.9624 ± 0.0159 0.9876 ± 0.0193 0.9978 ± 0.0046 
+
+satimage 0.8694 ± 0.0162 0.9280 ± 0.0335 0.9764 ± 0.0056 
+
+MNIST_784 (20%) 0.8935 ± 0.0201 0.9483 ± 0.0353 0.9842 ± 0.0086 
+
+Fashion-MNIST (20%) 0.8088 ± 0.0174 0.8790 ± 0.0524 0.9252 ± 0.0152 
+
+Kuzushiji-MNIST (20%) 0.8730 ± 0.0320 0.9474 ± 0.0491 0.9769 ± 0.0152 
+
+madelon 0.5406 ± 0.0038 0.5475 ± 0.0097 0.6357 ± 0.0247 
+
+page-blocks 0.6975 ± 0.0767 0.7256 ± 0.0923 0.8716 ± 0.0950 
+
+Indian_pines 0.7015 ± 0.0266 0.7030 ± 0.0377 0.8462 ± 0.0555 
+
+phoneme 0.8105 ± 0.0239 0.8608 ± 0.0463 0.9962 ± 0.0079 
+
+sylvine 0.8000 ± 0.0184 0.8481 ± 0.0504 0.9470 ± 0.0295 
+
+eye_movements 0.4842 ± 0.0283 0.5024 ± 0.0460 0.5963 ± 0.0450 
+
+GesturePhaseSegmentation 0.4756 ± 0.0394 0.5026 ± 0.0658 0.5949 ± 0.0573 
+
+splice 0.6236 ± 0.0331 0.6528 ± 0.0638 0.7320 ± 0.0516 
+
+hill-valley 0.5112 ± 0.0061 0.5128 ± 0.0030 0.6072 ± 0.0288 
+
+thyroid-dis 0.4205 ± 0.0163 0.4548 ± 0.0342 0.6549 ± 0.0502 
+
+wine-quality-white 0.2588 ± 0.0224 0.2510 ± 0.0257 0.4214 ± 0.0551 
+
+wine-quality-red 0.2703 ± 0.0116 0.2731 ± 0.0194 0.5214 ± 0.0442 
+
+eeg-eye-state 0.7982 ± 0.0291 0.8235 ± 0.0941 0.9963 ± 0.0085 
+
+spambase 0.8822 ± 0.0158 0.9258 ± 0.0391 0.9947 ± 0.0091 
+
+scene 0.8346 ± 0.0217 0.8766 ± 0.0423 0.9843 ± 0.0222 
+
+har 0.9417 ± 0.0202 0.9694 ± 0.0283 0.9963 ± 0.0069 
+
+nursery 0.6629 ± 0.0734 0.7297 ± 0.1227 0.9323 ± 0.0679 
+
+isolet 0.8552 ± 0.0208 0.9162 ± 0.0597 0.9496 ± 0.0224 
+
+ipums_la_99-small 0.4016 ± 0.0182 0.4263 ± 0.0198 0.4621 ± 0.0259 
+
+waveform-5000 0.7668 ± 0.0069 0.8128 ± 0.0458 0.8867 ± 0.0175 
+
+Average 0.7273 0.7623 0.8455 
+
+Median 0.7991 0.8358 0.9397 
+
+scoring, and therefore does not inherit this sensitivity to seed set quality, a structural advantage that is reflected in its consistently lower standard deviations across most datasets. Table 6 extends the evaluation of CuBAS to a second and substantially more challenging benchmark comprising 32 datasets, including high-dimensional image recognition tasks (MNIST_784, Fashion-MNIST, Kuzushiji-MNIST), multi-class feature extraction collections (the mfeat family), remote sensing data ( Indian_pines ), biomedical sig-nals ( eeg-eye-state , thyroid-dis ), natural language and genomic tasks ( splice , spambase , qsar-biodeg ), and several structurally difficult problems with fine-grained ordinal class structure ( wine-quality-white ,
+
+wine-quality-red ). CuBAS achieves the highest balanced accuracy on every dataset in the benchmark, with an average of 0.8455 against 0.7623 for entropy sampling and 0.7273 for random sampling, absolute improvements of +8 .3 and +11 .8 percentage points, respectively. The median balanced accuracy reinforces this picture: 0.9397 
+
+for CuBAS versus 0.8358 for entropy sampling and 0.7991 for random sampling, confirming that the performance advantage is not attributable to a small number of high-performing datasets but instead reflects a broad and consistent shift across diverse classification regimes. Taken together with the results of Table 5, these findings establish CuBAS as a robust and generalizable sampling strategy across a cumulative benchmark of more than 50 datasets spanning a wide range of sample sizes, ambient dimensions, and class structures. 20 PREPRINT - J ULY 7, 2026 Among the most striking individual results, CuBAS achieves near-perfect balanced accuracy on several large-scale datasets where the geometry of the labeled graph is particularly well-defined. On phoneme (0.9962 ± 0.0079 ), 
+
+eeg-eye-state (0.9963 ±0.0085 ), spambase (0.9947 ±0.0091 ), har (0.9963 ±0.0069 ), and mfeat-pixel (0.9978 ±
+
+0.0046 ), CuBAS attains balanced accuracies that are exceptional not only in absolute terms but relative to both baselines, which fall substantially short on the same datasets. The common thread across these cases is that the underlying classification problem admits a clear geometric decomposition: the class-conditional distributions are well-separated in the feature space, and the Potts curvature field successfully concentrates on the narrow manifold regions where the decision boundary localizes, yielding training subsets that are simultaneously compact and maximally discriminative. The consistently low standard deviations of CuBAS in these cases (below 0.01 ) further indicate that the curvature-based decomposition is stable across independent random repetitions of the train-test partition, a property not shared by entropy sampling, whose variance remains substantially higher across the same datasets. The three large-scale image benchmarks, MNIST_784, Fashion-MNIST, and Kuzushiji-MNIST, each subsampled to 
+
+20% of the original training set prior to evaluation, merit particular attention. On all three, CuBAS achieves balanced accuracies of 0.9842 , 0.9252 , and 0.9769 , respectively, outperforming entropy sampling by +3 .6, +4 .6, and +2 .9
+
+percentage points. Given that these datasets are defined in a 784-dimensional pixel space, the result illustrates an important property of the CuBAS framework: the curvature signal derived from the k-nearest-neighbor graph and the Potts observed Fisher information remains informative in high ambient dimensions, where Euclidean distance concentration is a well-known obstacle for geometry-based methods. The relative robustness of CuBAS in this regime suggests that the graph-based, non-parametric nature of the curvature estimator provides a form of implicit dimensionality reduction by operating on local neighborhoods rather than on global pairwise distances. The datasets on which all three methods perform poorly, wine-quality-white (0.2588 , 0.2510 ,
+
+0.4214 ), wine-quality-red (0.2703 , 0.2731 , 0.5214 ), eye_movements (0.4842 , 0.5024 , 0.5963 ), 
+
+GesturePhaseSegmentation (0.4756 , 0.5026 , 0.5949 ), hill-valley (0.5112 , 0.5128 , 0.6072 ), and 
+
+ipums_la_99-small (0.4016 , 0.4263 , 0.4621 ), share a common characteristic: they exhibit fine-grained or-dinal class structures, severe class overlap in the feature space, or highly irregular cluster geometries that challenge any k-NN-based method regardless of the sampling strategy. Importantly, even in these adversarial conditions, CuBAS consistently improves over both baselines, with absolute gains ranging from +0 .4 percentage points (ipums_la_99-small ) to +25 .1 percentage points ( wine-quality-red ). The wine-quality datasets are particularly noteworthy: with 7 to 11 ordinal quality grades and substantial inter-grade overlap, even a classifier trained on the full dataset achieves limited balanced accuracy under a k-NN model; yet CuBAS nearly doubles the performance of random sampling on wine-quality-red , suggesting that the curvature field identifies the rare samples located at the boundary between adjacent quality grades, precisely the most informative observations for distinguishing fine-grained ordinal categories. The comparison between entropy sampling and random sampling on this second benchmark reveals a pattern consistent with Table 5: entropy sampling improves on average over random sampling ( +3 .5 percentage points), but the improve-ment is modest and unreliable on datasets with low inter-class separability, such as madelon (+0 .7 pp), hill-valley 
+
+(+0 .2 pp), wine-quality-white (−0.8 pp), and Indian_pines (+0 .1 pp). This brittleness is a known limitation of uncertainty sampling when the seed classifier is trained on an insufficiently representative initial labeled set: the posterior entropy scores inherit the biases of the seed model and fail to identify the globally most informative samples. CuBAS avoids this failure mode by design, as its curvature scores are derived entirely from the graph topology and the Potts sufficient statistics, quantities that are fixed once the k-NN graph is constructed and βMPL is estimated, independently of any auxiliary classifier. Table 7 presents results on a third benchmark comprising 16 high-dimensional datasets, spanning mass spectrometry (micro-mass ), face recognition ( UMIST_Faces_Cropped , Olivetti_Faces ), genomic and transcriptomic profiling (AP_Lung_Kidney , AP_Omentum_Kidney , AP_Breast_Uterus , AP_Ovary_Lung , AP_Ovary_Kidney , leukemia ,
+
+OVA_Breast , GLI , MLL , CNS , DLBCL ), proteomics ( arcene ), and text categorization ( tr11.wc ). These datasets are characterized by ambient dimensions ranging from the hundreds to the tens of thousands, with sample sizes that are often small relative to the feature space, the prototypical high-dimensional, low-sample-size (HDLSS) regime in which classical distance-based methods are known to degrade due to concentration of measure phenomena [Donoho, 2000]. The results of Table 7 therefore constitute a particularly demanding stress test for CuBAS, which relies on a 
+
+k-nearest-neighbor graph whose edge weights are Euclidean distances in the ambient space. CuBAS nonetheless achieves the highest balanced accuracy on every dataset in the benchmark, with an average of 
+
+0.8451 against 0.7573 for entropy sampling and 0.7339 for random sampling, absolute improvements of +8 .8 and 
+
++11 .1 percentage points, respectively, closely consistent with the gains observed in Tables 5 and 6. The median balanced accuracy of 0.9404 for CuBAS versus 0.7612 for entropy sampling and 0.7365 for random sampling further confirms that the advantage of the proposed method is robust and broadly distributed across the benchmark rather than being 21 PREPRINT - J ULY 7, 2026 Table 7: Average balanced accuracies achieved by the k-NN classifier under random sampling, entropy-based uncertainty sampling, and the proposed CuBAS method. The evaluation was performed over 15 training set sizes (10%–80%, with 5% increments). For each training size, 100 independent experiments were conducted using different train-test partitions. The reported results represent the average over the 100 repetitions and all training set sizes. 
+
+Datasets Random Entropy CuBAS 
+
+micro-mass 0.6650 ± 0.1355 0.6828 ± 0.1943 0.7420 ± 0.1477 
+
+UMIST_Faces _Cropped 0.7556 ± 0.1638 0.7704 ± 0.2073 0.7909 ± 0.1747 
+
+Olivetti_Faces 0.5780 ± 0.1888 0.5839 ± 0.2388 0.6150 ± 0.1989 
+
+AP_Lung_Kidney 0.9162 ± 0.0244 0.9476 ± 0.0097 0.9908 ± 0.0222 
+
+AP_Omentum_Kidney 0.9093 ± 0.0469 0.9562 ± 0.0140 0.9932 ± 0.0199 
+
+AP_Breast_Uterus 0.8943 ± 0.0272 0.9419 ± 0.0277 0.9969 ± 0.0082 
+
+AP_Ovary_Lung 0.8823 ± 0.0193 0.9194 ± 0.0455 0.9880 ± 0.0238 
+
+AP_Ovary_Kidney 0.9300 ± 0.0238 0.9750 ± 0.0097 0.9815 ± 0.0184 
+
+leukemia 0.6663 ± 0.0618 0.7001 ± 0.1079 0.8729 ± 0.1210 
+
+OVA_Breast 0.8848 ± 0.0187 0.9298 ± 0.0186 0.9971 ± 0.0061 
+
+GLI 0.7222 ± 0.0682 0.7003 ± 0.1027 0.9836 ± 0.0404 
+
+MLL 0.7207 ± 0.1253 0.7520 ± 0.1713 0.7761 ± 0.1348 
+
+CNS 0.5494 ± 0.0320 0.5213 ± 0.0216 0.6397 ± 0.0599 
+
+arcene 0.7507 ± 0.0614 0.7899 ± 0.0941 0.8993 ± 0.0675 
+
+tr11.wc 0.2040 ± 0.0431 0.2070 ± 0.0406 0.2642 ± 0.0674 
+
+DLBCL 0.7143 ± 0.0904 0.7396 ± 0.1313 0.9909 ± 0.0233 
+
+Average 0.7339 0.7573 0.8451 
+
+Median 0.7365 0.7612 0.9404 
+
+driven by a subset of favorable datasets. Considered cumulatively across all three tables, CuBAS achieves the best performance on all datasets in a benchmark that now spans more than 60 datasets, a result that, to the best of our knowledge, is without precedent for a single sampling strategy evaluated under a fixed classifier and a consistent experimental protocol. The genomic and transcriptomic datasets in this benchmark deserve particular attention, as they represent one of the most challenging and practically consequential instantiations of the HDLSS problem in machine learning. On the five AP_* datasets, which correspond to binary tissue-type discrimination tasks derived from gene expression microarrays, CuBAS achieves near-perfect balanced accuracies ranging from 0.9815 (AP_Ovary_Kidney ) to 0.9969 
+
+(AP_Breast_Uterus ), with standard deviations below 0.025 in all cases. The margin of improvement over entropy sampling on these datasets ( +2 .0 to +5 .6 percentage points) is more moderate than in previous benchmarks, which is consistent with the fact that the underlying binary classification problems are relatively well-posed: with only two classes and a large number of informative features, the entropy signal from the seed classifier is itself reliable, reducing the marginal value of the geometric correction provided by CuBAS. Nevertheless, CuBAS systematically improves upon entropy sampling even in this favorable regime. The most dramatic gains on this benchmark are observed on DLBCL (0.9909 vs. 0.7396 for entropy and 0.7143 for random, corresponding to an absolute gain of +25 .1 and +27 .7 percentage points), GLI (0.9836 vs. 0.7003 and 0.7222 ,gains of +28 .3 and +26 .1 percentage points), and leukemia (0.8729 vs. 0.7001 and 0.6663 , gains of +17 .3 and +20 .7
+
+percentage points). These three datasets share a common structure: they are genomic classification problems with a moderate number of classes, small sample sizes (typically n < 200 ), and very high feature dimensionality (thousands of gene expression probes). In this regime, the entropy signal derived from a k-NN seed classifier is particularly unreliable, as the initial labeled pool is too small to train a posterior that accurately reflects the true class boundaries. CuBAS circumvents this limitation structurally: the Potts curvature field is estimated directly from the labeled graph and the sufficient statistics of the MRF model, without requiring a pre-trained classifier as an intermediate step. In the HDLSS regime, this model-free property of CuBAS translates into a direct and substantial performance advantage. The text categorization dataset tr11.wc and the face recognition datasets Olivetti_Faces and 
+
+UMIST_Faces_Cropped yield the lowest absolute balanced accuracies across all three methods, with CuBAS achieving 0.2642 , 0.6150 , and 0.7909 , respectively. On tr11.wc , the combination of sparse bag-of-words features, a large number of categories, and a small sample size creates a setting in which the k-NN graph captures little meaningful geometric structure: nearest-neighbor relationships in high-dimensional sparse spaces are dominated by the sparsity pattern rather than by semantic similarity, and the Potts curvature field consequently provides a weaker discriminative signal. The face datasets present a complementary challenge: with up to 40 classes and as few as 10 samples per class 22 PREPRINT - J ULY 7, 2026 
+
+Figure 3: Average balanced accuracies achieved by the k-NN classifier under entropy-based uncertainty sampling, and the proposed CuBAS method using only the smallest training set size (10%) with 100 independent experiments for different train-test partitions. in some folds, the per-class representation in the training set is severely limited regardless of the sampling strategy, and the curvature signal concentrates on a small number of boundary samples that may not generalize reliably across partitions. Even in these adversarial conditions, however, CuBAS consistently outperforms both baselines, and the improvement on tr11.wc (+6 .0 pp over random sampling) is non-trivial given the overall difficulty of the task. The CNS and MLL datasets, both multi-class genomic classification problems, yield moderate absolute balanced accuracies for all three methods ( 0.55 –0.78 ) and relatively small gains for CuBAS ( +9 .0 and +2 .4 percentage points over random sampling, respectively). In both cases, the datasets are characterized by overlapping class distributions in gene expression space, a known challenge in central nervous system tumor subtyping ( CNS ) and mixed-lineage leukemia subclassification ( MLL ). The limited gain on MLL in particular ( 0.7761 vs. 0.7520 for entropy and 0.7207 for random) suggests that when class overlap is severe and the number of samples is very small ( n < 100 ), the curvature field may not provide sufficient contrast between the low- and high-information regions to produce a highly selective partition, a limitation that is shared by all geometry-based methods and that motivates future work on curvature regularization strategies for ultra-small sample regimes. To further characterize the advantage of CuBAS in the most data-scarce regime, Figure 3 compares the balanced accuracies achieved by entropy-based sampling and CuBAS when only 10% of the total samples are available for training, across 42 benchmark datasets from Tables 2, 3 and 4. This regime is of particular practical relevance, as it corresponds to the setting in which the quality of the selected subset has the greatest impact on classification performance: with a limited labeling budget, redundant or geometrically uninformative samples directly translate into degraded generalization. The results establish a remarkably consistent and statistically significant advantage for CuBAS across the entire benchmark. CuBAS outperforms entropy-based sampling on all datasets without exception, with an average balanced accuracy of 0.8691 against 0.7345 for entropy sampling, a mean absolute gain of +13 .5 percentage points ( +20 .2% 
+
+in relative terms). The median gain of +10 .7 percentage points, combined with a first quartile of +9 .5 and a third quartile of +15 .2 percentage points, confirms that the advantage is broadly distributed across the benchmark rather than being driven by a small number of favorable datasets. A Wilcoxon signed-rank test rejects the null hypothesis of equal performance at p < 10 −10 , providing strong statistical evidence that the observed differences are not attributable to chance. The largest gains are concentrated on datasets where the 10% training budget is most severely limiting: gains of +34 .5,
+
++34 .3, +33 .3, and +30 .7 percentage points are observed on four datasets for which entropy sampling achieves balanced accuracies between 0.50 and 0.66 , performances close to or at chance level for the relevant number of classes. In these cases, the entropy signal derived from a k-NN classifier trained on a small, potentially unrepresentative seed set is unreliable, and the uncertainty scores fail to identify genuinely informative samples. CuBAS, by contrast, derives its 23 PREPRINT - J ULY 7, 2026 
+
+Figure 4: Average balanced accuracies obtained by random sampling, entropy-based sampling and the proposed CuBAS method for datasets AP_Breast_Uterus (left) and eeg_eye_state (right). 
+
+Figure 5: Average balanced accuracies obtained by random sampling, entropy-based sampling and the proposed CuBAS method for datasets har (left) and Indian_pines (right). curvature scores directly from the Potts sufficient statistics over the full labeled graph, without requiring a pre-trained auxiliary model, and is therefore immune to the seed-set bias that afflicts entropy sampling in this regime. Even at its most modest, the advantage of CuBAS does not fall below +3 .6 percentage points (minimum gain across the 42 datasets), confirming that the geometric information encoded in the Potts curvature field provides a reliable signal for sample selection at low training budgets regardless of dataset structure. The contrast between the two methods is further underscored by the distributional properties of the balanced accuracy vectors: CuBAS achieves a standard deviation of 0.114 , substantially lower than the 0.137 of entropy sampling, indicating that the curvature-based selection strategy not only raises average performance but also reduces variability across datasets. This property is particularly desirable in practical applications where the characteristics of the target dataset are unknown a priori, as it implies that CuBAS provides more predictable performance guarantees than uncertainty-based alternatives in the low-budget regime. To further illustrate the effectiveness of CuBAS across the full range of training set sizes considered, Figures 4–6 display the average balanced accuracy curves as a function of training set size for a representative selection of datasets drawn from eight datasets. Each point on a curve represents the mean balanced accuracy over 100 independent train-test partitions at a fixed training set size, ranging from 10% to 80% of the available samples in increments of 5% .24 PREPRINT - J ULY 7, 2026 
+
+Figure 6: Average balanced accuracies obtained by random sampling, entropy-based sampling and the proposed CuBAS method for datasets MNIST (left) and nursery (right). Several consistent patterns emerge from these curves. First, the accuracy curve of CuBAS lies strictly above those of entropy sampling and random sampling at virtually every training set size and on every dataset shown, confirming that the advantage of the proposed method is not restricted to the low-budget regime, but persists as the training set grows. Second, and more notably, CuBAS consistently achieves at smaller training set sizes the same level of balanced accuracy that competing methods require substantially more data to attain, a property we refer to as data efficiency : the ability to extract more predictive information from fewer labeled samples. Third, the standard deviation of CuBAS is in most cases narrower than that of the baselines, particularly at small training fractions, indicating that the curvature-based decomposition produces more stable and reproducible training subsets than uncertainty-driven or random selection strategies. This data efficiency property has direct practical implications. In application domains where labeled data is scarce or costly to obtain, such as medical imaging, genomic profiling, or industrial quality control, the ability of CuBAS to match or exceed the performance of random sampling with a fraction of the training data translates directly into reduced annotation costs without sacrificing predictive accuracy. The geometric foundation of this advantage is clear: by simultaneously including high-curvature samples that concentrate near decision boundaries and low-curvature samples that provide representative coverage of homogeneous regions, CuBAS constructs training subsets that are both maximally discriminative and structurally balanced, properties that neither random nor uncertainty-based sampling can guarantee by design. 
+
+# 5 Conclusions 
+
+The quality and informativeness of the training set are among the most consequential yet underexplored determinants of supervised classification performance. While the machine learning literature has devoted considerable attention to model architecture, regularization, and optimization, the question of which samples should form the training set has received comparatively less principled treatment: most practical sampling strategies remain either purely random or rely on uncertainty scores derived from auxiliary classifiers that are themselves trained on potentially unrepresentative labeled pools. This paper addressed that gap by proposing CuBAS (Curvature-Based Adaptive Sampling), an information-geometric framework for adaptive data selection grounded in the q-state Potts Markov random field model, which exploits the intrinsic geometric structure of the labeled data manifold to identify the most informative samples for supervised classification. 
+
+Summary of Contributions 
+
+The central theoretical contribution of this work is the observation that the local curvature of the statistical manifold induced by the Potts MRF model, estimated via the ratio of second- to first-order observed Fisher information, provides a principled and computationally efficient measure of sample informativeness in labeled graphs. By viewing a labeled dataset as a k-nearest-neighbor graph embedded in a statistical manifold, CuBAS derives a closed-form curvature score at each vertex from the Potts sufficient statistics, without requiring eigendecompositions, kernel density estimates, or 25 PREPRINT - J ULY 7, 2026 pre-trained auxiliary classifiers. This curvature field naturally partitions the graph into two complementary regimes: a low-curvature population corresponding to smooth, homogeneous cluster interiors, efficiently represented by a small number of prototypical samples, and a high-curvature population concentrated near decision boundaries and topologically complex structures, which are disproportionately informative for classification. The resulting training subsets are simultaneously compact, geometrically representative, and maximally discriminative, properties that random and uncertainty-based sampling strategies cannot jointly guarantee by design. A second methodological contribution is the adaptive threshold estimator for the curvature partition boundary T ∗,which selects between Otsu’s inter-class variance criterion and a Tukey-fence interquartile range fallback based on a bimodality diagnostic via Ashman’s D statistic. This data-driven threshold estimation replaces the fixed-quantile heuristics commonly used in graph-based partitioning methods and allows CuBAS to adapt to the heterogeneous curvature distributions encountered across diverse real-world datasets, without requiring any dataset-specific tuning. The empirical evaluation, conducted on a benchmark of more than 60 publicly available datasets from OpenML spanning tabular, image, genomic, and spectroscopic domains, provides consistent and statistically significant evidence for the effectiveness of CuBAS. The proposed method outperformed random sampling and entropy-based uncertainty sampling on every single dataset in the benchmark under the k-NN classifier, with a mean absolute gain of +13 .5 percentage points over entropy sampling in the most data-scarce regime ( 10% training budget), and consistent improvements across the full range of training set sizes from 10% to 80% of the available data. A Wilcoxon signed-rank test confirmed the statistical significance of these results at p < 10 −10 . Critically, CuBAS achieves these gains without access to any pre-trained model and with a computational cost that is linear in the number of edges of the k-NN graph, making it directly applicable to large-scale classification problems where the annotation budget is limited. 
+
+Directions for Future Research 
+
+The results and limitations identified in this work suggest several promising directions for future investigation. 
+
+Extension to other MRF models. The Potts model, while natural for multi-class classification, is a homogeneous, isotropic MRF that assigns equal interaction weights to all neighbor pairs. Generalizations to inhomogeneous or anisotropic MRFs, such as the Ising model with class-dependent couplings, or edge-weighted MRFs that incorporate feature-space distances into the interaction potential, may produce curvature fields that are more discriminative in settings with heterogeneous cluster geometries or strongly imbalanced class distributions. 
+
+Curvature-aware active learning. The current work operates in a passive sampling setting, in which all labels are available and the curvature field is estimated once from the full labeled graph. An active learning extension, in which CuBAS iteratively refines the curvature partition as new labels are acquired, would be of considerable practical interest. The theoretical connection between the Potts Fisher information and the expected reduction in generalization error under sequential Bayesian label acquisition provides a natural foundation for such an extension. 
+
+Curvature regularization in the ultra-small sample regime. The results on datasets such as MLL and CNS , where sample sizes are very small relative to the number of features ( n ≪ p), suggest that the curvature signal may be insufficiently contrasted to produce a reliable partition when the k-NN graph is sparse and noisy. Curvature regularization strategies, for instance, smoothing the curvature field over the graph Laplacian or incorporating prior information on the class structure via empirical Bayes, represent a promising direction for improving CuBAS in the high-dimensional, low-sample-size regime. 
+
+Integration with deep learning pipelines. The CuBAS framework is currently formulated for tabular and fixed-dimensional feature representations. Extending it to operate on learned embeddings from deep neural networks, for instance, by constructing the k-NN graph in the penultimate-layer representation space and estimating the Potts curvature field therein, would enable its application to unstructured data such as raw images, text, and biological sequences. This direction connects naturally to the growing literature on coreset construction and data pruning for large-scale deep learning. 
+
+Theoretical analysis of sample complexity. While the empirical evidence for the data efficiency of CuBAS is compelling, a formal characterization of its sample complexity guarantees, bounding the number of samples required by CuBAS to achieve a given generalization error relative to training on the full dataset, remains an open theoretical question. Such a result would strengthen the information-geometric foundations of the method and provide guidance on the choice of k and the training set size fraction in practice. 26 PREPRINT - J ULY 7, 2026 
+
+Multi-modal and heterogeneous data. Real-world classification problems increasingly involve data from multiple modalities (e.g., imaging, genomic, and clinical variables jointly). Extending CuBAS to heterogeneous graphs, where nodes may carry features from different measurement spaces and edges may encode multiple types of proximity, represents an important step toward applicability in clinical decision support, multi-omics integration, and multimodal foundation model fine-tuning. 
+
+Curvature-guided warm-up sets for neural network initialization. A particularly promising direction concerns the use of CuBAS as a principled strategy for constructing warm-up sets : small, geometrically representative subsets of the training data used to obtain a high-quality initial weight vector prior to full-scale stochastic gradient training. In the standard deep learning pipeline, network weights are initialized randomly or via heuristics such as Xavier or He initialization, which are agnostic to the structure of the target data distribution. We conjecture that replacing this initialization stage with a short pre-training phase on a CuBAS-selected warm-up set comprising 5% –10% of the available training data would yield a substantially better-conditioned initial weight vector: the high-curvature samples included by CuBAS encode the most discriminative geometric information near decision boundaries, while the low-curvature prototypes provide stable gradient signal in homogeneous regions, together producing a warm-up set that covers the full geometric spectrum of the data manifold with minimal redundancy. This initialization strategy could accelerate convergence by placing the network in a region of the loss landscape that is closer to a good local minimum from the outset, reducing the number of full-data epochs required to reach a target validation accuracy, an effect analogous to, but geometrically motivated differently from, curriculum learning and loss-aware sample weighting. Beyond convergence speed, a curvature-guided warm-up set may improve generalization by reducing the risk of early overfitting to redundant or noisy samples that dominate randomly constructed mini-batches in the early epochs of training, a phenomenon that has been linked to memorization of atypical examples. Empirically validating this conjecture across deep architectures (residual networks, transformers, graph neural networks) and comparing the resulting training dynamics against standard initialization and coreset-based warm-up strategies constitutes a natural and well-motivated extension of the present work. In summary, CuBAS offers a principled, scalable, and theoretically grounded alternative to heuristic data selection for supervised learning. By bridging information geometry, Markov random field theory, and adaptive sampling, it opens a productive research direction at the intersection of geometric machine learning and data-efficient classification, with broad applicability across scientific and engineering domains where labeled data is a scarce and valuable resource. 
+
+# Statements and declarations 
+
+Funding 
+
+This work has been supported by CNPq (National Council for Scientific and Technological Development) through grant number 301432/2025-2. This study was also financed in part by the Coordenação de Aperfeiçoamento de Pessoal de Nível Superior - Brasil (CAPES) - Finance Code 001. 
+
+Code availability 
+
+Python scripts to reproduce the results reported in this paper may be found at the following github repository: 
+
+https://github.com/alexandrelevada/CuBAS .
+
+Data availability 
+
+All datasets used in the experiments are publicly available at www.openml.org .
+
+# References 
+
+Dennis L. Wilson. Asymptotic properties of nearest neighbor rules using edited data. IEEE Transactions on Systems, Man, and Cybernetics , SMC-2(3):408–421, 1972. doi: 10.1109/TSMC.1972.4309137. Salvador Garcia, Joaquin Derrac, Jose Cano, and Francisco Herrera. Prototype selection for nearest neighbor classifi-cation: Taxonomy and empirical study. IEEE Transactions on Pattern Analysis and Machine Intelligence , 34(3): 417–435, 2012. doi: 10.1109/TPAMI.2011.142. Xiaojin Zhu, Zoubin Ghahramani, and John Lafferty. Semi-supervised learning using gaussian fields and harmonic functions. In Proceedings of the Twentieth International Conference on International Conference on Machine Learning , ICML’03, page 912–919. AAAI Press, 2003. ISBN 1577351894. 27 PREPRINT - J ULY 7, 2026 Mikhail Belkin, Partha Niyogi, and Vikas Sindhwani. Manifold regularization: A geometric framework for learning from labeled and unlabeled examples. Journal of Machine Learning Research , 7(85):2399–2434, 2006. URL 
+
+http://jmlr.org/papers/v7/belkin06a.html .Michael M. Bronstein, Joan Bruna, Yann LeCun, Arthur Szlam, and Pierre Vandergheynst. Geometric deep learning: Going beyond Euclidean data. IEEE Signal Processing Magazine , 34(4):18–42, 2017. doi: 10.1109/MSP.2017. 2693418. Mathilde Papillon, Sophia Sanborn, Johan Mathe, Louisa Cornelis, Abby Bertics, Domas Buracas, Hansen J. Lillemark, Christian Shewmake, Fatih Dinc, Xavier Pennec, and Nina Miolane. Beyond Euclid: An illustrated guide to modern machine learning with geometric, topological, and algebraic structures. Machine Learning: Science and Technology ,6, 2025. doi: 10.1088/2632-2153/adf375. Melanie Weber. Geometric machine learning. AI Magazine , 46(1):e12210, 2025. doi: https://doi.org/10.1002/aaai. 12210. Shun-ichi Amari. Information Geometry and Its Applications . Springer, 2016. Frank Nielsen. An elementary introduction to information geometry. Entropy , 22(10):1100, 2020. ISSN 1099-4300. doi: 10.3390/e22101100. URL https://www.mdpi.com/1099-4300/22/10/1100 .Simon Tong and Daphne Koller. Support vector machine active learning with applications to text classification. J. Mach. Learn. Res. , 2:45–66, March 2002. ISSN 1532-4435. doi: 10.1162/153244302760185243. Burr Settles. Active learning literature survey. University of Wisconsin–Madison Technical Report , 2010. Yoshua Bengio, Jérôme Louradour, Ronan Collobert, and Jason Weston. Curriculum learning. In Proceedings of the 26th Annual International Conference on Machine Learning , ICML ’09, page 41–48, New York, NY, USA, 2009. Association for Computing Machinery. doi: 10.1145/1553374.1553380. H. Liu and H. Motoda. On issues of instance selection. Data Mining and Knowledge Discovery , 6:115–130, 2002. URL https://doi.org/10.1023/A:1014056429969 .C.C. Aggarwal. Data Classification: Algorithms and Applications . Chapman and Hall/CRC, 2014. doi: https: //doi.org/10.1201/b17320. J. Arturo Olvera-López, J. Ariel Carrasco-Ochoa, J. Francisco Martínez-Trinidad, and Josef Kittler. A review of instance selection methods. Artificial Intelligence Review , 34:133–143, 2010. URL https://doi.org/10.1007/ s10462-010-9165-y .Aida de Haro-García, Gonzalo Cerruela-García, and Nicolás García-Pedrajas. Instance selection based on boosting for instance-based learners. Pattern Recognition , 96:106959, 2019. ISSN 0031-3203. doi: https://doi.org/10.1016/j. patcog.2019.07.004. Dengyong Zhou, Olivier Bousquet, Thomas Navin Lal, Jason Weston, and Bernhard Schölkopf. Learning with local and global consistency. In Proceedings of the 17th International Conference on Neural Information Processing Systems , NIPS’03, page 321–328, Cambridge, MA, USA, 2003. MIT Press. Jifan Zhang, Julian Katz-Samuels, and Robert Nowak. GALAXY: Graph-based active learning at the extreme. In Kamalika Chaudhuri, Stefanie Jegelka, Le Song, Csaba Szepesvari, Gang Niu, and Sivan Sabato, editors, 
+
+Proceedings of the 39th International Conference on Machine Learning , volume 162 of Proceedings of Machine Learning Research , pages 26223–26238. PMLR, 17–23 Jul 2022. URL https://proceedings.mlr.press/ v162/zhang22k.html .Mo-Lin Ge, Liangzhong Hu, and Yiwen Wang. Knot theory, partition function and fractals. Journal of Knot Theory and Its Ramifications , 05(01):37–54, 1996. C. C. Adams. The Knot Book: An Elementary Introduction to the Mathematical Theory of Knots . Holt Paperbacks, 1 edition, 2000. Xian’an Jin and Fuji Zhang. Jones polynomials and their zeros for a family of links. Physica A: Statistical Mechanics and its Applications , 333:183–196, 2004. Elliott W. Montroll. Statistical Mechanics of Nearest Neighbor Systems. Journal of Chemical Physics , 9(9):706–721, September 1941. Ian G. Enting and Anthony J. Guttmann. Susceptibility amplitudes for the three- and four-state potts models. Physica A: Statistical Mechanics and its Applications , 321(1):90–107, 2003. Eugenio Mauri, Simona Cocco, and Rémi Monasson. Transition paths in potts-like energy landscapes: General properties and application to protein sequence models. Phys. Rev. E , 108:024141, 2023. 28 PREPRINT - J ULY 7, 2026 Noriyuki Bob Ouchi, James A. Glazier, Jean-Paul Rieu, Arpita Upadhyaya, and Yasuji Sawada. Improving the realism of the cellular potts model in simulations of biological cells. Physica A: Statistical Mechanics and its Applications ,329(3):451–458, 2003. Roeland M.H. Merks and James A. Glazier. A cell-centered approach to developmental biology. Physica A: Statistical Mechanics and its Applications , 352(1):113–130, 2005. R. Belousov, S. Savino, P. Moghe, T. Hiiragi, L. Rondoni, and A. Erzberger. Poissonian cellular potts models reveal nonequilibrium kinetics of cell sorting. Phys. Rev. Lett. , 132:248401, Jun 2024. Martin Storath, Andreas Weinmann, Jürgen Frikel, and Michael Unser. Joint image reconstruction and segmentation using the potts model. Inverse Problems , 31(2):025003, jan 2015. Andreas Galanis, Leslie Ann Goldberg, and Andrés Herrera-Poyatos. The complexity of approximating the complex-valued potts model. Computational Complexity , 31(1):2, 2022. J. M. Hammersley and P. Clifford. Markov field on finite graphs and lattices (preprint). unpublished, 1971. URL 
+
+www.statslab.cam.ac.uk/~grg/books/hammfest/hamm-cliff.pdf .Alexandre L.M. Levada, Nelson D.A. Mascarenhas, and Alberto Tannús. A novel map-mrf approach for multispectral image contextual classification using combination of suboptimal iterative algorithms. Pattern Recognition Letters , 31 (13):1795–1808, 2010. Julian Besag. Efficiency of pseudolikelihood estimation for simple Gaussian fields. Biometrika , 64(3):616–618, 12 1977. J. L. Jensen and H. R. Künsh. On asymptotic normality of pseudo likelihood estimates for pairwise interaction processes. 
+
+Annals of the Institute of Statistical Mathematics , 46:475–486, 1994. Richard L. Burden and J. Douglas Faires. Numerical Analysis . Cengage Learning, Boston, MA, 10th edition, 2015. ISBN 9781305253667. Michael Spivak. A Comprehensive Introduction to Differential Geometry . Publish or Perish, 1999. Barrett O’Neill. Elementary Differential Geometry . Academic Press, 2nd edition, 2006. Manfredo P. do Carmo. Differential Geometry of Curves and Surfaces: Revised and Updated Second Edition . Dover Publications, New York, UNITED STATES, 2016. ISBN 978-0-486-81797-2. Loring W Tu. Differential geometry: connections, curvature, and characteristic classes , volume 275. Springer, 2017. Tristan Needham. Visual Differential Geometry and Forms: A Mathematical Drama in Five Acts . Princeton University Press, Princeton, NJ, 2021. ISBN 978-0-691-20369-0. Manfredo P. do Carmo. Differential Geometry of Curves and Surfaces . Dover Publications Inc., 2nd edition, 2017. E. L. Lehmann and G. Casella. Theory of point estimation . Springer, 2 edition, 2011. Xumeng Cao and James C. Spall. Preliminary results in comparing the expected and observed fisher information for maximum likelihood estimates. In 2009 43rd Annual Conference on Information Sciences and Systems , pages 436–441, 2009. Nobuyuki Otsu. A threshold selection method from gray-level histograms. IEEE Transactions on Systems, Man, and Cybernetics , 9(1):62–66, 1979. doi: 10.1109/TSMC.1979.4310076. Kathryn M. Ashman, Christine M. Bird, and Stephen E. Zepf. Detecting bimodality in astronomical datasets. The Astronomical Journal , 108:2348–2361, 1994. doi: 10.1086/117248. Yungtai Lo. A likelihood ratio test of a homoscedastic normal mixture against a heteroscedastic normal mixture. 
+
+Statistics and Computing , 18(2):233–240, 2008. doi: 10.1007/s11222-008-9052-4. Joaquin Vanschoren, Jan N. van Rijn, Bernd Bischl, and Luis Torgo. OpenML: Networked science in machine learning. 
+
+SIGKDD Explorations Newsletter , 15(2):49–60, 2013. doi: 10.1145/2641190.2641198. Bernd Bischl, Giuseppe Casalicchio, Matthias Feurer, Pieter Gijsbers, Frank Hutter, Michel Lang, Rafael G. Mantovani, Jan N. van Rijn, and Joaquin Vanschoren. OpenML benchmarking suites. In Advances in Neural Information Processing Systems (NeurIPS) Track on Datasets and Benchmarks , 2021. URL https://arxiv.org/abs/1708. 03731 .Nicholas Roy and Andrew McCallum. Toward optimal active learning through sampling estimation of error reduction. In Proceedings of the Eighteenth International Conference on Machine Learning , ICML ’01, page 441–448, San Francisco, CA, USA, 2001. Morgan Kaufmann Publishers Inc. ISBN 1558607781. Burr Settles. Active learning literature survey. Computer Sciences Technical Report 1648, University of Wisconsin– Madison, 2009. 29 PREPRINT - J ULY 7, 2026 Pengzhen Ren, Yun Xiao, Xiaojun Chang, Po-Yao Huang, Zhihui Li, Brij B. Gupta, Xiaojiang Chen, and Xin Wang Wang. A survey of deep active learning. ACM Computing Surveys (CSUR) , 54(9):1–40, 2021. Claude E. Shannon. A mathematical theory of communication. Bell System Technical Journal , 27(3):379–423, 1948. David L. Donoho. High-dimensional data analysis: The curses and blessings of dimensionality. In AMS Conference on Math Challenges of the 21st Century , pages 1–32. American Mathematical Society, 2000. URL https://pdfs. semanticscholar.org/63c6/8278418b69f60b4814fae8dd15b1b1854295.pdf .30

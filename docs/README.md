@@ -6,26 +6,33 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-08
-- 运行时间：2026-07-08 21:52:02 UTC
+- 最新运行日期：2026-07-09
+- 运行时间：2026-07-09 20:33:25 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：1
-- 速读区：0
+- 本次总论文数：4
+- 精读区：0
+- 速读区：4
 
 ### 今日简报（AI）
-今日精读1篇高分论文，聚焦多光谱目标跟踪突破。  
-《SpecTrack》提出频谱提示引导的自适应专家模型，显著提升复杂场景跟踪精度。  
-建议关注频谱特征融合技术，对多模态视觉任务启发很大。
-- 详情：[/202607/08/README](/202607/08/README)
+今日速读3篇论文，涵盖自适应采样、月球遥感多模态模型及红外光谱重建。最值得关注的是《CuBAS》中基于信息几何曲率的自适应采样方法，以及《Moonstone》专为月球遥感设计的多模态基础模型。建议对监督分类或遥感基础模型感兴趣的读者深入阅读这两篇。
+- 详情：[/202607/09/README](/202607/09/README)
 
 ### 精读区论文标签
-1. [SpecTrack: Spectral Prompt Guided Adaptive Experts for Multispectral Object Tracking](/202607/08/2607.05988v1-spectrack-spectral-prompt-guided-adaptive-experts-for-multispectral-object-tracking)  
-   标签：评分：9.0/10、query:hsi-lidar
-   evidence：多光谱与高光谱目标跟踪，采用光谱-空间复杂度感知方法
+- 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [CuBAS: Information Geometric Curvature-Based Adaptive Sampling for Supervised Classification](/202607/09/2607.03145v1-cubas-information-geometric-curvature-based-adaptive-sampling-for-supervised-classification)  
+   标签：评分：6.0/10、query:hsi
+   evidence：适用于高光谱数据的自适应采样分类方法
+2. [Moonstone: A Multimodal Foundation Model and Benchmark for Lunar Remote Sensing](/202607/09/2607.03644v1-moonstone-a-multimodal-foundation-model-and-benchmark-for-lunar-remote-sensing)  
+   标签：评分：6.0/10、query:hsi-lidar
+   evidence：多模态遥感基础模型
+3. [Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors](/202607/09/2607.05636v1-sensor-adaptive-infrared-spectral-reconstruction-with-plug-and-play-diffusion-priors)  
+   标签：评分：6.0/10、query:hsi
+   evidence：高光谱光谱重建用于材料识别
+4. [ASFR-Net: Adversarial Alignment and Spatio-Frequency Refinement Network for Heterogeneous Remote Sensing Image Change Detection](/202607/09/2607.07161v1-asfr-net-adversarial-alignment-and-spatio-frequency-refinement-network-for-heterogeneous-remote-sensing-image-change-detection)  
+   标签：评分：6.0/10、query:hsi-lidar
+   evidence：多模态对齐用于异构遥感
 
 
 <div class="dpr-home-promo-card">

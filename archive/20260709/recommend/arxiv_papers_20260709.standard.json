@@ -1,0 +1,181 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-09T20:31:01.423549+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 4,
+    "quick_skim_target": 12,
+    "quick_selected": 4
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.03145v1",
+      "source": "arxiv",
+      "title": "CuBAS: Information Geometric Curvature-Based Adaptive Sampling for Supervised Classification",
+      "abstract": "The informativeness of a training set is as consequential as its size, yet most sampling strategies remain agnostic to the intrinsic geometry of the data distribution. We introduce CuBAS (Curvature-Based Adaptive Sampling), an information-geometric framework for adaptive data selection in supervised classification, grounded in the q-state Potts Markov random field (MRF) model. The central insight is that a labeled dataset can be viewed as a statistical manifold, on which local curvature, estimated via the ratio of second to first-order observed Fisher information, faithfully encodes the geometric complexity of the data distribution. We construct a k-nearest-neighbor graph over the labeled data and derive a closed-form curvature score at each vertex from the Potts sufficient statistics. This curvature signal partitions the graph into two complementary regimes: low-curvature regions, corresponding to smooth, homogeneous clusters, and high-curvature regions, concentrated around decision boundaries that are disproportionately informative for classification. By selecting nodes from both regimes, CuBAS constructs compact yet maximally informative training subsets. Empirical evaluation across more than 60 benchmark datasets demonstrates consistent and statistically significant improvements over random sampling and uncertainty-based baselines, across a wide range of labeling budgets and classifier architectures. CuBAS is computationally efficient (linear in the number of k-NN graph edges), theoretically grounded in the differential geometry of statistical manifolds, and interpretable in terms of the local shape operator of the data manifold.",
+      "authors": [
+        "Alexandre L. M. Levada"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.CV",
+        "cs.IT",
+        "stat.ML"
+      ],
+      "published": "2026-07-03T09:36:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.03145v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "adaptive sampling method for supervised classification applicable to hyperspectral data",
+      "llm_evidence_cn": "适用于高光谱数据的自适应采样分类方法",
+      "llm_evidence": "适用于高光谱数据的自适应采样分类方法",
+      "canonical_evidence": "适用于高光谱数据的自适应采样分类方法",
+      "llm_tldr_en": "Introduces CuBAS, an information-geometric curvature-based adaptive sampling framework for supervised classification, that selects informative samples by modeling the data manifold.",
+      "llm_tldr_cn": "该论文针对训练样本选择问题，提出基于信息几何曲率的自适应采样框架CuBAS，通过统计流形上的局部曲率估计样本信息量，可有效提升高光谱图像等分类任务的样本效率。在多个基准数据集上验证了优越性。",
+      "llm_tldr": "该论文针对训练样本选择问题，提出基于信息几何曲率的自适应采样框架CuBAS，通过统计流形上的局部曲率估计样本信息量，可有效提升高光谱图像等分类任务的样本效率。在多个基准数据集上验证了优越性。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.03644v1",
+      "source": "arxiv",
+      "title": "Moonstone: A Multimodal Foundation Model and Benchmark for Lunar Remote Sensing",
+      "abstract": "Decades of orbital missions have produced multi-modal remote sensing data for the Moon, spanning optical imagery, spectroscopy, thermal emission, radar, gravity, and elemental composition. Yet these datasets remain fragmented across archives, and no benchmark exists for evaluating machine learning on lunar data. We introduce Moonstone, the first multi-modal foundation model benchmark for lunar remote sensing. Our contributions are: (1) a 28-channel, 128 pixels-per-degree (~237 m) global lunar pretraining dataset from seven instrument families across five missions, (2) MG-MAE, a modality-grouped masked autoencoder with per-group convolutional tokenizers, a shared Vision Transformer encoder, attention masking for missing modalities, coverage-adaptive masking for heterogeneous spatial coverage, and spectral continuity regularization for physically plausible reconstructions, and (3) a benchmark of six downstream tasks covering classification, regression, and segmentation. MG-MAE pretrained features outperform scratch baselines on all tasks and surpass both ImageNet-pretrained and vanilla MAE baselines by large margins. Data and code are available at https://huggingface.co/datasets/ayushprd/Moonstone and https://github.com/ayushprd/Moonstone .",
+      "authors": [
+        "Ayush Prasad",
+        "Swarnalee Mazumder"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-03T23:54:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.03644v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multimodal remote sensing foundation model",
+      "llm_evidence_cn": "多模态遥感基础模型",
+      "llm_evidence": "多模态遥感基础模型",
+      "canonical_evidence": "多模态遥感基础模型",
+      "llm_tldr_en": "First multimodal foundation model benchmark for lunar remote sensing, integrating 7 instrument modalities.",
+      "llm_tldr_cn": "该论文针对月球遥感数据分散、缺乏基准的问题，提出Moonstone多模态基础模型基准，整合28通道多仪器数据，设计模态分组掩码自编码器MG-MAE，支持缺失模态推理。实验表明该模型在多模态分类和分割任务上优于单模态方法，为月球科学分析提供统一框架。",
+      "llm_tldr": "该论文针对月球遥感数据分散、缺乏基准的问题，提出Moonstone多模态基础模型基准，整合28通道多仪器数据，设计模态分组掩码自编码器MG-MAE，支持缺失模态推理。实验表明该模型在多模态分类和分割任务上优于单模态方法，为月球科学分析提供统一框架。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.05636v1",
+      "source": "arxiv",
+      "title": "Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors",
+      "abstract": "Hyperspectral sensing enables material identification; however, state-of-the-art spectrometers are costly and bulky, which limits their use in mobile applications. We address this by proposing sparse spectrum reconstruction from narrowband photocurrents using a pseudoinverse-guided diffusion model (ΠGDM). With ΠGDM we use a denoising diffusion probabilistic model (DDPM) to reconstruct the spectrum, which is trained on a large public spectral dataset to learn realistic spectral priors, eliminating the need for paired sensor measurements. At inference, ΠGDM alternates reverse-diffusion denoising steps with pseudoinverse projection to enforce consistency with measured photocurrents via the calibrated responsivity matrices of sensors. Consequently, our method is sensor-adaptive: when detector arrays change, we simply substitute the responsivity matrix in the pseudoinverse projection without retraining of the diffusion model. The resulting computational spectrometer achieves 1.502% average estimation error, outperforming Tikhonov, Gaussian, compressive-sensing, and multilayer perceptron (MLP) baselines, while providing calibrated uncertainty estimates via Monte Carlo sampling from different random initializations of ΠGDM. Summarizing, our approach offers an accurate, compact alternative for spectral recovery on resource-constrained platforms.",
+      "authors": [
+        "Alireza Siyavashi",
+        "Jon Schlipf",
+        "Sebastian Reiter",
+        "Inga Fischer",
+        "Christian Wenger",
+        "Christian Herglotz"
+      ],
+      "primary_category": "eess.SP",
+      "categories": [
+        "eess.SP"
+      ],
+      "published": "2026-07-06T20:56:19+00:00",
+      "link": "https://arxiv.org/pdf/2607.05636v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "hyperspectral spectrum reconstruction for material identification",
+      "llm_evidence_cn": "高光谱光谱重建用于材料识别",
+      "llm_evidence": "高光谱光谱重建用于材料识别",
+      "canonical_evidence": "高光谱光谱重建用于材料识别",
+      "llm_tldr_en": "Proposes PiGDM, a pseudoinverse-guided diffusion model, to reconstruct full hyperspectral spectra from narrowband photocurrents, enabling compact spectrometers and potential support for hyperspectral image classification.",
+      "llm_tldr_cn": "该论文针对高光谱传感中光谱仪昂贵且笨重的问题，提出伪逆引导扩散模型(PiGDM)，利用预训练的扩散模型学习光谱先验，从窄带光电流稀疏重建全光谱。通过交替逆扩散去噪和伪逆投影，保证与传感器测量的一致性。在公共光谱数据集上的实验表明，该方法能有效重建光谱，无需配对传感器测量，为移动终端的高光谱分析，包括图像分类，提供了可行的数据重建方案。",
+      "llm_tldr": "该论文针对高光谱传感中光谱仪昂贵且笨重的问题，提出伪逆引导扩散模型(PiGDM)，利用预训练的扩散模型学习光谱先验，从窄带光电流稀疏重建全光谱。通过交替逆扩散去噪和伪逆投影，保证与传感器测量的一致性。在公共光谱数据集上的实验表明，该方法能有效重建光谱，无需配对传感器测量，为移动终端的高光谱分析，包括图像分类，提供了可行的数据重建方案。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.07161v1",
+      "source": "arxiv",
+      "title": "ASFR-Net: Adversarial Alignment and Spatio-Frequency Refinement Network for Heterogeneous Remote Sensing Image Change Detection",
+      "abstract": "The core challenge of heterogeneous change detection in remote sensing imagery lies in effectively decoupling genuine land-cover changes from significant modal disparities caused by distinct imaging mechanisms. These intrinsic inconsistencies are prone to introducing pseudo-changes, thereby constraining detection accuracy. To address this, we propose a novel, end-to-end adversarial spatio-frequency refinement network (ASFR-Net). Initially, a modality-invariant representation learner (MIR-Learner) guides the backbone to extract modality-invariant features, effectively bridging the primary domain gap. Subsequently, to address persistent residual modal differences, we design an innovative spatio-frequency synergistic enhancement module (SFEM), which identifies and suppresses sensor-specific noise and artifacts that are difficult to discern in the spatial domain by leveraging frequency-domain processing. Multi-level difference features are then computed from these refined representations and fed into a decoder equipped with cascaded hierarchical guided fusion module (HGFM) blocks to generate precise change maps. To alleviate the data scarcity in heterogeneous tasks, we construct and release a new high-resolution benchmark specifically focused on building changes: the visible-near-infrared heterogeneous change detection (VisNIR-HCD) dataset. It presents unique scientific challenges arising from deceptive visual similarity and non-linear spectral inversions, providing a robust platform for evaluating model generalization. Extensive experiments on VisNIR-HCD and public datasets demonstrate that ASFR-Net achieves state-of-the-art (SOTA) performance, significantly outperforming existing methods. The source code and the VisNIR-HCD dataset are publicly available at https://github.com/LuoYang2024/ASFR-Net.",
+      "authors": [
+        "Xin-Jie Wu",
+        "Zhi-Hui You",
+        "Si-Bao Chen",
+        "Qing-Ling Shu",
+        "Xiao Wang",
+        "Jin Tang",
+        "Bin Luo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-08T08:52:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.07161v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multimodal alignment for heterogeneous remote sensing",
+      "llm_evidence_cn": "多模态对齐用于异构遥感",
+      "llm_evidence": "多模态对齐用于异构遥感",
+      "canonical_evidence": "多模态对齐用于异构遥感",
+      "llm_tldr_en": "ASFR-Net uses adversarial alignment and spatio-frequency refinement to decouple modal disparities from real changes in heterogeneous remote sensing, offering transferable modality-invariant learning for fusion tasks.",
+      "llm_tldr_cn": "该文针对异构遥感变化检测中模态差异导致伪变化的问题，提出ASFR-Net网络，包含模态不变表示学习器和对抗对齐框架，用于提取跨模态不变特征并消除残余模态差异。实验结果证明该方法能有效提升变化检测精度。其模态不变特征学习思路可迁移至高光谱与LiDAR的联合分类或目标检测任务中。",
+      "llm_tldr": "该文针对异构遥感变化检测中模态差异导致伪变化的问题，提出ASFR-Net网络，包含模态不变表示学习器和对抗对齐框架，用于提取跨模态不变特征并消除残余模态差异。实验结果证明该方法能有效提升变化检测精度。其模态不变特征学习思路可迁移至高光谱与LiDAR的联合分类或目标检测任务中。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

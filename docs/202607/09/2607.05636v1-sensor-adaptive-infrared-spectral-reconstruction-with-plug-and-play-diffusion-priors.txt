@@ -1,0 +1,261 @@
+Title: Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors
+
+URL Source: https://arxiv.org/pdf/2607.05636v1
+
+Published Time: Wed, 08 Jul 2026 00:13:22 GMT
+
+Number of Pages: 5
+
+Markdown Content:
+# Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors 
+
+1st Alireza Siyavashi 
+
+Chair of Computer Engineering Brandenburgische Technische Universit¨ at (BTU) 
+
+Cottbus, Germany siyavash@b-tu.de 
+
+2nd Jon Schlipf 
+
+IHP–Leibniz–Institut f¨ ur Innovative Mikroelektronik 
+
+Frankfurt (Oder), Germany schlipf@ihp-microelectronics.com 
+
+3rd Sebastian Reiter 
+
+Chair of Experimental Physics and Functional Materials, BTU 
+
+Cottbus, Germany sebastian.reiter@b-tu.de 
+
+4th Inga Fischer 
+
+Chair of Experimental Physics and Functional Materials, BTU 
+
+Cottbus, Germany inga.fischer@b-tu.de 
+
+5th Christian Wenger 
+
+IHP–Leibniz–Institut f¨ ur Innovative Mikroelektronik 
+
+Frankfurt (Oder), Germany wenger@ihp-microelectronics.com 
+
+6th Christian Herglotz 
+
+Chair of Computer Engineering Brandenburgische Technische Universit¨ at (BTU) 
+
+Cottbus, Germany christian.herglotz@b-tu.de 
+
+Abstract —Hyperspectral sensing enables material identifica-tion; however, state-of-the-art spectrometers are costly and bulky, which limits their use in mobile applications. We address this by proposing sparse spectrum reconstruction from narrow-band photocurrents using a pseudoinverse-guided diffusion model (ΠGDM). With ΠGDM we use a denoising diffusion probabilistic model (DDPM) to reconstruct the spectrum, which is trained on a large public spectral dataset to learn realistic spectral priors, eliminating the need for paired sensor measurements. At inference, ΠGDM alternates reverse-diffusion denoising steps with pseudoinverse projection to enforce consistency with mea-sured photocurrents via the calibrated responsivity matrices of sensors. Consequently, our method is sensor-adaptive: when detector arrays change, we simply substitute the responsivity matrix in the pseudoinverse projection without retraining of the diffusion model. The resulting computational spectrome-ter achieves 1.502% average estimation error, outperforming Tikhonov, Gaussian, compressive-sensing, and multilayer per-ceptron (MLP) baselines, while providing calibrated uncertainty estimates via Monte Carlo sampling from different random initializations of ΠGDM. Summarizing, our approach offers an accurate, compact alternative for spectral recovery on resource-constrained platforms. 
+
+Index Terms —spectroscopy, sparse modeling, diffusion model, machine learning, deep generative models. 
+
+I. I NTRODUCTION 
+
+Optical spectroscopy, which analyzes the spectral compo-sition of light entering a spectrometer, can be a valuable tool in a wide variety of applications, including astronomy, agriculture, material analysis, and biomedical detection [1], [2]. Typical spectrometers use diffraction gratings or me-chanically modifiable cavities, leading to large, costly, and heavy devices [3]. This limits their applicability, especially in low-cost and mobile applications. A way to overcome such limitations is the use of computational spectrometers [3]. In these methods, instead of directly measuring the spectrum with the spectrometer, an array of sensors [4] is employed to measure the photocurrent at a few bandwidth-limited wave-lengths. Then, by exploiting the spectral response of sensors, reconstruction of the entire spectrum becomes possible. These spectrum reconstruction methods are classified into traditional reconstruction algorithms and deep learning-based models [5]. Classical methods, such as the Tikhonov regularization and Compressive Sensing (CS) [6]–[8], are computationally lightweight. However, their hyperparameters need to be tuned when the process of sensor manufacturing changes, which leads to different sensor responsivity. Schlipf et al. [4] re-constructed spectra using the photocurrent of metasurface photodetectors by solving a linear inverse problem using Gaussian basis functions and matrix inversion. They assumed that the input optical spectrum can be represented as a super-position of Gaussian basis functions. However, this method suffers from limited reconstruction accuracy due to the limited number of detectors and the simplified assumption of Gaussian spectral bases. As their coefficients are recovered by direct matrix inversion, the reconstruction can become sensitive to measurement noise and overlapping detector responses. On the other hand, end-to-end deep learning methods (e.g., MLP) rely on large datasets, which can be a major practical bottleneck when collecting paired sensor readouts and ground-truth spectra. Additionally, these methods may suffer from limited generalizability and biases in the case of uneven distri-bution of samples [9]. A practical way to alleviate this bottle-neck is to decouple learning from data collection. Rather than learning an end-to-end mapping from photocurrents to spectra using paired measurements, we train a DDPM on a large, publicly available spectral library dataset without requiring any sensor data. This decoupling offers two key advantages: (1) we can leverage abundant existing spectral databases comprising thousands of diverse material reflectances, which is the target application of our spectral reconstruction algorithm, and (2) the same trained model generalizes across different sensor configurations without retraining. At inference, measurement consistency is enforced by projecting diffusion-generated spec-tra onto the subspace that matches observed photocurrents via the calibrated forward model [4], which calculates from sensors’ responsivity matrices and the generated spectra. Existing Plug-and-Play methods [10], which separate the learned spectral prior from the sensor-specific measurement model, often rely on MLP-generated priors for spectral recon-arXiv:2607.05636v1 [eess.SP] 6 Jul 2026 Fig. 1. Overview of the proposed method. a: Expanded view of the diffusion module separated in three main phases for reflectance spectra generation through an iterative denoising process. b: Full pipeline steps for ΠGDM to reconstruct spectra from trained DDPM. 
+
+struction [11]. Zheng et al. note that such generator prior PnP approaches can generalize poorly to new sensors due to dataset bias, be sensitive to initialization, and mismatch real, model-induced artifacts when the denoiser is trained only for additive Gaussian noise [10]. Moreover, MLP generator priors are typically deterministic : for a given photocurrent measurement, they return a single spectrum and do not naturally provide uncertainty intervals. This is a practical limitation for sparse narrow-band sensing, where multiple spectra may explain the same measurement; uncertainty bands help reveal ambiguity and prevent overconfident material identification. In this paper, we trained the DDPM, which is used for generating synthetic data that captures the distribution of realistic spectra from a large public dataset, intending to learn a sensor-adaptive spectral prior that can be applied to any calibrated detector array without requiring retraining. In the spectral reconstruction step, each run of ΠGDM [12] starts from random noise (with the same dimensionality as the target spectrum) and iteratively refines it into a reconstructed spectrum that matches the measured photocurrents. The pre-trained DDPM serves as a learned spectral prior , steering the reconstruction toward spectra that are realistic with respect to the public spectral dataset used for training. After each denoising step, ΠGDM applies a physics-based correction using the pseudoinverse of the sensors responsivity matrix rule to control whether the measured photocurrents agree with the predicted photocurrents. Repeating the reconstruction with different noise initializations yields multiple measurement-conditioned reconstructions , i.e., different spectra that all explain the same photocurrent measurement. To the best of our knowledge, this is the first use of 
+
+ΠGDM for infrared spectrum reconstruction in the nm range and silicon–germanium (SiGe) photocurrent sensors with the modified DDPM. The method combines the generality of pretrained DDPM [13] with explicit physical constraints and avoids retraining for new set of sensors. Applied to metasur-face photocurrent measurements, it yields high-quality spectra with a sensor-adaptive prior. The contribution of our paper is summarized to: 1) Generalized DDPM for spectra generation We intro-duce a lightweight neural diffusion model that learns the structure of real spectra from public datasets. 2) PnP with pseudoinverse guidance: integrating a pre-trained DDPM into the spectral reconstruction process with physics-based measurement corrections for sensor-adaptive reconstruction. 3) Calibrated posterior uncertainty: Provides confidence bands per wavelength with empirically validated cov-erage (90% intervals contain ground truth 90% of the time), showing reliability beyond Root Mean Square Error (RMSE) and Mean Absolute Percentage Error (MAPE). 4) Benchmarking: Comparison and evaluation with mul-tiple benchmarking methods. The remainder of the paper is organized as follows. In Sec-tion II we introduce the physical law and equation of the photodetector. We also explain two approaches that we utilize for spectra reconstruction from the literature. Section III delin-eates our proposed model architecture. Section IV describes the evaluation protocol and metrics, and reports quantitative and qualitative comparisons against the baselines. Section V is an overview of our results and future work. II. PRELIMINARIES 
+
+A. Physical Model of Photocurrent Sensors 
+
+We model the m-channel photodetector where m is the number of sensors as a linear spectral mixer sampled on a uniform spectrum {λj }nj=1 with m = 9 and n = 301 wavelength, λ1 = 1300 nm, λn = 1600 nm, and a wavelength step of ∆λ = 1 nm. We adopt a physical model (called forward model) to calculate the photocurrents from the photodetector 
+
+i as i = Rp + η, (1) where i ∈ Rm are photocurrents [A], p ∈ Rn is the dis-cretized power spectrum [W/nm] spectra (which we target to reconstruct), η accounts for sensor noise and model mismatch, which is additive Gaussian noise, and R ∈ Rm×n stacks the calibrated responsivities of the sensors on the photodetector [A/W] [4]. 
+
+B. Nonnegative Linear Regularization 
+
+Given the forward model in Equation (1), reconstructing the reflectance spectrum p ∈ Rn from m photocurrents is underdetermined when m < n (e.g., few detectors, many wavelengths). A common solution to calculate the estimated ˆp
+
+is the Tikhonov-regularized nonnegative least squares (NNLS) [5]: min  
+
+> ˆp≥012
+
+∥Rˆp − i∥22 + Λ2 ∥Dˆ p∥22, (2) where D is the second-derivative operator (penalizing the spectral curvature) to encourage smooth spectra. This model has low computational complexity and is stable, but quadratic smoothing can oversuppress narrow spectral features and re-quires tuning the hyperparameter Λ, which sets the importance of smoothness. 
+
+C. Sparse Compressive-sensing Priors 
+
+As a second benchmark model, we modeled the spectrum 
+
+p ∈ Rn as sparse in a discrete cosine transform (DCT-II) [14] dictionary Φ ∈ Rn×k (first k atoms), so that p ≈ Φx with coefficients x ∈ Rk. Let B := RΦ denote the forward operator from coefficients to photocurrents i. We estimate x
+
+by Elastic-Net–regularized least squares [5], [14]: 
+
+min  
+
+> x
+> 12
+
+∥Bx − i∥22 + Λ  ρ∥x∥1 + (1 − ρ)∥x∥22
+
+ , (3) where Λ = 1 controls the regularization strength and ρ ∈
+
+[0 , 1] mixes the ℓ1/ℓ 2 penalties that balance sparsity. We select 
+
+Λ by grid search over [10 −3, 10 1] (25 log-spaced values) on the training set, and fix ρ = 0 .95 as the value minimizing validation RMSE. The reconstruction is ˆp = max( Φˆx, 0) .III. P ROPOSED RECONSTRUCTION METHOD 
+
+In this section, we explain how we reconstruct spectra p ∈
+
+[0 , 1] n from measured photocurrents i using ΠGDM, which couples a learned spectral prior (modeled by DDPM that learns the distribution of clean spectra through noise prediction) with responsivity-based projection via the forward model (Eq. 1), as illustrated in Fig. 1. The DDPM pipeline, which denoises noisy input spectra (Fig. 1a) consists of three phases: First, we define the for-ward diffusion process (Equation (4)) that progressively adds Gaussian noise to clean spectra from public datasets, creating training pairs (pt, ϵ) at various timesteps t ∈ {1, . . . , T }.Second, we train a U-Net to predict the added noise ϵ from any noisy spectrum pt and the timestep t, enabling the model to separate noise from spectra. Third, at inference, starting from pure noise pT ∼ N (0, I), the reverse diffusion process iteratively applies the trained U-Net to predict and remove noise at each timestep, progressively recovering a realistic spectrum. Once trained on public spectral datasets, the U-Net model is frozen and reused for reconstruction within the DDPM framework. In inference (Fig. 1b), ΠGDM iteratively refines random noise into an estimated spectrum by alternating DDPM de-noising with pseudoinverse projection to enforce measurement consistency (Section III-C). This yields the final reconstructed spectrum ˆp ∈ [0 , 1] n. Crucially, our framework supports zero-shot reconstruction: the same pretrained DDPM applies to any calibrated sensor by simply substituting the responsivity matrix 
+
+R, without retraining. 
+
+A. Noisy Data Generation for Training 
+
+We define the forward diffusion process with T = 1000 
+
+timesteps, as illustrated in phase 1 of Fig. 1a. Let p0 ∈ Rn
+
+denote a clean (normalized) reflectance spectrum from the public training datasets, and pt its noisy version at timestep 
+
+t ∈ { 1, . . . , T }. Given i.i.d. Gaussian noise ϵ ∼ N (0, In), the noisy spectrum at any timestep t can be computed directly as: 
+
+pt = √¯αt p0 + √1 − ¯αt ϵ (4) where ¯αt ∈ (0 , 1] controls the signal-to-noise ratio at timestep 
+
+t. We adopt the cosine noise schedule [15] with offset s =0.008 :
+
+¯αt ∝ cos 2
+
+ t/T + s
+
+1 + s · π
+
+2
+
+
+
+, βt = min 
+
+
+
+0.999 , 1 − ¯αt
+
+¯αt−1
+
+
+
+,αt = 1 − βt, ¯αt =
+
+> t
+
+Y
+
+> j=1
+
+αj .
+
+(5) This schedule gradually increases noise while preserving spec-tral structure longer than a linear schedule [13], leading to more stable training and higher-quality reconstructions. During training, we randomly sample a timestep t for each clean spectrum and generate the corresponding noisy version pt on-the-fly using Eq. (4). 
+
+B. U-Net Architecture with Time Conditioning 
+
+We employ a 1D U-Net denoising network ϵθ (pt, t ) as the backbone [13]. The network operates on spectral sequences 
+
+pt ∈ Rn (n = 301 wavelengths), outputting the predicted noise ˆϵ ∈ Rn. Temporal conditioning is implemented via sinusoidal embeddings [16] processed through a small MLP and injected into each residual block of U-net, enabling timestep-adaptive denoising across diffusion steps. The archi-tecture follows with four resolution levels (channel multipliers 
+
+1×, 2×, 4×, 8× over a base of 96 channels), two residual blocks per level, and a bottleneck of two time-conditioned residual blocks [17]. Each residual block uses 3 × 1 convo-lutions with padding, group normalization, SiLU [13] activa-tions, and 5% dropout. Downsampling uses strided convolu-tions; upsampling uses nearest-neighbor interpolation followed by convolution. Skip connections concatenate encoder and decoder features at matching resolutions. The model totals 4.8M parameters. The training objective minimizes the mean squared error between predicted and true noise: 
+
+L(θ) = Ep0,ϵ,t 
+
+∥ϵ − ϵθ (pt, t )∥22
+
+ . (6) This trains the model to denoise from any corruption level t,providing a flexible spectral prior for reconstruction. From the predicted noise ˆϵ = ϵθ (pt, t ), the clean spectrum estimate is recovered as ˆp0 = ( pt − √1 − ¯αt ˆϵ) / √¯αt.
+
+C. Pseudoinverse-Guided Diffusion Sampling 
+
+At inference (Fig. 1b), the trained U-Net is coupled with the responsivity matrix of sensors projection to enforce mea-surement consistency. We reformulate the forward model as TABLE I RECONSTRUCTION ERRORS ACROSS SIX REFLECTANCE SPECTRA SAMPLES .                                                          
+
+> Samples Tikhonov Gaussian Compressive Sensing MLP Priors Diffusion ( ΠGDM) RMSE MAPE RMSE MAPE RMSE MAPE RMSE MAPE RMSE MAPE p1 17.656 18.023 13.856 11.492 3.348 2.903 10.720 10.231 1.854 1.454 p2 5.968 7.047 15.259 11.506 3.012 2.363 9.302 9.122 2.708 1.972 p3 12.400 13.731 13.819 11.648 3.245 2.628 10.145 10.002 1.700 1.391 p4 10.285 9.842 16.534 11.114 1.236 0.848 11.000 10.860 2.625 1.431 p5 12.617 14.385 12.188 11.748 1.530 1.672 9.335 9.230 1.298 1.515 p6 19.382 12.190 17.805 10.942 0.250 0.249 9.650 9.357 2.483 1.254 Mean 13.052 12.536 14.910 11.408 2.115 1.776 9.960 9.800 2.111 1.502
+
+A(p) = 12 Rp + 12 R1n, which maps DDPM-normalized reflectance p ∈ [−1, 1] n to photocurrents ( p). Starting from pure noise pT ∼ N (0 , I ), we iteratively refine the spectrum through Steps I–IV: 
+
+Step I (Denoise): The pretrained U-Net predicts noise ˆϵ =
+
+ϵθ (pt, t ) and proposes an initial clean spectrum estimate ˆp0.
+
+Step II (Residual): Compute the measurement residual r =
+
+i − A(ˆ p0).
+
+Step III (Projection): Apply pseudoinverse-based correc-tion to ensure consistency with measured photocurrents: 
+
+p0,proj = ˆ p0 + γA +(r), (7) where A+ is the Moore–Penrose pseudoinverse [18] of A and 
+
+γ ∈ [0 , 1] controls projection strength. We fix γ = 1 .0, the value minimizing validation RMSE. 
+
+Step IV (DDPM Step): Advance to the next timestep by computing pt−1 from p0,proj using the standard DDPM update rule utilizing Equation (4) [13]. pt−1 is then used as the input to step I in the next iteration. This loop repeats for K = 50 
+
+uniformly spaced steps from t = T to t = 0 (a standard DDIM-style acceleration [13] that sub-samples the full T =1000 trajectory), yielding the final reconstructed spectrum ˆp ∈
+
+[0 , 1] n.IV. EVALUATION 
+
+For the generative prior models (DDPM and MLP), we use the datasets USGS v7 [19], SPECCHIO [20] (1429– 2500 nm), and ECOSTRESS [21]. We evaluated our model using public and private spectra. The missing wavelengths in SPECCHIO are filled by the means of USGS + EcoSTRESS. Baseline hyperparameters (e.g., the regularization weight λ for Tikhonov and compressive sensing) are tuned on the same validation split used to select ΠGDM’s projection weight 
+
+γ. For the MLP prior, we use the architecture and training method of [11], reporting the best validation checkpoint from all epochs. Our target test set includes 2 SiGe arrays of sensor chan-nels [4]. Sensor data comprises nine photodetector-calibrated responsivities within 1300–1600 nm and measured reflectance spectra (P1–P6) plus soil, PVC and PET. Ground-truth spectra and photocurrents are used to assess the reconstruction accu-racy. Accuracy is measured against the ground-truth p using RMSE and MAPE: 
+
+RMSE = 
+
+vuut 1
+
+N
+
+> n
+
+X
+
+> j=1
+
+(ˆ pj − pj )2, MAPE = 100 
+
+N
+
+> n
+
+X
+
+> j=1
+
+ˆpj − pj
+
+pj
+
+.
+
+(8) 
+
+Fig. 2. Reflectance spectra reconstruction with ΠGDM To test sensor adaptivity, we replace the second independently calibrated responsivity matrix 
+
+R2 (nine channels) corresponding to a different sensor array, while keeping the pretrained diffusion prior fixed. 
+
+Fig. 3. Comparison of NIR reflectance reconstructions: ΠGDM (orange; shaded 90% percentile interval) versus ground truth (blue), along with tra-ditional baselines (compressive sensing, Tikhonov, Gaussian) and a learning-based prior (MLP+ Π). 
+
+where j is wavelength index and N is the number of re-flectance spectra samples. We train a 1D DDPM prior on publicly available reflectance spectra (1300–1600 nm) using a standard training and validation split; no sensor measurements are used during the DDPM training. At test time, we performed a zero-shot reconstruction by plugging another measured independent calibrated responsivity R2 and photocurrents i
+
+into the ΠGDM model. Next to the accuracy evaluation, we calculate Uncertainty by running the projection of ΠGDM 
+
+S = 128 times with independent Gaussian initializations, i.e., 
+
+p(s) 
+
+> t1
+
+∼ N (0 , I ) for s = 1 , . . . , S yielding spectra p(s) ∈ Rn
+
+consistent with the measurements and learned prior. The set 
+
+{P(s)}Ss=1 approximates P(ˆ p | i, R), the distribution of unknown spectrum ˆp given measured photocurrent i and re-sponsivity R. We report the credible intervals of the posterior mean ¯P(λ) = 1
+
+> S
+
+PSs=1 P(s)(λ) and pointwise 90% credible intervals (5 th –95 th percentiles over s). Figure 2 compares the reconstructed reflectance spectra with the ground truth when using a responsivity matrix different from the one used during training. We can see that the diffusion-based model (DDPM prior with ΠGDM) recovers the global shape and characteristic across the 1300–1600 nm band. Table I reports RMSE and MAPE for six reflectance spectra (p1–p6) against baselines and MLP prior. Overall, our diffusion-based ΠGDM achieves the lowest average error (RMSE 2.111 , MAPE 1.502% ). Compressive sensing achieves competitive performance and can even outperform ΠGDM on some samples; however, its reconstruction quality strongly depends on the regularization parameter α, which typically needs to be retuned for each new calibrated sensor set. In contrast, ΠGDM is trained once on reflectance spectra and incorporates the sensor responsivity only at inference via the projection step, enabling plug-and-play deployment across sensors without retraining or retuning. We demonstrate this by swapping calibrated responsivity matrices and comparing both the ground truth and reconstruction results in Figs. 2 and 3. The MLP prior also avoids per-sensor tuning, but it yields substantially higher errors than ΠGDM, indicating that the diffusion prior captures the spectral manifold more effectively. Figure 3 compares the proposed method with classical and learning-based baselines and visualizes the associated uncer-tainty region , shown as the shaded area between the 5th and 95th percentiles of the posterior samples {P(s)(λ)}Ss=1 at each wavelength. The uncertainty bands are narrow in wavelength regions where the sensor provides strong information, i.e., where the responsivity matrix R is well conditioned with high sensitivity and low inter-channel collinearity. Conversely, the bands widen in poorly constrained regions, particularly in the long-wavelength tail (1550–1600 nm), where the sensor sensitivity diminishes. Across all scenes, the ground-truth spectra remain within the 90% uncertainty intervals, indicating well-calibrated posterior uncertainty. V. C ONCLUSION 
+
+We propose a model for spectral reconstruction using sparse photocurrent sensors, yielding average MAPE = 1.502% ,trained on a broad dataset and usable with calibrated photocur-rent sensors by simply plugging in the sensor’s responsivity without retraining. The proposed diffusion model is sensor-agnostic (independent in terms of manufacturing process and characteristic), and can reconstruct the general shape of spectra. The model returns calibrated probabilities and per-wavelength uncertainty bands, enabling decision-making under ambiguity. When confidence is low, these uncertainty estimates indicate spectra ranges in which additional measurements will be most informative. In future work, we are going to deploy this method for sensor arrays for material classification by drones. VI. ACKNOWLEDGEMENT 
+
+The authors would like to thank the Federal Ministry of Research, Technology and Space of Germany (BMFTR) for financial support under the Innovations campus Elektronik und Mikrosensorik – iCampus Cottbus“ project, grant numbers 16ME0424 and 16ES1131. REFERENCES [1] B. A. Taha, A. C. Kadhim, A. J. Addie, Q. Al-Jubouri, A. S. Azzahrani, A. J. Haider, A. N. Alkawaz, and N. Arsad, “Optical spectroscopy of cerebral blood flow for tissue interrogation in ischemic stroke diagnosis,” 
+
+ACS Chemical Neuroscience , vol. 16, no. 5, pp. 895–907, 2025. [2] I. Marini, P. Popesso, K. Dolag, M. Bravo, A. Robotham, E. Tempel, Q. Li, X. Yang, B. Csizi, P. Behroozi et al. , “Detecting clusters and groups of galaxies populating the local universe in large optical spectroscopic surveys,” Astronomy & Astrophysics , vol. 694, p. A207, 2025. [3] L. Gao, Y. Qu, L. Wang, and Z. Yu, “Computational spectrometers enabled by nanophotonics and deep learning,” Nanophotonics , vol. 11, no. 11, pp. 2507–2529, 2022. [4] J. Schlipf, F. Berkmann, Y. Yamamoto, M. Reichenbach, M. Veleski, Y. Kawaguchi, F. M¨ orz, J. W. Tomm, D. Weißhaupt, and I. A. Fis-cher, “Robust si/ge heterostructure metasurfaces as building blocks for wavelength-selective photodetectors,” Applied Physics Letters , vol. 122, no. 12, p. 121701, 2023. [5] Q. Xue, Y. Yang, W. Ma, H. Zhang, D. Zhang, X. Lan, L. Gao, J. Zhang, and J. Tang, “Advances in miniaturized computational spectrometers,” 
+
+Advanced Science , vol. 11, no. 47, p. 2404448, 2024. [6] S. Yuan, D. Naveh, K. Watanabe, T. Taniguchi, and F. Xia, “A wavelength-scale black phosphorus spectrometer,” Nature Photonics ,vol. 15, pp. 601–607, 2021, ADS Bibcode: 2021NaPho..15..601Y. [7] U. Kurokawa, B. I. Choi, and C.-C. Chang, “Filter-based miniature spectrometers: Spectrum reconstruction using adaptive regularization,” 
+
+IEEE Sensors Journal , vol. 11, no. 7, pp. 1556–1563, 2011. [Online]. Available: https://doi.org/10.1109/JSEN.2010.2103054 [8] W. Ma, Q. Xue, Y. Yang, H. Zhang, D. Zhang, X. Lan, L. Gao, J. Zhang, and J. Tang, “Robust spectral reconstruction algorithm enables quantum dot spectrometers with subnanometer spectral accuracy,” Advanced Photonics Nexus , vol. 3, no. 4, p. 046009, 2024, publisher: SPIE. [9] J. Zhang, R. Su, Q. Fu, W. Ren, F. Heide, and Y. Nie, “A survey on com-putational spectral reconstruction methods from RGB to hyperspectral imaging,” Scientific Reports , vol. 12, no. 1, p. 11905, 2022. [10] S. Zheng, Y. Liu, Z. Meng, M. Qiao, Z. Tong, X. Yang, S. Han, and X. Yuan, “Deep plug-and-play priors for spectral snapshot compressive imaging,” Photonics Research , vol. 9, no. 2, p. B18, 2021. [11] H. Zhang, Q. Li, H. Zhao, B. Wang, J. Gong, and L. Gao, “Snapshot computational spectroscopy enabled by deep learning,” Nanophotonics ,vol. 13, no. 22, pp. 4159–4168, 2024. [12] J. Song, A. Vahdat, M. Mardani, and J. Kautz, “Pseudoinverse-guided diffusion models for inverse problems,” in Proc. International Confer-ence on Learning Representations (ICLR) , 2023. [13] J. Ho, A. Jain, and P. Abbeel, “Denoising diffusion probabilistic models,” 
+
+Advances in neural information processing systems , vol. 33, pp. 6840– 6851, 2020. [14] E. J. Cand` es, J. Romberg, and T. Tao, “Robust uncertainty principles: Exact signal reconstruction from highly incomplete frequency informa-tion,” IEEE Transactions on information theory , vol. 52, no. 2, pp. 489– 509, 2006. [15] P. Dhariwal and A. Nichol, “Diffusion models beat gans on image synthesis,” Advances in neural information processing systems , vol. 34, pp. 8780–8794, 2021. [16] A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, “Attention is all you need,” Advances in neural information processing systems , vol. 30, 2017. [17] K. He, X. Zhang, S. Ren, and J. Sun, “Deep Residual Learning for Image Recognition,” in Proc. IEEE Conf. on Computer Vision and Pattern Recognition (CVPR) . Las Vegas, NV, USA: IEEE, June 2016, pp. 770–778. [18] J. C. A. Barata and M. S. Hussein, “The moore–penrose pseudoinverse: A tutorial review of the theory,” Brazilian Journal of Physics , vol. 42, no. 1, pp. 146–165, 2012. [19] R. Kokaly, R. N. Clark, G. A. Swayze, K. E. Livo, T. M. Hoefen, N. C. Pearson, R. A. Wise, W. M. Benzel, H. A. Lowers, R. L. Driscoll, and A. J. Klein, “USGS spectral library version 7 data.” [20] A. Hueni, J. Nieke, J. Schopfer, M. Kneub¨ uhler, and K. I. Itten, “The spectral database SPECCHIO for improved long-term usability and data sharing,” Computers & Geosciences , vol. 35, no. 3, pp. 557–565, Mar. 2009. [Online]. Available: https://doi.org/10.1016/j.cageo.2008.03.015 [21] S. K. Meerdink, S. J. Hook, D. A. Roberts, and E. A. Abbott, “The ECOSTRESS spectral library version 1.0,” Remote Sensing of Environ-ment , vol. 230, p. 111196, Sep. 2019.

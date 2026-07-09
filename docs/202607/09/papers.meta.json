@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-09",
+  "date": "2026-07-09",
+  "generated_at": "2026-07-09T20:33:32",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/09/2607.03145v1-cubas-information-geometric-curvature-based-adaptive-sampling-for-supervised-classification",
+      "section": "quick",
+      "title_en": "CuBAS: Information Geometric Curvature-Based Adaptive Sampling for Supervised Classification",
+      "authors": "Alexandre L. M. Levada",
+      "date": "2026-07-03",
+      "pdf": "https://arxiv.org/pdf/2607.03145v1",
+      "score": "6.0",
+      "evidence": "适用于高光谱数据的自适应采样分类方法",
+      "tldr": "训练集信息性至关重要，但多数采样策略忽略数据几何结构。CuBAS基于信息几何曲率，将标注数据视为统计流形，通过Potts MRF模型计算局部曲率，划分低曲率（同质簇）和高曲率（决策边界）区域，从而自适应选择紧凑而信息丰富的子集。在60+基准数据集上显著优于随机采样和不确定性基线，计算高效且可解释。",
+      "tags": "query:hsi",
+      "abstract_en": "The informativeness of a training set is as consequential as its size, yet most sampling strategies remain agnostic to the intrinsic geometry of the data distribution. We introduce CuBAS (Curvature-Based Adaptive Sampling), an information-geometric framework for adaptive data selection in supervised classification, grounded in the q-state Potts Markov random field (MRF) model. The central insight is that a labeled dataset can be viewed as a statistical manifold, on which local curvature, estimated via the ratio of second to first-order observed Fisher information, faithfully encodes the geometric complexity of the data distribution. We construct a k-nearest-neighbor graph over the labeled data and derive a closed-form curvature score at each vertex from the Potts sufficient statistics. This curvature signal partitions the graph into two complementary regimes: low-curvature regions, corresponding to smooth, homogeneous clusters, and high-curvature regions, concentrated around decision boundaries that are disproportionately informative for classification. By selecting nodes from both regimes, CuBAS constructs compact yet maximally informative training subsets. Empirical evaluation across more than 60 benchmark datasets demonstrates consistent and statistically significant improvements over random sampling and uncertainty-based baselines, across a wide range of labeling budgets and classifier architectures. CuBAS is computationally efficient (linear in the number of k-NN graph edges), theoretically grounded in the differential geometry of statistical manifolds, and interpretable in terms of the local shape operator of the data manifold.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/09/2607.03644v1-moonstone-a-multimodal-foundation-model-and-benchmark-for-lunar-remote-sensing",
+      "section": "quick",
+      "title_en": "Moonstone: A Multimodal Foundation Model and Benchmark for Lunar Remote Sensing",
+      "authors": "Ayush Prasad, Swarnalee Mazumder",
+      "date": "2026-07-03",
+      "pdf": "https://arxiv.org/pdf/2607.03644v1",
+      "score": "6.0",
+      "evidence": "多模态遥感基础模型",
+      "tldr": "月球遥感多模态数据分散在不同档案中，缺乏统一的机器学习基准。Moonstone构建了28通道全球月球预训练数据集，并提出了模态分组掩码自编码器MG-MAE。该模型在六项下游任务中显著优于从头训练和ImageNet预训练基线。这是首个为月球遥感定制的多模态基础模型和基准。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Decades of orbital missions have produced multi-modal remote sensing data for the Moon, spanning optical imagery, spectroscopy, thermal emission, radar, gravity, and elemental composition. Yet these datasets remain fragmented across archives, and no benchmark exists for evaluating machine learning on lunar data. We introduce Moonstone, the first multi-modal foundation model benchmark for lunar remote sensing. Our contributions are: (1) a 28-channel, 128 pixels-per-degree (~237 m) global lunar pretraining dataset from seven instrument families across five missions, (2) MG-MAE, a modality-grouped masked autoencoder with per-group convolutional tokenizers, a shared Vision Transformer encoder, attention masking for missing modalities, coverage-adaptive masking for heterogeneous spatial coverage, and spectral continuity regularization for physically plausible reconstructions, and (3) a benchmark of six downstream tasks covering classification, regression, and segmentation. MG-MAE pretrained features outperform scratch baselines on all tasks and surpass both ImageNet-pretrained and vanilla MAE baselines by large margins. Data and code are available at https://huggingface.co/datasets/ayushprd/Moonstone and https://github.com/ayushprd/Moonstone .",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/09/2607.05636v1-sensor-adaptive-infrared-spectral-reconstruction-with-plug-and-play-diffusion-priors",
+      "section": "quick",
+      "title_en": "Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors",
+      "authors": "Alireza Siyavashi, Jon Schlipf, Sebastian Reiter, Inga Fischer, Christian Wenger, Christian Herglotz",
+      "date": "2026-07-06",
+      "pdf": "https://arxiv.org/pdf/2607.05636v1",
+      "score": "6.0",
+      "evidence": "高光谱光谱重建用于材料识别",
+      "tldr": "高光谱传感成本高昂、体积庞大，限制移动应用。提出伪逆引导扩散模型（ΠGDM），利用去噪扩散概率模型学习光谱先验，无需配对数据。推理时交替去噪与伪逆投影保证测量一致性，且传感器自适应只需替换响应矩阵。平均估计误差1.502%，优于多种基线，并提供不确定性估计，为资源受限平台提供准确紧凑方案。",
+      "tags": "query:hsi",
+      "abstract_en": "Hyperspectral sensing enables material identification; however, state-of-the-art spectrometers are costly and bulky, which limits their use in mobile applications. We address this by proposing sparse spectrum reconstruction from narrowband photocurrents using a pseudoinverse-guided diffusion model (ΠGDM). With ΠGDM we use a denoising diffusion probabilistic model (DDPM) to reconstruct the spectrum, which is trained on a large public spectral dataset to learn realistic spectral priors, eliminating the need for paired sensor measurements. At inference, ΠGDM alternates reverse-diffusion denoising steps with pseudoinverse projection to enforce consistency with measured photocurrents via the calibrated responsivity matrices of sensors. Consequently, our method is sensor-adaptive: when detector arrays change, we simply substitute the responsivity matrix in the pseudoinverse projection without retraining of the diffusion model. The resulting computational spectrometer achieves 1.502% average estimation error, outperforming Tikhonov, Gaussian, compressive-sensing, and multilayer perceptron (MLP) baselines, while providing calibrated uncertainty estimates via Monte Carlo sampling from different random initializations of ΠGDM. Summarizing, our approach offers an accurate, compact alternative for spectral recovery on resource-constrained platforms.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/09/2607.07161v1-asfr-net-adversarial-alignment-and-spatio-frequency-refinement-network-for-heterogeneous-remote-sensing-image-change-detection",
+      "section": "quick",
+      "title_en": "ASFR-Net: Adversarial Alignment and Spatio-Frequency Refinement Network for Heterogeneous Remote Sensing Image Change Detection",
+      "authors": "Xin-Jie Wu, Zhi-Hui You, Si-Bao Chen, Qing-Ling Shu, Xiao Wang, Jin Tang, Bin Luo",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.07161v1",
+      "score": "6.0",
+      "evidence": "多模态对齐用于异构遥感",
+      "tldr": "异质遥感图像变化检测面临模态差异导致的伪变化难题。提出ASFR-Net，先用模态不变表示学习器桥接域差异，再用空频协同增强模块抑制传感器特有噪声，最后通过级联分层引导融合模块生成精确变化图。在公开及自建VisNIR-HCD数据集上达到SOTA，并开源数据集与代码。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "The core challenge of heterogeneous change detection in remote sensing imagery lies in effectively decoupling genuine land-cover changes from significant modal disparities caused by distinct imaging mechanisms. These intrinsic inconsistencies are prone to introducing pseudo-changes, thereby constraining detection accuracy. To address this, we propose a novel, end-to-end adversarial spatio-frequency refinement network (ASFR-Net). Initially, a modality-invariant representation learner (MIR-Learner) guides the backbone to extract modality-invariant features, effectively bridging the primary domain gap. Subsequently, to address persistent residual modal differences, we design an innovative spatio-frequency synergistic enhancement module (SFEM), which identifies and suppresses sensor-specific noise and artifacts that are difficult to discern in the spatial domain by leveraging frequency-domain processing. Multi-level difference features are then computed from these refined representations and fed into a decoder equipped with cascaded hierarchical guided fusion module (HGFM) blocks to generate precise change maps. To alleviate the data scarcity in heterogeneous tasks, we construct and release a new high-resolution benchmark specifically focused on building changes: the visible-near-infrared heterogeneous change detection (VisNIR-HCD) dataset. It presents unique scientific challenges arising from deceptive visual similarity and non-linear spectral inversions, providing a robust platform for evaluating model generalization. Extensive experiments on VisNIR-HCD and public datasets demonstrate that ASFR-Net achieves state-of-the-art (SOTA) performance, significantly outperforming existing methods. The source code and the VisNIR-HCD dataset are publicly available at https://github.com/LuoYang2024/ASFR-Net.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
