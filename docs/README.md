@@ -6,33 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-09
-- 运行时间：2026-07-09 20:33:25 UTC
+- 最新运行日期：2026-07-10
+- 运行时间：2026-07-10 20:04:28 UTC
 - 运行状态：成功
-- 本次总论文数：4
-- 精读区：0
-- 速读区：4
+- 本次总论文数：3
+- 精读区：2
+- 速读区：1
 
 ### 今日简报（AI）
-今日速读3篇论文，涵盖自适应采样、月球遥感多模态模型及红外光谱重建。最值得关注的是《CuBAS》中基于信息几何曲率的自适应采样方法，以及《Moonstone》专为月球遥感设计的多模态基础模型。建议对监督分类或遥感基础模型感兴趣的读者深入阅读这两篇。
-- 详情：[/202607/09/README](/202607/09/README)
+今天精读两篇8分论文，聚焦恶劣天气下的稳健3D检测及实时动态分辨率目标检测；最值得关注开放天气鲁棒性对齐与任意时刻推理效率优化；建议读者优先探索扩散对齐方法在真实自动驾驶场景中的部署潜力。
+- 详情：[/202607/10/README](/202607/10/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Open-Weather Robust 3D Detection via Dual-Critic Diffusion Alignment](/202607/10/2607.01983v1-open-weather-robust-3d-detection-via-dual-critic-diffusion-alignment)  
+   标签：评分：8.0/10、query:hsi-lidar
+   evidence：LiDAR与4D雷达融合实现恶劣天气下鲁棒三维检测
+2. [On Exploring Input Resolution Scaling For Anytime LiDAR Object Detection](/202607/10/2607.08391v1-on-exploring-input-resolution-scaling-for-anytime-lidar-object-detection)  
+   标签：评分：8.0/10、query:hsi-lidar
+   evidence：LiDAR点云目标检测与输入分辨率缩放
 
 ### 速读区论文标签
-1. [CuBAS: Information Geometric Curvature-Based Adaptive Sampling for Supervised Classification](/202607/09/2607.03145v1-cubas-information-geometric-curvature-based-adaptive-sampling-for-supervised-classification)  
-   标签：评分：6.0/10、query:hsi
-   evidence：适用于高光谱数据的自适应采样分类方法
-2. [Moonstone: A Multimodal Foundation Model and Benchmark for Lunar Remote Sensing](/202607/09/2607.03644v1-moonstone-a-multimodal-foundation-model-and-benchmark-for-lunar-remote-sensing)  
+1. [NegROI: Click-Centric Uncertainty-Guided Refinement with Scene-Conditioned Negative Prompts for Robust Interactive 3D Segmentation](/202607/10/2607.05955v1-negroi-click-centric-uncertainty-guided-refinement-with-scene-conditioned-negative-prompts-for-robust-interactive-3d-segmentation)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：多模态遥感基础模型
-3. [Sensor-Adaptive Infrared Spectral Reconstruction with Plug-and-Play Diffusion Priors](/202607/09/2607.05636v1-sensor-adaptive-infrared-spectral-reconstruction-with-plug-and-play-diffusion-priors)  
-   标签：评分：6.0/10、query:hsi
-   evidence：高光谱光谱重建用于材料识别
-4. [ASFR-Net: Adversarial Alignment and Spatio-Frequency Refinement Network for Heterogeneous Remote Sensing Image Change Detection](/202607/09/2607.07161v1-asfr-net-adversarial-alignment-and-spatio-frequency-refinement-network-for-heterogeneous-remote-sensing-image-change-detection)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：多模态对齐用于异构遥感
+   evidence：LiDAR点云的交互式三维分割
 
 
 <div class="dpr-home-promo-card">

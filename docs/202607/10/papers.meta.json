@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-10",
+  "date": "2026-07-10",
+  "generated_at": "2026-07-10T20:04:34",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/10/2607.01983v1-open-weather-robust-3d-detection-via-dual-critic-diffusion-alignment",
+      "section": "deep",
+      "title_en": "Open-Weather Robust 3D Detection via Dual-Critic Diffusion Alignment",
+      "authors": "Shuyao Li, Chuanxing Geng, Heyang Sun, Qiang Zhou, Jingjing Gu",
+      "date": "2026-07-02",
+      "pdf": "https://arxiv.org/pdf/2607.01983v1",
+      "score": "8.0",
+      "evidence": "LiDAR与4D雷达融合实现恶劣天气下鲁棒三维检测",
+      "tldr": "现有3D检测方法在恶劣天气下性能显著下降，因为其封闭世界假设要求训练与测试天气一致。本文提出双批评器引导扩散对齐（DCDA），利用4D雷达条件扩散过程逐步恢复退化LiDAR特征，并通过检测引导批评器保持目标判别性以及天气对抗批评器对齐分布，从而无需显式建模天气类型。实验在提出的开放天气基准上验证了DCDA对未见天气类型和强度的泛化优势，显著提升鲁棒性。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Robust 3D object detection under adverse weather remains a critical hurdle for autonomous driving. Despite progress with LiDAR-4D radar fusion, most methods are constrained by a closed-world assumption, implicitly requiring training and test weather to align in both type and severity. This premise fails in practice: the open-ended nature of weather, and even variations within a single type like rain, cause dramatically different LiDAR degradation patterns, leading to significant performance drops in unseen conditions. To address this, we present Dual-Critic Guided Diffusion Alignment (DCDA), a weather-agnostic framework that learns to recover degraded LiDAR features toward a clean manifold. Rather than modeling specific weather types, DCDA employs a 4D radar-conditioned diffusion process to progressively refine features, guided by two complementary critics. (i) A detection-guided critic, anchored by a pre-trained clean-weather model, ensures that the refined features retain object-level discriminability and localization accuracy. (ii) A weather adversarial critic enforces holistic distributional consistency with clean-weather representations. By aligning features through semantic and distributional constraints rather than explicit weather modeling, DCDA generalizes effectively to unseen weather types and severities without requiring paired data or weather labels. We further introduce a structured open-weather benchmark with held-out type-severity combinations and extensive experiments verify DCDA's advantages.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/10/2607.08391v1-on-exploring-input-resolution-scaling-for-anytime-lidar-object-detection",
+      "section": "deep",
+      "title_en": "On Exploring Input Resolution Scaling For Anytime LiDAR Object Detection",
+      "authors": "Ahmet Soyyigit, Shuochao Yao, Heechul Yun",
+      "date": "2026-07-09",
+      "pdf": "https://arxiv.org/pdf/2607.08391v1",
+      "score": "8.0",
+      "evidence": "LiDAR点云目标检测与输入分辨率缩放",
+      "tldr": "针对LiDAR点云3D目标检测中动态操作需求导致的延迟与精度权衡问题，提出一种面向任意时间计算的多分辨率输入缩放方法。通过单模型支持Pillar/Voxel特征的多分辨率推理，并设计截止时间感知调度器预测各分辨率执行时间以选择最优输入。在nuScenes数据集上显著优于现有方法，在模拟自动驾驶中实现无碰撞导航并避免冗余停顿。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Making tradeoffs between execution latency and result utility (i.e., anytime computing) for adapting to dynamic operational requirements has been shown to enhance the performance of cyber-physical systems. In this work, we focus on enabling anytime computing for deep neural networks (DNNs) that process LiDAR point clouds for 3D object detection. We propose a novel method that enables multi-resolution inference for models that process point clouds as pillars or voxels, allowing the input to be dynamically scaled and processed at the resolution needed to meet timing requirements. Importantly, our memory-efficient approach requires the deployment of only a single DNN model, avoiding the need to deploy multiple models, each trained for a different input resolution. We also introduce a deadline-aware scheduler that selects the highest possible resolution for any given input by accurately predicting the execution time for all possible resolutions at runtime, which is challenging due to the irregularity of LiDAR point clouds. Experimental results on the nuScenes autonomous driving dataset demonstrate that our method significantly outperforms existing anytime computing approaches for LiDAR object detection. Finally, we deploy our approach in a simulated autonomous driving system, where it consistently enables collision-free navigation while avoiding unnecessary stalls caused by environmental complexity.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/10/2607.05955v1-negroi-click-centric-uncertainty-guided-refinement-with-scene-conditioned-negative-prompts-for-robust-interactive-3d-segmentation",
+      "section": "quick",
+      "title_en": "NegROI: Click-Centric Uncertainty-Guided Refinement with Scene-Conditioned Negative Prompts for Robust Interactive 3D Segmentation",
+      "authors": "Shuheng Zhang, Feng Wu",
+      "date": "2026-07-07",
+      "pdf": "https://arxiv.org/pdf/2607.05955v1",
+      "score": "6.0",
+      "evidence": "LiDAR点云的交互式三维分割",
+      "tldr": "现有交互式3D分割方法在有限点击下存在边界模糊和假阳性问题，跨数据集泛化差。本文提出NegROI框架，通过点击中心的多分辨率ROI细化和不确定性驱动的选择性细化来提升边界精度，同时利用场景条件负提示和多样性正则化抑制背景假阳性，并引入边界感知硬负挖掘。在ScanNet、S3DIS和KITTI上，该方法以更少点击实现了更少假阳性，跨数据集鲁棒性优于现有方法。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Interactive 3D segmentation aims to extract object masks in point clouds with minimal user clicks. Despite recent progress, most existing approaches still struggle with (i) coarse voxel resolution that blurs fine boundaries under limited clicks and (ii) hard false positives caused by confusing background structures. These issues are exacerbated by density and scale shifts across datasets (e.g., dense RGB-D reconstructions vs. sparse LiDAR scans), where fixed refinement heuristics and purely click-driven decoding generalize poorly. To address them, we propose NegROI -- a novel transformer-based interactive framework that couples click-centric multi-resolution refinement with scene-conditioned negative prompts. Given a coarse voxel prediction, it refines only a local Region Of Interest (ROI) around the current click on a finer grid and fuses refined logits back to the coarse mask. To improve robustness and efficiency, we introduce uncertainty-driven selective refinement that prioritizes ambiguous regions. Meanwhile, we model hard background patterns via a set of scene-conditioned negative prompts obtained by cross-attention over scene tokens. We further stabilize these prompts with a diversity regularizer. Finally, we propose boundary-aware hard negative mining to supervise negative-prompt attention toward boundary-proximal, high-confidence false positives. Our experiments on common benchmark datasets (i.e., ScanNet, S3DIS, and KITTI) demonstrate improved click efficiency and reduced false positives, with stronger cross-dataset robustness than the state-of-the-art baselines.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

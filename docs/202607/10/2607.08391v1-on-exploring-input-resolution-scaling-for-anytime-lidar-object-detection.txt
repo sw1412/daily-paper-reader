@@ -1,0 +1,648 @@
+Title: On Exploring Input Resolution Scaling For Anytime LiDAR Object Detection
+
+URL Source: https://arxiv.org/pdf/2607.08391v1
+
+Published Time: Fri, 10 Jul 2026 00:49:12 GMT
+
+Number of Pages: 14
+
+Markdown Content:
+> 1
+
+# On Exploring Input Resolution Scaling For Anytime LiDAR Object Detection 
+
+Ahmet Soyyigit, Shuochao Yao, and Heechul Yun 
+
+✦
+
+Abstract —Making tradeoffs between execution latency and result utility (i.e., anytime computing) for adapting to dynamic operational require-ments has been shown to enhance the performance of cyber-physical systems. In this work, we focus on enabling anytime computing for deep neural networks (DNNs) that process LiDAR point clouds for 3D object detection. We propose a novel method that enables multi-resolution inference for models that process point clouds as pillars or voxels, allow-ing the input to be dynamically scaled and processed at the resolution needed to meet timing requirements. Importantly, our memory-efficient approach requires the deployment of only a single DNN model, avoiding the need to deploy multiple models, each trained for a different input resolution. We also introduce a deadline-aware scheduler that selects the highest possible resolution for any given input by accurately predict-ing the execution time for all possible resolutions at runtime, which is challenging due to the irregularity of LiDAR point clouds. Experimen-tal results on the nuScenes autonomous driving dataset demonstrate that our method significantly outperforms existing anytime computing approaches for LiDAR object detection. Finally, we deploy our approach in a simulated autonomous driving system, where it consistently enables collision-free navigation while avoiding unnecessary stalls caused by environmental complexity. 
+
+Index Terms —LiDAR, 3D object detection, Deep neural networks, Any-time computing, Simulation 
+
+1 INTRODUCTION 
+
+Autonomous systems are critically dependent on the accu-rate detection of surrounding objects in real-time. For this task, numerous highly accurate LiDAR-based object detec-tion deep neural networks (DNNs) have been proposed in recent years [1], [2], [3], [4]. However, these state-of-the-art LiDAR object detection DNNs are computationally expensive, making deployment on resource-constrained em-bedded computing hardware challenging. This challenge is particularly pronounced in systems with strict size, weight, and power (SWaP) constraints, necessitating trade-offs be-tween accuracy and latency. The required accuracy/latency trade-offs depend not only on the SWaP constraints but also on the dynamic operation environment [5], [6]. For example, in complex and crowded urban environments where objects move slowly, processing input in a fine-grained manner may be desirable 
+
+Dr. Soyyigit is with The National Defense University, Istanbul, Turkiye (e-mail: ahmet.soyyigit@msu.edu.tr). He is the corresponding author of this paper. Dr. Yao is with George Mason University, Fairfax, VA, USA (e-mail: shuochao@gmu.edu). Dr. Yun is with The University of Kansas, Lawrence, KS, USA (e-mail: heechul.yun@ku.edu). 
+
+to maximize detection accuracy, even if it takes longer. How-ever, in simpler environments with fast-moving objects, such as highways, it may be preferable to process quickly in a coarse-grained manner, as lower processing latency could be more important than high precision and fine-grained details. Algorithms that can trade off quality and latency are known as anytime algorithms in the literature, and there has been significant effort in recent years to make anytime-capable DNNs that process perceptual input data. For image classification and object detection tasks, “early-exit” archi-tectures have been explored [7], [8], [9], [10], where addi-tional output layers are integrated at intermediate stages of a DNN to allow predictions to be made before reaching the full depth of the model. Criticality-based slicing and scheduling of input [9], [11], [12], [13], [14] and dynamic scaling of image resolution [15], [16], [17] have been studied to enable anytime processing capabilities in object classifica-tion and detection DNNs. However, most prior works have focused on DNNs that process camera images. For LiDAR-based object detection tasks, Anytime-LiDAR [18] combined the early-exit method with a novel detection head scheduling technique to enable dynamic latency/accuracy trade-offs for PointPillars [4]. VALO [19] explores a deadline-aware input slicing and scheduling ap-proach that greatly improves anytime performance, achiev-ing higher accuracy across a gamut of deadlines, when applied to the state-of-the-art LiDAR object detection mod-els [2], [20]. However, input resolution, defined here as the spatial granularity of the input encoded from the LiDAR scans, remains a largely underexplored scaling factor in the design of anytime LiDAR detection models. Although adjusting resolution provides an excellent trade-off between detection accuracy and execution time (as shown in Fig-ure 4), the runtime memory requirements grow linearly with the number of supported resolutions due to the need for a separate model for each resolution, presenting a key challenge for practical deployment. In this paper, we propose MURAL 1, a multi-resolution anytime framework for LiDAR object detection DNNs. First, MURAL enables dynamic selection of input resolution, allowing flexible trade-offs between accuracy and latency while using a single shared set of network weights. This 
+
+1. This work extends a prior conference publication [21] by adding voxel-based DNN support and closed-loop evaluation. arXiv:2607.08391v1 [cs.RO] 9 Jul 2026 2Sparse 
+
+CNN 
+
+Dense 
+
+CNN Feature 
+
+Encoder 
+
+Detected objects Point cloud 
+
+Fig. 1: General architecture of LiDAR Object Detection DNNs. is possible thanks to its multi-resolution architecture en-hancement and training methodology (Section 4.2). Second, MURAL can support additional input resolutions on top of those used during training, by synthesizing new in-put resolutions (Section 4.3). Third, MURAL incorporates a deadline-aware scheduler that dynamically selects the highest feasible input resolution for a given time constraint, based on accurate execution time predictions for each reso-lution (Section 4.4). We evaluate MURAL on two 2D pillar-based models: the state-of-the-art Pillarnet [3] and the widely used PointPillars [4]. To demonstrate the versatility of our approach, we fur-ther apply MURAL to CenterPoint [2], a popular 3D voxel-based DNN. We assess performance in terms of accuracy, la-tency, and resource utilization, comparing MURAL against separately trained baseline models for each resolution as well as the prior state-of-the-art anytime method [19]. Our evaluation is two-fold: (i) a hard-deadline, open-loop setting using a large-scale autonomous driving dataset, and (ii) a closed-loop simulated environment in which object detection directly influences navigation performance. Re-sults show that MURAL achieves higher detection accuracy under a wide range of deadlines compared to both the baselines and the prior anytime approach. In the closed-loop experiments, we demonstrate that MURAL improves navigation safety and efficiency by adjusting input resolu-tion according to the ego-vehicle’s velocity, outperforming fixed-resolution baselines. In summary, our key contributions are:  
+
+> •
+
+We present the first work enabling runtime resolu-tion scaling for LiDAR-based object detection DNNs and release it open-source 2. 
+
+> •
+
+We introduce a general framework applicable to both pillar- and voxel-based detection architectures.  
+
+> •
+
+We achieve superior accuracy–latency trade-offs compared to non-anytime baseline models and the prior state-of-the-art anytime LiDAR approach.  
+
+> •
+
+We demonstrate the practical benefits of MURAL in a closed-loop autonomous driving simulation, show-ing improved navigation safety and efficiency. 
+
+2 BACKGROUND 
+
+In this section, we provide the necessary background on LiDAR object detection DNNs and resolution scaling. 
+
+2.1 LiDAR Object Detection DNNs 
+
+The LiDAR sensor continuously scans the surrounding en-vironment, producing periodic snapshots. Each snapshot 
+
+> 2. MURAL code repository: https://github.com/CSL-KU/MURAL
+
+Fig. 2: 3D points converted to voxels and pillars. is represented as a point cloud P consisting of n points, formally defined as: 
+
+P = {(x1, y 1, z 1, i 1), . . . , (xn, y n, z n, i n)} (1) where each point encodes its 3D spatial coordinates in meters along with the laser return intensity. DNNs have emerged as a powerful approach for detecting objects of in-terest within point clouds [2], [3], [4], [22]. To enable efficient DNN-based processing, the cubic space S encompassing the point cloud is partitioned into a grid G of uniformly sized cubical cells. Cells that contain at least one point are referred to as voxels . The dimensions of G are determined by: 
+
+G = ( Xe − Xs
+
+Vx
+
+, Ye − Ys
+
+Vy
+
+, Ze − Zs
+
+Vz
+
+) (2) where (Xs, X e, Y s, Y e, Z s, Z e) define the range of S in the LiDAR-centered coordinate system and (Vx, V y , V z ) denotes the voxel size, both expressed in meters. Converting a point cloud into a voxel representation enables the application of convolutional neural networks (CNNs) for feature extrac-tion, as the resulting voxel grid can be treated as either a sparse or dense tensor (i.e., a multidimensional array). When the height of the voxels (Vz ) is equal to the height of the cubic space (Ze − Zs), effectively removing the height dimension of G, the voxels are called instead pillars . Figure 2 illustrates the conversion of raw points into both pillars and voxels. In practice, a DNN typically employs only one of these representations, as they require distinct feature encoders and specialized model architectures. Several works have proposed using pillars rather than voxels [3], [4] to avoid computationally expensive 3D convolutional layers, thereby providing deployment-friendly solutions with min-imal sacrifice in detection accuracy. Figure 1 illustrates the general architecture of LiDAR-based object detection DNNs. The process begins with a feature encoder (FE) that transforms raw points into pillars or voxels, typically represented in a coordinate list (COO) format. At this stage, the sparse data occupy only a small 3Pillar size: 0.1m x 0.1m 
+
+Grid size: 600 x 600 
+
+Number of pillars: 12342 
+
+Pillar size: 0.3m x 0.3m 
+
+Grid size: 200 x 200 
+
+Number of pillars: 5024 
+
+Pillar size: 0.5m x 0.5m 
+
+Grid size: 120 x 120 
+
+Number of pillars: 2925 
+
+Fig. 3: Bird’s-eye-views of a LiDAR point cloud transformed into pillars of three sizes. Darkness indicates point density. fraction of the grid (e.g., 3%–20%). Consequently, converting this sparse tensor into a dense tensor and applying standard dense convolutions—as used in image processing—would be computationally wasteful. To address this, sparse CNNs [22] are employed to pro-cess the data directly in its sparse format. Sparse convolu-tions apply the same mathematical operations as dense con-volutions, but restrict computation to non-zero (occupied) elements, skipping empty locations to reduce computational cost. Output of the sparse CNN is scattered onto a dense grid of zeros to form a bird’s-eye view (BEV) feature map. This representation is then processed by a conventional dense CNN. Finally, post-processing operations, such as non-maximum suppression (NMS), are applied to generate the final detection results. 
+
+2.2 Convolution and Batch Normalization 
+
+As discussed above, once the 3D point cloud input is en-coded into pillars or voxels, it can be processed by CNNs. Importantly, CNNs do not require the spatial dimensions of their inputs (i.e., the input resolution) to be fixed. Instead, these dimensions can be determined at runtime, allowing the same CNN to process inputs of varying resolutions. It is worth noting that CNNs typically incorporate batch normalization (BN) layers following each convolution layer to accelerate and stabilize model training. A BN layer is formally expressed as: 
+
+y = γ · x − μσ + β (3) where y is the normalized output, x is the input, μ and σ
+
+denote the mean and standard deviation, respectively, and 
+
+γ and β are learnable scale and shift parameters whose values depend on the statistical distribution of the input tensors [23]. 
+
+2.3 Resolution Scaling of Pillars/Voxels 
+
+Given the general architecture of a LiDAR object detection DNN described above, adjusting the pillar or voxel size de-rived from point clouds represents an effective strategy for scaling the input resolution of the detector [3], [24]. Figure 3 illustrates three examples of pillars generated from the same point cloud. Enlarging the pillar dimensions (Vx, V y ) used to encode the points reduces both the total number of pillars and the height and width of the grid G. This leads to faster inference without requiring any modifications to the model architecture. However, the trade-off is a reduced capacity to capture fine-grained spatial details, analogous to the loss of detail observed when processing lower-resolution images. 
+
+3 MOTIVATION 
+
+In this section, we explore the feasibility and challenges of resolution scaling to enable anytime computing capability in LiDAR object detection. Pillarnet (0.100) Pillarnet (0.128) Pillarnet (0.160) Pillarnet (0.200) Pillarnet (0.100) Pillarnet (0.128) Pillarnet (0.160) Pillarnet (0.200) Pillarnet (0.100) Pillarnet (0.128) Pillarnet (0.160) Pillarnet (0.200) Pillarnet (0.100) Pillarnet (0.128) Pillarnet (0.160) Pillarnet (0.200)             
+
+> 0
+> 50
+> 100
+> 150
+> 200
+> 250
+> 300
+> Execution time (msec)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> Normalized Accuracy (mAP)
+> 1.00 0.96 0.93 0.89
+> 1.00 0.96 0.93 0.89
+> 1.00 0.96 0.93 0.89
+> 1.00 0.96 0.93 0.89
+
+Fig. 4: Execution time (on Jetson AGX Orin at 30W) and accuracy statistics of Pillarnet separately trained with four different pillar sizes. Figure 4 shows the execution time distribution and aver-age accuracy of Pillarnet [3] LiDAR object detection models, where each model is trained for a different input resolution. As expected, higher resolutions resulting from smaller pillar sizes enable higher accuracy but also, on average, longer execution times. A straightforward way to enable anytime computing would be to deploy multiple models at different resolutions and switch among them based on the current deadline. However, this strategy requires loading multiple DNNs into memory, which is often impractical on memory-constrained embedded platforms. 4Forecast    
+
+> Point
+> Cloud
+> Detected
+> Objects Sched
+> Previously Detected Objects
+> Configure to selected pillar size
+> Forecasted
+> Objects
+> Final
+> Objects
+> RA Sparse
+> CNN
+> RA Dense
+> CNN
+> RA Feature
+> Encoder
+
+Fig. 5: The architecture of MURAL. RA stands for resolution-aware. In principle, one could instead run a single model at resolutions other than the one for which it was trained, leveraging the fully convolutional nature of LiDAR object detection architectures. However, Table 1 shows the nor-malized mAP scores of Pillarnet when trained at 0.100 2 m2
+
+and evaluated with four different pillar sizes. As shown, when the resolution used during inference differs from the training resolution, accuracy drops significantly. Thus, naively using a single model for multiple resolutions is not a viable solution for anytime computing.         
+
+> Pillar size ( m2)0.100 20.128 20.160 20.200 2
+> Normalized mAP (%) 100.0 78.8 41.0 18.0
+
+TABLE 1: Impact of pillar size mismatch. In this paper, we propose a framework that equips a single LiDAR object detection model with anytime inference capability in a deployment-friendly manner. Specifically, our objective is to support multiple input resolutions at runtime while maintaining minimal memory overhead and preserving accuracy relative to baseline models trained at fixed resolutions. 
+
+4 MURAL 
+
+In this section, we introduce MURAL, a MU lti-Resolution 
+
+Anytime LiDAR framework, which transforms any pillar-or voxel-based LiDAR object detection DNN into an (non-interruptible [25]) anytime algorithm, ensuring that detec-tion results are delivered on time with the highest possible accuracy. Throughout this section, we use ”pillar” to refer to both pillar- and voxel-based representations for brevity. We provide explicit clarification for cases where the implemen-tation or applicability differs between the two. 
+
+4.1 Overview 
+
+The general architecture of MURAL is illustrated in Figure 5. MURAL is designed to enable efficient accuracy–latency trade-offs by dynamically adjusting the size of pillars into which the input point cloud is encoded. Recall that in-creasing the pillar size reduces the number of pillars and the resolution (i.e., the width and height dimensions) of the grid processed by the CNN (Section 2.3). By adjusting the pillar size, MURAL ensures that the entire input is processed within the deadline for each invocation of the object detector. To support this capability, MURAL modifies the normalization layers of the target DNN to be resolution-aware and trains the model to adapt to multiple pillar sizes (Section 4.2). After training, MURAL can support additional pillar (only, not voxel) sizes—beyond those used during training by regressing resolution-specific parameters (Sec-tion 4.3). During inference, its scheduler (Section 4.4) takes the input point cloud and selects the smallest pillar size that can meet a given deadline, as smaller pillars are most likely to yield better detection performance. This selection entails accurately predicting the end-to-end execution time for each candidate pillar size until one that can meet the deadline is found. The scheduler then configures the detection pipeline to accommodate the chosen pillar size. Beyond its core multi-resolution capabilities, MURAL integrates complementary optimizations from our prior work [19]. Specifically, it eliminates redundant computa-tions in the dense CNN layers (Section 4.5) and utilizes a forecasting mechanism to predict object positions based on historical detections (Section 4.6). After forecasting, detected and forecasted objects are merged, with priority given to the current detections to maximize accuracy. Furthermore, for voxel-based models, MURAL incorporates a region-dropping mechanism (Section 4.7) to mitigate the impact of potential execution time prediction inaccuracies. Following the execution of the 3D backbone, this mechanism crops the intermediate data to reduce the execution time if a deadline miss is anticipated otherwise. 
+
+4.2 Multi-Resolution Training and Inference 
+
+We introduce a DNN training scheme for LiDAR object de-tection that allows the pillar size to be dynamically selected at runtime from a predefined set of options. A key require-ment is that for each pillar size, the single trained model should achieve accuracy comparable to or exceeding that of individually trained dedicated models. Consequently, a MURAL-enabled DNN can serve as a drop-in replace-ment for multiple baseline DNNs, facilitating efficient and memory-friendly accuracy-latency trade-offs. In the proposed training scheme, for each input batch of point clouds, a separate forward pass is conducted for every targeted pillar size, and the resulting loss values are accumulated as follows: 
+
+Ltotal = X
+
+> p∈P
+
+L(fθ (x, p ), y ) (4) 51 2 3 4
+
+Layer index 
+
+> 0.18
+> 0.20
+> 0.22
+> 0.24
+> 0.26
+> Channel-wise mean of
+> paramameter values
+
+Weight    
+
+> 1024x1024
+> 928x928*
+> 800x800
+> 672x672*
+> 512x512
+> 384x384*
+> 1234
+
+Layer index 
+
+> 0.10
+> 0.08
+> 0.06
+> 0.04
+
+Bias    
+
+> 1234
+
+Layer index 
+
+> 1.2
+> 1.0
+> 0.8
+> 0.6
+> 0.4
+> 0.2
+
+Running mean    
+
+> 1234
+
+Layer index 
+
+> 2
+> 3
+> 4
+> 5
+> 6
+> 7
+
+Running variance 
+
+Fig. 6: Channel-wise means of batch normalization parameters (weight, bias, running mean, running variance) for six grid areas from 1024 × 1024 to 384 × 384 . The grid areas of the synthesized resolutions are indicated with a (*) in the legend. Their predicted batch normalization parameters are predicted with regression. 𝑩𝑵 𝟏 (𝝁 𝟏 ,𝝈 𝟏 ,𝜸 𝟏 ,𝜷 𝟏 )  
+
+> 𝑩𝑵 𝑴 (𝝁 𝑴 ,𝝈 𝑴 ,𝜸 𝑴 ,𝜷 𝑴 )
+
+.
+
+.
+
+.
+
+# DNN layer DNN layer 
+
+Fig. 7: Resolution-aware batch normalization. where Ltotal is the total accumulated loss, P is the set of all targeted pillar sizes, L is the loss function of the baseline DNN, fθ is the DNN with weights θ, x is the input point cloud encoded into pillars of size p, and y is the ground truth. Subsequently, backpropagation is applied using Ltotal to update the model parameters θ, ensuring that the gradi-ents accumulated across all resolutions contribute to each parameter update. While this approach renders the DNN adaptable to P to some extent, we observe that the accuracy achieved for each pillar size still falls noticeably below that of separately trained models. To overcome this limitation, we introduce dedicated batch normalization (BN) layers for each input resolution throughout the DNN, as depicted for a single BN layer in Figure 7. This design draws inspiration from a prior work on image classification [16], which demonstrates that varying image resolutions give rise to distinct statistical distributions that influence the behavior of BN layers (see Section 2.3). That work proposes resolution-aware BN lay-ers as an effective mechanism for accommodating multiple image resolutions while keeping the weights of all other layers shared. We hypothesize that LiDAR pillar feature maps exhibit resolution-dependent statistical distributions analogous to those observed in camera-based object detection networks, which motivates our decision to replace all BN layers with resolution-aware counterparts in LiDAR object detection networks. During training, since forward passes are performed for each pillar size, all BN layers within each resolution-aware BN block are activated. As a result, backpropagation updates the parameters of the BN layers corresponding to every input resolution. At inference time, the appropriate BN layers are dynamically activated based on the selected pillar size. It is worth noting that since each BN layer has only a small number of parameters, maintaining separate layers per resolution introduces negligible memory over-head while yielding substantial accuracy improvements. 
+
+4.3 Synthesizing Additional Input Resolutions Post-Training 
+
+At inference time, restricting the model only to input res-olutions used during training can result in coarse-grained latency–accuracy trade-offs. To provide greater flexibility, we enable the use of additional resolutions at runtime by synthesizing BN layers post-training, thereby widening the list of available pillar sizes without requiring retraining or fine-tuning. The parameters of these synthesized BN layers are predicted using regression models fitted to the parame-ters of the originally trained BN layers. Specifically, for each BN parameter — running statistics (mean and variance) and learnable parameters (scale and shift) — we fit independent quadratic models per layer and input channel. Figure 6 illustrates the BN parameters for six different input resolutions (resulted from six different pillar sizes). The channel-wise means are visualized to demonstrate that the relationship between the input resolutions and the parameter values can be modeled independently for each layer. Notably, only three of the input resolutions were used during training; the remaining three (marked with ‘*’) were synthesized post-training. This approach allows our model to generalize to reso-lutions beyond those encountered during training. Empiri-cally, we observe that the accuracy achieved with additional resolutions falls between the accuracies of the two closest trained ones. Furthermore, adding resolutions smaller than the smallest trained resolution still yields satisfactory accu-racy. Unfortunately, the input resolution synthesis introduced here does not produce satisfactory results for voxel-based models. Although their BN layers also exhibit a strong relationship between input resolution and parameter values (similar to Figure 6), the effectiveness of the synthesized BN layers also depends on the adaptability of the convolutional 6LPFE LSC LDC LPP          
+
+> (a)
+> 0
+> 50
+> 100
+> 150
+> 200
+> Execution time (msec)
+> 180 200 220 240 260 280
+> Number of points ( x10 3)
+> (b)
+> 10
+> 11
+> 12
+> 13
+> 14
+> 15
+> LPFE  (msec)
+> 20 40 60 80 100
+> Number of pillars ( x10 3)
+> (c)
+> 50
+> 75
+> 100
+> 125
+> 150
+> 175
+> 200
+> LSC  (msec)
+
+Fig. 8: (a) Component-wise execution timing of the Pillarnet (trained for pillar size 0.100 2 m2). (b) PFE latency of the same Pillarnet with respect to its input. (c) Sparse CNN latency of the same Pillarnet with respect to its input. Conv. or 
+
+Max -pool 
+
+Grid with 6 pillars 
+
+> 3x3 filter
+
+Grid with 29 pillars 
+
+Fig. 9: Active output locations of a convolution depend on the spatial distribution of active input locations — a dependency that max pooling can replicate with matching kernel parameters. layers to the new resolutions. We posit that the sparse 3D CNNs used in voxel-based models struggle in this regard, as the 3D convolutions are more sensitive to resolution changes than the 2D convolutions used in pillar-based models. 
+
+4.4 Dynamic Resolution Scheduling 
+
+To maximize detection accuracy under a dynamically im-posed deadline, we propose scheduling the smallest pillar size (i.e., the highest input resolution) that can be processed within the given deadline. This necessitates accurate run-time latency prediction for multiple pillar sizes, which is a non-trivial challenge due to the high variability in execution times. To address the latency prediction challenge for a given pillar size, we decompose the total latency L of a LiDAR object detection model into four constituent parts: 
+
+L = LP F E + LSC + LDC + LP P (5) where the four components represent the latencies of the pillar feature encoder (PFE), sparse CNN, dense CNN, and post-processing stages, respectively. Note that this decom-position equally applies to voxel-based models by substitut-ing the PFE with the voxel feature encoder (VFE). Figure 8-a shows the latencies of these four components for baseline Pillarnet [3] utilizing a pillar size of 0.100 2 m2.We first observe that LP P and LDC show almost no vari-ation in execution time across a range of input samples. Therefore, their 99th percentile values, obtained from offline benchmarking per input resolution, provide reliable predic-tions for all MURAL pillar size configurations. For LP F E , shown in Figure 8-b, there is a strong cor-relation between the number of input points and LP F E .For each input resolution, we model this relationship with a quadratic regression and use these fitted models for runtime prediction. Finally, LSC exhibits substantial variability, as illustrated in Figure 8-c, even when processing an identical number of input pillars. This unpredictability renders execution time estimation unreliable using either a fixed worst-case value or a simple quadratic equation as employed for LP F E .This variability arises because each sparse convolution within the sparse CNN can produce a different number of output pillars for the same number of input pillars. Since sparse convolution filters operate based on the spatial coordinates of active input pillars within the grid, both the count and coordinates of the output pillars are inherently dependent on those of the inputs. An illustrative example is provided in Figure 9. This spatial dependency introduces a cascade effect throughout the sparse CNN, causing the number of active pillars to fluctuate dynamically across layers—the primary driver of execution time variability [19]. While the relationship between input pillar count and execution time for any individual sparse convolution can be accurately captured by a quadratic model, the core difficulty lies in predicting per-layer pillar counts prior to sparse CNN execution. Our previous work [19] addressed this through a history-based approach that assumed strong spatial con-sistency between consecutive LiDAR frames. However, this assumption weakens as the environment becomes increas-ingly dynamic. In this work, we propose a more robust latency es-timation method for pillar-based models that infers the input pillar counts for all sparse convolution layers without executing the sparse CNN itself. Our approach employs lightweight max pooling operations configured to replicate the behavior of the sparse convolution layers. The under-lying insight is that for a given input, the output pillar coordinates of a convolution (sparse or dense) can be re-produced by a suitably configured max pooling operation sharing the same kernel size, stride, and padding as the convolution it emulates. Once the input pillar counts for all sparse convolution layers are calculated via max pooling, 
+
+LSC is predicted by mapping these counts to execution 7
+
+times through per-layer quadratic equations and summing the results. These calculations are carried out independently for each pillar size considered during scheduling. For voxel-based models, the overhead of 3D max pooling is prohibitive, rendering our max-pooling based time pre-diction infeasible. Unlike pillar-based models where sparse CNN operates over a compact 2D representation, voxel-based models process the input in 3D. Thus, mimicking the sparse CNN of voxel-based models requires 3D max pooling operations (whether sparse or dense), making its execution cost disproportionately high relative to the 2D pillar-based counterpart. To address this, we construct an offline lookup table where each row corresponds to a representative input sam-ple and each column to a candidate resolution, with cell values storing the measured execution time. Samples are selected to span the expected range of scene densities and spatial distributions encountered at runtime, ensuring the table captures latency variability across diverse conditions. Our method is built on two premises: (1) consecutive inputs tend to share similar spatial characteristics, resulting in comparable latencies, and (2) relative latency trends across resolutions remain consistent for inputs with similar spatial characteristics. At runtime, we identify the column of our lookup table corresponding to the pillar size used in the last frame, find the row whose latency value in that column is closest to the last frame’s execution time, and use the latencies in that row as our predicted execution times for all candidate resolutions. Empirically, this approach yields prediction accuracy similar to the history-based method described in [19]. However, it inherits the spatial consistency assumption from [19], and the region-dropping mechanism described in Section 4.7 is employed to mitigate the impact of potential prediction inaccuracies. 
+
+Algorithm 1: Dynamic Resolution Scheduling 
+
+Require: Deadline d,input point cloud C,available pillar sizes P = {p1, p 2, . . . , p n} (sorted from smallest to largest) 
+
+Ensure: Selected pillar size p∗ 
+
+> 1:
+
+for i = 1 to n do  
+
+> 2:
+
+ti ← predict exec time (C, p i) 
+
+> 3:
+
+if ti ≤ d then  
+
+> 4:
+
+return pi 
+
+> 5:
+
+end if  
+
+> 6:
+
+end for  
+
+> 7:
+
+return pn
+
+Algorithm 1 summarizes the steps of our dynamic res-olution scheduling. The scheduler performs a top-down search, starting from the highest resolution and decreasing it until the predicted latency falls within the deadline. MURAL then configures the DNN to match the selected resolution. 
+
+4.5 Dense CNN Optimizations 
+
+The point cloud from LiDAR may occupy a smaller area in the BEV than the cuboid space defined by its range. As a result, large portions of the grid, especially at the edges, can be empty. We crop these empty regions to speed up the dense CNN without sacrificing accuracy, as implemented in our prior work [19]. Additionally, dense convolutions in detection head that infer object attributes (e.g., size, velocity) perform computations across the entire grid, with-out considering object locations. To avoid the redundant computations introduced by this, we apply an optimization from [19] that limits the computation to regions where detected objects are located, reducing latency while main-taining accuracy. This optimization is also incorporated into MURAL. 
+
+4.6 Forecasting 
+
+The forecasting process entails predicting the current posi-tions of previously detected objects based on their estimated velocity and ego-vehicle localization data. In our prior work [19], input data scheduling was employed to navigate latency–accuracy trade-offs, where a portion of the input data was skipped and forecasting of past detection results was used to compensate for the missing information. Inter-estingly, forecasting also proves beneficial within MURAL, despite the absence of any input skipping. Specifically, it enables objects that were missed in the current frame (e.g., due to occlusion) but detected in earlier frames to be con-tinuously tracked. For this reason, forecasting is integrated into the MURAL framework. 
+
+4.7 Region Dropping 
+
+Our lookup table-based sparse CNN time prediction method for voxel-based models can inevitably yield over-and underpredictions, since it assumes perfect spatial con-sistency across consecutive LiDAR scans — an assumption inherited from our prior work [19]. Underpredicted timings of the sparse CNN can lead to deadline misses. To mitigate this issue, we adapt the region dropping method introduced in [19] to MURAL. This method, executed after the sparse CNN, trims the dense input tensor to the largest size that can still meet the deadline, and is only applied when an underprediction would otherwise cause a deadline miss. Specifically, regions are equally cropped from the left and right sides of the BEV input tensor. This is because the ego vehicle and its immediate surroundings are centered in the BEV representation as illustrated in Figure 3, making the left and right regions less likely to contain safety-critical objects. 
+
+5 EVALUATION 
+
+We extended OpenPCDet [26], an open-source LiDAR object detection framework that supports state-of-the-art methods, to implement MURAL. Our evaluation is two-fold: an open-loop study using the nuScenes [27] dataset to assess detec-tion performance under hard deadlines, and a closed-loop study in a simulated environment to evaluate the impact of MURAL on autonomous driving safety and efficiency. 
+
+5.1 Open-loop Evaluation 
+
+In our open-loop evaluation, we primarily use Pillarnet [3], a leading pillar-based DNN. To demonstrate MURAL’s gen-eral applicability, we also present results on two more meth-ods: PointPillars [4], and CenterPoint [2]. Table 2 presents 8
+
+the architectural differences of the evaluated models. Unlike Pillarnet and CenterPoint, PointPillars does not employ a sparse CNN, which simplifies its scheduling because latency prediction becomes more straightforward.            
+
+> Feature Encoding Sparse CNN Dense CNN Pillarnet Pillar ✓✓
+> PointPillars Pillar ×✓
+> CenterPoint Voxel ✓✓
+
+TABLE 2: Architectural differences of evaluated models. For comparison, MURAL is evaluated against our prior work, VALO [19], a state-of-the-art anytime LiDAR ob-ject detection framework that achieves anytime capability through input data slicing and scheduling. VALO is ap-plied to baseline models utilizing the smallest available pillar/voxel size to maximize detection accuracy. For model training and evaluation, we employ the nuScenes [27] autonomous driving dataset, reporting de-tection accuracy using the mean average precision (mAP) metric. All models are trained on the full nuScenes training split, which comprises 700 distinct scenes, each consist-ing of a 20-second LiDAR scan sequence captured at 50-millisecond intervals. In both training and evaluation, the 10 most recent LiDAR scans are merged for each input, a commonly adopted technique to enhance accuracy and facilitate object velocity estimation [27]. For runtime evaluation under hard deadline constraints, we utilize 75 scenes from the nuScenes validation split, pro-cessing all annotated frames in each sequence sequentially at 250-millisecond intervals. This process is repeated under varying deadline constraints for each evaluated model. Our runtime testing methodology maintains a buffer of the most recent successful detection outputs, which is updated when-ever a method meets its deadline. In the event of a missed deadline, the late output is discarded and the buffered results are used instead, effectively simulating job abortion. Runtime evaluation is conducted on two hardware plat-forms: NVIDIA Jetson AGX Xavier and NVIDIA Jetson AGX Orin, both operating under a 30W power profile. Platform specifications are summarized in Table 3. On each device, six CPU cores and all available GPU resources are exclusively allocated to the method under evaluation.          
+
+> Jetson AGX Xavier Jetson AGX Orin CPU 8-core NVIDIA Carmel 12-core Arm Cortex-A78AE RAM 16 GB 32 GB OS Ubuntu 20.04 Ubuntu 22.04 Software Jetpack 5.1 Jetpack 6.0
+
+TABLE 3: Experiment platforms. Our evaluation results are organized into six subsections: (1) details of MURAL’s training; (2) MURAL’s performance on Pillarnet; (3) MURAL’s performance on PointPillars; (4) MURAL’s performance on CenterPoint; (5) an ablation study of MURAL’s components; (6) an analysis of the sched-uler’s time prediction errors; and (7) overhead analysis. In each section (except for the first), we normalize the detection scores (mAP) of all the methods evaluated relative to the highest score obtained in that section. 
+
+5.1.1 Training Results 
+
+Using the nuScenes dataset, we first train three separate baseline Pillarnet models, each with a distinct pillar size, and subsequently compare MURAL’s performance across resolutions against these baselines. Note that in this exper-iment, forecasting is disabled for MURAL and no deadline violations are assumed for any method, in order to isolate the accuracy implications of MURAL. Table 4 presents the results. MURAL maintains compa-rable accuracy for the smallest ( 0.100 2) and largest ( 0.200 2)pillar sizes, while surpassing the baseline for the medium pillar size ( 0.128 2). These results demonstrate that MURAL, as a single model capable of operating across multiple resolutions, achieves accuracy on par with or better than in-dividually trained fixed-resolution models. We attribute the accuracy gain at the medium resolution to the regularization effect inherent in multi-resolution training, consistent with observations reported in [16] for multi-resolution image classification.         
+
+> Pillar size ( m2)Pillarnet MURAL
+> 0.100 20.564 0.564 (+0.000)
+> 0.128 20.537 0.560 (+0.023)
+> 0.200 20.506 0.499 (-0.007)
+
+TABLE 4: Accuracy in mAP of baseline Pillarnet and the MURAL-applied version. Numbers in parentheses indicate the differences with respect to the baseline. In the next experiment, to evaluate the effectiveness of additional pillar size support described in Section 4.3, we introduce several pillar sizes post-training and evaluate their mAP scores. Table 5 shows the results. Note that the blue color repre-sents the pillar sizes added post-training. The results show that for these pillar sizes, enabled by synthesized BN layers, the model achieves satisfactory accuracy, falling between the neighboring trained pillar sizes. The smallest new pillar size (0.263 2m2) further allows tight deadlines to be met.               
+
+> Pillar size ( m2)Grid area mAP
+> 0.100 21024 20.564
+> 0.109 2928 20.568
+> 0.128 2800 20.560
+> 0.151 2672 20.540
+> 0.200 2512 20.499
+> 0.263 2384 20.390
+
+TABLE 5: MURAL on Pillarnet with post-training intro-duced pillar sizes (blue). 
+
+5.1.2 MURAL on Pillarnet 
+
+Figures 10-a and 10-b depict the relationship between de-tection accuracy and deadline, with MURAL consistently outperforming the baselines on both platforms. By lever-aging dynamic resolution scheduling, MURAL can draw from a broad range of resolutions to satisfy any given deadline, as shown in Figure 11, thereby maximizing accu-racy under varying time constraints. The baseline Pillarnet models, lacking anytime computing capability, can only pro-duce predictions within a much narrower deadline range, resulting in comparatively lower accuracies. VALO [19], while possessing anytime capability and achieving higher 975 125 175 225 275 
+
+Deadline (msec) 
+
+(a) 
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Normalized accuracy (%)
+
+Jetson AGX Orin 
+
+> Pillarnet(0.100)
+> Pillarnet(0.128)
+> Pillarnet(0.200)
+> VALO(0.100)
+> MURAL 100 150 200 250 300 350
+
+Deadline (msec) 
+
+(b) 
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Normalized accuracy (%)
+
+Jetson AGX Xavier 
+
+> Pillarnet(0.100)
+> Pillarnet(0.128)
+> Pillarnet(0.200)
+> VALO(0.100)
+> MURAL 50 65 80 95 110
+
+Deadline (msec) 
+
+(c) 
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Normalized accuracy (%)
+
+Jetson AGX Orin 
+
+> PointPillars(0.200)
+> PointPillars(0.256)
+> PointPillars(0.400)
+> VALO(0.200)
+> MURAL 75 100 125 150 175
+
+Deadline (msec) 
+
+(d) 
+
+> 0
+> 20
+> 40
+> 60
+> 80
+> 100
+> Normalized accuracy (%)
+
+Jetson AGX Xavier 
+
+> PointPillars(0.200)
+> PointPillars(0.256)
+> PointPillars(0.400)
+> VALO(0.200)
+> MURAL
+
+Fig. 10: (a,b) Pillarnet, (c,d) PointPillars, and (e,f) CenterPoint experiments on both evaluation platforms. In each plot figure, MURAL and VALO were applied to the baseline they are being compared. 275 225 175 125 75 Deadline (msec) 020 40 60 80 100 Pillar size selection rate (%)  0.100 0.109 0.128 0.151 0.200 0.263 
+
+Fig. 11: Pillar size selection rates of MURAL during Pillarnet experiment on Jetson AGX Orin. accuracies than the baselines over a wider deadline range, is nonetheless outperformed by MURAL. Its data schedul-ing strategy proves less effective than MURAL’s dynamic resolution scaling, primarily because VALO processes only a small fraction of the input data under tight deadlines, making it heavily reliant on forecasted detections. MURAL, by contrast, always processes the complete input frame— albeit at a reduced resolution—regardless of the imposed deadline. Consequently, MURAL achieves superior accu-racy compared to both VALO and the individually trained baseline models. 
+
+5.1.3 MURAL on PointPillars 
+
+We further evaluate MURAL using the PointPillars [4] ar-chitecture, benchmarking it against multiple baseline Point-Pillars models as well as a VALO [19] variant applied to PointPillars. The MURAL model was trained to accommo-date all pillar sizes used in the baselines, in addition to five supplementary synthesized pillar sizes introduced after training (see Section 4.3). 10 
+
+Figures 10-c and 10-d present the results. Consistent with the Pillarnet findings, MURAL achieves better or compara-ble accuracy across all evaluated deadlines relative to both the PointPillars baselines and the VALO-applied model. 
+
+5.1.4 MURAL on CenterPoint 
+
+To showcase the performance of MURAL on voxel-based DNNs, we evaluate it using CenterPoint [2]. For this task, we use multiple baseline CenterPoint models and VALO on CenterPoint. The MURAL model was again trained to support all voxel sizes used in the evaluated baselines. Figures 10-e and 10-f presents the results. Even with-out synthesizing additional pillar sizes (since this feature is only available for pillar-based models as explained in Section 4.3), it still maintains better or comparable accuracy across all the tested deadlines in comparison to the baselines and VALO. The only exception is the tightest deadline on Orin, where MURAL’s performance is noticeably worse than VALO’s, due to MURAL having difficulty meeting deadlines with its smallest input resolution, which VALO can meet by processing only a very small subset of the input data. Nevertheless, the accuracy of VALO at this deadline is very low, and MURAL still outperforms the baselines by a large margin. Overall, the results demonstrate that MURAL general-izes to multiple DNN architectures, both pillar- and voxel-based, and achieves efficient performance across different computing platforms, establishing it as the new state-of-the-art anytime LiDAR object detection method. 
+
+5.1.5 Ablation study 
+
+We ablate MURAL on Pillarnet across four configurations: 
+
+SS (static scheduler using WCET-based resolution selec-tion), DS (dynamic scheduling of MURAL only), DS-APS 
+
+(+ additional pillar sizes), DS-APS-DCO (+ dense CNN optimizations), and DS-APS-DCO-FRC (full MURAL with forecasting). No deadlines were missed in any configura-tion. Table 6 shows the results. Using DS improves perfor-mance over SS due to its more accurate execution time pre-diction, enabling better scheduling decisions. Introducing APS allows better utilization of the time until the deadline, improving accuracy. Adding DCO allows meeting deadlines with higher resolutions without sacrificing accuracy. Finally, FRC further improves detection by recovering occluded or missed objects from prior frames.                   
+
+> MURAL variant Deadline (ms) 225 175 125 SS 96.17 85.60 85.60 DS 96.70 95.08 87.68 DS-APS 97.03 96.14 89.66 DS-APS-DCO 96.93 96.46 91.28 DS-APS-DCO-FRC 100.00 99.49 93.98
+
+TABLE 6: Normalized accuracy of MURAL variants. We also train MURAL without resolution-aware BN and make a comparison in Table 7. Resolution-aware BN significantly improves performance, while using common BN layers for all pillar sizes degrades accuracy and makes it mostly adapt to the medium pillar size.         
+
+> Pillar size ( m2)MURAL w/o RABN MURAL w/ RABN
+> 0.100 275.00 100.00
+> 0.128 293.373 99.238
+> 0.200 261.836 88.395
+
+TABLE 7: Normalized accuracy of MURAL (on Pillarnet) without and with resolution-aware BN. Forecasting was disabled and no deadline was considered. 20 10 0 10 20     
+
+> Sparse CNN time
+> pred. error (msec)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> CDF
+> VALO(0.100) (dl=75 ms)
+> MURAL (dl=75 ms)
+> 20 10 010 20
+> Sparse CNN time
+> pred. error (msec)
+> 0.0
+> 0.2
+> 0.4
+> 0.6
+> 0.8
+> 1.0
+> VALO(0.100) (dl=275 ms)
+> MURAL (dl=275 ms)
+
+Fig. 12: Time prediction errors of VALO and MURAL ap-plied Pillarnet on Jetson AGX Orin. The errors were calcu-lated by subtracting the actual time from the predicted time. 
+
+5.1.6 Time Prediction Error 
+
+In this experiment, we examine the latency prediction er-ror of MURAL’s scheduler and compare it against that of VALO [19]. The analysis focuses specifically on the sparse CNN of Pillarnet, as latency prediction for the dense CNN and post-processing stages is straightforward and handled identically in both VALO and MURAL. Figure 12 presents the latency prediction errors as cumu-lative distribution functions. As shown, MURAL achieves superior prediction accuracy by precisely estimating the number of input pillars for each sparse convolution layer within the sparse CNN, accomplished by efficiently emulat-ing all sparse convolutions through max-pooling operations. VALO, by contrast, assumes that the per-layer input pil-lar counts remain consistent with the most recently observed historical values. This assumption breaks down in highly dynamic environments, where the 3D structure of suc-cessive LiDAR scans can vary considerably. Consequently, VALO’s history-based prediction approach yields higher errors compared to MURAL’s method. 
+
+5.1.7 Time and Memory Overhead Analysis 
+
+Table 8 shows the average scheduling overhead of MURAL variants, measured on the Jetson AGX Orin. Recall that MURAL on CenterPoint incorporates region drop (RD), explained in Section 4.7, and does not support synthesizing additional pillar sizes (APS), as this feature is only applica-ble to pillar-based models (Section 4.3). For the static scheduler (SS), the overhead is negligible across all models since we simply use the WCETs acquired from offline benchmarking. Using the dynamic scheduler (DS) notably increases the overhead for Pillarnet, as sparse convolutions must be mimicked for time prediction. How-ever, the overhead increases only slightly for PointPillars, which does not use sparse CNNs. For CenterPoint, the DS overhead is moderate, falling between Pillarnet and 11                            
+
+> MURAL variant Applied baseline Pillarnet PointPillars CenterPoint SS 0.31 0.13 0.42 DS 3.23 0.53 1.19 DS-APS 5.47 1.17 –DS-APS-DCO 6.22 2.01 –DS-APS-DCO-FRC 6.24 1.97 –DS-DCO ––1.76 DS-DCO-FRC ––1.77 DS-DCO-FRC-RD ––1.75
+
+TABLE 8: Average scheduling overhead (milliseconds) of MURAL variants on Jetson AGX Orin. PointPillars, as it does time prediction of sparse CNN with a history-based method (Section 4.4). When we introduce post-training pillar size synthe-sis (DS-APS) for the pillar-based models, the scheduling overhead increases due to new pillar sizes considered for scheduling. Adding dense convolution optimization (DS-APS-DCO and DS-DCO) requires determining the empty parts of the input scene in bird-eye view, which increases scheduling overhead. However, cropping these empty parts accelerates the dense CNN, compensating for the overhead. Enabling forecasting (DS-APS-DCO-FRC and DS-DCO-FRC) incurs no significant overhead, as it occurs in parallel on the CPU while the DNN layers execute on the GPU. Finally, adding region drop for CenterPoint (DS-DCO-FRC-RD) maintains nearly the same overhead, as the calculation of remaining time to deadline is minimal. Finally, Table 9 shows the memory overhead of MURAL compared to using multiple baseline models with different resolutions. Note that MURAL, despite supporting multiple input resolutions, uses almost the same number of param-eters as a single baseline model that supports only one resolution. This is because MURAL’s memory overhead for supporting a new resolution is limited to the parameters for added BN layers, which are minimal compared to all the weights of the DNN. As a result, MURAL’s memory overhead increases only slightly as a function of the number of resolutions it supports, whereas the memory overhead of the baseline models increases multiplicatively with the number of supported resolutions.               
+
+> Pillarnet PointPillars CenterPoint Baseline 61 .003 ×623 .956 ×635 .766 ×3
+> MURAL 61.378 24.259 35.871
+
+TABLE 9: Memory in MiB (megabytes) needed to store DNN parameters in 32-bit floating-point format. 
+
+5.2 Closed-loop evaluation 
+
+To evaluate the impact of MURAL on navigation per-formance, we integrate it into the Autoware [28], an open-source autonomous driving framework, and conduct closed-loop simulations using AWSIM [29], a 3D game engine-based simulator. Videos of our experiments are avail-able 3.
+
+5.2.1 Simulation Setup 
+
+The simulation forms a closed-loop system where AWSIM (running at 100 frames per second) provides LiDAR point 
+
+> 3. Video link: https://www.youtube.com/watch?v=Xi1YL2ukNHI
+
+clouds and other sensor data to Autoware, while Autoware sends control commands to the simulator. These data and command exchanges occur asynchronously. Figure 13 illus-trates the environment simulated by AWSIM. We utilize Autoware’s LiDAR-centric perception pipeline, where object detection results are processed by a Kalman filter-based tracker, then forwarded to a motion prediction task. The predicted object trajectories are passed on to multiple planning tasks as the final result of object recognition. To isolate the impact of the object detection DNN on driving, we disable the auxiliary LiDAR point cloud clustering task and ground-filter-based emergency stops. 
+
+Fig. 13: AWSIM simulator. Red points visualize a sample LiDAR scan. We conduct the experiments on a desktop PC (AMD 7800X3D, NVIDIA RTX 4090, 128 GB DRAM, Ubuntu 22.04). Since this hardware significantly outperforms embedded platforms, we emulate the execution time of a Jetson AGX Orin (30W mode) for the object detection DNN task using the latency prediction models described in Section 4.4. 
+
+5.2.2 Methodology 
+
+We compare MURAL applied on Pillarnet against three fixed-resolution Pillarnet baselines ( 0.100 2 m2, 0.128 2 m2,and 0.200 2 m2). MURAL is configured to dynamically sup-port these three resolutions and also synthesized ones (Sec-tion 4.3). We determine the object detection task deadline d (mil-liseconds) at runtime based on the ego-vehicle velocity v
+
+(m/s) using a linear mapping of d = 250 − 12 .5v. This mapping prioritizes high-resolution (thus, high-latency) de-tection at low speeds and low-latency detection at high speeds [6]. We assume the maximum speed of the ego-vehicle to be around 13 m/s. We evaluate performance using two distinct driving scenarios in an urban environment. (1) In the Dense Urban Environment, we measure the time to reach the destination in a cluttered setting where the ego-vehicle’s path is clear but surrounded by numerous static and moving objects. (2) In the Dynamic Hazard Environment, we count collisions across three high-speed reactive scenarios: a suddenly ap-pearing truck, a car merging into the ego-vehicle’s lane, and a jaywalking pedestrian. We repeat both experiments 10 times and present the statistical results. 12 
+
+TABLE 10: Closed-loop simulation results for the Dense Urban Environment. We report median track completion time and false positive detection rate.                  
+
+> Median Object Detection Method Time (s) FP Rate (%) Pillarnet 0.100 2m231.70 13.6 Pillarnet 0.128 2m248.05 21.5 Pillarnet 0.200 2m250.40 27.7 MURAL (Ours) 36.10 20.2
+
+5.2.3 Results in the Dense Urban Environment 
+
+We evaluate a traffic intersection scenario featuring numer-ous pedestrians and vehicles and present our results in Ta-ble 10. Although the ego-vehicle’s planned path was clear of obstacles, the low-resolution baseline ( 0.200 2m2) frequently misclassified static objects, such as lampposts, as pedestri-ans. At lower resolutions, fine-grained geometric features of thin vertical structures are lost during voxelization, causing them to resemble the sparse point cloud signature of a pedestrian. These false positives (FPs) led the system to anticipate imminent crosswalk entries, causing the vehicle to stall or decelerate unnecessarily. The intermediate reso-lution baseline ( 0.128 2m2) also suffered from elevated FP rates and longer completion times, suggesting that the mis-classification issue is not exclusive to the lowest resolution. The strong correlation between FP rate and completion time across all baselines confirms that false positive detections are the primary bottleneck in this scenario. Consequently, the median time to reach the destination increased by up to 59% for the lowest resolution compared to the 0.100 2m2
+
+baseline. By selecting the highest resolution permitted by the deadline — which tends to be finer at lower speeds — MURAL achieved a completion time comparable to the high-resolution baseline. MURAL’s FP rate exceeds that of the Pillarnet 0.100 2m2 baseline because it dynamically switches to larger pillar sizes at higher speeds to meet tighter deadlines, increasing FP rate during those frames. 
+
+5.2.4 Results in the Dynamic Hazard Environment 
+
+We evaluate three high-speed scenarios (approximately 8 m/s): a sudden truck appearance, a merging car, and a jaywalking pedestrian. Table 11 presents the results. The high-resolution baseline ( 0.100 2m2) failed to avoid 16 out of 30 hazards due to an average detection latency of 247.8 ms. The intermediate resolution baseline ( 0.128 2m2) reduced collisions to 11/30 by lowering average latency to 172.2 ms, yet still failed to avoid all collisions, suggesting the latency reduction remains insufficient for high speeds. The low-resolution baseline ( 0.200 2m2) avoided all collisions with a 99.9 ms average latency. MURAL also avoided all collisions, while maintaining an average latency of 174.4 ms — comparable to the 0.128 2m2 baseline. This highlights the key advantage of dynamic resolution selection: by reducing latency precisely during high-speed frames where the dead-line is tightest, MURAL meets timing requirements when it matters most, unlike fixed-resolution baselines, which cannot adapt to varying deadline demands. TABLE 11: Closed-loop simulation for the Dynamic Hazard Environment. We report collision counts out of 30 (10 runs per scenario × 3 hazardous objects per run) and average latency.                 
+
+> Method Collisions Average Latency (ms) Pillarnet 0.100 2m216/30 247.8 Pillarnet 0.128 2m211/30 172.2 Pillarnet 0.200 2m20/30 99.9 MURAL (Ours) 0/30 174.4
+
+5.2.5 Discussion of Closed-loop Simulation Results 
+
+The results demonstrate that no single fixed resolution is sufficient for all driving conditions. High resolution is essen-tial in complex urban scenes to minimize false positives and avoid unnecessary stalls; conversely, low latency is critical at high speeds to ensure timely hazard detection. Notably, while the low-resolution baseline avoids collisions in high-speed scenarios, its elevated false positive rate makes it unsuitable for dense urban environments. By dynamically adapting its input resolution, MURAL provides the ver-satility required for both efficient and safe autonomous navigation across diverse conditions. 
+
+6 RELATED WORK 
+
+Cyber-physical systems require timely execution to ensure safety and operational efficiency. Conventional methods that rely on fixed deadlines determined at design time [28], [30] struggle to adapt to dynamic execution time require-ments [6], [31]. 
+
+Anytime Deep Neural Networks: In recent years, ”any-time” processing has emerged as a promising approach for perception DNNs, enabling flexible trade-offs between accu-racy and latency to meet varying deadline constraints. Lee et al. [32] reduced computation time by selectively deacti-vating non-critical neurons while prioritizing essential ones. Kim et al. [33] introduced incremental layer processing with early exit mechanisms for image classification networks. Yao et al. [8] and Bateni et al. [34] investigated schedul-ing strategies for multiple DNN tasks through imprecise computation, employing early exits and layer-wise approxi-mation techniques, respectively. However, these approaches primarily target image classification, which differs substan-tially from the complexity inherent in object detection tasks. 
+
+Anytime End-to-end DNNs: Chen et al. [35] proposed TimelyNet, which integrates a supernet into the image encoder of end-to-end autonomous driving pipelines. It dynamically samples subnets of this supernet at run-time to meet deadlines determined by the vehicle’s ve-locity and acceleration. Their evaluation included closed-loop CARLA [36] simulations across multi-modal pipelines, demonstrating that this adaptive approach significantly im-proves driving safety and reduces collisions compared to static models. While TimelyNet is designed for end-to-end DNNs, MURAL’s target is the industry-standard modular approaches [28], [30] where object detection is a separate DNN task. 
+
+Anytime Object Detection: Several works have explored deadline-aware object detection strategies. Kuhse et al. [7] examined early exit mechanisms for YOLO architectures. 13 
+
+Heo et al. [37] designed a multipath network architecture to enable anytime perception capabilities. Hu et al. [11] proposed adaptive resolution reduction in scene regions deemed less critical. Liu et al. [9], [12] partitioned image frames into sub-regions based on criticality, leveraging Li-DAR data to prioritize processing of important areas. Kang et al. [13] applied a split-and-merge strategy, processing critical regions at high resolution while handling non-critical areas at lower resolution. Gog et al. [38] proposed dynam-ically switching between different DNNs based on runtime conditions. 
+
+Multi-Resolution Processing: Heo et al. [15] presented an adaptive image scaling approach that adjusts resolution based on the operational environment, training a unified DNN capable of multi-resolution inference. However, their evaluation did not include comparisons against single-resolution baseline models. Wang et al. [16] employed resolution-sensitive batch normalization and ensemble dis-tillation for image classification. Zhu et al. [17] integrated a resolution predictor network into their framework. Chin et al. [39] developed a resolution predictor for video object detection by exploiting temporal consistency across frames. Notably, most prior work in anytime object detection and multi-resolution processing concentrates on 2D vision tasks and does not address the distinct characteristics of 3D LiDAR point cloud object detection. 
+
+LiDAR Object Detection: LiDAR-based object detection plays a vital role in autonomous driving systems [1]. With the availability of large-scale datasets [27], [40], research has primarily focused on enhancing detection accuracy and reducing inference latency [2], [3], [4], [20], [41], [42], [43], [44]. While these models achieve strong performance on high-end computing platforms, their deployment on embedded and edge devices remains challenging due to stringent size, weight, and power (SWaP) constraints and limited computational resources. 
+
+Anytime LiDAR Object Detection: Soyyigit et al. [18] introduced Anytime-LiDAR, which enables anytime pro-cessing through early exits and detection head scheduling for LiDAR object detection DNNs not having a sparse CNN [4]. However, this approach shows limited effective-ness with models of higher accuracy where sparse CNN is essential [2], [3], [20]. VALO [19] subsequently proposed a data-scheduling strategy that maximizes input processing within deadline constraints and forecasts skipped data to maintain accuracy. While VALO offers flexibility, it suffers from accuracy degradation under tight deadlines due to incomplete input processing. Yuhang et al. [45] explored multi-modal BEV detection with dynamic skipping of cam-era processing and LiDAR scans. However, their data scheduling approach is not directly applicable to single-modality models, which is the focus of our work. 
+
+Our Approach: While reducing input resolution can substantially decrease latency with minimal accuracy loss, achieving dynamic resolution adjustment within a single DNN that maintains or exceeds the accuracy of single-resolution baselines remains challenging. Unlike prior work on resolution adaptation for image classification and 2D object detection, our research addresses dynamic resolution inference specifically for real-time LiDAR-based 3D object detection, filling a critical gap in the literature. Importantly, unlike most prior work that relies solely on offline metrics, we conduct closed-loop simulations to evaluate the impact of our anytime framework on autonomous driving safety and efficiency in dynamic environments. 
+
+7 CONCLUSION 
+
+This paper presented MURAL, a multi-resolution anytime framework for LiDAR 3D object detection that balances detection accuracy and processing latency through dynamic resolution scaling. Our approach combines multi-resolution training with shared weights, resolution-aware batch nor-malization, post-training pillar size synthesis, and deadline-aware scheduling, providing a memory-efficient solution that eliminates the need to deploy multiple model variants. We demonstrated MURAL’s versatility across both pillar-based (Pillarnet, PointPillars) and voxel-based (Cen-terPoint) architectures. Open-loop experiments on the nuScenes dataset show that MURAL achieves higher de-tection accuracy across various deadlines compared to baseline models and the prior state-of-the-art anytime ap-proach. Closed-loop simulation experiments validate MU-RAL’s practical benefits, demonstrating collision-free nav-igation while avoiding unnecessary stalls in dynamic en-vironments. These results establish MURAL as the state-of-the-art solution for real-time LiDAR object detection on resource-constrained embedded platforms. 
+
+ACKNOWLEDGMENTS 
+
+This research is supported in part by NSF grants CNS-1815959, CPS-2038923, III-2107200, and CPS-2038658. 
+
+REFERENCES                                  
+
+> [1] Y. Li and J. Ibanez-Guzman, “LiDAR for autonomous driving: The principles, challenges, and trends for automotive LiDAR and perception systems,” IEEE Signal Processing Magazine , vol. 37, no. 4, pp. 50–61, 2020. [2] T. Yin, X. Zhou, and P. Kr¨ ahenb ¨ uhl, “Center-based 3D object detection and tracking,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2021. [3] G. Shi, R. Li, and C. Ma, “PillarNet: Real-time and high-performance pillar-based 3D object detection,” in European Con-ference on Computer Vision (ECCV) , 2022. [4] A. H. Lang, S. Vora, H. Caesar, L. Zhou, J. Yang, and O. Bei-jbom, “PointPillars: Fast encoders for object detection from point clouds,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2019. [5] G.-E. Sela, I. Gog, J. Wong, K. K. Agrawal, X. Mo, S. Kalra, P. Schafhalter, E. Leong, X. Wang, B. Balaji, J. Gonzalez, and I. Stoica, “Context-aware streaming perception in dynamic en-vironments,” in European Conference on Computer Vision (ECCV) ,2022. [6] I. Gog, S. Kalra, P. Schafhalter, J. E. Gonzalez, and I. Stoica, “D3: a dynamic deadline-driven approach for building autonomous vehicles,” in European Conference on Computer Systems (EuroSys) ,2022. [7] D. Kuhse, H. Teper, S. Buschj¨ ager, C.-Y. Wang, and J.-J. Chen, “You only look once at anytime (AnytimeYOLO): Analysis and optimization of early-exits for object-detection,” in arXiv preprint:2503.17497 , 2025. [8] S. Yao, Y. Hao, Y. Zhao, H. Shao, D. Liu, S. Liu, T. Wang, J. Li, and T. Abdelzaher, “Scheduling real-time deep learning services as imprecise computations,” in IEEE International Conference on Em-bedded and Real-Time Computing Systems and Applications (RTCSA) ,2020. 14
+
+[9] S. Liu, S. Yao, X. Fu, H. Shao, R. Tabish, S. Yu, A. Bansal, H. Yun, L. Sha, and T. Abdelzaher, “Real-time task scheduling for machine perception in intelligent cyber-physical systems,” IEEE Transactions on Computers , vol. 71, no. 8, pp. 1770–1783, 2022. [10] J.-E. Kim, R. Bradford, M.-K. Yoon, and Z. Shao, “ABC: Abstract prediction before concreteness,” in Design, Automation and Test in Europe Conference and Exhibition (DATE) , 2020. [11] Y. Hu, S. Liu, T. Abdelzaher, M. Wigness, and P. David, “On exploring image resizing for optimizing criticality-based machine perception,” in IEEE International Conference on Embedded and Real-Time Computing Systems and Applications (RTCSA) , 2021. [12] S. Liu, S. Yao, X. Fu, R. Tabish, S. Yu, A. Bansal, H. Yun, L. Sha, and T. Abdelzaher, “On removing algorithmic priority inversion from mission-critical machine inference pipelines,” in IEEE Real-Time Systems Symposium (RTSS) , 2020. [13] W. Kang, S. Chung, J. Y. Kim, Y. Lee, K. Lee, J. Lee, K. G. Shin, and H. S. Chwa, “DNN-SAM: Split-and-merge DNN execution for real-time object detection,” in IEEE Real-Time and Embedded Technology and Applications Symposium (RTAS) , 2022. [14] L. Liu, J. Lee, and K. G. Shin, “Rt-bev: Enhancing real-time bev perception for autonomous vehicles,” in IEEE Real-Time Systems Symposium (RTSS) , 2024, pp. 267–279. [15] S. Heo, S. Jeong, and H. Kim, “RTScale: Sensitivity-aware adaptive image scaling for real-time object detection,” in Euromicro Confer-ence on Real-Time Systems (ECRTS) , 2022. [16] Y. Wang, F. Sun, D. Li, and A. Yao, “Resolution switchable networks for runtime efficient image recognition,” in European Conference on Computer Vision (ECCV) , 2020. [17] M. Zhu, K. Han, E. Wu, Q. Zhang, Y. Nie, Z. Lan, and Y. Wang, “Dynamic resolution network,” in International Conference on Neu-ral Information Processing Systems (NeurIPS) , 2021. [18] A. Soyyigit, S. Yao, and H. Yun, “Anytime-LiDAR: Deadline-aware 3D object detection,” in IEEE International Conference on Embedded and Real-Time Computing Systems and Applications (RTCSA) , 2022. [19] ——, “VALO: A versatile anytime framework for LiDAR-based object detection deep neural networks,” IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems , vol. 43, no. 11, pp. 4045–4056, 2024. [20] Y. Chen, J. Liu, X. Zhang, X. Qi, and J. Jia, “VoxelNeXt: Fully sparse VoxelNet for 3D object detection and tracking,” in IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2023. [21] A. Soyyigit, S. Yao, and H. Yun, “MURAL: A multi-resolution anytime framework for LiDAR object detection deep neural net-works,” in IEEE International Conference on Embedded and Real-Time Computing Systems and Applications (RTCSA) , 2025. [22] Y. Yan, Y. Mao, and B. Li, “SECOND: Sparsely embedded convo-lutional detection,” Sensors , vol. 18, no. 10, p. 3337, 2018. [23] S. Ioffe and C. Szegedy, “Batch normalization: Accelerating deep network training by reducing internal covariate shift,” in Interna-tional Conference on Machine Learning (ICML) , 2015. [24] C. R. Qi, L. Yi, H. Su, and L. J. Guibas, “PointNet++: Deep hierarchical feature learning on point sets in a metric space,” in 
+
+International Conference on Neural Information Processing Systems (NeurIPS) , 2017. [25] “Real-time problem-solving with contract algorithms,” in Interna-tional Joint Conference on Artificial Intelligence (IJCAI) , 1999. [26] O. D. Team, “OpenPCDet: An open-source toolbox for 3D object detection from point clouds,” https://github.com/open-mmlab/OpenPCDet, Last accessed: 27-05-2025. [27] H. Caesar, V. Bankiti, A. H. Lang, S. Vora, V. E. Liong, Q. Xu, A. Krishnan, Y. Pan, G. Baldan, and O. Beijbom, “nuScenes: A multimodal dataset for autonomous driving,” in IEEE/CVF Con-ference on Computer Vision and Pattern Recognition (CVPR) , 2020. [28] S. Kato, S. Tokunaga, Y. Maruyama, S. Maeda, M. Hirabayashi, Y. Kitsukawa, A. Monrroy, T. Ando, Y. Fujii, and T. Azumi, “Au-toware on board: Enabling autonomous vehicles with embedded systems,” in ACM/IEEE International Conference on Cyber-Physical Systems (ICCPS) , 2018. [29] TIER4, “AWSIM, scene simulator for autoware,” https://github.com/tier4/AWSIM, Last accessed: 25-03-2026. [30] Baidu Apollo Team, “Apollo: Open Source Autonomous Driv-ing,” https://github.com/ApolloAuto/apollo, Last accessed: 27-05-2025. [31] M. Alcon, H. Tabani, L. Kosmidis, E. Mezzetti, J. Abella, and F. J. Cazorla, “Timing of autonomous driving software: Problem analysis and prospects for future solutions,” in IEEE Real-Time and Embedded Technology and Applications Symposium (RTAS) , 2020. [32] S. Lee and S. Nirjon, “Subflow: A dynamic induced-subgraph strategy toward real-time DNN inference and training,” in IEEE Real-Time and Embedded Technology and Applications Symposium (RTAS) , 2020. [33] J.-E. Kim, R. Bradford, and Z. Shao, “AnytimeNet: Controlling time-quality tradeoffs in deep neural network architectures,” in 
+
+Design, Automation and Test in Europe Conference and Exhibition (DATE) , 2020. [34] S. Bateni and C. Liu, “ApNet: Approximation-aware real-time neural network,” in IEEE Real-Time Systems Symposium (RTSS) ,2018. [35] J. Chen, D. V. Le, Y. Li, Y. Liu, and R. Tan, “Timelynet: Adaptive neural architecture for autonomous driving with dynamic dead-line,” ACM Transactions on Embedded Computing Systems , vol. 24, no. 5s, pp. 1–23, 2025. [36] A. Dosovitskiy, G. Ros, F. Codevilla, A. Lopez, and V. Koltun, “CARLA: An open urban driving simulator,” in Proceedings of the 1st Annual Conference on Robot Learning , 2017. [37] S. Heo, S. Cho, Y. Kim, and H. Kim, “Real-time object detection system with multi-path neural networks,” in IEEE Real-Time and Embedded Technology and Applications Symposium (RTAS) , 2020. [38] I. Gog, S. Kalra, P. Schafhalter, M. A. Wright, J. E. Gonzalez, and I. Stoica, “Pylot: A modular platform for exploring latency-accuracy tradeoffs in autonomous vehicles,” in IEEE International Conference on Robotics and Automation (ICRA) , 2021. [39] T.-W. Chin, R. Ding, and D. Marculescu, “Adascale: Towards real-time video object detection using adaptive scaling,” in Conference on Machine Learning and Systems (MLSys) , 2019. [40] P. Sun, H. Kretzschmar, X. Dotiwalla, A. Chouard, V. Patnaik, P. Tsui, J. Guo, Y. Zhou, Y. Chai, B. Caine et al. , “Scalability in perception for autonomous driving: Waymo open dataset,” in 
+
+IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2020. [41] S. Shi, Z. Wang, J. Shi, X. Wang, and H. Li, “From points to parts: 3d object detection from point cloud with part-aware and part-aggregation network,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 43, no. 8, 2020. [42] T. Zhao, X. Ning, K. Hong, Z. Qiu, P. Lu, Y. Zhao, L. Zhang, L. Zhou, G. Dai, H. Yang, and Y. Wang, “Ada3D : Exploiting the spatial redundancy with adaptive inference for efficient 3D object detection,” in IEEE/CVF International Conference on Computer Vision (ICCV) , 2023. [43] J. Liu, Y. Chen, X. Ye, Z. Tian, X. Tan, and X. QI, “Spatial pruned sparse convolution for efficient 3d object detection,” in Interna-tional Conference on Neural Information Processing Systems (NeurIPS) ,2022. [44] J. Li, C. Luo, and X. Yang, “Pillarnext: Rethinking network designs for 3d object detection in lidar point clouds,” in IEEE/CVF Confer-ence on Computer Vision and Pattern Recognition (CVPR) , 2023. [45] Y. Xu, Z. Liu, X. Fu, S. Liu, F. Wu, and G. Chen, “FLEX: Adaptive task batch scheduling with elastic fusion in multi-modal multi-view machine perception,” in IEEE Real-Time Systems Symposium (RTSS) , 2024. 
+
+Ahmet Soyyi ˘ git is an Assistant Professor of Computer Engineering at the National Defense University, Turkish Naval Academy. His research interests are in real-time embedded systems and artificial intelligence. He received a PhD in Computer Science from the University of Kansas. 
+
+Shuochao Yao is an Assistant Professor of Computer Science at George Mason University. His research interests are in intelligent internet-of-things and cyber-physical systems. He received a PhD in Computer Science from the University of Illinois Urbana-Champaign. 
+
+Heechul Yun is a Deane E. Ackers Scholar and Professor in the Department of Electrical Engineering and Computer Science at the University of Kansas. He leads research on safe and secure real-time computing infrastructure—spanning operating systems, computer ar-chitecture, and middleware—for intelligent cyber-physical systems. His work encompasses predictable real-time computing, embedded AI/ML, and hardware security. He has received multiple best and outstanding paper awards at top real-time systems venues. He earned his Ph.D. in Computer Science from the University of Illinois at Urbana–Champaign and previously worked at Samsung Electronics and ETRI.

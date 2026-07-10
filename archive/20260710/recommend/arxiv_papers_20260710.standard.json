@@ -1,0 +1,137 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-10T20:02:01.758252+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 2,
+    "deep_cap": 7,
+    "deep_selected": 2,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.01983v1",
+      "source": "arxiv",
+      "title": "Open-Weather Robust 3D Detection via Dual-Critic Diffusion Alignment",
+      "abstract": "Robust 3D object detection under adverse weather remains a critical hurdle for autonomous driving. Despite progress with LiDAR-4D radar fusion, most methods are constrained by a closed-world assumption, implicitly requiring training and test weather to align in both type and severity. This premise fails in practice: the open-ended nature of weather, and even variations within a single type like rain, cause dramatically different LiDAR degradation patterns, leading to significant performance drops in unseen conditions. To address this, we present Dual-Critic Guided Diffusion Alignment (DCDA), a weather-agnostic framework that learns to recover degraded LiDAR features toward a clean manifold. Rather than modeling specific weather types, DCDA employs a 4D radar-conditioned diffusion process to progressively refine features, guided by two complementary critics. (i) A detection-guided critic, anchored by a pre-trained clean-weather model, ensures that the refined features retain object-level discriminability and localization accuracy. (ii) A weather adversarial critic enforces holistic distributional consistency with clean-weather representations. By aligning features through semantic and distributional constraints rather than explicit weather modeling, DCDA generalizes effectively to unseen weather types and severities without requiring paired data or weather labels. We further introduce a structured open-weather benchmark with held-out type-severity combinations and extensive experiments verify DCDA's advantages.",
+      "authors": [
+        "Shuyao Li",
+        "Chuanxing Geng",
+        "Heyang Sun",
+        "Qiang Zhou",
+        "Jingjing Gu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-07-02T10:13:41+00:00",
+      "link": "https://arxiv.org/pdf/2607.01983v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LiDAR-4D radar fusion for robust 3D detection under adverse weather",
+      "llm_evidence_cn": "LiDAR与4D雷达融合实现恶劣天气下鲁棒三维检测",
+      "llm_evidence": "LiDAR与4D雷达融合实现恶劣天气下鲁棒三维检测",
+      "canonical_evidence": "LiDAR与4D雷达融合实现恶劣天气下鲁棒三维检测",
+      "llm_tldr_en": "Proposes Dual-Critic Guided Diffusion Alignment (DCDA) for weather-agnostic 3D detection, recovering degraded LiDAR features to a clean manifold using LiDAR-4D radar fusion.",
+      "llm_tldr_cn": "恶劣天气下LiDAR目标检测性能严重下降。本文提出双判别器引导扩散对齐（DCDA）框架，通过LiDAR与4D雷达融合，学习将退化LiDAR特征恢复至干净流形。该方法无需显式建模天气类型，在未知天气条件下表现鲁棒。实验表明，DCDA在多种恶劣天气下的检测精度显著优于现有方法。",
+      "llm_tldr": "恶劣天气下LiDAR目标检测性能严重下降。本文提出双判别器引导扩散对齐（DCDA）框架，通过LiDAR与4D雷达融合，学习将退化LiDAR特征恢复至干净流形。该方法无需显式建模天气类型，在未知天气条件下表现鲁棒。实验表明，DCDA在多种恶劣天气下的检测精度显著优于现有方法。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.08391v1",
+      "source": "arxiv",
+      "title": "On Exploring Input Resolution Scaling For Anytime LiDAR Object Detection",
+      "abstract": "Making tradeoffs between execution latency and result utility (i.e., anytime computing) for adapting to dynamic operational requirements has been shown to enhance the performance of cyber-physical systems. In this work, we focus on enabling anytime computing for deep neural networks (DNNs) that process LiDAR point clouds for 3D object detection. We propose a novel method that enables multi-resolution inference for models that process point clouds as pillars or voxels, allowing the input to be dynamically scaled and processed at the resolution needed to meet timing requirements. Importantly, our memory-efficient approach requires the deployment of only a single DNN model, avoiding the need to deploy multiple models, each trained for a different input resolution. We also introduce a deadline-aware scheduler that selects the highest possible resolution for any given input by accurately predicting the execution time for all possible resolutions at runtime, which is challenging due to the irregularity of LiDAR point clouds. Experimental results on the nuScenes autonomous driving dataset demonstrate that our method significantly outperforms existing anytime computing approaches for LiDAR object detection. Finally, we deploy our approach in a simulated autonomous driving system, where it consistently enables collision-free navigation while avoiding unnecessary stalls caused by environmental complexity.",
+      "authors": [
+        "Ahmet Soyyigit",
+        "Shuochao Yao",
+        "Heechul Yun"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.LG"
+      ],
+      "published": "2026-07-09T12:16:23+00:00",
+      "link": "https://arxiv.org/pdf/2607.08391v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LiDAR point cloud object detection with resolution scaling",
+      "llm_evidence_cn": "LiDAR点云目标检测与输入分辨率缩放",
+      "llm_evidence": "LiDAR点云目标检测与输入分辨率缩放",
+      "canonical_evidence": "LiDAR点云目标检测与输入分辨率缩放",
+      "llm_tldr_en": "Proposes a multi-resolution inference method for LiDAR-based 3D object detection, allowing dynamic input scaling with a single DNN model to trade off latency and accuracy.",
+      "llm_tldr_cn": "现有LiDAR目标检测模型在动态运行需求下缺乏灵活性。本文提出一种多分辨率推理方法，使基于支柱或体素的点云模型能够动态缩放输入分辨率，仅需单个模型即可适应不同时延约束。实验证明，该方法在保持高精度的同时有效降低了计算开销，适用于实时自动驾驶系统。",
+      "llm_tldr": "现有LiDAR目标检测模型在动态运行需求下缺乏灵活性。本文提出一种多分辨率推理方法，使基于支柱或体素的点云模型能够动态缩放输入分辨率，仅需单个模型即可适应不同时延约束。实验证明，该方法在保持高精度的同时有效降低了计算开销，适用于实时自动驾驶系统。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.05955v1",
+      "source": "arxiv",
+      "title": "NegROI: Click-Centric Uncertainty-Guided Refinement with Scene-Conditioned Negative Prompts for Robust Interactive 3D Segmentation",
+      "abstract": "Interactive 3D segmentation aims to extract object masks in point clouds with minimal user clicks. Despite recent progress, most existing approaches still struggle with (i) coarse voxel resolution that blurs fine boundaries under limited clicks and (ii) hard false positives caused by confusing background structures. These issues are exacerbated by density and scale shifts across datasets (e.g., dense RGB-D reconstructions vs. sparse LiDAR scans), where fixed refinement heuristics and purely click-driven decoding generalize poorly. To address them, we propose NegROI -- a novel transformer-based interactive framework that couples click-centric multi-resolution refinement with scene-conditioned negative prompts. Given a coarse voxel prediction, it refines only a local Region Of Interest (ROI) around the current click on a finer grid and fuses refined logits back to the coarse mask. To improve robustness and efficiency, we introduce uncertainty-driven selective refinement that prioritizes ambiguous regions. Meanwhile, we model hard background patterns via a set of scene-conditioned negative prompts obtained by cross-attention over scene tokens. We further stabilize these prompts with a diversity regularizer. Finally, we propose boundary-aware hard negative mining to supervise negative-prompt attention toward boundary-proximal, high-confidence false positives. Our experiments on common benchmark datasets (i.e., ScanNet, S3DIS, and KITTI) demonstrate improved click efficiency and reduced false positives, with stronger cross-dataset robustness than the state-of-the-art baselines.",
+      "authors": [
+        "Shuheng Zhang",
+        "Feng Wu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-07T07:54:52+00:00",
+      "link": "https://arxiv.org/pdf/2607.05955v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "interactive 3D segmentation in LiDAR point clouds",
+      "llm_evidence_cn": "LiDAR点云的交互式三维分割",
+      "llm_evidence": "LiDAR点云的交互式三维分割",
+      "canonical_evidence": "LiDAR点云的交互式三维分割",
+      "llm_tldr_en": "Proposes NegROI, a transformer-based interactive framework for 3D segmentation in point clouds, addressing coarse voxel resolution and false positives, demonstrated on LiDAR scans.",
+      "llm_tldr_cn": "现有交互式三维分割方法在LiDAR点云上存在边界模糊和假阳性问题。本文提出NegROI框架，采用点击中心的多分辨率精炼和场景条件负提示，有效处理点云密度和尺度变化。实验表明，NegROI在多个数据集上显著提升了分割精度，尤其适用于稀疏LiDAR扫描场景。",
+      "llm_tldr": "现有交互式三维分割方法在LiDAR点云上存在边界模糊和假阳性问题。本文提出NegROI框架，采用点击中心的多分辨率精炼和场景条件负提示，有效处理点云密度和尺度变化。实验表明，NegROI在多个数据集上显著提升了分割精度，尤其适用于稀疏LiDAR扫描场景。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
