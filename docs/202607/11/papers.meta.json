@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-11",
+  "date": "2026-07-11",
+  "generated_at": "2026-07-11T21:10:13",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/11/2607.03692v2-piefs-physics-informed-eigenfunction-features-with-learnable-scaling",
+      "section": "quick",
+      "title_en": "PIEFS: Physics-Informed Eigenfunction Features with Learnable Scaling",
+      "authors": "Varvara Nazarenko, Timur Lidzhiev, Alexander Tarakanov",
+      "date": "2026-07-04",
+      "pdf": "https://arxiv.org/pdf/2607.03692v2",
+      "score": "7.0",
+      "evidence": "提出可应用于高光谱数据的光谱特征学习框架",
+      "tldr": "传统光谱方法依赖固定核或手动缩放，缺乏任务适应性。本文提出PIEFS，一种基于改进Dirichlet能量的监督表示学习框架，通过可学习度量（对角缩放与Givens旋转）变换梯度，结合Gram正交性和线性读出训练坐标。实验表明PIEFS在合成、表格和图像数据上优于经典基线和NeuralEF，提供了紧凑的任务自适应光谱表示，但优化稳定性和更丰富度量参数化仍是待解问题。",
+      "tags": "query:hsi",
+      "abstract_en": "Spectral methods are widely used to construct representations from the geometry of data, but they often rely on a fixed kernel, graph Laplacian, or manually selected feature scaling. We propose Physics-Informed Eigenfunction Features with Learnable Scaling (PIEFS), a supervised neural representation-learning framework with a spectral inductive bias, based on a modified Dirichlet energy. In PIEFS, scalar coordinate maps are trained under empirical Gram orthogonality, a supervised linear readout, and a Dirichlet penalty in which the input gradient is transformed by a learnable metric $A(x)=Λ(x)U(x)$. The diagonal factor $Λ(x)$ controls anisotropic scaling, while the orthogonal factor $U(x)$ is parameterized by a structured product of Givens rotations. This construction yields task-adaptive Dirichlet-regularized coordinates rather than eigenfunctions of a fixed supervision-independent operator. Experiments on synthetic, tabular, and image-based benchmarks study the effect of identity, diagonal, and rotation-scaling metrics, and compare the resulting coordinates with classical baselines and NeuralEF. The results support PIEFS as a compact supervised spectral representation method and identify optimization stability, validation on explicit operator eigenproblems, and richer metric parameterizations as the main directions for future work.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/11/2607.07758v1-scalable-and-trustworthy-earth-observation-foundation-models",
+      "section": "quick",
+      "title_en": "Scalable and Trustworthy Earth Observation Foundation Models",
+      "authors": "Syed Usama Imtiaz, Mitra Nasr Azadani, Nasrin Alamdari",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.07758v1",
+      "score": "7.0",
+      "evidence": "多模态遥感基础模型",
+      "tldr": "地球观测基础模型受数据物理测量和决策约束，需领域特定适应。本文综述了遥感基础模型的设计原则，包括预训练目标、架构、下游适应和可信度要求。基准证据表明无通用最佳模型，且评估标准不一致。通过有害藻华预测和监测站选择案例演示领域引导原则。提出下一代模型应评估模态感知迁移和物理合理表示。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Foundation models (FMs) have transformed machine learning from isolated task-specific model development toward general-purpose models pretrained on broad data and adapted to multiple downstream tasks. Earth observation (EO) is an important domain for this paradigm because satellite and airborne archives are large, high-revisit, and increasingly multimodal, while reliable field labels are often sparse. Remote sensing foundation models (RSFMs) cannot be transferred reliably/optimally without domain-specific adaptation. This is because EO data are governed by measurement physics and operational decision constraints. This chapter reviews the design principles arising from these domain-specific constraints. It first defines the FMs paradigm in remote sensing (RS), then synthesizes the current model landscape, pretraining objectives, architecture designs, downstream adaptation and trustworthiness requirements. The chapter also incorporates recent benchmark evidence showing that no single geospatial foundation model is universally best and that inconsistent evaluation remains a major issue to fair comparison and reliable deployment. In addition, two brief environmental monitoring case studies; physics-informed spectral targeted masking for harmful algal bloom prediction and reinforcement learning for adaptive environmental monitoring station selection to illustrate the FMs domain-guided principles in practice. This chapter posits that next-generation RSFMs should be evaluated not only by benchmark accuracy, but also by modality-aware transfer and physically plausible representations for trustworthy EO decisions.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/11/2607.07887v1-mixtures-of-spatial-factor-analyzers-for-tensor-variate-data",
+      "section": "quick",
+      "title_en": "Mixtures of spatial factor analyzers for tensor-variate data",
+      "authors": "Hanzhang Lu, Keiran Malott, Kirsty Milligan, Sanjeena Subedi, Edana Cassol, Vinita Chauhan, Connor McNairn, Prarthana Pasricha, Sangeeta Murugkar, Rowan Thomson, Andrew Jirasek, Jeffrey L. Andrews",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.07887v1",
+      "score": "7.0",
+      "evidence": "将空间因子分析应用于高光谱纹理数据聚类",
+      "tldr": "高维空间数据聚类面临参数膨胀和计算挑战。本文提出混合空间因子分析器（MSFA），利用样条基函数灵活建模空间衰减协方差，防止参数随维度增加，同时引入矩阵变因子分析器降低非空间依赖维度。通过EM算法与广义最小二乘联合估计。模拟研究和拉曼光谱、高光谱纹理应用表明能准确推断和区分空间模式。贡献在于为高维张量数据提供可扩展的聚类框架，兼具空间结构和降维优势。",
+      "tags": "query:hsi",
+      "abstract_en": "A mixture of spatial factor analyzers (MSFA) is introduced to address the challenges of clustering high-dimensional spatial data. By leveraging the underlying coordinate system, the proposed framework incorporates a flexible, spline-based spatial decay covariance structure that prevents parameter inflation as dimensionality increases. To model non-spatial dependence, matrix variate factor analyzers are employed for further dimensionality reduction. Parameter estimation is conducted via a variant of the expectation-maximization algorithm combined with a generalized least squares estimator. The proposed models are explored in the context of tensor-variate data analysis, where simulation studies and applications to Raman spectroscopy and hyperspectral texture databases demonstrate their capacity to accurately infer and differentiate distinct spatial patterns.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/11/2607.03760v1-geosam-lite-a-lightweight-foundation-model-for-onboard-remote-sensing-segmentation",
+      "section": "quick",
+      "title_en": "GeoSAM-Lite: A Lightweight Foundation Model for Onboard Remote Sensing Segmentation",
+      "authors": "Yongcong Wang, Jie Zhang, Rui Jiang, Xubing Yang, Ting Yun, Li Zhang",
+      "date": "2026-07-04",
+      "pdf": "https://arxiv.org/pdf/2607.03760v1",
+      "score": "6.0",
+      "evidence": "轻量级遥感分割基础模型",
+      "tldr": "在资源受限的地球观测平台上部署大型基础模型（如SAM）面临计算成本高和遥感图像域偏移的挑战。为此，提出GeoSAM-Lite轻量级无提示分割框架，通过地理域初始化（Geo-Init）迁移域知识，并设计特征融合层（FFL）恢复高频边界信息。在云场景等数据集上，该方法在参数减少92.8%的同时保持竞争性精度，为边缘设备实时分割提供了高效方案。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "The deployment of large-scale foundation models like Segment Anything Model (SAM) on resource-constrained Earth observation platforms is hindered by prohibitive computational costs and the domain shift between natural and remote sensing imagery. To address these challenges, we propose \\textit{Geo}spatial \\textit{S}egment \\textit{A}nything \\textit{M}odel-Lite (GeoSAM-Lite), a lightweight, prompt-free segmentation framework designed for efficient onboard remote sensing segmentation. GeoSAM-Lite incorporates two core innovations: (1) Geospatial-Domain Initialization (Geo-Init), a domain-aware pre-training strategy that distills geospatial priors from a specialized teacher to bridge the domain gap; and (2) Feature Fusion Layers (FFL), which recalibrate spatial features and restore high-frequency boundary cues to overcome the capacity bottlenecks of lightweight backbones. Experiments across representative datasets, with a primary focus on cloud scenarios to evaluate performance under extreme scale variations and complex boundaries, demonstrate that GeoSAM-Lite achieves competitive accuracy while reducing parameters by 92.8\\% compared to the heavyweight RSAM-Seg. By establishing a superior Pareto frontier between efficiency and fidelity, GeoSAM-Lite offers a practical solution for real-time segmentation on edge devices.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

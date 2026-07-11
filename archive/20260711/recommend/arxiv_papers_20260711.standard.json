@@ -1,0 +1,187 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-11T21:07:33.015750+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 4,
+    "quick_skim_target": 12,
+    "quick_selected": 4
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.03692v2",
+      "source": "arxiv",
+      "title": "PIEFS: Physics-Informed Eigenfunction Features with Learnable Scaling",
+      "abstract": "Spectral methods are widely used to construct representations from the geometry of data, but they often rely on a fixed kernel, graph Laplacian, or manually selected feature scaling. We propose Physics-Informed Eigenfunction Features with Learnable Scaling (PIEFS), a supervised neural representation-learning framework with a spectral inductive bias, based on a modified Dirichlet energy. In PIEFS, scalar coordinate maps are trained under empirical Gram orthogonality, a supervised linear readout, and a Dirichlet penalty in which the input gradient is transformed by a learnable metric $A(x)=Λ(x)U(x)$. The diagonal factor $Λ(x)$ controls anisotropic scaling, while the orthogonal factor $U(x)$ is parameterized by a structured product of Givens rotations. This construction yields task-adaptive Dirichlet-regularized coordinates rather than eigenfunctions of a fixed supervision-independent operator. Experiments on synthetic, tabular, and image-based benchmarks study the effect of identity, diagonal, and rotation-scaling metrics, and compare the resulting coordinates with classical baselines and NeuralEF. The results support PIEFS as a compact supervised spectral representation method and identify optimization stability, validation on explicit operator eigenproblems, and richer metric parameterizations as the main directions for future work.",
+      "authors": [
+        "Varvara Nazarenko",
+        "Timur Lidzhiev",
+        "Alexander Tarakanov"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "math.NA",
+        "math.ST"
+      ],
+      "published": "2026-07-04T03:55:40+00:00",
+      "link": "https://arxiv.org/pdf/2607.03692v2",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "proposes spectral feature learning framework that can be applied to hyperspectral data",
+      "llm_evidence_cn": "提出可应用于高光谱数据的光谱特征学习框架",
+      "llm_evidence": "提出可应用于高光谱数据的光谱特征学习框架",
+      "canonical_evidence": "提出可应用于高光谱数据的光谱特征学习框架",
+      "llm_tldr_en": "PIEFS learns eigenfunction features with learnable scaling and spectral inductive bias, applicable to representation learning for hyperspectral data.",
+      "llm_tldr_cn": "针对传统谱方法依赖固定核和手动特征缩放的问题，提出物理信息特征学习框架PIEFS，通过可学习度量矩阵和正交约束学习标量坐标映射。该方法可迁移至高光谱数据的谱-空特征提取。实验验证了框架在几何表示学习上的有效性。",
+      "llm_tldr": "针对传统谱方法依赖固定核和手动特征缩放的问题，提出物理信息特征学习框架PIEFS，通过可学习度量矩阵和正交约束学习标量坐标映射。该方法可迁移至高光谱数据的谱-空特征提取。实验验证了框架在几何表示学习上的有效性。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "spectral-spatial feature extraction for hyperspectral data",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.03760v1",
+      "source": "arxiv",
+      "title": "GeoSAM-Lite: A Lightweight Foundation Model for Onboard Remote Sensing Segmentation",
+      "abstract": "The deployment of large-scale foundation models like Segment Anything Model (SAM) on resource-constrained Earth observation platforms is hindered by prohibitive computational costs and the domain shift between natural and remote sensing imagery. To address these challenges, we propose \\textit{Geo}spatial \\textit{S}egment \\textit{A}nything \\textit{M}odel-Lite (GeoSAM-Lite), a lightweight, prompt-free segmentation framework designed for efficient onboard remote sensing segmentation. GeoSAM-Lite incorporates two core innovations: (1) Geospatial-Domain Initialization (Geo-Init), a domain-aware pre-training strategy that distills geospatial priors from a specialized teacher to bridge the domain gap; and (2) Feature Fusion Layers (FFL), which recalibrate spatial features and restore high-frequency boundary cues to overcome the capacity bottlenecks of lightweight backbones. Experiments across representative datasets, with a primary focus on cloud scenarios to evaluate performance under extreme scale variations and complex boundaries, demonstrate that GeoSAM-Lite achieves competitive accuracy while reducing parameters by 92.8\\% compared to the heavyweight RSAM-Seg. By establishing a superior Pareto frontier between efficiency and fidelity, GeoSAM-Lite offers a practical solution for real-time segmentation on edge devices.",
+      "authors": [
+        "Yongcong Wang",
+        "Jie Zhang",
+        "Rui Jiang",
+        "Xubing Yang",
+        "Ting Yun",
+        "Li Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-04T08:20:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.03760v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Lightweight foundation model for remote sensing segmentation",
+      "llm_evidence_cn": "轻量级遥感分割基础模型",
+      "llm_evidence": "轻量级遥感分割基础模型",
+      "canonical_evidence": "轻量级遥感分割基础模型",
+      "llm_tldr_en": "Proposes GeoSAM-Lite, a lightweight segmentation foundation model for onboard remote sensing, using domain-aware pretraining and feature fusion.",
+      "llm_tldr_cn": "针对星载分割任务，提出GeoSAM-Lite轻量级基础模型，通过域感知预训练（Geo-Init）和特征融合层（FFL）弥合自然图像与遥感图像之间的域差距，在不需提示的情况下实现高效分割。实验表明其在保持性能的同时大幅降低了计算开销，适用于资源受限的遥感平台，为多模态遥感图像分类与分割提供可迁移的基础架构。",
+      "llm_tldr": "针对星载分割任务，提出GeoSAM-Lite轻量级基础模型，通过域感知预训练（Geo-Init）和特征融合层（FFL）弥合自然图像与遥感图像之间的域差距，在不需提示的情况下实现高效分割。实验表明其在保持性能的同时大幅降低了计算开销，适用于资源受限的遥感平台，为多模态遥感图像分类与分割提供可迁移的基础架构。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.07758v1",
+      "source": "arxiv",
+      "title": "Scalable and Trustworthy Earth Observation Foundation Models",
+      "abstract": "Foundation models (FMs) have transformed machine learning from isolated task-specific model development toward general-purpose models pretrained on broad data and adapted to multiple downstream tasks. Earth observation (EO) is an important domain for this paradigm because satellite and airborne archives are large, high-revisit, and increasingly multimodal, while reliable field labels are often sparse. Remote sensing foundation models (RSFMs) cannot be transferred reliably/optimally without domain-specific adaptation. This is because EO data are governed by measurement physics and operational decision constraints. This chapter reviews the design principles arising from these domain-specific constraints. It first defines the FMs paradigm in remote sensing (RS), then synthesizes the current model landscape, pretraining objectives, architecture designs, downstream adaptation and trustworthiness requirements. The chapter also incorporates recent benchmark evidence showing that no single geospatial foundation model is universally best and that inconsistent evaluation remains a major issue to fair comparison and reliable deployment. In addition, two brief environmental monitoring case studies; physics-informed spectral targeted masking for harmful algal bloom prediction and reinforcement learning for adaptive environmental monitoring station selection to illustrate the FMs domain-guided principles in practice. This chapter posits that next-generation RSFMs should be evaluated not only by benchmark accuracy, but also by modality-aware transfer and physically plausible representations for trustworthy EO decisions.",
+      "authors": [
+        "Syed Usama Imtiaz",
+        "Mitra Nasr Azadani",
+        "Nasrin Alamdari"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-08T14:31:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.07758v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Multimodal remote sensing foundation models",
+      "llm_evidence_cn": "多模态遥感基础模型",
+      "llm_evidence": "多模态遥感基础模型",
+      "canonical_evidence": "多模态遥感基础模型",
+      "llm_tldr_en": "Reviews design principles of foundation models for Earth observation, addressing multimodal data and domain adaptation.",
+      "llm_tldr_cn": "该论文综述了面向地球观测的基础模型设计原则，指出遥感数据具有多模态、高时空分辨率和稀疏标签等特点。文章探讨了如何通过域特定适配来提升模型的可迁移性和可靠性，为多模态遥感图像分类等下游任务提供通用框架。虽未直接提出新方法，但其对多模态融合和域适应性的系统分析对高光谱与LiDAR联合分类具有重要参考价值。",
+      "llm_tldr": "该论文综述了面向地球观测的基础模型设计原则，指出遥感数据具有多模态、高时空分辨率和稀疏标签等特点。文章探讨了如何通过域特定适配来提升模型的可迁移性和可靠性，为多模态遥感图像分类等下游任务提供通用框架。虽未直接提出新方法，但其对多模态融合和域适应性的系统分析对高光谱与LiDAR联合分类具有重要参考价值。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.07887v1",
+      "source": "arxiv",
+      "title": "Mixtures of spatial factor analyzers for tensor-variate data",
+      "abstract": "A mixture of spatial factor analyzers (MSFA) is introduced to address the challenges of clustering high-dimensional spatial data. By leveraging the underlying coordinate system, the proposed framework incorporates a flexible, spline-based spatial decay covariance structure that prevents parameter inflation as dimensionality increases. To model non-spatial dependence, matrix variate factor analyzers are employed for further dimensionality reduction. Parameter estimation is conducted via a variant of the expectation-maximization algorithm combined with a generalized least squares estimator. The proposed models are explored in the context of tensor-variate data analysis, where simulation studies and applications to Raman spectroscopy and hyperspectral texture databases demonstrate their capacity to accurately infer and differentiate distinct spatial patterns.",
+      "authors": [
+        "Hanzhang Lu",
+        "Keiran Malott",
+        "Kirsty Milligan",
+        "Sanjeena Subedi",
+        "Edana Cassol",
+        "Vinita Chauhan",
+        "Connor McNairn",
+        "Prarthana Pasricha",
+        "Sangeeta Murugkar",
+        "Rowan Thomson",
+        "Andrew Jirasek",
+        "Jeffrey L. Andrews"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME",
+        "stat.ML"
+      ],
+      "published": "2026-07-08T19:49:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.07887v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "applies spatial factor analyzers to hyperspectral texture data for clustering",
+      "llm_evidence_cn": "将空间因子分析应用于高光谱纹理数据聚类",
+      "llm_evidence": "将空间因子分析应用于高光谱纹理数据聚类",
+      "canonical_evidence": "将空间因子分析应用于高光谱纹理数据聚类",
+      "llm_tldr_en": "MSFA introduces a mixture of spatial factor analyzers for high-dimensional spatial data, demonstrated on hyperspectral texture data for clustering and dimension reduction.",
+      "llm_tldr_cn": "针对高维空间数据聚类中的参数膨胀问题，提出混合空间因子分析模型（MSFA），利用样条基空间衰减协方差结构降低维度，并应用于高光谱纹理数据聚类。方法可扩展至高光谱图像分类中的特征提取。实验证明了在仿真和真实高光谱数据上的有效性。",
+      "llm_tldr": "针对高维空间数据聚类中的参数膨胀问题，提出混合空间因子分析模型（MSFA），利用样条基空间衰减协方差结构降低维度，并应用于高光谱纹理数据聚类。方法可扩展至高光谱图像分类中的特征提取。实验证明了在仿真和真实高光谱数据上的有效性。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
