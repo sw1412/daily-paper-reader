@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-14",
+  "date": "2026-07-14",
+  "generated_at": "2026-07-14T21:46:51",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/14/2607.06896v1-dynamic-object-detection-and-tracking-in-construction-a-fisheye-camera-and-lidar-sensor-fusion-model",
+      "section": "quick",
+      "title_en": "Dynamic Object Detection and Tracking in Construction: A Fisheye Camera and LiDAR Sensor Fusion Model",
+      "authors": "Yilong Chen, Huili Huang, Yong K. Cho",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.06896v1",
+      "score": "7.0",
+      "evidence": "LiDAR与相机融合用于目标检测",
+      "tldr": "在复杂建筑工地环境中，机器人需鲁棒检测和跟踪动态物体。现有方法依赖预训练网络或需额外后处理，鲁棒性不足。本文提出一种结合LiDAR与向上鱼眼相机的传感器融合框架，通过将3D点云投影到圆柱全景图与实时图像检测对齐，用于卡尔曼滤波器更新。系统实现高精度、简单性和鲁棒性，尤其能处理物体在动态与静态状态间的切换，适合真实建筑工地部署。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Robust dynamic object detection and tracking are essential for enabling robots to operate safely and effectively alongside humans in complex environments such as construction sites. While LiDAR-based SLAM and occupancy grid methods offer viable solutions for detecting and tracking motion, many state-of-the-art 3D vision approaches rely heavily on pre-trained neural networks and require additional post-processing to identify moving objects. Sensor fusion techniques, combining the precision of LiDAR with the semantic richness of RGB imagery, offer a promising alternative. In this work, we present a novel framework that enhances a quadruped robot equipped with a LiDAR sensor and an upward-facing fisheye camera for real-time dynamic object detection and tracking. After identifying moving objects within a registered point cloud, our method assigns semantic labels by projecting 3D coordinates onto a 2D cylindrical panorama, aligning with real-time image-based detections for observation update of the Kalman filter. The proposed system demonstrates high precision, simplicity, and robustness, particularly in handling objects transitioning between dynamic and static states, thus it is well-suited for deployment in real-world construction environments.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/14/2607.08191v1-dual-correlation-hypergraph-network-for-unaligned-rgbt-video-object-detection-and-a-large-scale-benchmark",
+      "section": "quick",
+      "title_en": "Dual-Correlation Hypergraph Network for Unaligned RGBT Video Object Detection and A Large-scale Benchmark",
+      "authors": "Qishun Wang, Yapeng Li, Bin Luo, Zhengzheng Tu, Chenglong Li",
+      "date": "2026-07-09",
+      "pdf": "https://arxiv.org/pdf/2607.08191v1",
+      "score": "6.0",
+      "evidence": "多模态RGBT目标检测与超图网络",
+      "tldr": "针对RGB-Thermal视频检测中普遍存在的空间未对齐问题，提出双相关超图网络DHNet，通过补丁级空间对齐模块（PSAM）和双超图融合模块分别捕获时序相关和跨模态空间相关，以增强目标判别性。同时构建了包含1000个视频序列的大规模基准数据集DVT-VOD1000，覆盖多种复杂场景。在VT-VOD50和DVT-VOD1000上的实验表明，该方法达到了最先进检测精度。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "RGB-Thermal (RGBT) Video Object Detection (VOD) has gained significant traction due to its ability to overcome the limitations of conventional RGB-based VOD under challenging conditions. However, spatial misalignment commonly exists between RGBT image pairs. To address this, we propose a Dual-Correlation Hypergraph Network (DHNet) that captures high-dimensional complementary information by explicitly modeling two types of correlations: temporal correlation across consecutive frames and spatial correlation from cross-modal features. Specifically, we first design a Patch-based Spatial Alignment Module (PSAM) to sequentially align the multimodal features at the local region level. Subsequently, we introduce a Dual Hypergraph Fusion Module (DHFM), which constructs separate temporal and multimodal hypergraphs to enhance object discriminability through dual-correlation learning. Furthermore, the field currently lacks a large-scale, scene-diverse benchmark dataset for comprehensive evaluation. To address this gap, we construct DVT-VOD1000, a large-scale RGBT VOD dataset containing 1,000 video sequences with 103,464 RGBT image pairs. The dataset covers diverse scenarios, including campuses, parks, transportation, rural areas, night scenes, rain, and snow. Comprehensive experiments on VT-VOD50 and our DVT-VOD1000 demonstrate that DHNet achieves state-of-the-art detection accuracy. The dataset and source code will be made publicly available on https://github.com/tzz-ahu/ to support academic research.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/14/2607.10762v1-tolid-bridging-the-architecture-gap-in-vision-foundation-model-to-lidar-pretraining-via-token-lifting-for-distillation",
+      "section": "quick",
+      "title_en": "TOLiD: Bridging the Architecture Gap in Vision Foundation Model to LiDAR Pretraining via Token Lifting for Distillation",
+      "authors": "Sutharsan Mahendran, Darshana Priyasad, Kaushik Roy, Tharindu Fernando, Sridha Sridharan, Clinton Fookes, Peyman Moghadam",
+      "date": "2026-07-12",
+      "pdf": "https://arxiv.org/pdf/2607.10762v1",
+      "score": "6.0",
+      "evidence": "通过蒸馏进行LiDAR表示学习",
+      "tldr": "跨模态蒸馏从视觉基础模型到LiDAR骨干存在模态与架构差距。TOLiD通过耦合LiDAR骨干与学生ViT，采用Frustum Pooling和Attention将点特征转换为token，进行token级蒸馏。在五个异构LiDAR数据集和四个跨传感器适应对上，冻结骨干与轻量头展现了更优迁移性能。该方法缩小了架构差距，实现了无需密集标注的自监督LiDAR预训练。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Cross-modal distillation from Vision Foundation Models (VFMs) to LiDAR backbones has recently emerged as a self-supervised pretraining strategy that reduces reliance on dense point-wise annotation for 3D scene understanding. However, existing distillation pipelines typically treat the VFM as a frozen feature source and train a heterogeneous 3D backbone to match fixed image embeddings, forcing the student to bridge both the modality gap and the cross-architecture gap between dense ViT token representations and sparse 3D encoders. We propose TOLiD, a self-supervised pretraining method for LiDAR representation learning that addresses this gap by coupling a LiDAR backbone with a student Vision Transformer (ViT) initialized from a frozen VFM teacher and applying supervision over compatible patch-token representations. TOLiD converts the set of point features within each image patch frustum into a token using Frustum Pooling followed by Frustum Attention, and performs token-level distillation with visibility masking. For LiDAR-only deployment, we lift token features back to per-point representations using masked bilinear sampling to avoid patches that have limited LiDAR points. We extensively evaluate TOLiD on five heterogeneous LiDAR datasets and four cross-sensor adaptation pairs, demonstrating improved transfer with frozen backbones and lightweight heads.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
