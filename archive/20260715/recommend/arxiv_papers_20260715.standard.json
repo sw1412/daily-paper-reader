@@ -1,0 +1,105 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-15T21:05:18.889926+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.12782v1",
+      "source": "arxiv",
+      "title": "MBTI: A Multi-Branch Efficient Fine-Tuning Framework for Hyperspectral Image Classification with Foundation Models",
+      "abstract": "Hyperspectral foundation models learn transferable spectral-spatial representations from large-scale unlabeled data. They provide an effective paradigm for adapting to downstream hyperspectral image (HSI) classification tasks with limited labeled samples. However, spectral band configurations vary substantially across sensors, which makes direct model transfer difficult. Existing adaptation strategies often compress, select, or reshape the original spectra to match model-specific input requirements. These operations may discard useful spectral information and weaken local spectral continuity. To address this problem, we propose MBTI, a Multi-Branch efficient fine-tuning framework for Hyperspectral Image classification. MBTI adapts hyperspectral foundation models to downstream classification tasks while preserving full-band spectral information. First, we introduce a spectral-continuity-preserving multi-branch preprocessing strategy. The original HSI is divided into multiple continuous spectral subsets, and a band reuse mechanism is used when the remaining bands cannot form a complete branch. This avoids invalid padding and unnecessary spectral loss. Second, independent Low-Rank Adaptation (LoRA) modules are inserted into each branch. They enable different spectral intervals to learn task-specific discriminative features while keeping most pre-trained parameters frozen. Finally, a multi-branch channel attention fusion module adaptively recalibrates and integrates features from all spectral branches. Experiments on three public hyperspectral datasets show that MBTI achieves competitive and superior performance compared with representative classification methods. Under the final rank-8 configuration, only about 2.33\\%--2.36\\% of the parameters are trainable. The code will be available at https://github.com/Azhenmiddleblock/MBTI/tree/main.",
+      "authors": [
+        "Mingzhen Xu",
+        "Haonan Guo",
+        "Di Wang",
+        "Yinghua Qu",
+        "Zhiliang Zhou",
+        "Lei Zhang",
+        "Huiwen Yao",
+        "Rui Zhao",
+        "Fengxiang Wang",
+        "Gang Wan",
+        "Bo Du",
+        "Liangpei Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-14T13:58:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.12782v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "hyperspectral image classification with foundation models",
+      "llm_evidence_cn": "使用基础模型的高光谱图像分类",
+      "llm_evidence": "使用基础模型的高光谱图像分类",
+      "canonical_evidence": "使用基础模型的高光谱图像分类",
+      "llm_tldr_en": "MBTI is a multi-branch efficient fine-tuning framework for hyperspectral image classification using foundation models, addressing spectral band variability across sensors.",
+      "llm_tldr_cn": "针对高光谱图像分类中不同传感器光谱波段配置差异导致基础模型迁移困难的问题，本文提出MBTI多分支高效微调框架。该方法通过多分支结构保留完整光谱信息并适配不同输入需求，在少量标注样本下实现高效分类。实验表明，MBTI在多个高光谱数据集上优于现有适应策略，显著提升了分类准确率。该框架为高光谱图像分类提供了一种鲁棒且高效的迁移学习方案。",
+      "llm_tldr": "针对高光谱图像分类中不同传感器光谱波段配置差异导致基础模型迁移困难的问题，本文提出MBTI多分支高效微调框架。该方法通过多分支结构保留完整光谱信息并适配不同输入需求，在少量标注样本下实现高效分类。实验表明，MBTI在多个高光谱数据集上优于现有适应策略，显著提升了分类准确率。该框架为高光谱图像分类提供了一种鲁棒且高效的迁移学习方案。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.09319v1",
+      "source": "arxiv",
+      "title": "Differential Analysis of Multispectral Images for Terrain Identification",
+      "abstract": "Reliable terrain understanding is a prerequisite for autonomous robot navigation. Yet, the widespread RGB-based perception can fail under low illumination, shadows, and material ambiguities. In this work we propose DRIFT, a lightweight multispectral framework that combines raw spectral bands and illumination-tolerant band-ratio representations through a dual-stream residual architecture and a differential fusion branch. Band ratios attenuate multiplicative acquisition effects (illumination/sensor gains), while the differential fusion explicitly highlights discrepancies between absolute-band and ratio-derived cues, which improves the robustness to noisy or partially unreliable spectral measurements. In the paper (i) we evaluate DRIFT on a new oil-on-soil multispectral dataset acquired using a MicaSense RedEdge-P camera mounted on an Unmanned Aerial Vehicle, and (ii) we provide an additional controlled study on water-on-grass under varying illumination and thermal perturbations (hot/cold water) to analyze NIR-sensitive effects. DRIFT consistently improves over strong baselines, while remaining compatible with edge deployment.",
+      "authors": [
+        "Omar Kashmar",
+        "Hemendra Arya",
+        "Fulvio Mastrogiovanni"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "eess.IV"
+      ],
+      "published": "2026-07-10T11:57:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.09319v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multispectral image classification using dual-stream fusion",
+      "llm_evidence_cn": "多光谱图像分类的双流融合方法",
+      "llm_evidence": "多光谱图像分类的双流融合方法",
+      "canonical_evidence": "多光谱图像分类的双流融合方法",
+      "llm_tldr_en": "Proposes DRIFT, a lightweight multispectral framework with dual-stream residual architecture and differential fusion for terrain identification.",
+      "llm_tldr_cn": "该论文提出DRIFT框架，用于多光谱图像地形识别。方法采用双流残差架构，分别处理原始光谱波段和光照不变的波段比，并通过差分融合分支突出绝对波段与比值线索的差异。在油污和地形数据集上的实验表明，DRIFT在低光照和阴影条件下具有优越的鲁棒性。该框架可扩展至高光谱图像分类，提供了一种有效的谱空特征融合思路。",
+      "llm_tldr": "该论文提出DRIFT框架，用于多光谱图像地形识别。方法采用双流残差架构，分别处理原始光谱波段和光照不变的波段比，并通过差分融合分支突出绝对波段与比值线索的差异。在油污和地形数据集上的实验表明，DRIFT在低光照和阴影条件下具有优越的鲁棒性。该框架可扩展至高光谱图像分类，提供了一种有效的谱空特征融合思路。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

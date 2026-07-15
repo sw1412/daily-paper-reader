@@ -1,0 +1,346 @@
+Title: Differential Analysis of Multispectral Images for Terrain Identification
+
+URL Source: https://arxiv.org/pdf/2607.09319v1
+
+Published Time: Mon, 13 Jul 2026 01:07:10 GMT
+
+Number of Pages: 7
+
+Markdown Content:
+# Differential Analysis of Multispectral Images for Terrain Identification 
+
+Omar Kashmar 
+
+University of Genoa , Italy omar.kashmar@edu.unige.it 
+
+Hmeandra Arya 
+
+Indian Institute of Technology Bombay , Mumbai, India arya@aero.iitb.ac.in 
+
+Fulvio Mastrogiovanni 
+
+University of Genoa , Italy fulvio.mastrogiovanni@unige.it 
+
+Abstract —Reliable terrain understanding is a prerequisite for autonomous robot navigation. Yet, the widespread RGB-based perception can fail under low illumination, shadows, and material ambiguities. In this work we propose DRIFT , a lightweight multispectral framework that combines raw spec-tral bands and illumination-tolerant band-ratio representations through a dual-stream residual architecture and a differential fusion branch. Band ratios attenuate multiplicative acquisition effects (illumination/sensor gains), while the differential fusion explicitly highlights discrepancies between absolute-band and ratio-derived cues, which improves the robustness to noisy or partially unreliable spectral measurements. In the paper (i) we evaluate DRIFT on a new oil-on-soil multispectral dataset acquired using a MicaSense RedEdge-P camera mounted on an Unmanned Aerial Vehicle, and (ii) we provide an additional con-trolled study on water-on-grass under varying illumination and thermal perturbations (hot/cold water) to analyze NIR-sensitive effects. DRIFT consistently improves over strong baselines, while remaining compatible with edge deployment. 
+
+Index Terms —Band ratios, Multispectral camera, Terrain identification, Oil detection. 
+
+Code Availability: https://tinyurl.com/4wzekcar I. I NTRODUCTION 
+
+A reliable identification of terrains is a prerequisite for a safe robot autonomy in a variety of outdoor scenarios. A robot must anticipate what its wheels or feet will contact in the upcoming instants, often under challenging sensing conditions, such as low light, shadows, specularities, bad weather, or seasonal changes. The majority of existing approaches rely on standard RGB imagery because it is ubiquitous and nowadays relatively inexpensive. However, RGB is fundamentally limited when appearance changes are dominated by illumination rather than the properties of materials, or when different terrains exhibit near-identical color/texture cues, such as wet grass versus 
+
+muddy soil. These limitations become critical in field robotics scenarios, in which sensing must remain robust and carried out in real time on embedded compute [1], [2]. Multispectral cameras may provide a practical middle ground between RGB and hyperspectral imaging. They acquire a small number of informative bands, typically spanning visible and near-infrared, which are sensitive to physical and chemical properties of the surface. In particular, near-infrared 
+
+This paper was accepted at the 2026 IEEE/ASME International Conference on Advanced Intelligent Mechatronics (AIM 2026). RGB input 
+
+> Multispectral input
+> CNN
+> Band ratios
+> fully connected layer
+> fully connected layer
+> Terrain classification (a)
+> (b)
+> Dual CNN
+> Accurate terrain analysis
+
+Fig. 1: An accurate terrain analysis is required for outdoor robot navigation: (a) RGB images may provide insufficient cues for robust terrain classification, for example, grass-covered dry, wet, or muddy terrain can appear similar to each other; (b) multispectral images can enhance separability for materials such as oil and wet vegetation. responses can reveal information that is weak or ambiguous in RGB, such as vegetation condition and moisture content. Specific spectral signatures can help distinguish slick or con-taminated substrates, for example, oil films, from visually similar backgrounds [3], [4]. Figure 1 illustrates a repre-sentative failure mode of RGB-based classification. Multiple terrain states can look similar in the visible spectrum, while multispectral sensing preserves additional cues that can be exploited algorithmically. Beyond cameras, alternative sensing modalities have been proposed for terrain and environment perception. LiDARs can be used to provide accurate geometry and high-resolution 3D mapping, and are largely invariant to illumination. Neverthe-less, they remain comparatively expensive and the computa-tional cost of processing dense point clouds can be a limiting factor for edge deployment [1], [5]. Radar is robust at long range and under adverse weather conditions, but its lower spatial resolution can hinder fine-grained terrain discrimina-tion [1]. The Ground Penetrating Radar (GPR) can classify surface terrains for robots operating in harsh conditions and can complement semantic mapping frameworks. However, it arXiv:2607.09319v1 [cs.RO] 10 Jul 2026 Blue 
+
+> Green
+> Red
+> NIR
+> Redege
+> Panchromatic
+> Our band ratios to handle missing band effects
+> wavelength
+> Intensity
+> wavelength
+> Intensity
+> Hyperspectral
+> Continuous spectrum
+> (a) Hyperspectral
+> Missing band
+> (b) Multispectral
+> ……………..
+
+Fig. 2: Comparison between traditional approaches and our approach: (a) hyperspectral imaging provides densely sam-pled wavelengths over a continuous spectrum; (b) in con-trast, DRIFT uses multispectral band ratios to obtain robust, illumination-tolerant cues without the cost and complexity of hyperspectral cameras. typically requires bulky and costly hardware configurations, which restricts its applicability on many mobile platforms [6]. As a result, vision remains attractive due to cost and rich-ness of information, but requires improved robustness to the confounders that dominate in unstructured environments [1]. Recent learning-based approaches have explored cross-modal and self-supervised schemes to mitigate the fragility of pure RGB perception. For example, the approach in [7] uses visual input to infer terrain-related physical properties, such as stiffness and friction, with the aim to close the gap between simulation-trained policies and real-world deployment. At the same time, the same approach highlights the sensitivity of visual data to environmental conditions. In this context, multispectral perception is particularly promising because it encodes additional invariants linked to material composition and surface state. Oil detection is a salient example, as spectral signatures depend on oil properties and illumination, and near-infrared (NIR) bands have been shown to support oil spill detection in remote sensing settings [3]. Hyperspectral imaging can provide even richer spectral information by sampling narrow bands over a wide wavelength range [3], but its cost and complexity often make it impractical for robots. In this paper, we focus on (i) multispectral sensing as a deployable alternative, and (ii) algorithmic mechanisms that extract robust cues without requiring expensive hyperspectral instrumentation. In particular, this paper introduces DRIFT ,which stands for Differential Ratio Integration For robust Terrain , a framework that addresses robust terrain identifi-cation from multispectral imagery under realistic acquisition variability, including changes in illumination and environmen-tal conditions. Our core idea is to represent multispectral observations through band ratios , and to learn complementary representations from both raw bands and ratio-derived cues as illustrated in Figure 2. Band ratios are widely used in remote sensing because they can attenuate multiplicative illumination effects and emphasize material-dependent differences across wavelengths. Building on this intuition, we introduce a dual-stream residual architecture that processes (i) the original multispectral bands and band-ratio representations, and (ii) combines the resulting features through a differential fusion mechanism to improve separability under challenging condi-tions. The main contributions of this work are: (i) DRIFT , a multispectral differential framework for terrain identification as a learning-based approach that exploits multispectral band ratios and differential feature fusion to improve robustness over RGB-centric baselines; (ii) an embedded-oriented de-sign, whereas the proposed pipeline is designed to remain lightweight and suitable for deployment on edge compute commonly available on robot platforms; (iii) an empirical evaluation under acquisition variability, for which we collect and analyze multispectral data under varying illumination and environmental conditions, including oil-on-soil scenes and water-on-grass scenarios, and we evaluate the impact of spectral cues (notably, NIR) on classification performance. II. R ELATED WORK 
+
+In the past few years, terrain understanding for autonomous robot has been approached through a wide range of sensing modalities and learning paradigms. While RGB cameras re-main attractive for their low cost and high spatial resolution, their performance can degrade substantially under illumination changes, presence of shadows, weather variability, and ma-terial ambiguities, which produce similar visible appearance across different surface states [1]. These limitations motivate either complementary sensors or representations that are less sensitive to illumination. A significant body of work targets terrain recognition and traversability estimation using learning-based perception. Guan et al . [8] propose GA-Nav, a group-wise attention mech-anism that performs efficient terrain segmentation for naviga-tion in unstructured outdoor environments, and demonstrates strong results on established datasets. Beyond pure vision, alternative sensing channels and interaction-based methods have also been explored. For instance, terrain-related physical properties can be inferred from vision to support locomotion and navigation [7]. Other approaches leverage specialized sensing such as whisker-based systems combined with learning for terrain identification in unstructured environments [9], or acoustic cues for terrain classification [10]. Self-supervised schemes can further reduce annotation effort by transferring supervision across data sources and learning terrain-related features directly from real-world imagery [11]. However, many solutions still rely primarily on RGB cues, and robustness un-der challenging illumination remains a central open issue [1]. Multispectral imaging is widely adopted in remote sens-ing and in monitoring scenarios based on Unmanned Aerial Vehicles (UAVs), because it captures wavelength-dependent responses that correlate with material composition and sur-face state. In the context of UAV-based sensing, Tsouros et al . [12] review precision agriculture applications and highlight the benefits of high-resolution data acquisition and timely decision-making, while also noting practical challenges related to standardized acquisition and processing pipelines. For en-vironmental monitoring, multispectral imagery has been used for automated oil spill detection [13] and operational response activities, including lessons learned from large-scale incidents such as the well-known Deepwater Horizon [14]. Compared to hyperspectral imaging, which offers dense spectral sampling but typically involves higher sensor cost and processing com-plexity, multispectral setups provide a more practical trade-off for embedded platforms. Hyperspectral classification methods can achieve high accuracy when rich spectral-spatial informa-tion is available [15]. However, multispectral approaches are often preferred when cost, payload, and compute constraints are strict. More generally, comparative analyses of multispec-tral versus hyperspectral retrieval highlight fundamental trade-offs in spectral resolution, information content, and operational complexity [16]. A standard strategy in remote sensing is to compute spectral indices or band ratios to attenuate illumination effects and emphasize material-dependent differences across wavelengths. Band-ratio style representations have been used as effective inputs to learning pipelines in multispectral imagery analy-sis [17]. In parallel, data fusion architectures, most notably dual-branch or dual-stream networks, have become a common mechanism to combine complementary representations. Early multimodal segmentation architectures such as for example FuseNet [18] inspired subsequent dual-branch designs in spectral-spatial classification [19] and remote sensing tasks, including multispectral segmentation datasets and lightweight models targeting efficient deployment [20], [21]. Dual-branch spatial-spectral data fusion has also been explored for oil spill monitoring in high-dimensional spectral settings [22]. Building on these directions, DRIFT targets robot-relevant terrain identification under realistic acquisition variability, with particular emphasis on illumination robustness and deploya-bility. Differently from RGB-based terrain segmentation ap-proaches [8], we explicitly leverage multispectral information to disambiguate visually similar terrain states. Compared to hyperspectral methods [15], we focus on a practical multispec-tral setup and derive discriminative cues through band ratios computed from a small number of bands. Finally, while prior dual-stream designs fuse modalities or representations [18], [19], we propose a differential fusion strategy that jointly exploits raw multispectral bands and band-ratio representations to improve robustness and sensitivity to oil/vegetation-related spectral signatures. III. M ETHODS 
+
+This Section describes the main conceptual tenets of 
+
+DRIFT , which is based on (i) an illumination-tolerant ratio representation, and (ii) a dual-stream residual architecture with differential data fusion. The design is motivated by the need for robust classification under acquisition variability, that is, illumination changes, shadows, and sensor gain differences, while remaining deployable on edge compute. 
+
+A. Acquisition Model and Ratio Representation 
+
+Let Xi ∈ RH×W ×B denote the i-th multispectral sample with B spectral bands, where H and W are the image height and width (that is, spatial resolution in pixels), and let X(b) 
+
+> i
+
+∈
+
+RH×W be the image acquired in band b ∈ B = {b1, . . . , b B }.A minimal and commonly used model for band-dependent illumination/sensor effects assumes that each observed band is approximately a scaled version of an underlying band-specific scene response plus noise, that is, 
+
+X(b) 
+
+> i
+
+= g(b) 
+
+> i
+
+S(b) 
+
+> i
+
++ η(b) 
+
+> i
+
+, (1) where g(b) 
+
+> i
+
+is a multiplicative factor accounting for illumi-nation and sensor gain, S(b) 
+
+> i
+
+captures the material-dependent reflectance-related signal, and η(b) 
+
+> i
+
+is additive noise. While this model is simplified, it captures the key confounder that often dominates RGB-based terrain recognition in the field, that is, changes in intensity that do not correspond to changes in material. To attenuate multiplicative effects, we represent multispec-tral data through band ratios . For a predefined set of K ordered band pairs (pk, q k), with pk̸ = qk, we define 
+
+R(k) 
+
+> i
+
+= X(bpk )
+
+> i
+
+X(bqk ) 
+
+> i
+
++ ϵ, k = 1 , . . . , K, (2) where ϵ > 0 avoids division by zero. Under Equation (1), ratios reduce sensitivity to shared multiplicative factors and emphasize wavelength-dependent differences that are more tightly linked to material properties, that is, a standard practice in remote sensing and spectral analysis [23], [24]. Stacking the ratios yields the ratio tensor 
+
+Ri =
+
+h
+
+R(1)  
+
+> i
+
+, . . . , R (K)
+
+> i
+
+i
+
+∈ RH×W ×K , (3) with K ≤ B(B − 1) in the ordered-pair case. In practice, K
+
+is selected to balance discriminative power and computational cost. 
+
+B. Dual-stream Residual Encoders 
+
+DRIFT learns complementary representations from (i) the raw multispectral bands and (ii) the ratio tensor. Specifically, we use two residual encoders: 
+
+FX = fθ (Xi), FR = fϕ(Ri), (4) where FX , F R ∈ RH′×W ′×D are feature maps, and fθ , f ϕ
+
+share the same backbone design (ResNet-style residual blocks), but do not share weights. The use of two streams allows the network to preserve (a) absolute spectral content from Xi, and (b) illumination-tolerant relative cues from Ri.In DRIFT , we adopt a standard residual block formulation. Given an input feature map Hl−1 ∈ RH′×W ′×D , the l-th block computes 
+
+Hl = ReLU( Hl−1 + fl(Hl−1)) , (5) where fl(·) is a residual mapping implemented with two 3 ×
+
+3 convolutional layers, each followed by batch normalization and ReLU. This definition is used consistently in both streams. C. Differential Fusion and Classification Head 
+
+To explicitly highlight discrepancies between absolute-band features and ratio-derived features, we compute a differential feature map, as 
+
+F∆ = gψ (|FX − FR|) , (6) where | · | is the element-wise absolute difference, and gψ is a lightweight refinement module, implemented as Conv 3×3 +
+
+BN + ReLU , such that 
+
+F∆ = ReLU  BN  Conv 3×3(|FX − FR|) . (7) We aggregate information from both streams and the differ-ential branch. Let GAP( ·) denote global average pooling. We define the fused descriptor 
+
+zi = [GAP( FX ), GAP( FR), GAP( F∆)] ∈ R3D , (8) and obtain class probabilities with a small MLP and softmax, such that 
+
+pω (y | Xi) = softmax(MLP ω (zi)) , (9) where y ∈ { 1, . . . , C }, and C is the number of terrain classes. 
+
+D. Training Objective 
+
+We train the full model end-to-end with the standard cate-gorical cross-entropy loss: 
+
+LCE = −
+
+> C
+
+X
+
+> c=1
+
+1[yi = c] log ( pω (yi = c | Xi)) . (10) In addition, to encourage discriminative structure in the dif-ferential representation, we optionally include a contrastive term computed on the pooled differential descriptor ˜zi =GAP( F∆), such that 
+
+Lctr = X
+
+> (i,j )
+
+
+
+∥˜zi − ˜zj ∥22 1[yi = yj ]+ max  0, m − ∥ ˜zi − ˜zj ∥22
+
+ 1[yi̸ = yj ]
+
+
+
+,
+
+(11) where m > 0 is a margin. The total objective is 
+
+Ltotal = LCE + λ Lctr , (12) with λ ≥ 0 controlling the contribution of the contrastive term. In our experiments we report results both with λ = 0 
+
+(classification-only case) and with λ > 0 to quantify the benefit of explicit differential-feature separation. 
+
+Remark . The pipeline is intentionally lightweight. Ratios are computed with simple per-pixel operations, and the differential branch uses only a small refinement module on top of two standard residual encoders. The ratio stream provides a rep-resentation that is less sensitive to multiplicative illumination variation, as in Equation (1), while the dual-stream differential fusion in Equation (6) promotes features that remain discrim-inative even when absolute intensity cues become unreliable. Blue       
+
+> Panchromatic
+> (CW: 475 nm) (BR: 32 nm) (CW: 560 nm) (BR: 27 nm) (CW: 668 nm) (BR: 16 nm)
+> (CW: 717 nm) (BR:12 nm) (CW: 842 nm) (BR: 57 nm) (CW: 634.5 nm) (BR: 463 nm)
+> Green Red
+> NIR Redege
+
+Fig. 3: Example images showing the oil-on-soil scenario, represented through six-band multispectral images. ‘CW’ is center wavelength, and ‘BR’ is band range for each band. Halogen Light Normal Light LED Light            
+
+> (a)
+> dry
+> Water source Water
+> 713 nm 736 nm 759 nm 782 nm 805 nm
+> 828 nm 851 nm 874 nm 897 nm 920 nm
+> (b) Our Multispectral data
+
+# {
+
+Fig. 4: Use of multispectral data: (a) the experiment setup and the RGB images for the grass terrain; (b) multispectral images of grass terrain after the direct application of hot water under normal lighting condition. 
+
+(a) Initial state (b) at T1 (immediately) 
+
+(c) at T2 (15 minutes later) (d) after 1 hour 
+
+Fig. 5: Reflectance signals of grass terrain. (a) Oil-affected (b) Oil-free 
+
+Fig. 6: Two experimental conditions: (a) presence of oil; (b) absence of oil.  
+
+> (a) Oil-affected (b) Oil-free
+
+Fig. 7: Grad-CAM visualizations for the two experimental conditions: (a) presence of oil; (b) absence of oil. 
+
+> (a) Oil-affected
+> (b) Oil-free
+
+Fig. 8: NIR statistics for the two experimental conditions: (a) mean NIR pixel values for oil-affected samples; (b) mean NIR pixel values for oil-free samples. IV. E XPERIMENTAL EVALUATION 
+
+We evaluate DRIFT on a multispectral oil-on-soil dataset, and report an additional controlled water-on-grass study to analyze the effect of illumination and thermal perturbations on NIR responses. All data were collected at the Indian Institute of Technology Bombay, Department of Aerospace Engineer-ing. The experimental evaluation discussed here is designed to support three claims introduced in Sections I–III, namely (i) band-ratio cues improve robustness to acquisition variability, (ii) dual-stream differential fusion provides complementary discriminative power over single-stream baselines, and (iii) the resulting model remains compatible with edge-oriented deployment. 
+
+Datasets and acquisition protocol . We collected an oil-on-soil 
+
+dataset using a UAV equipped with a MicaSense RedEdge-P multispectral camera with six spectral bands. Data were acquired in both static and flying modes. In total, approxi-mately 400 images were captured while progressively adding oil to dry soil in multiple stages. After approximately 300 ml of oil was poured in the central region, the contamination became visually more apparent in the red and NIR bands, while blue and green bands were comparatively less infor-mative as illustrated in Figure 3. To reduce over-optimistic estimates caused by temporal correlation, for example, due to consecutive frames acquired during progressive oil addition, we adopted a sequence/stage -level split rather than a frame-level split. In addition, we performed controlled acquisitions in a water-on-grass as illustrated in Figure 4 scenario using a multi-band NIR camera (10 bands, 713 –920 nm) under different illumination sources, namely sunlight, LED, and halogen light. Hot water was applied to a designated region, and images were captured at three time instants, namely T1 (immediately after application), T2 (after 15 minutes), and T3 (after 1 hour). This study is used as a supporting analysis to characterize how NIR responses vary under environmental perturbations relevant to outdoor robotic perception. 
+
+Baselines and evaluation metrics . For the oil-on-soil classi-fication task, we compare four models trained with identical optimization settings and the same train/validation/test split, as follows:  
+
+> •
+
+raw-only : a single-stream encoder trained on the raw multi-spectral input Xi; 
+
+> •
+
+ratio-only : a single-stream encoder trained on the band-ratio tensor Ri; 
+
+> •
+
+concat-fusion : a two-stream architecture in which raw-band and ratio-based features are fused by concatenation, without an explicit differential branch;  
+
+> •
+
+DRIFT : the proposed two-stream architecture with dif-ferential fusion, as described in Section III. For the six-band camera, the maximum number of ordered ratios is B(B − 1) = 30 . In our work, we use two com-plementary analyses: (i) single-ratio experiments, to assess the discriminative contribution of individual band ratios; and (ii) the full ratio-stream input used by DRIFT . We report classification accuracy and F1-score, and all results are av-Method Accuracy (%) F1-score                         
+
+> raw-only 78.95 ±0.11 0.714 ±0.03
+> ratio-only 85.70 ±1.00 0.875 ±0.01
+> concat-fusion 87.72 ±0.15 0.863 ±0.10
+> DRIFT 94.50 ±0.80 0.93 ±0.02
+
+TABLE I: Classification results for all internal baselines in the 
+
+oil-on-soil scenario. Results are averaged over three random seeds.                                              
+
+> Single Band-Ratio Classification Accuracy (%)
+> B1/B2 98.4 B2/B1 92.7 B1/B3 98.5 B2/B3 85.0 B3/B2 99.7 B1/B4 98.5 B3/B4 98.4 B4/B3 91.3 B1/B5 98.5 B4/B5 98.4 B5/B4 98.5 B1/B6 97.5 B5/B6 96.8 B6/B5 98.5 B2/B4 98.5 B2/B5 98.5 B2/B6 98.5 B3/B1 95.6 B3/B5 95.6 B3/B6 98.5 B4/B1 91.3 B4/B2 94.2 B4/B6 98.5 B5/B1 92.7 B6/B2 99.9 B6/B3 94.2 B6/B4 98.5
+
+TABLE II: Accuracy obtained by training on a single band-ratio image. Ratios involving NIR are generally more discrim-inative for oil-on-soil separation. eraged over three random seeds. Main results on oil-on-soil classification . Table I summarizes quantitative results. The progression from raw-only to ratio-only , then to concat-fusion , and finally to DRIFT , is consistent with the conceptual motivation of our method. Raw multi-spectral bands alone already provide a usable representation, but the ratio-based encoding improves discrimination, suggesting that band ratios help attenuate acquisition variability and highlight material-dependent spectral differences. A simple two-stream concate-nation further improves performance, which indicates that raw and ratio-derived cues are complementary. However, the best results are obtained with DRIFT , whose explicit differential fusion yields the highest accuracy and F1-score, therefore supporting the hypothesis that modeling discrepancies between absolute-band and ratio-derived features is beneficial. 
+
+Effect of individual band ratios . To better understand which spectral relationships are most informative, we trained classi-fiers using individual band-ratio images. Table II reports the resulting accuracies. It can be observed that ratios involv-ing NIR tend to be among the most discriminative, which is consistent with the known sensitivity of NIR to surface composition and contamination. In contrast, ratios between nearby visible bands often provide weaker discrimination. This observation is aligned with the physical intuition underlying 
+
+DRIFT , and supports the use of ratio-derived cues as a robust complementary representation. 
+
+Interpretability analysis . To qualitatively verify that DRIFT 
+
+relies on physically meaningful regions, we apply Gradient-weighted Class Activation Mapping (Grad-CAM) to the trained classifier. Let yc denote the pre-softmax logit for class 
+
+c, that is, oil , and let Ak ∈ RH′×W ′
+
+be the k-th activation map of the last convolutional layer, with k = 1 , . . . , K . Grad-CAM computes a class-specific importance weight for each channel by globally averaging the gradients of yc with respect to Ak,that is 
+
+αck = 1
+
+H′W ′
+
+> H′
+
+X 
+
+> i=1
+> W′
+
+X
+
+> j=1
+
+∂y c
+
+∂A kij 
+
+. (13) The class activation map is then obtained as 
+
+Lc
+
+> Grad
+
+-CAM = ReLU 
+
+> K
+
+X
+
+> k=1
+
+αckAk
+
+!
+
+∈ RH′×W ′
+
+. (14) After bilinear upsampling to the input resolution, the resulting heatmaps indicate that the model focuses on the oil-affected regions as illustrated in Figure 7. The conditions of the experi-ment are illustrated in Figure 6. This observation suggests that the learned decision cues are spatially localized and physically plausible. In addition, the mean NIR pixel values exhibit a consistent shift between oil and non-oil samples, further supporting the importance of NIR for discrimination in this scenario as illustrated in Figure 8. 
+
+Computational aspects . An 80/20 stratified split (ran-dom state=42) over seeds {42,7,21 }. All models used Adam (lr= 10 −4) + CE loss; DRIFT additionally used AdamW, label smoothing (0.1), LR scheduling, and early stopping (patience=5, 20 epochs). We evaluated the computational foot-print of all the considered models on an Intel i7-10700 CPU. The raw-only and ratio-only models each contain approxi-mately 24 .6M parameters and require about 4.1–4.2 GFLOPs per forward pass, whereas the two-stream variants roughly double both the parameter count and the computational cost. In particular, DRIFT contains 48 .67 M parameters and requires 
+
+8.34 GFLOPs. On a single CPU core, its average inference latency is 180 .77 ms per image, while with 16 CPU threads the latency decreases to 71 .21 ms, corresponding to a throughput of 14 .04 images/s. These results indicate that, although the dual-stream design is naturally heavier than single-stream baselines, DRIFT remains compatible with edge-oriented CPU deployment, especially when moderate parallelism is available. 
+
+Supporting study: water-on-grass . As a supporting analysis, we considered the water-on-grass scenario under varying illu-mination and thermal perturbations. Across both regular and LED illumination, the reflectance peak around 897 nm remains stable, while the localized thermal perturbation induced by hot water produces a decrease that becomes more evident over time as illustrated in Figure 5. Although this study is not used as a benchmark classification task, it provides qualitative evidence that NIR-sensitive responses vary in a structured way with environmental changes, thereby motivating the use of multi-band cues and ratio-based representations for outdoor robotic perception. 
+
+Discussion . The experimental results support three main ob-servations. First , band ratios are effective because, under the simplified acquisition model of Section III, they attenuate multiplicative illumination and gain effects while empha-sizing wavelength-dependent differences associated with the underlying material. This is empirically supported by the strong performance of several NIR-involving ratios in Table II. 
+
+Second , differential fusion provides additional value beyond ratios alone. While ratio-based encodings are robust, they may suppress useful absolute spectral cues. DRIFT achieves substantially better performance than all internal baselines 
+
+because it jointly processes raw bands and ratio-derived fea-tures, and because it explicitly models their discrepancy. Third ,the present evaluation has limitations. The oil-on-soil dataset remains relatively small and scenario-specific, and the current results are limited to one primary sensor configuration and one contamination setup. Broader generalization across soil types, oil types, illumination geometries, and sensors should therefore be considered in future work. A natural next step is to complement the current evaluation with controlled robustness experiments under synthetic gain perturbations, additive noise, and missing-band masking. V. C ONCLUSION 
+
+In this paper, we present DRIFT , a lightweight multispectral framework for terrain surface classification that combines raw spectral bands with illumination-tolerant band-ratio represen-tations using a dual-stream residual architecture and a differ-ential fusion branch. The key idea of our work is to exploit complementary cues: on the one hand, band ratios attenuate multiplicative acquisition effects, such as illumination and sensor gain variations; on the other hand, raw-band features preserve absolute spectral information that can be lost by normalization. Experiments on an oil-on-soil dataset acquired with aMicaSense RedEdge-P camera indicate that (i) multispectral ratios, especially those involving NIR, provide strong discrim-inative power for oil contamination, and that (ii) differential fusion improves robustness relative to single-stream base-lines. Grad-CAM visualizations further suggest that the model focuses on physically meaningful regions around the con-taminated area, supporting the interpretability of the learned decision cues. In addition, a controlled water-on-grass study under varying illumination and thermal perturbations provides qualitative evidence that NIR responses are sensitive to envi-ronmental changes, motivating the use of multi-band cues and ratio-based normalization for outdoor robot perception. This work has limitations. The current evaluation is based on a single primary acquisition setting and a limited set of surface conditions, whereas temporal correlation in progressive contamination sequences can inflate performance if not han-dled with sequence-wise splits. Future work will therefore (i) expand the dataset across different soils, oil types, illumination geometries, and sensors; (ii) include explicit robustness tests. REFERENCES [1] M. M. Kabir, J. R. Jim, and Z. Istenes, “Terrain detection and segmen-tation for autonomous vehicle navigation: A state-of-the-art systematic review,” Information Fusion , vol. 113, p. 102644, 2025. [2] H. Zhang, E. Fromont, S. Lefevre, and B. Avignon, “Deep active learn-ing from multispectral data through cross-modality prediction inconsis-tency,” in 2021 IEEE International Conference on Image Processing (ICIP) . IEEE, 2021, pp. 449–453. [3] R. Al-Ruzouq, M. B. A. Gibril, A. Shanableh, A. Kais, O. Hamed, S. Al-Mansoori, and M. A. Khalil, “Sensors, features, and machine learning for oil spill detection and monitoring: A review,” Remote Sensing , vol. 12, no. 20, p. 3338, 2020. [4] R. Niclos, C. Dona, E. Valor, and M. Bisquert, “Thermal-infrared spectral and angular characterization of crude oil and seawater emis-sivities for oil slick identification,” IEEE Transactions on Geoscience and Remote Sensing , vol. 52, no. 9, pp. 5387–5395, 2013. [5] N. Steinke, D. Goehring, and R. Rojas, “Groundgrid: Lidar point cloud ground segmentation and terrain estimation,” IEEE Robotics and Automation Letters , vol. 9, no. 1, pp. 420–426, 2023. [6] A. Sheppard, J. Brown, N. Renno, and K. A. Skinner, “Learning surface terrain classifications from ground penetrating radar,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2024, pp. 3047–3055. [7] J. Chen, J. Frey, R. Zhou, T. Miki, G. Martius, and M. Hutter, “Identify-ing terrain physical parameters from vision-towards physical-parameter-aware locomotion and navigation,” IEEE Robotics and Automation Letters , vol. 9, no. 11, pp. 9279–9286, 2024. [8] T. Guan, D. Kothandaraman, R. Chandra, A. J. Sathyamoorthy, K. Weer-akoon, and D. Manocha, “Ga-nav: Efficient terrain segmentation for robot navigation in unstructured outdoor environments,” IEEE Robotics and Automation Letters , vol. 7, no. 3, pp. 8138–8145, 2022. [9] Z. Yu, S. Perera, H. Hauser, P. R. Childs, and T. Nanayakkara, “A tapered whisker-based physical reservoir computing system for mobile robot terrain identification in unstructured environments,” IEEE Robotics and Automation Letters , vol. 7, no. 2, pp. 3608–3615, 2022. [10] A. Valada, L. Spinello, and W. Burgard, “Deep feature learning for acoustics-based terrain classification,” pp. 21–37, 2017. [11] J. Frey, M. Mattamala, N. Chebrolu, C. Cadena, M. Fallon, and M. Hutter, “Fast traversability estimation for wild visual navigation,” 
+
+arXiv preprint arXiv:2305.08510 , 2023. [12] D. C. Tsouros, S. Bibi, and P. G. Sarigiannidis, “A review on uav-based applications for precision agriculture,” Information ,vol. 10, no. 11, p. 349, Nov. 2019. [Online]. Available: http: //dx.doi.org/10.3390/info10110349 [13] B. N. Bradford and P. J. Sanchez-Reyes, “Automated oil spill detection with multispectral imagery,” in Ocean Sensing and Monitoring III , vol. 8030. SPIE, 2011, pp. 213–223. [14] J. Svejkovsky, W. Lehr, J. Muskat, G. Graettinger, and J. Mullin, “Operational utilization of aerial multispectral remote sensing during oil spill response: Lessons learned during the deepwater horizon (mc-252) spill.” Photogrammetric Engineering & Remote Sensing , vol. 78, no. 10, 2012. [15] X. Hu, G. Zhao, A. Dong, G. Lv, Y. Zhai, Y. Guo, and X. Dong, “Few-shot hyperspectral image classification with spectral-spatial feature fu-sion based on fuzzy broad learning system,” in 2023 IEEE International Conference on Image Processing (ICIP) . IEEE, 2023, pp. 3160–3164. [16] S. H. Jung, S. Kwon, I. W. Seo, and J. S. Kim, “Comparison between hyperspectral and multispectral retrievals of suspended sediment con-centration in rivers,” Water , vol. 16, no. 9, p. 1275, 2024. [17] X. Hu, Y. Ban, and A. Nascetti, “Uni-temporal multispectral imagery for burned area mapping with deep learning,” Remote Sensing , vol. 13, no. 8, p. 1509, 2021. [18] C. Hazirbas, L. Ma, C. Domokos, and D. Cremers, FuseNet: Incorporating Depth into Semantic Segmentation via Fusion-Based CNN Architecture . Springer International Publishing, 2017, p. 213–228. [Online]. Available: http://dx.doi.org/10.1007/978-3-319-54181-5 14 [19] Y. Zhang, Z. Wang, M. Huang, M. Li, J. Zhang, S. Wang, J. Zhang, and H. Zhang, “S2dbft: Spectral-spatial dual-branch fusion transformer for hyperspectral image classification,” IEEE Transactions on Geoscience and Remote Sensing , 2025. [20] E. Celikkan, T. Kunzmann, Y. Yeskaliyev, S. Itzerott, N. Klein, and M. Herold, “Weedsgalore: A multispectral and multitemporal uav-based dataset for crop and weed segmentation in agricultural maize fields,” IEEE, pp. 4767–4777, 2025. [21] Z. Zhao, B. Zhao, R. Du, Y. Wu, J. Chen, and Y. Zheng, “Dlitenet: A dual-branch lightweight framework for efficient and precise building extraction from visible and sar imagery,” Remote Sensing , vol. 17, no. 24, p. 3939, 2025. [22] J. Yang, J. Wang, Y. Hu, Y. Ma, Z. Li, and J. Zhang, “Hyperspectral marine oil spill monitoring using a dual-branch spatial–spectral fusion model,” Remote Sensing , vol. 15, no. 17, p. 4170, 2023. [23] J. R. Jensen, Remote sensing of the environment: An earth resource perspective . Pearson Education India, 2009. [24] R. A. Schowengerdt, Remote sensing: models and methods for image processing . elsevier, 2006.

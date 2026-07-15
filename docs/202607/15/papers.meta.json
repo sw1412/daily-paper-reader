@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-15",
+  "date": "2026-07-15",
+  "generated_at": "2026-07-15T21:07:15",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/15/2607.12782v1-mbti-a-multi-branch-efficient-fine-tuning-framework-for-hyperspectral-image-classification-with-foundation-models",
+      "section": "deep",
+      "title_en": "MBTI: A Multi-Branch Efficient Fine-Tuning Framework for Hyperspectral Image Classification with Foundation Models",
+      "authors": "Mingzhen Xu, Haonan Guo, Di Wang, Yinghua Qu, Zhiliang Zhou, Lei Zhang, Huiwen Yao, Rui Zhao, Fengxiang Wang, Gang Wan, Bo Du, Liangpei Zhang",
+      "date": "2026-07-14",
+      "pdf": "https://arxiv.org/pdf/2607.12782v1",
+      "score": "10.0",
+      "evidence": "使用基础模型的高光谱图像分类",
+      "tldr": "高光谱基础模型因传感器波段配置差异难以直接迁移。现有方法压缩或选择光谱会损失信息。本文提出MBTI多分支微调框架，通过连续子集划分和波段重用保留全波段信息，各分支插入独立LoRA模块，并用多分支通道注意力融合特征。在三个公开数据集上达到领先性能，仅需约2.3%可训练参数。",
+      "tags": "query:hsi",
+      "abstract_en": "Hyperspectral foundation models learn transferable spectral-spatial representations from large-scale unlabeled data. They provide an effective paradigm for adapting to downstream hyperspectral image (HSI) classification tasks with limited labeled samples. However, spectral band configurations vary substantially across sensors, which makes direct model transfer difficult. Existing adaptation strategies often compress, select, or reshape the original spectra to match model-specific input requirements. These operations may discard useful spectral information and weaken local spectral continuity. To address this problem, we propose MBTI, a Multi-Branch efficient fine-tuning framework for Hyperspectral Image classification. MBTI adapts hyperspectral foundation models to downstream classification tasks while preserving full-band spectral information. First, we introduce a spectral-continuity-preserving multi-branch preprocessing strategy. The original HSI is divided into multiple continuous spectral subsets, and a band reuse mechanism is used when the remaining bands cannot form a complete branch. This avoids invalid padding and unnecessary spectral loss. Second, independent Low-Rank Adaptation (LoRA) modules are inserted into each branch. They enable different spectral intervals to learn task-specific discriminative features while keeping most pre-trained parameters frozen. Finally, a multi-branch channel attention fusion module adaptively recalibrates and integrates features from all spectral branches. Experiments on three public hyperspectral datasets show that MBTI achieves competitive and superior performance compared with representative classification methods. Under the final rank-8 configuration, only about 2.33\\%--2.36\\% of the parameters are trainable. The code will be available at https://github.com/Azhenmiddleblock/MBTI/tree/main.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/15/2607.09319v1-differential-analysis-of-multispectral-images-for-terrain-identification",
+      "section": "quick",
+      "title_en": "Differential Analysis of Multispectral Images for Terrain Identification",
+      "authors": "Omar Kashmar, Hemendra Arya, Fulvio Mastrogiovanni",
+      "date": "2026-07-10",
+      "pdf": "https://arxiv.org/pdf/2607.09319v1",
+      "score": "7.0",
+      "evidence": "多光谱图像分类的双流融合方法",
+      "tldr": "针对基于RGB的感知在低光照、阴影等条件下失效的问题，提出DRIFT多光谱地形识别框架。该方法采用双流残差架构融合原始光谱波段与光照不变的波段比特征，并通过差分融合分支突出两者差异以增强鲁棒性。在MicaSense RedEdge-P无人机采集的油污土壤数据集和水草控制实验（光照、温度变化）中，DRIFT持续优于强基线。该轻量级框架适合边缘部署，为自主导航中的可靠地形理解提供了新方案。",
+      "tags": "query:hsi",
+      "abstract_en": "Reliable terrain understanding is a prerequisite for autonomous robot navigation. Yet, the widespread RGB-based perception can fail under low illumination, shadows, and material ambiguities. In this work we propose DRIFT, a lightweight multispectral framework that combines raw spectral bands and illumination-tolerant band-ratio representations through a dual-stream residual architecture and a differential fusion branch. Band ratios attenuate multiplicative acquisition effects (illumination/sensor gains), while the differential fusion explicitly highlights discrepancies between absolute-band and ratio-derived cues, which improves the robustness to noisy or partially unreliable spectral measurements. In the paper (i) we evaluate DRIFT on a new oil-on-soil multispectral dataset acquired using a MicaSense RedEdge-P camera mounted on an Unmanned Aerial Vehicle, and (ii) we provide an additional controlled study on water-on-grass under varying illumination and thermal perturbations (hot/cold water) to analyze NIR-sensitive effects. DRIFT consistently improves over strong baselines, while remaining compatible with edge deployment.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

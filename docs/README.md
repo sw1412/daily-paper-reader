@@ -6,30 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-14
-- 运行时间：2026-07-14 21:46:44 UTC
+- 最新运行日期：2026-07-15
+- 运行时间：2026-07-15 21:07:10 UTC
 - 运行状态：成功
-- 本次总论文数：3
-- 精读区：0
-- 速读区：3
+- 本次总论文数：2
+- 精读区：1
+- 速读区：1
 
 ### 今日简报（AI）
-今天速读3篇论文，聚焦多模态融合检测与LiDAR预训练架构突破。最值得关注的是鱼眼相机与LiDAR融合的建筑动态检测模型（7.0/10），以及RGB-T视频双相关超图网络（6.0/10）。建议优先精读高分论文，深入理解其多传感器融合策略在复杂场景中的适用性。
-- 详情：[/202607/14/README](/202607/14/README)
+今日精读与速读共2篇高光谱/多光谱遥感图像分析论文，其中1篇高分精读提出创新微调框架。  
+最值得关注的是《MBTI: A Multi-Branch Efficient Fine-Tuning Framework》中的多分支高效微调思路，可用于提升高光谱分类的泛化能力。  
+建议普通读者优先精读这篇10分论文，理解其轻量化适配策略，后续可关注其在不同遥感任务中的迁移效果。
+- 详情：[/202607/15/README](/202607/15/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [MBTI: A Multi-Branch Efficient Fine-Tuning Framework for Hyperspectral Image Classification with Foundation Models](/202607/15/2607.12782v1-mbti-a-multi-branch-efficient-fine-tuning-framework-for-hyperspectral-image-classification-with-foundation-models)  
+   标签：评分：10.0/10、query:hsi
+   evidence：使用基础模型的高光谱图像分类
 
 ### 速读区论文标签
-1. [Dynamic Object Detection and Tracking in Construction: A Fisheye Camera and LiDAR Sensor Fusion Model](/202607/14/2607.06896v1-dynamic-object-detection-and-tracking-in-construction-a-fisheye-camera-and-lidar-sensor-fusion-model)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：LiDAR与相机融合用于目标检测
-2. [Dual-Correlation Hypergraph Network for Unaligned RGBT Video Object Detection and A Large-scale Benchmark](/202607/14/2607.08191v1-dual-correlation-hypergraph-network-for-unaligned-rgbt-video-object-detection-and-a-large-scale-benchmark)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：多模态RGBT目标检测与超图网络
-3. [TOLiD: Bridging the Architecture Gap in Vision Foundation Model to LiDAR Pretraining via Token Lifting for Distillation](/202607/14/2607.10762v1-tolid-bridging-the-architecture-gap-in-vision-foundation-model-to-lidar-pretraining-via-token-lifting-for-distillation)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：通过蒸馏进行LiDAR表示学习
+1. [Differential Analysis of Multispectral Images for Terrain Identification](/202607/15/2607.09319v1-differential-analysis-of-multispectral-images-for-terrain-identification)  
+   标签：评分：7.0/10、query:hsi
+   evidence：多光谱图像分类的双流融合方法
 
 
 <div class="dpr-home-promo-card">
