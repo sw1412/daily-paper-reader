@@ -1,0 +1,1345 @@
+Title: ASFR-Net: Adversarial Alignment and Spatio-Frequency Refinement Network for Heterogeneous Remote Sensing Image Change Detection
+
+URL Source: https://arxiv.org/pdf/2607.07161v1
+
+Published Time: Thu, 09 Jul 2026 01:04:25 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+> 1
+
+# ASFR-Net: Adversarial Alignment and Spatio-Frequency Refinement Network for Heterogeneous Remote Sensing Image Change Detection 
+
+Xin-Jie Wu, Zhi-Hui You, Si-Bao Chen, Qing-Ling Shu, Xiao Wang, Jin Tang, and Bin Luo 
+
+Abstract —The core challenge of heterogeneous change detec-tion in remote sensing imagery lies in effectively decoupling gen-uine land-cover changes from significant modal disparities caused by distinct imaging mechanisms. These intrinsic inconsistencies are prone to introducing pseudo-changes, thereby constraining detection accuracy. To address this, we propose a novel, end-to-end adversarial spatio-frequency refinement network (ASFR-Net). Initially, a modality-invariant representation learner (MIR-Learner) guides the backbone to extract modality-invariant fea-tures, effectively bridging the primary domain gap. Subsequently, to address persistent residual modal differences, we design an innovative spatio-frequency synergistic enhancement module (SFEM), which identifies and suppresses sensor-specific noise and artifacts that are difficult to discern in the spatial domain by leveraging frequency-domain processing. Multi-level difference features are then computed from these refined representations and fed into a decoder equipped with cascaded hierarchi-cal guided fusion module (HGFM) blocks to generate precise change maps. To alleviate the data scarcity in heterogeneous tasks, we construct and release a new high-resolution bench-mark specifically focused on building changes: the visible-near-infrared heterogeneous change detection (VisNIR-HCD) dataset. It presents unique scientific challenges arising from deceptive visual similarity and non-linear spectral inversions, providing a robust platform for evaluating model generalization. Extensive experiments on VisNIR-HCD and public datasets demonstrate that ASFR-Net achieves state-of-the-art (SOTA) performance, significantly outperforming existing methods. The source code and the VisNIR-HCD dataset are publicly available at https: //github.com/LuoYang2024/ASFR-Net. 
+
+Index Terms —Change detection (CD), domain adaptation (DA), frequency domain analysis, multimodal, heterogeneous image, remote sensing (RS). 
+
+I. I NTRODUCTION 
+
+# CHANGE DETECTION (CD) stands as a fundamen-tal cornerstone in remote sensing image interpretation, dedicated to discerning significant land-cover alterations by analyzing bi-temporal images of the same geographical area acquired at different timestamps [1]. By delivering timely and precise insights into Earth surface dynamics, CD plays an 
+
+This work was supported in part by the NSFC Key Project of Joint Fund for Enterprise Innovation and Development under Grant U24A20342 and in part by the National Natural Science Foundation of China under Grant 62576006 and Grant 61976004. (Xin-Jie Wu and Zhi-Hui You contributed equally to this work.) ( Corresponding author: Si-Bao Chen. )Xin-Jie Wu, Si-Bao Chen, Qing-Ling Shu, Xiao Wang, Jin Tang, and Bin Luo are with the MOE Key Laboratory of ICSP, IMIS Laboratory of Anhui Province, Anhui Provincial Key Laboratory of Multimodal Cognitive Computation, Zenmorn-AHU AI Joint Laboratory, School of Computer Sci-ence and Technology, Anhui University, Hefei 230601, China (e-mail: lu-oyang unique@outlook.com; sbchen@ahu.edu.cn; 2563489133@qq.com; xi-aowang@ahu.edu.cn; tangjin@ahu.edu.cn; luobin@ahu.edu.cn). Zhi-Hui You is with the School of Public Safety and Emergency Man-agement, Anhui University of Science and Technology, Hefei 231131, China (e-mail: youzh@aust.edu.cn). 
+
+indispensable role across a spectrum of critical applications, ranging from post-disaster damage assessment [2] and urban expansion monitoring [3] to ecosystem sustainability analysis. In recent years, the explosive proliferation of earth observation programs has led to a surge in high-resolution, multi-source remote sensing data. This data deluge has necessitated a paradigm shift in CD techniques, propelling the field from traditional algebra-based comparisons toward advanced, data-driven deep learning paradigms capable of robust feature representation and high-level semantic abstraction. Conventionally, most CD methods rely on the assumption of using homogeneous images, where bi-temporal data are acquired by homologous sensors. Under this assumption, unchanged regions exhibit consistent spectral and textural features, allowing algorithms to detect changes based on direct feature distances. However, in practical real-world sce-narios, acquiring high-quality homogeneous image pairs is often hindered by adverse weather conditions, cloud cover, or sensor revisit cycles [4]. To ensure continuous all-weather monitoring, it has become a prevalent trend to utilize multi-source data captured by different sensors, such as combining optical images with synthetic aperture radar (SAR) data, or visible spectrum images with near-infrared (NIR) data [5]. This gives rise to the task of heterogeneous CD. However, compared with homogeneous CD, heterogeneous CD confronts a significantly more intricate and fundamental challenge: modal heterogeneity. Images from different modal-ities possess distinct imaging mechanisms, which manifest as profound non-linear radiometric differences and disparate feature distributions even for the same ground objects [6]. This implies that the mapping between heterogeneous images is not merely complex but highly non-linear, often involving complex phenomena, such as spectral inversions, that defy any simple linear correlation. Consequently, the direct com-parison strategies that are foundational to homogeneous CD are rendered ineffective, as they inherently lack the capacity to distinguish between genuine semantic changes and the spurious differences caused by modal disparity [7]. Existing heterogeneous CD approaches generally tackle this challenge through two main technical routes: image-to-image translation and feature-level alignment. Translation-based methods [8], [9] transform heterogeneous images into a pseudo-homogeneous domain. However, the generation pro-cess introduces geometric distortions or artifacts, leading to error accumulation in subsequent detection. Feature-level alignment methods, such as AFENet [10] and HeteCD [11], utilize adversarial learning or metric constraints to project features into a shared latent space. Despite the significant progress achieved by these feature-level alignment methods, arXiv:2607.07161v1 [cs.CV] 8 Jul 2026 2
+
+they typically encounter three intrinsic limitations. First, they face a severe alignment-discriminability trade-off. This ag-gressive alignment often inadvertently minimizes the dis-tance between changed features in the source domain and background features in the target domain, thereby eroding the semantic discriminability required to accurately detect changes [12]. Second, these methods often suffer from the neglect of frequency-domain priors. Most current approaches operate solely in the spatial domain. However, residual modal differences, such as sensor-specific noise patterns or spectral shifts, are often deeply entangled with semantic content in the spatial domain but are readily separable in the frequency domain [13]. Neglecting frequency information restricts the capability of the model to filter out stubbornly persistent modal noise that spatial convolutions struggle to resolve. Third, existing frameworks frequently overlook the semantic-spatial gap and the amplification of cross-modal noise during decoding. While recent homogeneous CD methods employ advanced multi-level aggregation strategies to recover details, applying these directly to heterogeneous tasks often fails. Shallow-level difference features in heterogeneous pairs are highly contaminated by modality-specific noise. Without ded-icated selective filtering, existing aggregation modules indis-criminately propagate or even amplify this cross-modal noise into the final prediction. Leveraging aligned deep semantic priors to gate shallow details thus remains a bottleneck for precise boundary delineation. Furthermore, the development of supervised heterogeneous CD methods is constrained by the lack of extensive, high-resolution heterogeneous benchmarks, particularly for visible-NIR scenarios, which are crucial for urban vegetation and building monitoring. This data scarcity fundamentally restricts the training of robust deep models, of-ten resulting in poor generalization when facing complex real-world spectral variations and diverse environmental conditions. To address these challenges, we propose a novel end-to-end framework named the adversarial spatio-frequency re-finement network (ASFR-Net). First, we design a modality-invariant representation learner (MIR-Learner) incorporating a gated adversarial domain unifier (GADU) and a polarity-aware feature regularizer (PAFR). GADU utilizes prediction maps to condition the alignment, ensuring semantic consistency, while PAFR imposes geometric constraints to prevent feature space collapse, preserving discriminability. Second, to address residual modal discrepancies, we introduce a spatio-frequency synergistic enhancement module (SFEM). By transforming features into the Fourier domain, SFEM identifies and sup-presses high-frequency modal noise and low-frequency style biases imperceptible in the spatial domain, injecting purified frequency-domain priors back into the network. Finally, to overcome the semantic-spatial gap, a decoder equipped with cascaded hierarchical guided fusion module (HGFM) blocks is employed. HGFM uses a residual dynamic gating mechanism to leverage deep semantic priors to filter cross-modal noise from shallow difference features, preserving critical high-frequency details for precise change maps. Furthermore, the VisNIR-HCD dataset, a high-resolution benchmark for hetero-geneous building CD, is constructed and released. The main contributions of this work are as follows: 1) We propose a robust heterogeneous CD method named ASFR-Net. By organically integrating global adversarial alignment with fine-grained spatio-frequency refinement, it explicitly decouples modality-induced discrepancies from genuine semantic changes. Comprehensive evalua-tions across diverse public benchmarks demonstrate that ASFR-Net yields state-of-the-art (SOTA) performance, decisively outperforming current competitive methods. 2) To bridge the primary domain gap, we design MIR-Learner. It reconciles the intrinsic conflict between feature alignment and semantic discriminability via polarity-aware geometric constraints during adversarial training, effectively preventing feature space collapse while ensuring robust cross-modal semantic consistency. 3) To mitigate residual modal discrepancies, we introduce SFEM. This module leverages frequency-domain priors to explicitly decouple and suppress sensor-specific high-frequency noise and low-frequency style biases, while preserving structural integrity and enhancing feature discriminability through dense aggregation. 4) To bridge the semantic-spatial gap during the decod-ing phase, we propose HGFM. It employs a residual dynamic gating mechanism that utilizes deep semantic priors to actively filter cross-modal noise from shallow features for the precise delineation of change boundaries. 5) We construct and open-source a high-resolution visible-NIR heterogeneous CD dataset named VisNIR-HCD. Focused on building changes, it presents unique scien-tific challenges arising from deceptive visual similarity and non-linear spectral inversions, thereby providing a rigorous platform for evaluating model generalization. II. R ELATED WORK 
+
+Existing CD research traditionally explores surface dynam-ics by assuming data homogeneity between bi-temporal image pairs. Under this premise, homogeneous CD typically domi-nates the field and operates on the core assumption that bi-temporal data originate from homologous sensors. Unchanged regions therefore exhibit consistent spectral and textural fea-tures which allow for direct feature comparison based on dis-tance metrics. Early methods rely heavily on hand-crafted fea-tures and algebraic or statistical techniques including change vector analysis [14], principal component analysis [15], [16], and multivariate alteration detection [17]. However, they are unable to model high-level semantic information and are sensitive to noise and variations in imaging conditions, which fundamentally limits their effectiveness in complex urban scenes and high-resolution environments. Consequently, deep learning serves as the dominant paradigm in contemporary research. Current architectures evolve from simple early-fusion networks [18] to weight-sharing Siamese convolutional neural networks [19] which independently extract deep features to preserve distinct semantic representations. To further expand the receptive field and capture global contexts, sophisticated models increasingly leverage attention mechanisms [3] and Transformers [20], [21]. Very recently, state space models such as the Mamba architecture [22] emerge as highly effi-cient alternatives by offering linear computational complexity 3
+
+while maintaining robust global spatial contextual modeling. Furthermore, to balance computational costs and accuracy, progressive feature aggregation strategies [23]–[25] actively exploit multi-level hierarchical features to recover fine-grained details and suppress pseudo-changes. Despite these advancements, homogeneous CD methods face strict constraints due to their heavy reliance on spec-tral and spatial consistency. In practical applications such as disaster assessment [2], post-earthquake damage evaluation, and continuous all-weather monitoring [4], adverse weather conditions, dense cloud cover, or lengthy sensor revisit cycles frequently hinder the acquisition of high-quality homogeneous image pairs. While visible light spectral images capture rich textural and boundary details, they suffer from severe informa-tion degradation under poor visibility. Conversely, SAR pro-vides all-weather capabilities but introduces severe geometric distortions and speckle noise that obscure building structures. Meanwhile, NIR sensors effectively mitigate atmospheric haze and strongly suppress seasonal vegetation interference, but still exhibit massive spectral disparities compared to visible bands. Consequently, using multi-source data to leverage their complementary advantages becomes an inevitable trend to ensure continuous Earth observation [5]. However, this tran-sition to heterogeneous CD introduces a profound challenge known as modal heterogeneity. Distinct imaging mechanisms manifest as severe non-linear radiometric differences, struc-tural inconsistencies, and disparate feature distributions. These intrinsic discrepancies render the direct comparison strategies of homogeneous CD ineffective because they lack the capacity to distinguish between genuine semantic changes and spurious differences caused by modal disparity [6], [26]. To decouple genuine semantic changes from these modality-induced discrepancies, existing heterogeneous CD approaches predominantly explore the paradigms of image-to-image trans-lation and feature-level alignment. Translation-based strategies aim to map the radiometric characteristics of one modality into another and create pseudo-homogeneous pairs via image regression [27], [28] or deep generative models such as generative adversarial networks [8], [9], [29]. While con-ceptually intuitive, this indirect approach inherently suffers from the generation process itself. It frequently introduces geometric distortions, semantic shifts, or synthetic artifacts because the generative models struggle to simultaneously pre-serve modality-specific intrinsic structures and cross-temporal semantic consistency. These generative flaws inevitably prop-agate to downstream tasks and severely undermine the relia-bility and precision of the final results [12], [30]. To circumvent the pitfalls of image translation, current research heavily shifts toward direct feature-level alignment. This paradigm projects high-level representations from dis-parate domains into a shared and modality-invariant latent space to achieve semantic consistency. Some methods employ metric learning and graph-based models to minimize statisti-cal distances, namely maximum mean discrepancy, between global feature distributions [6], [31]. However, relying on fixed distance metrics limits their flexibility when modeling highly complex and non-linear multimodal relationships. Con-sequently, adversarial learning based domain adaptation ap-proaches gain immense prominence [10], [12]. By establishing a min-max game between a feature extractor and a domain discriminator, these methods adaptively compel the network to produce sensor-agnostic representations while retaining essential semantic content. Despite its powerful alignment capabilities, adversarial learning confronts an intrinsic alignment-discriminability trade-off. Aggressive global distribution alignment often forces changed source regions to align with target background fea-tures and erodes the semantic distinctiveness required to accurately identify subtle changes [32]. Furthermore, existing alignment methods predominantly operate solely in the spatial domain and neglect crucial frequency-domain priors. Residual modal discrepancies, including sensor-specific high-frequency noise and low-frequency global style biases, deeply entangle with semantic content spatially but remain readily separable in the frequency domain [13]. Motivated by these critical limitations, the proposed ASFR-Net reconciles this conflict through a progressive refinement strategy. It employs MIR-Learner equipped with geometric constraints to establish pri-mary alignment without feature space collapse. Concurrently, it leverages a spatio-frequency synergistic module to filter out stubborn modal noise. Ultimately, the framework aggregates these purified and multi-scale features to ensure robust change identification and precise boundary delineation. III. P ROPOSED BENCHMARK DATASET 
+
+In this study, we construct a new benchmark dataset termed VisNIR-HCD to address the lack of high-resolution heterogeneous data. As illustrated in Fig. 1, the dataset encompasses diverse scenes exhibiting significant spectral differences between the visible and NIR modalities. The data collection covers two representative regions in Wuhan, China, spanning 114 .04 ◦E–114 .23 ◦E, 30 .36 ◦N –30 .61 ◦N
+
+and 114 .32 ◦E–114 .53 ◦E, 30 .50 ◦N –30 .72 ◦N . Images were acquired by the PMS1 and PMS2 sensors on the Gaofen-2 satellite, featuring diverse landscapes such as urban residential zones, industrial lands, and rural settlements. All images are aligned to the WGS 84 / UTM zone 50N coordinate system, achieving a spatial resolution of 0.8 m/pixel. The dataset uses bi-temporal image pairs that align precisely in space. Each pair consists of a pre-change visible RGB image from 2016 for the pre-change phase T1 and a single-band NIR image from 2023 for the post-change phase T2. To provide a comprehensive statistical profile, the VisNIR-HCD dataset comprises about 552.6 million pixels and a total of 18,488 building change instances. The foreground changed regions account for only 3.08 % of the total, while the unchanged background dominates at 96.92 %. This high foreground-to-background ratio reflects the inherent physical sparsity of buildings in geographic space and aligns closely with the distributions observed in other mainstream benchmarks, such as XiongAn [11] at 2.00%, WHU-CD [33] at 4.33%. Table I provides a comprehensive comparison between the proposed VisNIR-HCD and existing mainstream CD datasets. Current benchmarks can be broadly categorized into homo-geneous and heterogeneous types. Homogeneous datasets, 4                                                       
+
+> TABLE I SUMMARY OF WIDELY USED CHANGE DETECTION DATASETS AND THE PROPOSED VIS NIR-HCD Dataset Resolution (m/pixel) Image pairs Image size Train/Val/Test T1/T2type Change Ratio Change Instances Homogeneous change detection datasets LEVIR-CD [3] 0.5 / 0.5 637 1024 ×1024 445/64/128 RGB/RGB 4.63% 31,333 WHU-CD [33] 0.2 / 0.2 132207 ×15354 5947/743/744 RGB/RGB 4.33% 12,796 Heterogeneous change detection datasets MT-Wuhan [32] 10 / 3 111216 ×13693 552/129/112 RGB/SAR 15.31% 4,204 XiongAn [11] 4 / 8 2314 512 ×512 1901/413/413 ∗RGB/SAR 2.00% 16,846 Proposed heterogeneous change detection dataset
+> VisNIR-HCD (Ours) 0.8 / 0.8 8,432 256 ×256 5901/839/1692 RGB/NIR 3.08% 18,488
+> ∗Note: Due to discrepancies between the paper description and the released dataset, statistics follow the actual public data where the validation set serves as the test set. Visible  NIR  Label
+> …8432 Pairs
+> Fig. 1. Annotation samples from the proposed VisNIR-HCD dataset.The right side shows close-up of the region with changes in the sample and highlights the challenge of distinguishing buildings due to non-linear spectral differences.
+
+such as LEVIR-CD and WHU-CD, rely exclusively on RGB imagery. While they offer high spatial resolution, they lack the spectral diversity required to evaluate cross-modal algo-rithms. Conversely, existing heterogeneous datasets like MT-Wuhan and XiongAn predominantly focus on the optical-SAR modality. While SAR offers critical all-weather observation capabilities, it introduces severe speckle noise, complex mul-tiple scattering effects, and geometric distortions like layover and foreshortening. These factors inherently obscure structural edges and degrade building extraction performance. In con-trast, the proposed VisNIR-HCD dataset focuses on the under-explored visible-NIR modality, offering distinct practical ben-efits. NIR imagery maintains high geometric fidelity and spatial resolution comparable to visible light while providing enhanced atmospheric penetration to mitigate thin clouds or haze. Most importantly, NIR effectively suppresses seasonal vegetation interference, which is a primary source of pseudo-changes in building CD. Because healthy vegetation strongly reflects NIR while man-made structures absorb it, RGB-NIR combinations serve as a highly reliable tool for decoupling seasonal variations from genuine structural changes. RGB-NIR presents a unique challenge distinct from optical-SAR tasks, namely deceptive similarity. Because RGB and NIR images share high structural consistency and visual clar-ity, models are prone to erroneously assuming a simple linear mapping between them. However, the true mapping involves complex and category-specific non-linear spectral inversions. Methods tailored for optical-SAR often employ aggressive global distribution alignment to bridge massive modality gaps. When applied directly to RGB-NIR data, such approaches can trigger over-alignment or negative transfer. This inadvertently erases the fine-grained spectral cues essential for distinguish-ing pseudo-changes from genuine building alterations. To ensure both spectral consistency and annotation accuracy, a rigorous multi-stage processing pipeline was implemented. First, the original images underwent radiometric correction and normalization to standardize pixel intensities to the range of [0 , 255] . Following this pre-processing, a meticulous an-notation process was conducted on the large-format and co-registered image pairs. To mitigate visual ambiguities arising from modal heterogeneity, an auxiliary optical reference strat-egy was employed. By leveraging a corresponding pair of con-temporaneous high-resolution optical images as a reference, precise building change labels were generated. These initial labels were then subjected to a dual-person cross-validation protocol, serving as a critical quality control step to filter low-quality samples and ensure high fidelity. Subsequently, these fully annotated and validated large-scale images were partitioned into non-overlapping patches of 256 × 256 pixels. The final dataset comprises 8,432 high-quality sample pairs and is randomly partitioned into a training set with 5,901 pairs, a validation set with 839 pairs, and a test set with 1,692 pairs. This strictly follows a 7:1:2 ratio to facilitate a rigorous evaluation of model generalization performance. Furthermore, to facilitate broader research in homogeneous and heterogeneous CD as well as multi-modal fusion, we simultaneously open-source the complete quad-image sets containing RGB and NIR modalities at both T1 and T2.5HGFM  HGFM HGFM HGFM 
+
+MIR -
+
+Learner     
+
+> Weight -Sharing
+> L1L4L3L2
+> 𝑯
+> 𝟐 𝑾
+> 𝟐 C1
+> 𝑾
+> 𝟒
+> 𝑯
+> 𝟒
+> C2
+> 𝑾
+> 𝟖
+> 𝑯
+> 𝟖
+> C3
+> 𝑾
+> 𝟏𝟔
+> 𝑯
+> 𝟏𝟔
+> C4
+> 𝑾
+> 𝟑𝟐
+> 𝑯
+> 𝟑𝟐 C5
+
+IT1
+
+IT2             
+
+> Ground Truth
+> GADU
+> PAFR
+> 𝑺 &𝑨 Subtraction and
+> Absolute -Value
+> 𝑯
+> 𝟐 𝑾
+> 𝟐 C1
+> 𝑾
+> 𝟒
+> 𝑯
+> 𝟒 C2
+> 𝑾
+> 𝟖
+> 𝑯
+> 𝟖
+> C3
+> 𝑾
+> 𝟏𝟔
+> 𝑯
+> 𝟏𝟔
+> C4
+> 𝑾
+> 𝟑𝟐
+> 𝑯
+> 𝟑𝟐 C5
+> SFEM SFEM SFEM SFEM
+> SFEM SFEM SFEM SFEM
+> ASAU
+> HPAU
+> HPAU
+> Features
+> Features
+> 𝑺 &𝑨 𝑺 &𝑨 𝑺 &𝑨 𝑺 &𝑨 𝑺 &𝑨
+> Fig. 2. Overview of the proposed ASFR-Net. Firstly, a weight-sharing Siamese encoder extracts hierarchical bi-temporal features from the heterogeneous image pair. Then, the MIR-Learner, incorporating the GADU and the PAFR, is utilized to bridge the domain gap and align cross-modal features. Next, the SFEM leverages the ASAU and the HPAU to suppress residual modal noise and refine feature discriminability. Finally, the multi-scale guided fusion decoder employs cascaded HGFM blocks to progressively aggregate multi-level information for precise change map generation.
+
+IV. T HE PROPOSED APPROACH 
+
+In this section, the overall architecture of the proposed ASFR-Net is first briefly described, and then the intrinsic mechanisms of its constituent modules are elaborated in detail. Finally, the optimization strategy is presented. 
+
+A. Approach Overview 
+
+The schematic architecture of ASFR-Net is illustrated in Fig. 2. Built upon a cascaded feature refinement paradigm, the network synergizes adversarial feature alignment with spatio-frequency enhancement to tackle heterogeneous CD tasks through three key modules: a Siamese encoder guided by a modality-invariant representation learner (MIR-Learner), a spatio-frequency synergistic enhancement module (SFEM), and a decoder equipped with cascaded hierarchical guided fusion module (HGFM) blocks. 
+
+1) Encoder and Adversarial Alignment: A weight-sharing Siamese MobileNetV2 [34] is employed as the backbone to extract multi-level hierarchical features from a pair of hetero-geneous images, IT1 and IT2 . We do not assign independent encoders to each modality, as this choice would substantially increase the parameter count of the network, causing the model to overfit sensor-specific noise. In contrast, sharing weights acts as a strict physical regularizer. It compels the network to map disparate inputs into a roughly overlapping latent space from the outset. This shared projection greatly reduces the burden on the subsequent adversarial learning stage; the discriminator only needs to refine a single, unified feature distribution instead of attempting to bridge two isolated spaces. This direct constraint stabilizes gradient updates, enabling the entire framework to converge much faster than a dual-encoder setup. The extracted feature sets are denoted as Ft =
+
+{F 1 
+
+> t
+
+, . . . , F 5 
+
+> t
+
+}, where t ∈ { T1, T 2}. To bridge the modality gap, the proposed MIR-Learner integrates an adversarial learn-ing mechanism directly into the encoding stage [35]. MIR-Learner trains a domain discriminator to identify the modal origin of the features, thereby compelling the encoder to gen-erate modality-invariant representations. While the adversarial pressure from this module aligns global feature distributions, it can inadvertently suppress high-frequency structural details critical for delineating boundaries, necessitating a subsequent feature refinement stage to recover these lost details. 
+
+2) Spatio-Frequency Synergistic Enhancement: SFEM is proposed to mitigate the loss of feature discriminability and detail suppression caused by adversarial alignment. The mod-ule leverages the insight that structural integrity resides in high-frequency components, which are often attenuated during adversarial training [12]. SFEM integrates two key compo-nents: an adaptive spectral attention unit (ASAU) that enhances structural features while suppressing modality-specific noise, and a holistic pyramid aggregation unit (HPAU) for spatial aggregation. By injecting the purified frequency priors from ASAU into HPAU, SFEM restores fine-grained structural details. This process yields the refined feature maps Sit :
+
+Sit = SF EM i(FT1 , FT2 ), t ∈ { T1, T 2}, i ∈ { 1, . . . , 5}, (1) 6True/False ？   
+
+> M1
+> Exchange ?
+> Pseudo Label
+> Patch GAN
+> Discriminator
+> Ladv
+> FT1
+> 𝜶
+> 𝜷
+> FT2 (change,p i=1)
+> FT2 (unchange,p i=0)
+> LPAFS
+> FT1FT2
+
+(a)  (b) 
+
+> Element -wise
+> dot product
+
+Fig. 3. Illustration of the MIR-Learner. (a) GADU: Utilizes M1 predicted by the decoder to condition feature alignment via adversarial learning. (b) PAFR: Regularizes feature space geometry by constraining unchanged features within distance β and pushing changed features beyond distance α.
+
+where Sit denotes the structurally enhanced feature at the i-th level for the image at time t. To generate the change representation, we compute the multi-level difference features: 
+
+Xi = Abs( SiT1 − SiT2 ), i ∈ { 1, . . . , 5}, (2) where Abs (·) denotes the element-wise absolute difference operation between the bi-temporal features, and Xi represents the difference feature map at the i-th level. 
+
+3) Decoder: The decoder comprises cascaded HGFM blocks designed to progressively bridge the gap between global context and local details. To ensure precise object localization and robust suppression of pseudo-changes, each HGFM leverages deep semantic priors to adaptively guide the refinement of shallower, detail-oriented difference features Xi:
+
+Pi, M i = HGF M (Xi, U p (Pi+1 )) , i ∈ { 4, . . . , 1}, (3) where U p (·) denotes the bilinear upsampling operation, and 
+
+Pi represents the change probability map at the i-th level. The final inference result M1 corresponds to the highest-resolution output P1. A deep supervision strategy is employed during training to impose constraints on predictions across all scales. 
+
+B. Modality-Invariant Representation Learner (MIR-Learner) 
+
+In heterogeneous CD, a fundamental challenge lies in simul-taneously bridging modal disparities and highlighting genuine semantic changes. Since homogeneous CD methods often fail to decouple these signals, MIR-Learner, illustrated in Fig. 3, employs an adversarial strategy to disentangle semantic content from modal heterogeneity. This approach ensures that the learned features are invariant to sensor distributions while capturing intrinsic structural changes. It achieves this through two synergistic components: gated adversarial domain unifier (GADU) for distribution alignment and polarity-aware feature regularizer (PAFR) for preserving discriminability. During the training phase, GADU and PAFR operate strictly in parallel. Multi-scale bi-temporal features extracted by the weight-sharing encoder are simultaneously fed into both mod-ules. They independently evaluate the identical extracted fea-tures without modifying them sequentially, thereby forming a complementary push-pull optimization strategy. GADU ag-gressively aligns global feature distributions to eliminate the 2D FFT   
+
+> AVG
+> Conv 1 ×1
+> ReLU
+> Sigmod
+> Conv 1 ×1
+> MAX , AVG
+> (C) 1-B-R
+> Sigmod
+> Conv 7 ×7
+> 2D IFFT
+> Element -wise dot product Element -wise Subtraction (C) 1-B-RConv(k=i) + BN + ReLU
+> FT1
+> FT2
+> ෩𝑨 𝑻 1
+> ෩𝑨 𝑻 2
+
+Fig. 4. Structure of the ASAU. It leverages FFT to transform features into the frequency domain, employs a difference-guided attention mask to filter modal noise, and reconstructs the refined features via IFFT. HPAU 3                 
+
+> (C) 3-B-R
+> C
+> (C) 3-B-R
+> (C) 3-B-R
+> (C) 1-B-R
+> (DC) 3-B-R
+> (C) 1-B-R
+> C
+> Element -wise Addition
+> Concatenation
+> (DC) i-B-R
+> (C) i-B-R
+> DSConv(k=i) + BN + ReLU
+> Conv(k=i) + BN + ReLU
+> 𝑯
+> 𝟑𝟐 ,𝑾
+> 𝟑𝟐 ,c 5
+> 𝑯
+> 𝟏𝟔 ,𝑾
+> 𝟏𝟔 ,c 4
+> 𝑯
+> 𝟖 ,𝑾
+> 𝟖 ,c 3
+> 𝑯
+> 𝟒 ,𝑾
+> 𝟒 ,c2
+> 𝑯
+> 𝟐 ,𝑾
+> 𝟐 ,c1
+> (C) 1-B-R
+> (DC) 3-B-R
+> (C) 1-B-R
+> (DC) 3-B-R
+> S3
+> MaxPooling( 𝟏
+> 𝟒 )
+> MaxPooling( 𝟏
+> 𝟐 )
+> UpSampling(2)
+> UpSampling(4)
+> 𝑯
+> 𝟖 ,𝑾
+> 𝟖 ,c 3
+> ෩𝑨 𝟑
+
+Fig. 5. Overview of HPAU, exemplified by the 3rd-level processing pipeline. Leveraging the frequency-refined features from ASAU as guidance, it densely aggregates hierarchical spatial features to reconstruct modality-invariant rep-resentations with rich structural details. 
+
+macroscopic modality gap, while PAFR operates in parallel to impose explicit geometric boundary constraints, preventing over-alignment and strictly preserving local semantic discrim-inability. The gradients from their respective objectives are then jointly back-propagated to optimize the shared encoder. 
+
+1) Gated Adversarial Domain Unifier (GADU): The pri-mary objective of GADU is to construct a modality-invariant unified feature space. To address the risk of negative transfer caused by erroneously forcing changed source regions to align with target background regions [10], GADU incorporates a prediction-based conditional adversarial mechanism to enforce semantically consistent alignment. Specifically, we utilize the probability map P ∈ RNc×H×W
+
+(Nc = 2 ) predicted by the decoder to gate the multilinear conditioning on feature map F ∈ RC×H×W . This enables the discriminator to capture the cross-covariance between features and predictions, aligning their joint distributions. The conditional feature Hc is formulated via the outer product: 
+
+Hc = F ⊗ P ∈ R(C×Nc)×H×W . (4) This explicitly conditions the multimodal feature distribution on specific semantic categories, ensuring that semantic con-sistency is preserved throughout the alignment process. To ensure stability and gradient smoothness, we employ a discriminator D optimized via hinge adversarial loss with an 
+
+R1 gradient penalty. Unlike standard BCE-based objectives 7
+
+used in AFENet [10], this Wasserstein-inspired formulation offers stable gradients and mitigates mode collapse. The specific optimization objective LD is detailed in Section IV-E. Conversely, for the generator, the adversarial objective is to minimize the probability of the discriminator correctly identifying target domain features. This is formulated as: 
+
+Ladv = −EHc∼T [D(Hc)] , (5) where T denotes the target domain distribution. By mini-mizing Ladv , the generator is compelled to extract modality-invariant features that deceive the discriminator, bridging the domain gap between the source ( S) and target ( T ) domains. 
+
+2) Polarity-Aware Feature Regularizer (PAFR): Despite the effectiveness of GADU in domain alignment, it risks over-compressing the feature manifold, potentially compro-mising semantic discriminability. This trade-off is addressed by PAFR, which enforces geometric regularity and enhances separability in the latent space. Distinct from the divergence-aware contrastive module (DCM) in AFENet [10], which primarily targets divergence amplification, PAFR functions as a geometric manifold regularizer designed to explicitly preserve the topological integrity of the feature space. Formally, PAFR imposes polarity-dependent constraints on the Euclidean distance between L2-normalized bi-temporal features FT1 and FT2 . Guided by change labels, we enforce distinct margins: feature pairs in changed regions ( pi = 1 )must separate beyond a lower bound α (repulsion), whereas those in unchanged regions ( pi = 0 ) are constrained within an upper bound β (attraction). Consequently, the PAFR objective is formulated as a bounded, ReLU-based margin loss: 
+
+LPAFR = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+[piReLU( α − δi) + (1 − pi)ReLU( δi − β)] ,
+
+(6) where δi = ∥F iT1 − F iT2 ∥2 denotes the pixel-wise Euclidean distance. This formulation explicitly penalizes embeddings violating these geometric boundaries, thereby preserving the local manifold structure while enhancing separability. In our implementation, the repulsion margin is set to α = 1 .0, and the attraction margin is set to β = 0 .05 . Since the features are L2-normalized, the maximum possible Euclidean distance between any two vectors is fixed at 2.0. Setting α = 1 .0
+
+geometrically guarantees an angular separation of at least 
+
+60 ◦ between changed feature pairs, establishing a robust and clear decision boundary in the latent space. Meanwhile, setting 
+
+β = 0 .05 enforces the clustering of unchanged features while preventing the network from over-penalizing inherent modality noise. The empirical validation of these boundary settings and their impact on model performance are detailed in the hyperparameter sensitivity analysis in Section V-E. To strike an optimal balance between modality alignment and semantic discriminability, a synergistic optimization strat-egy is adopted. Instead of treating these modules in isolation, it integrates the multi-scale adversarial loss from GADU and the geometric contrastive loss from PAFR as joint auxiliary regularizers. These terms operate alongside the primary pixel-level CD objective to constitute the total generator loss. The detailed mathematical formulation is provided in Section IV-E. 
+
+C. Spatio-Frequency Synergistic Enhancement Module (SFEM) 
+
+While adversarial alignment mitigates global shifts, residual low-frequency biases and high-frequency artifacts persist. To address this, SFEM employs frequency priors to guide spatial reconstruction, moving beyond spatial-domain-only process-ing. In our context, modal noise is operationally defined as task-irrelevant, non-semantic spectral components that are strictly induced by disparate sensor mechanisms. This includes high-frequency sensor artifacts, such as SAR speckle or pe-riodic stripes, and low-frequency global biases, such as at-mospheric variations or illumination shifts. These components typically lack coherent semantic structure and are precisely what our frequency-domain attention is designed to target. SFEM first filters spectral artifacts from bi-temporal pyramids (FT1 , FT2 ) via ASAU (Fig. 4), then performs spectral-guided spatial aggregation with HPAU (Fig. 5). 
+
+1) Adaptive Spectral Attention Unit (ASAU): Pseudo-changes driven by seasonality or illumination exhibit distinct spectral patterns: style biases dominate low frequencies, while noise affects high frequencies. Leveraging this, ASAU adap-tively suppresses these task-irrelevant components [36]. The Fourier transform is capable of decoupling style and content, decomposing the previously defined modal noise into specific frequency bands, thus making frequency-domain differencing a reliable tool for heterogeneous CD. To ensure that ASAU primarily addresses these modality-induced dis-crepancies without removing true change signals, we intro-duce a dynamic, data-driven difference-guided dual attention mechanism. Unlike traditional frequency filters that rely on manually fixed cutoff frequencies, our frequency attention gates are adaptively computed based on the specific content of the spectral difference map between the two modalities. This input-dependent design allows the parallel frequency channel and spatial attention branches to dynamically recalibrate each frequency component. Genuine land-cover changes produce robust, spatially coherent difference signals, which the network learns to adaptively identify and preserve, while simultane-ously suppressing modal noise and artifacts. This adaptive decoupling is difficult to achieve in the spatial domain, where style and content are intrinsically entangled, thus validating the reliability and flexibility of our frequency-based approach. Given spatial features F iT1 , F iT2 ∈ RC×H×W , we first perform 2D FFT to compute the spectral difference map Di
+
+> freq
+
+:
+
+Di 
+
+> freq
+
+= F F T (F iT1 ) − F F T (F iT2 ) ∈ RC×H×W . (7) By linearity, Di 
+
+> freq
+
+encapsulates the spectral distribution of differences. To disentangle artifacts, we employ a parallel dual-spectral attention mechanism on the concatenated real and imaginary parts of Di
+
+> freq
+
+, which we denote as Di
+
+> cat
+
+.Specifically, the frequency channel attention (FCA) branch computes the channel gate Gic to model inter-channel de-pendencies. It forms a channel descriptor via global average pooling (GAP) and processes it through a two-layer MLP with sigmoid activation to generate the final gate: 
+
+Gic = σ(M LP (GAP (Di
+
+> cat
+
+))) , (8) where σ(·) denotes the sigmoid function. Simultaneously, the frequency spatial attention (FSA) branch localizes noise by 8
+
+applying a large-kernel convolution on channel-pooled features to generate the spatial gate Gis:
+
+Gis = σ  Conv 7×7
+
+ [M axP c(Di
+
+> cat
+
+); AvgP c(Di
+
+> cat
+
+)]  , (9) where M axP c (AvgP c) denote channel-wise max (average) pooling. The unified gate Gi 
+
+> total
+
+synergistically combines the channel and spatial gates to adaptively recalibrate the features: 
+
+Gi 
+
+> total
+
+= Gic ⊙ Gis, (10) where ⊙ denotes element-wise multiplication. This unified gate adaptively filters the original spectra to yield purified priors via Inverse FFT: 
+
+˜F it = IF F T  F F T (F it ) ⊙ Gi
+
+> total
+
+ , t ∈ { T1, T 2}. (11) This rectifies modal discrepancies in the frequency domain, yielding high-fidelity structural priors for spatial enhancement. 
+
+2) Holistic Pyramid Aggregation Unit (HPAU): Following spectral purification, spatial features often suffer from struc-tural degradation due to aggressive domain alignment. To address this, we propose the HPAU. Unlike standard spatial-only pyramids, HPAU introduces a frequency-guided holistic view that leverages purified priors from ASAU to mitigate modal disparities and restore multi-scale spatial details. For j-th level at time T1, HPAU aggregates the feature hierarchy FT1 guided by the frequency prior ˜F jT1 . First, cross-scale alignment unifies the resolutions of auxiliary features 
+
+{F kT1 }k̸ =j to j-th level, yielding aligned contexts {F j←kT1 }. To reconstruct modality-invariant structures, we employ a dual-injection strategy. In the first injection, purified frequency priors are concatenated with spatial contexts to suppress modal noise during dense aggregation: 
+
+F j 
+
+> agg
+
+= Conv fuse 
+
+
+
+Concat 
+
+h
+
+{F j←kT1 }5  
+
+> k̸=j
+
+, F jT1 , ˜F jT1
+
+i 
+
+, (12) where Conv fuse denotes the fusion convolution block. Subse-quently, to preserve high-frequency details blurred by hetero-geneity, the second injection employs a residual mechanism: 
+
+SjT1 = F j 
+
+> agg
+
++ Conv 1×1(F jT1 ) + Conv 1×1( ˜F jT1 ). (13) By synergizing multi-scale semantics with high-fidelity structural priors, HPAU yields a robust, modality-agnostic representation SjT1 for subsequent processing. Crucially, the residual connection that re-injects the original, unfiltered spa-tial features serves as a second critical safeguard, preventing the loss of fundamental structures and fine-grained boundary details during frequency filtering. 
+
+D. Hierarchical Guided Fusion Module (HGFM) 
+
+The decoder reconstructs binary change maps {Mi}4
+
+> i=1
+
+from the SFEM-enhanced difference pyramid {Xi}5
+
+> i=1
+
+, where 
+
+Xi = |SiT1 − SiT2 |. As highlighted previously, a central bottle-neck in heterogeneous CD decoding is bridging the semantic-spatial gap while preventing the propagation of cross-modal noise. Deep-level features possess robust semantics essential for suppressing background interference and pseudo-changes. Conversely, shallow-level difference features contain fine-grained high-frequency details but are highly contaminated by (C) 1-B-R 
+
+> Conv 3 ×3
+> Upsampling
+> X2
+> CC
+> Y Avg Pool X Avg Pool
+> BatchNorm + Non -linear
+> Concat + Conv2d
+> Sigmoid
+> Split
+> (C) 3-B-RConv 1 × 1
+> (DC) 3-B-R
+> (C) 1-B-R
+> C
+> Element -wise Addition
+> Concatenation
+> (DC) i-B-R
+> (C) i-B-R
+> DSConv(k=i) + BN + ReLU
+> Conv(k=i) + BN + ReLU
+> Element -wise dot product
+> (C) 1-B-R
+> (DC) 3-B-R
+> Dilation:4
+> (C) 1-B-R
+> (DC) 3-B-R
+> Dilation:2
+> (C) 1-B-R
+> (DC) 3-B-R
+> Dilation:3
+> (C) 1-B-R
+> (DC) 3-B-R
+> Dilation:1
+> Split
+> Split
+> Sigmoid Sigmoid
+> Pi+1
+> Xi
+
+Fig. 6. Structure of the HGFM. This module uses a residual dynamic gating mechanism to adaptively fuse multi-scale semantic priors from dilated convolutions with spatial details from coordinate attention. 
+
+modal disparities. While existing advanced decoders employ various aggregation strategies, they often passively fuse these features and inadvertently propagate cross-modal noise. To reconcile this, we propose the hierarchical guided fusion module (HGFM). Rather than passive aggregation, HGFM is meticulously designed to leverage deep semantic priors to actively filter and selectively guide the refinement of shallow difference features. Initially, the deepest difference feature X5
+
+is processed to generate the coarse-grained semantic prior P5:
+
+P5 = ReLU (BN (Conv 3×3(X5))) , (14) where BN (·) denotes batch normalization. Subsequently, an iterative fusion process executes from level i = 4 down to 1.At each stage, HGFM refines the difference feature Xi using guidance from the upsampled higher-level feature U p (Pi+1 ),yielding the refined output Pi and auxiliary prediction Mi.HGFM, illustrated in Fig. 6, serves as the core execution unit designed to seamlessly integrate the shallow detail fea-ture Xi and the deep guidance feature U p (Pi+1 ). Unlike simple concatenation, the module operates through a coherent enhance-then-fuse strategy involving two parallel streams. On the semantic side, to harvest robust multi-scale contex-tual priors from the guidance feature, we employ a semantic split-aggregation strategy inspired by RFANet [24]. The input channels are partitioned into multiple groups, each processed by a parallel atrous convolution branch with a distinct dilation rate. This design enables the capture of diverse receptive fields. To efficiently consolidate these features, a depthwise separable fusion block is applied to generate the unified context feature: 
+
+Fctx = DSConv ([ o1; . . . ; oG]) , (15) where og denotes the output feature map from the g-th par-allel atrous convolution branch, and DSConv (·) denotes the depthwise separable convolution for efficient feature fusion. In parallel, addressing the issue that the shallow feature 
+
+Xi is detail-rich yet prone to background noise, we utilize coordinate attention [37]. This mechanism aggregates features 9
+
+along horizontal and vertical directions to generate direction-aware attention maps ( Ah, A w), which recalibrate the input to highlight change-relevant spatial structures: 
+
+˜Xi = Xi ⊙ Ah ⊙ Aw. (16) Next, to optimally integrate the semantic context Fctx and the enhanced spatial details ˜Xi, we introduce a dynamic gating mechanism. A gate generator G learns adaptive weight maps 
+
+[Wdet , W ctx ] based on the concatenated representations. The final refined output Pi is derived through a weighted fusion, reinforced by a critical residual connection to the original signal Xi to preserve high-frequency boundary information: 
+
+[Wdet , W ctx ] = Sof tmax (G([ ˜Xi; Fctx ])) , (17) 
+
+Pi = Conv 3×3(( Wdet ⊙ ˜Xi) + ( Wctx ⊙ Fctx ) + Xi), (18) where Conv 3×3 denotes the final refinement convolution layer. Here, the gate generator G is implemented as a lightweight 
+
+3 × 3 convolutional layer that maps the concatenated features to a two-channel logit map, representing the un-normalized importance scores for the detail and context streams. 
+
+E. Optimization Objective 
+
+The proposed framework is optimized end-to-end via an adversarial minimax game between the generator G and the domain discriminator D. A composite objective is designed to synergistically train the network for both robust cross-modal feature alignment and high-precision CD. The generator’s primary objective is to produce accurate change maps, guided by a composite loss function LG. The core component is the CD loss LCD , which employs deep supervision to ensure effective gradient propagation across hierarchical feature levels. Specifically, supervision signals are aggregated from the multi-scale predictions {Mi}4
+
+> i=1
+
+. The resulting CD loss LCD is formulated as a weighted sum: 
+
+LCD =
+
+> 4
+
+X
+
+> i=1
+
+Lbase (Mi, Down i(Y )) , (19) where Y is the ground truth, Down i(·) represents downsam-pling to the resolution of the i-th scale, and the base loss Lbase 
+
+jointly optimizes binary cross-entropy (BCE) and dice Loss to counteract the inherent class imbalance. In addition to pixel-level supervision, the generator is constrained by an adversarial loss Ladv to enforce modality invariance and a geometric contrastive loss LPAFR for manifold structure regularization. This synergistic formulation ensures the network learns features that are both aligned across modali-ties and discriminative for the CD task. Consequently, the total generator objective is formulated as: 
+
+LG = LCD + λadv 
+
+> K
+
+X
+
+> k=1
+
+Lk 
+
+> adv
+
++ λcon 
+
+> K
+
+X
+
+> k=1
+
+Lk
+
+> PAFR
+
+, (20) where λadv = 0 .001 and λcon = 0 .002 balance the contribu-tions of the adversarial and geometric regularization losses, respectively. Because both losses are aggregated over multiple dense feature pyramids, their raw gradients are exceptionally large, and their coefficients must be strictly scaled down to pre-vent these auxiliary gradients from overwhelming the primary pixel-level segmentation objective. Furthermore, a slightly stronger regularization push is required to preserve fine-grained structural boundaries, ensuring they function purely as gentle manifold regularizers, guiding the latent space distribu-tion without disrupting the stable convergence of the primary CD task. A comprehensive ablation study empirically verifying this gradient balancing strategy is provided in Section V-E. Concurrently, the discriminator D, comprising multi-scale sub-networks {Dk}Kk=1 , is trained to distinguish between real (source) and fake (target) conditioned feature distributions. To ensure training stability, we employ the Hinge Adversarial Loss augmented with an R1 gradient penalty. The total dis-criminator objective LD is aggregated across all scales: 
+
+LD =
+
+> K
+
+X
+
+> k=1
+
+
+
+EHkc, real [max(0 , 1 − Dk(Hkc, real ))] +EHkc, fake [max(0 , 1 + Dk(Hkc, fake ))] +EHkc, real [∥∇ Dk(Hkc, real )∥22]
+
+
+
+,
+
+(21) where Hkc, real and Hkc, fake denote the conditioned features from the source and target domains at the k-th scale, respectively. The interplay between minimizing LG and maximizing LD
+
+drives the end-to-end optimization of the network. V. E XPERIMENTS AND ANALYSIS 
+
+In this section, comprehensive experiments are conducted to assess the effectiveness and robustness of ASFR-Net. We first detail the experimental setup, including benchmark datasets, implementation details, and evaluation metrics. Subsequently, quantitative and qualitative comparisons are conducted against a suite of representative and advanced methods. Finally, we perform ablation studies to validate the impact of core com-ponents, backbone selections, and key hyperparameters. 
+
+A. Datasets 
+
+The generalization of our method is evaluated on three representative benchmarks. Spanning visible-NIR and optical-SAR modalities, these datasets possess distinct modal dispar-ities, providing diverse and challenging evaluation scenarios. 
+
+1) VisNIR-HCD Dataset (Ours): As detailed in Section III, this is a high-resolution benchmark comprising 8,432 visible-NIR image pairs focused on building changes. It presents a significant challenge in handling non-linear spectral hetero-geneity, particularly the distinct reflectance of vegetation and man-made structures between the RGB and NIR bands. For our experiments, we strictly adhere to the official partition of 5,901 training, 839 validation, and 1,692 test pairs. 
+
+2) MT-Wuhan Dataset [32]: This widely-used optical-SAR benchmark captures land-cover changes resulting from rapid urbanization in Wuhan, China. The dataset is partitioned into 552 training, 129 validation, and 112 test pairs of 256 × 256 
+
+pixels, where the number of unchanged pixels is approximately five times that of changed pixels. Despite the limited sample size, its complex urban textures present a rigorous test for model generalization under data scarcity conditions. 10 
+
+TABLE II QUANTITATIVE RESULTS OF DIFFERENT COMPARISON METHODS ON THE VIS NIR-HCD, MT-W UHAN , AND XIONG AN DATASETS . T HE EVALUATION METRICS INCLUDE MODEL COMPLEXITY [P ARAMS (M) AND FLOP S (G)] AND DETECTION ACCURACY [P RECISION (P RE ), R ECALL (R EC ), F1-SCORE 
+
+(F1), I NTERSECTION OVER UNION (I OU), AND OVERALL ACCURACY (OA)]. C OLOR CONVENTION : BEST , 2ND -BEST , AND 3RD -BEST .Methods Params (M) ↓
+
+FLOPs (G) ↓
+
+VisNIR-HCD (%) MT-Wuhan (%) XiongAn (%) Pre ↑ Rec ↑ F1 ↑ IoU ↑ OA ↑ Pre ↑ Rec ↑ F1 ↑ IoU ↑ OA ↑ Pre ↑ Rec ↑ F1 ↑ IoU ↑ OA ↑
+
+A2Net [23] 3.78 3.05 82.54 75.22 78.71 64.89 98.77 56.89 52.81 54.78 37.72 87.80 84.82 82.19 83.49 71.65 98.99 RFANet [24] 2.86 3.16 82.17 75.30 78.58 64.72 98.76 56.74 58.82 57.76 40.61 87.97 82.06 83.83 82.94 70.85 98.93 STADE-CDNet [38] 3.50 11.99 74.84 51.49 61.01 43.90 98.02 32.62 53.80 40.62 25.49 78.00 56.57 53.80 55.15 38.07 97.28 MambaCD [22] 85.53 44.83 76.43 74.24 75.32 60.41 98.53 58.50 54.63 56.50 39.37 88.24 79.20 86.20 82.55 70.29 98.87 STENet [39] 10.95 14.73 80.53 68.67 74.13 58.89 98.56 42.93 51.66 46.89 30.63 83.64 81.66 80.01 80.83 67.83 98.82 DGMA2-Net [40] 37.10 18.10 80.81 73.39 76.92 62.50 98.67 52.27 66.97 58.72 41.56 86.83 83.05 82.30 82.67 70.46 98.93 CSI-Net [41] 62.18 367.25 75.63 59.18 66.40 49.70 98.20 43.83 49.95 46.69 30.46 84.04 79.53 69.12 73.96 58.68 98.57 AFENet [10] 39.7 398.58 68.23 68.79 68.51 52.11 98.09 41.79 69.26 52.13 35.25 82.21 81.18 80.92 81.05 68.14 98.82 CASP [42] 1.74 2.63 81.28 72.16 76.43 61.86 98.66 63.48 47.90 54.60 37.55 88.86 86.78 80.30 83.41 71.55 99.01 
+
+ConvFormer-CD [43] 37.72 5.14 69.44 67.38 68.40 51.97 98.10 62.43 45.77 52.81 35.88 88.52 84.03 79.46 81.68 69.03 98.89 SFEARNet [44] 5.56 4.65 78.89 75.09 76.94 62.53 98.64 54.61 61.22 57.73 40.57 87.46 85.76 80.39 82.99 70.93 98.97 EFICNN [45] 21.32 91.34 81.93 75.87 78.78 64.99 98.77 60.16 57.74 58.92 41.77 88.74 85.43 81.14 83.23 71.28 98.98 HeteCD [11] 63.85 81.28 75.61 74.05 74.82 59.77 98.50 61.58 55.45 58.35 41.19 88.93 85.05 80.32 82.62 70.38 98.95 HRMNet [46] 13.46 12.17 82.41 74.08 78.02 63.96 98.74 52.65 55.07 53.83 36.83 86.79 84.74 82.80 83.76 72.06 99.00 
+
+Ours 6.35 15.13 † 82.45 78.53 80.44 67.28 98.86 58.68 62.99 60.76 43.64 88.62 87.17 82.66 84.86 73.71 99.08      
+
+> †Note: Since standard profiling tools often fail to track hardware-level FLOPs for frequency-domain operations, for methods incorporating ASAU, we manually calculated this overhead based on the Cooley-Tukey algorithm: O(C·HW log 2(HW )) . By meticulously accumulating this across all 5 pyramid levels in our Siamese architecture, the FFT/iFFT operations contribute approximately 0.39 GFLOPs, which has been added to the FLOPs of ASFR-Net to ensure transparency of complexity reporting.
+
+3) XiongAn Dataset [11]: This dataset focuses on building CD during large-scale urban redevelopment in Xiong’an New Area, China, comprising GaoFen-2 multispectral and GaoFen-3 SAR images. The inherent speckle noise and geometric distortions of SAR imagery pose severe challenges to detection accuracy. As the official test set is not publicly available, we follow common practice and use the validation set for evaluation. The original images have a resolution of 512 ×512 
+
+pixels. In our experiments, we crop them into non-overlapping 
+
+256 × 256 patches, ultimately resulting in 7,604 pairs for training and 1,652 pairs for validation and testing, respectively. 
+
+B. Implementation Details and Evaluation Metrics 
+
+Our approach is implemented in PyTorch, with all experi-ments conducted on a workstation equipped with two NVIDIA GeForce RTX 3090 GPUs (24 GB). We adopt a lightweight MobileNetV2 [34] backbone pre-trained on ImageNet as the weight-sharing feature extractor, while other components are randomly initialized. The network is optimized using the AdamW optimizer with β1 = 0 .9, β2 = 0 .99 , and a weight decay of 1e − 2. The initial learning rate is set to 0.0005 with a batch size of 16. A Poly learning rate schedule with a power of 0.9 is employed throughout training. The model is trained for 40k, 2k, and 20k iterations on the VisNIR-HCD, MT-Wuhan, and XiongAn datasets, respectively. A variety of online data augmentation techniques, including random re-scaling, cropping, flipping, temporal exchange, and cutmix, are incorporated to enhance generalization. The model is evaluated on the validation set after each epoch, saving the checkpoint with the highest F1 for final testing. In line with standard practices, five evaluation metrics are employed to quantify performance: precision (Pre), recall (Rec), f1-score (F1), intersection over union (IoU), and overall accuracy (OA). Among these, F1 and IoU are considered the primary indicators for comprehensive evaluation. 
+
+C. Quantitative Analysis 
+
+Table II details the quantitative comparison results of ASFR-Net against related methods, including A2Net [23], RFANet [24], STADE-CDNet [38], MambaCD [22], STENet [39], DGMA2-Net [40], CSI-Net [41], AFENet [10], CASP [42], ConvFormer-CD [43], SFEARNet [44], EFICNN [45], HeteCD [11], and HRMNet [46], on the three datasets. As evidently observed, ASFR-Net consistently achieves superior performance across key metrics, demonstrating its exceptional robustness in handling diverse heterogeneous scenarios. In the challenging VisNIR-HCD dataset where non-linear spectral discrepancies between visible and NIR bands often induce significant pseudo-changes, ASFR-Net secures a lead-ing F1 of 80.44% and an IoU of 67.28%. This performance substantially surpasses traditional CNN-based Siamese net-works such as RFANet [24] and A2Net [23]. It is worth noting that while the registration-aware method CASP [42] performs competitively on other datasets, its performance drops on VisNIR-HCD with an F1 of 76.43%. This indicates that relying solely on spatial alignment is insufficient to bridge the profound visible-NIR spectral gap. Furthermore, compared to the heterogeneous-specific method AFENet [10] which yields an F1 of 68.51%, our approach achieves a remarkable improvement of nearly 12%. This significant margin suggests that the global adversarial strategy employed by AFENet tends to over-smooth high-frequency details, whereas our coarse-to-fine strategy effectively preserves critical boundary infor-mation while mitigating spectral inconsistencies through the frequency-domain refinement module. Extending the evaluation to optical-SAR scenarios, ASFR-Net exhibits exceptional resistance to inherent speckle noise and geometric distortions found in the MT-Wuhan and Xion-gAn datasets. On the noise-heavy MT-Wuhan benchmark, our method outperforms top competitors like EFICNN [45] and DGMA2-Net [40] by approximately 2% in terms of 11 VisNIR -               
+
+> HCD
+> MT -
+> Wuhan
+> XiongAn
+> IT1IT2
+> Ground
+> Truth A2Net AFENet Mamba
+> CD CSI -Net DGMA2
+> -Net
+> STADE -
+> CENet STENet RFANet CASP EFICNN ConvFor
+> mer -CD
+> SFEAR
+> Net HeteCD HRMNet Ours
+> Fig. 7. Qualitative visualizations of different methods tested on VisNIR-HCD, MT-Wuhan and XiongAn datasets. The visualizations employ a standard color scheme for error analysis: true positives (TP) in white, true negatives (TN) in black, false positives (FP) in red, and false negatives (FN) in green.
+
+F1. Furthermore, it is worth noting that although lightweight models such as A2Net [23] establish a competitive baseline on VisNIR-HCD by exploiting spatial structural similarity, relying solely on spatial alignment is a fragile strategy for heteroge-neous tasks. This limitation becomes extremely evident when evaluated on the MT-Wuhan dataset; due to extreme speckle noise and geometric distortions, the performance of A2Net drops sharply, yielding an F1 score of only 54.78%. In stark contrast, ASFR-Net exhibits outstanding robustness, outper-forming A2Net by roughly 6% in both F1 and IoU. ASFR-Net strikes a better balance by leveraging SFEM to isolate and filter out sensor-specific noise components in the frequency domain, thereby effectively suppressing background false alarms that spatial-only methods often struggle to decouple. Beyond raw detection accuracy, computational efficiency is a critical factor for practical deployment in real-world remote sensing applications. As detailed in Table II, many existing high-performance models come with prohibitive computa-tional costs. For instance, MambaCD [22] and AFENet [10] require massive parameters exceeding 85 M and 39 M respec-tively, along with high FLOPs, which severely hinders their deployability on edge devices. Conversely, ASFR-Net adopts a relatively efficient design with only 6.35 M parameters and 15.13 G FLOPs. Although our model incurs a marginal increase in computational overhead compared to existing ultra-lightweight networks like RFANet [24], this trade-off is highly justified by the significant performance gains. Specifically, ASFR-Net outperforms RFANet by a solid margin of 2.56% in terms of IoU on the VisNIR-HCD dataset. Consequently, ASFR-Net establishes an optimal equilibrium between model complexity and detection accuracy, ensuring high-precision inference while maintaining a manageable memory footprint suitable for large-scale data processing. 
+
+D. Qualitative Analysis 
+
+To visually assess and compare the detection performance among different CD approaches, we also carry out qualitative visualizations on the three datasets, which are presented in Fig. 7. The qualitative results presented in these figures illustrate that our method exhibits superiority over other CD methods. In the VisNIR-HCD dataset, significant spectral reflectance differences in vegetation and building roofs between RGB and NIR bands constitute the primary source of pseudo-changes. Empirical observations reveal that methods such as AFENet [10], STADE-CDNet [38], and ConvFormer-CD [43] fail to effectively decouple these spectral discrepancies, re-sulting in dense FPs in vegetation-covered areas. Similarly, MambaCD [22] frequently misclassifies seasonal vegetation variations as building changes. In contrast, the prediction maps generated by ASFR-Net exhibit the highest purity, character-ized by coherent change regions and minimal false positive 12                                                                                                                                                                                                                                                                                                                                                         
+
+> TABLE III ABLATION STUDY FOR DIFFERENT COMPONENTS ON THE THREE DATASETS . C OLOR CONVENTION :BEST ,2ND -BEST ,AND 3RD -BEST .Methods Params (M) ↓
+> FLOPs (G) ↓
+> VisNIR-HCD (%) MT-Wuhan (%) XiongAn (%) Pre ↑Rec ↑F1 ↑IoU ↑OA ↑Pre ↑Rec ↑F1 ↑IoU ↑OA ↑Pre ↑Rec ↑F1 ↑IoU ↑OA ↑
+> (a) Baseline 2.63 2.54 81.75 73.84 77.59 63.39 98.72 53.01 58.23 55.50 38.41 86.94 82.92 84.35 83.63 71.87 98.97 (b) + MIR-Learner 4.50 3.65 85.16 74.35 79.38 65.82 98.84 62.29 52.94 57.23 40.09 88.94 85.13 82.69 83.89 72.25 99.01 (c) + MIR-Learner (w/o PAFR) 4.50 3.65 81.42 76.59 78.93 65.20 98.77 57.73 55.91 56.80 39.67 88.11 87.12 80.58 83.72 72.00 99.03 (d) + SFEM 3.77 10.92 82.47 76.46 79.35 65.77 98.80 52.67 63.26 57.48 40.33 86.91 83.91 84.75 84.33 72.91 99.02 (e) + SFEM (w/o HPAU) 2.68 3.11 80.00 76.41 78.16 64.16 98.71 55.70 58.86 57.23 40.09 87.70 82.81 85.67 84.21 72.73 99.00 (f) + SFEM (w/o ASAU) 3.49 8.49 81.86 76.62 79.15 65.50 98.78 57.42 57.07 57.24 40.10 88.08 85.97 82.32 84.11 72.57 99.03 (g) + HGFM 2.69 2.85 81.17 77.91 79.50 65.98 98.84 53.97 59.49 56.60 39.47 87.24 87.12 81.26 84.09 72.54 99.04
+> (h) + MIR-Learner+SFEM 5.65 12.03 85.91 74.37 79.72 66.28 98.86 57.11 58.04 58.08 40.92 88.28 85.22 83.94 84.57 73.27 99.05
+> (i) + MIR-Learner+HGFM 4.56 3.96 84.60 75.88 80.00 66.67 98.86 60.92 57.10 58.95 41.80 88.88 85.55 83.37 84.45 73.08 99.04
+> (j) + SFEM +HGFM 3.83 11.23 82.32 78.27 80.24 67.01 98.84 62.21 56.77 59.37 42.21 89.13 85.56 83.55 84.55 73.23 99.05
+> (k) ASFR-Net (Ours) 6.35 15.13 82.45 78.53 80.44 67.28 98.86 58.68 62.99 60.76 43.64 88.62 87.17 82.66 84.86 73.71 99.08
+> TABLE IV COMPARISON OF DIFFERENT BACKBONE ARCHITECTURES ON THE THREE DATASETS . C OLOR CONVENTION :BEST ,2ND -BEST ,AND 3RD -BEST .Methods Params (M) ↓
+> FLOPs (G) ↓
+> VisNIR-HCD (%) MT-Wuhan (%) XiongAn (%) Pre ↑Rec ↑F1 ↑IoU ↑OA ↑Pre ↑Rec ↑F1 ↑IoU ↑OA ↑Pre ↑Rec ↑F1 ↑IoU ↑OA ↑
+> (l) ResNet18 [47] 16.35 21.09 81.14 78.71 79.90 66.53 98.81 56.59 57.86 57.22 40.07 87.90 84.77 84.20 84.48 73.14 99.04
+> (m) EfficientNet [48] 8.18 18.41 83.06 77.43 80.15 66.87 98.84 61.45 55.41 58.27 41.12 88.90 86.92 82.01 84.39 73.00 99.06
+> (n) MobileViT [49] 9.80 18.90 79.97 70.33 74.84 59.80 98.58 49.97 54.67 52.21 35.33 86.01 83.66 82.63 83.14 71.15 98.96 (o) ConvNeXt [50] 34.56 64.48 83.30 76.17 79.58 66.08 98.82 56.84 54.27 55.52 38.43 87.84 86.54 82.65 84.55 73.24 99.06
+> (p) LWGANet [51] 23.67 21.22 84.77 76.46 80.40 67.23 98.88 62.73 56.22 59.29 42.14 89.21 86.99 83.03 84.96 73.85 99.09
+
+noise. This superior robustness demonstrates that GADU suc-cessfully aligns heterogeneous features via modality-invariant learning, while SFEM leverages frequency-domain filtering to further suppress residual spectral deviations, thereby enabling the model to focus on genuine semantic structural changes. For the MT-Wuhan and XiongAn datasets, the inherent SAR speckle noise often compromises model inference. STADE-CDNet [38] and STENet [39] falter significantly when pro-cessing these samples, misidentifying the granular texture of SAR as changes. In the complex scenes of XiongAn, particularly in rows 10 and 11, these methods generate exten-sive blocky false alarms marked in red. Moreover, DGMA2-Net [40] and CASP [42] exhibit marked discontinuities and missed detections (FNs) when detecting the slender road in row 8, revealing the limitations of context modeling under strong noise. Conversely, ASFR-Net demonstrates excellent noise resistance and object completeness. As shown in row 7 and row 11 of the figure, it successfully suppresses background speckles that confuse other models and accurately extracts complete change shapes. This performance is attributable to the frequency-domain purification and multi-scale aggregation strategies in SFEM, ensuring that the generated detection map is internally coherent and contiguous, significantly reducing the false alarm rate while ensuring a competitive recall. In urban monitoring tasks, accurately delineating building boundaries and separating closely adjacent targets are critical for evaluating model practicality. In the dense urban scenes of the XiongAn dataset (row 12), affected by the geometric distortion of SAR side-looking imaging, the prediction maps generated by RFANet [24] and EFICNN [45] suffer from boundary erosion and incomplete detection, represented by FNs. HRMNet [46] also manifests edge blurring when de-tecting large factories in VisNIR-HCD. In contrast, ASFR-Net exhibits superior boundary preservation in all scenarios. Even in the high-density building area of XiongAn, it generates sharp and regular contours and clearly separates adjacent targets. This precision is primarily attributed to the synergy between the deep semantic guidance of HGFM and the explicit geometric constraints of the PAFR loss. By regulating class margins in the feature space, ASFR-Net effectively suppresses prevalent blurring artifacts and ensures high structural fidelity. Despite the superior qualitative and quantitative perfor-mance, ASFR-Net is constrained by a fundamental limitation inherent to cross-modal tasks: it cannot resolve changes that are inherently unobservable in one modality. The practical boundary for ASFR-Net to work reliably relies on the premise that a genuine semantic change must leave an observable, structure-related imprint, such as clear edges or regular geome-tries, in both modalities, even if their radiometric relationship is non-linear. Consequently, there are inevitable modal blind spots where the method may experience performance degrada-tion, as evidenced by the minor error regions in Fig. 7. The first failure scenario is low-contrast structure invisibility, leading to missed detections (FNs). For instance, in row 3 of VisNIR-HCD, a distinct green gap appears at the edge of the large building on the right side of our prediction map. Observing the corresponding IT2 reveals that this roof section exhibits lower reflectance, making it visually indistinguishable from the adjacent dark ground or shadows. The second scenario is deceptive structure interference, causing false alarms (FPs). This occurs when large-scale non-building events generate strong, regular geometric patterns in a specific modality, coin-cidentally mimicking the structural characteristics of buildings. As observed in row 10 of Fig. 7, several distinct red patches appear below the correctly detected white region. Although IT1
+
+shows bare land in that area, IT2 exhibits highly structured, 13 VisNIR -HCD  MT -Wuhan  XiongAn                                                      
+
+> Baseline
+> Baseline
+> +MIR -
+> Learner
+> Fig. 8. Comparative t-SNE visualization of feature distributions with and without the MIR-Learner. The blue and red points correspond to features from two heterogeneous modalities like optical and SAR or NIR data. TABLE V HYPERPARAMETER SENSITIVITY ANALYSIS ON THE VIS NIR-HCD DATASET . C OLOR CONVENTION :BEST ,2ND -BEST ,AND 3RD -BEST .Settings αβλadv λcon Pre ↑Rec ↑F1 ↑IoU ↑OA ↑
+> αtoo small 0.5 0.05 0.001 0.002 84.46 76.68 80.38 67.20 98.87
+> αtoo strict 1.5 0.05 0.001 0.002 84.23 76.46 80.15 66.88 98.86
+> Zero tolerance 1.0 0.0 0.001 0.002 81.10 79.25 80.16 66.90 98.82
+> βtoo loose 1.0 0.2 0.001 0.002 81.90 78.12 79.96 66.62 98.82 Wrong magnitude 1.0 0.05 0.01 0.02 83.60 76.72 80.01 66.68 98.84 Ratio inverted 1.0 0.05 0.002 0.001 84.07 76.19 79.93 66.57 98.85 Ours 1.0 0.05 0.001 0.002 82.45 78.53 80.44 67.28 98.86
+
+bright scattering signals. These strong non-building geometric patterns deceive the network. Ultimately, ASFR-Net cannot in-trinsically resolve fundamentally unobservable changes; rather, it suppresses residual modal disparities, provided that the underlying structural evidence of the targets remains intact. 
+
+E. Ablation Study 
+
+To verify the effectiveness and necessity of the core compo-nents in ASFR-Net, we conduct detailed ablation experiments on all three datasets. The evaluated components include MIR-Learner, SFEM, and HGFM. Furthermore, we also evaluate the performance of ASFR-Net when incorporating different backbone alternatives as substitutions. The quantitative results are summarized in Table III and Table IV. The baseline (model (a)) is defined as a weight-sharing Siamese MobileNetV2 backbone with basic difference fusion and a simplified feature pyramid network decoder, without the proposed modules. 
+
+Effectiveness of Core Components: We first evaluate the effectiveness of MIR-Learner. Incorporating MIR-Learner in model (b) substantially improves the F1 from 77.59% to 79.38% on the VisNIR-HCD dataset. To isolate the specific contribution of the geometric constraint, model (c) is evaluated by removing the PAFR. This exclusion leads to a notable decline in Pre on VisNIR-HCD from 85.16% to 81.42%. This shows that while the adversarial component aligns global dis-tributions, the PAFR is indispensable for maintaining feature discriminability by enforcing a margin between changed and unchanged features in the latent space. The t-SNE visualization in Fig. 8 further corroborates that MIR-Learner effectively aligns distributions while preserving semantic separability. Building upon the aligned features, SFEM is introduced to suppress residual modal noise and recover fine-grained structural details. The integration of the full SFEM in model (d) yields significant quantitative gains, particularly in Rec which increases from 58.23% to 63.26% on the MT-Wuhan dataset. Removing HPAU in model (e) results in a loss of structural integrity and the exclusion of ASAU in model (f) degrades performance, suggesting that the network struggles to filter sensor-specific noise without frequency-domain analysis. These quantitative comparisons validate that ASAU and HPAU work synergistically to decouple modal artifacts from genuine changes. To intuitively comprehend this refinement process, Fig. 9 visualizes the multi-scale feature heatmaps for three examples. As clearly observed, the features extracted by the baseline model ( BiTt ) suffer from severe modal interference, heavily activating on background noise such as SAR speckles or spectral deviations. In contrast, within our framework, the raw backbone features ( F iTt ) first capture the coarse regions. After being explicitly purified by the ASAU in the frequency domain ( AiTt ) and structurally aggregated by the HPAU ( SiTt ), the task-irrelevant modal artifacts are effectively suppressed. Consequently, the final representations ( SiTt ) strictly focus on genuine semantic structural changes, visually corroborating the superiority of the proposed SFEM. Furthermore, replacing the baseline decoder with the pro-posed HGFM blocks in model (g) provides consistent im-provements across all metrics. For instance, on the XiongAn dataset, HGFM improves the IoU from 71.87% to 72.54%, demonstrating that the top-down guidance strategy effectively bridges the semantic-spatial gap by using deep semantics to refine the boundaries of shallow difference features. The complete ASFR-Net (model k), which integrates all the aforementioned modules, achieves the best overall perfor-mance across all benchmarks. The synergistic effect is clearly demonstrated when observing the performance degradation in combinations where key components are absent. For example, combining only SFEM and HGFM in model (j) without MIR-Learner leads to a sharp drop in F1 on MT-Wuhan from 60.76% to 59.37%, highlighting the necessity of adversarial alignment for bridging large modal gaps. 
+
+Choice of Backbone Architectures: Finally, Table IV assesses different backbone architectures to justify our design choice. Compared to heavier CNNs, namely ResNet18 [47] and ConvNeXt [50], our MobileNetV2-based model achieves superior accuracy with significantly fewer parameters. Train-ing logs further reveal that over-parameterized models suf-fer from validation fluctuations, likely overfitting to sensor-specific modal noise rather than learning generalizable cross-modal semantics. Among efficient alternatives, EfficientNet [48] delivers a highly competitive F1 score but incurs higher computational overhead. The recently proposed remote sens-ing backbone LWGANet [51] demonstrates remarkable capa-bilities. Although its parameter count is notably larger than that of MobileNetV2, its efficient grouped attention mechanism ensures that the actual GPU memory footprint as well as the 14 FT1 
+
+> 1
+
+FT1
+
+> 1
+
++I T1 FT2 
+
+> 1
+
+FT2
+
+> 1
+
++I T2
+
+AT1 
+
+> 1
+
+AT1
+
+> 1
+
++I T1 AT2 
+
+> 1
+
+AT2
+
+> 1
+
++I T2
+
+ST1 
+
+> 1
+
+ST1
+
+> 1
+
++I T1 ST2 
+
+> 1
+
+ST2
+
+> 1
+
++I T2
+
+FT1 
+
+> 3
+
+FT1
+
+> 3
+
++I T1 FT2 
+
+> 3
+
+FT2
+
+> 3
+
++I T2
+
+ST1 
+
+> 3
+
+ST1
+
+> 3
+
++I T1 ST2 
+
+> 3
+
+ST2
+
+> 3
+
++I T2
+
+AT1 
+
+> 3
+
+AT1
+
+> 3
+
++I T1 AT2 
+
+> 3
+
+AT2
+
+> 3
+
++I T2
+
+ST1 
+
+> 5
+
+ST1
+
+> 5
+
++I T1 ST2 
+
+> 5
+
+ST2
+
+> 5
+
++I T2
+
+AT1 
+
+> 5
+
+AT1
+
+> 5
+
++I T1 AT2 
+
+> 5
+
+AT2
+
+> 5
+
++I T2
+
+FT1 
+
+> 5
+
+FT1
+
+> 5
+
++I T1 FT2 
+
+> 5
+
+FT2
+
+> 5
+
++I T2
+
+IT1 IT2 Ground Truth 
+
+Example 1(VisNIR -HCD )
+
+(a)  × 𝟏 
+
+𝟐  (c) × 𝟏 
+
+𝟑𝟐 
+
+(b) × 𝟏 
+
+𝟖 
+
+BT1 
+
+> 1
+
+BT1
+
+> 1
+
++I T1 BT2 
+
+> 1
+
+BT2
+
+> 1
+
++I T2 BT1 
+
+> 3
+
+BT1
+
+> 3
+
++I T1 BT2 
+
+> 3
+
+BT2
+
+> 3
+
++I T2 BT1 
+
+> 5
+
+BT1
+
+> 5
+
++I T1 BT2 
+
+> 5
+
+BT2
+
+> 5
+
++I T2
+
+IT1 IT2 Ground Truth 
+
+Example 2(MT -Wuhan )
+
+FT1 
+
+> 1
+
+FT1
+
+> 1
+
++I T1 FT2 
+
+> 1
+
+FT2
+
+> 1
+
++I T2
+
+AT1 
+
+> 1
+
+AT1
+
+> 1
+
++I T1 AT2 
+
+> 1
+
+AT2
+
+> 1
+
++I T2
+
+ST1 
+
+> 1
+
+ST1
+
+> 1
+
++I T1 ST2 
+
+> 1
+
+ST2
+
+> 1
+
++I T2
+
+FT1 
+
+> 3
+
+FT1
+
+> 3
+
++I T1 FT2 
+
+> 3
+
+FT2
+
+> 3
+
++I T2
+
+ST1 
+
+> 3
+
+ST1
+
+> 3
+
++I T1 ST2 
+
+> 3
+
+ST2
+
+> 3
+
++I T2
+
+AT1 
+
+> 3
+
+AT1
+
+> 3
+
++I T1 AT2 
+
+> 3
+
+AT2
+
+> 3
+
++I T2
+
+ST1 
+
+> 5
+
+ST1
+
+> 5
+
++I T1 ST2 
+
+> 5
+
+ST2
+
+> 5
+
++I T2
+
+AT1 
+
+> 5
+
+AT1
+
+> 5
+
++I T1 AT2 
+
+> 5
+
+AT2
+
+> 5
+
++I T2
+
+FT1 
+
+> 5
+
+FT1
+
+> 5
+
++I T1 FT2 
+
+> 5
+
+FT2
+
+> 5
+
++I T2
+
+(a)  × 𝟏 
+
+𝟐  (c) × 𝟏 
+
+𝟑𝟐 
+
+(b) × 𝟏 
+
+𝟖 
+
+BT1 
+
+> 1
+
+BT1
+
+> 1
+
++I T1 BT2 
+
+> 1
+
+BT2
+
+> 1
+
++I T2 BT1 
+
+> 3
+
+BT1
+
+> 3
+
++I T1
+
+BT2 
+
+> 3
+
+BT2
+
+> 3
+
++I T2 BT1 
+
+> 5
+
+BT1
+
+> 5
+
++I T1
+
+BT2 
+
+> 5
+
+BT2
+
+> 5
+
++I T2
+
+IT1 IT2 Ground Truth 
+
+Example 3( XiongAn )
+
+ST1 
+
+> 1
+
+ST1
+
+> 1
+
++I T1 ST2 
+
+> 1
+
+ST2
+
+> 1
+
++I T2
+
+AT1 
+
+> 1
+
+AT1
+
+> 1
+
++I T1 AT2 
+
+> 1
+
+AT2
+
+> 1
+
++I T2
+
+FT1 
+
+> 1
+
+FT1
+
+> 1
+
++I T1 FT2 
+
+> 1
+
+FT2
+
+> 1
+
++I T2
+
+ST1 
+
+> 3
+
+ST1
+
+> 3
+
++I T1 ST2 
+
+> 3
+
+ST2
+
+> 3
+
++I T2
+
+AT1 
+
+> 3
+
+AT1
+
+> 3
+
++I T1 AT2 
+
+> 3
+
+AT2
+
+> 3
+
++I T2
+
+FT1 
+
+> 3
+
+FT1
+
+> 3
+
++I T1 FT2 
+
+> 3
+
+FT2
+
+> 3
+
++I T2
+
+ST1 
+
+> 5
+
+ST1
+
+> 5
+
++I T1 ST2 
+
+> 5
+
+ST2
+
+> 5
+
++I T2
+
+AT1 
+
+> 5
+
+AT1
+
+> 5
+
++I T1 AT2 
+
+> 5
+
+AT2
+
+> 5
+
++I T2
+
+FT1 
+
+> 5
+
+FT1
+
+> 5
+
++I T1 FT2 
+
+> 5
+
+FT2
+
+> 5
+
++I T2
+
+(a)  × 𝟏 
+
+𝟐  (c) × 𝟏 
+
+𝟑𝟐 
+
+(b) × 𝟏 
+
+𝟖 
+
+BT1 
+
+> 1
+
+BT1
+
+> 1
+
++I T1 BT2 
+
+> 1
+
+BT2
+
+> 1
+
++I T2 BT1 
+
+> 3
+
+BT1
+
+> 3
+
++I T1 BT2 
+
+> 3
+
+BT2
+
+> 3
+
++I T2 BT1 
+
+> 5
+
+BT1
+
+> 5
+
++I T1 BT2 
+
+> 5
+
+BT2
+
+> 5
+
++I T2
+
+High -value regions  Low -value regions 
+
+BT2 
+
+> 3
+
+BT2
+
+> 3
+
++I T2 BT1 
+
+> 5
+
+BT1
+
+> 5
+
++I T1
+
+Fig. 9. Progressive heatmap visualizations of multiple levels for ASFR-Net on the three datasets. IT1 and IT2 are the bi-temporal images, followed by the corresponding ground truth. (a)–(c) visualize the features from three distinct hierarchical levels, corresponding to downsampling rates of 1/2, 1/8, and 1/32 ,respectively. Each panel sequentially displays four feature states from top to bottom: the raw features F iTt extracted by the backbone, the intermediate features 
+
+AiTt purified by ASAU, the reinforced features SiTt aggregated by HPAU, and the features BiTt generated by the baseline (model (a)) in Table III, which utilizes basic convolutions for alignment. Each state is presented alongside its composite visualization overlaid on the original image, such as F iTt + ITt . A standard jet color map is employed, where warm colors indicate high activation values and cool colors represent low activation or suppressed regions. 
+
+training and inference times remain surprisingly comparable to our lightweight design. Furthermore, the final performance metrics of LWGANet are highly competitive and almost identical to our baseline model across most evaluation tracks. Nevertheless, our MobileNetV2-based architecture maintains a slight advantage on the highly noisy MT-Wuhan dataset 15 
+
+while requiring nearly a quarter of the parameters. Conse-quently, considering the experimental outcomes across the three datasets, MobileNetV2 is identified as the optimal archi-tecture for this task, as it achieves the best overall detection accuracy and superior training stability while simultaneously demanding the lowest computational overhead. 
+
+Hyperparameter Sensitivity Analysis: To justify the se-lected hyperparameter configurations, we evaluated ASFR-Net under specific boundary variations on the VisNIR-HCD dataset, as summarized in Table V. First, regarding the geometric boundaries ( α, β ) in the PAFR module: In the L2-normalized feature space, setting α = 1 .0
+
+guarantees an angular separation of at least 60 ◦ between changed feature pairs. As shown in Table V, reducing α to 0.5 fails to push changed features far enough apart, causing a slight drop in F1. Conversely, setting α = 1 .5 imposes an overly strict constraint, disrupting the feature manifold optimization and degrading F1 to 80.15%. For the attraction margin β, setting it to zero tolerance of 0.0 will force the network to penalize inherent sensor noise, causing modality-specific overfitting and a noticeable Pre drop. Setting β = 0 .2
+
+results in loose clustering, generating excessive false positives and dropping the overall F1 to 79.96%. Second, regarding the gradient balancing coefficients (λadv , λ con ): These parameters dictate the multi-task optimiza-tion dynamics. When scaled up to Wrong magnitude, the mas-sive gradients generated by the dense multi-scale adversarial and contrastive pyramids disrupt the pixel-level segmentation loss, leading to sub-optimal convergence, F1 dropping to 80.01%. When the ratio is inverted ( λadv = 0 .002 > λ con =0.001 ), the aggressive global distribution alignment overshad-ows the local geometric constraints. This over-alignment inad-vertently smooths out fine-grained boundary details, degrading F1 to 79.93%. Thus, maintaining the 10 −3 magnitude and with λcon > λ adv provides a slightly stronger contrastive push, acting as the optimal gentle manifold regularizer. VI. C ONCLUSION AND FUTURE WORK 
+
+In this article, we propose ASFR-Net, a robust framework designed to reconcile the intrinsic conflict between feature alignment and semantic discriminability in heterogeneous CD. Adopting a coarse-to-fine refinement paradigm, the model synergizes adversarial learning with frequency-domain anal-ysis. Specifically, MIR-Learner mitigates the primary modal discrepancy by enforcing geometric regularity, while SFEM demonstrates that residual modal discrepancies, which are often indistinguishable in the spatial domain, can be effec-tively decoupled and suppressed via frequency-domain priors. Then, HGFM bridges the semantic-spatial gap by employing hierarchical guided fusion, ensuring that deep semantic priors effectively sharpen fine-grained details for precise boundary delineation. Furthermore, the VisNIR-HCD benchmark allevi-ates the data scarcity issue in multi-source building CD. Exten-sive empirical evaluations substantiate that ASFR-Net achieves SOTA performance, demonstrating superior robustness against complex spectral heterogeneity and noise. Although the current framework achieves remarkable per-formance, its practical application in complex real-world sce-narios remains constrained by strict spatial image alignment. Future work will be dedicated to breaking this limitation, further enhancing the robustness and practicality of the model. Since perfectly aligned heterogeneous image pairs are scarce in rapid-response scenarios due to sensor parallax, jitter, and imaging principle differences, we plan to explore a unified architecture that jointly optimizes cross-modal registration and change detection in a mutually reinforcing manner. By investigating advanced representation disentanglement strate-gies, we aim to effectively separate the features required for spatial alignment from those critical for change identification. Meanwhile, we will explore task-driven feedback mechanisms, allowing the downstream CD process to actively guide and refine the spatial registration. Through this joint paradigm, we expect to minimize misalignment-induced pseudo-changes, mitigate the impact of adverse artifacts, and ultimately prevent the performance degradation of downstream semantic tasks. REFERENCES [1] Z. Lv, T. Liu, J. A. Benediktsson, and N. Falco, “Land Cover Change Detection Techniques: Very-high-resolution optical images: A review,”                                                                   
+
+> IEEE Geoscience and Remote Sensing Magazine , vol. 10, no. 1, pp. 44–63, 2022. [2] Z. Zheng, Y. Zhong, J. Wang, A. Ma, and L. Zhang, “Building damage assessment for rapid disaster response with a deep object-based semantic change detection framework: From natural disasters to man-made disasters,” Remote Sensing of Environment , vol. 265, p. 112636, 2021. [3] H. Chen and Z. Shi, “A Spatial-Temporal Attention-Based Method and a New Dataset for Remote Sensing Image Change Detection,” Remote Sensing , vol. 12, no. 10, 2020. [4] Z. Wang, Z. Yang, and Q. Zhang, “IA-CDNet: Change Detection in Adverse Remote Sensing Image Conditions With an Advanced Image-Adaptive Method,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–19, 2025. [5] G. Cheng, Y. Huang, X. Li, S. Lyu, Z. Xu, H. Zhao, Q. Zhao, and S. Xiang, “Change Detection Methods for Remote Sensing in the Last Decade: A Comprehensive Review,” Remote Sensing , vol. 16, no. 13, 2024. [6] Y. Sun, L. Lei, D. Guan, G. Kuang, and L. Liu, “Graph Signal Processing for Heterogeneous Change Detection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–23, 2022. [7] X. Jiang, G. Li, X.-P. Zhang, and Y. He, “A Semisupervised Siamese Network for Efficient Change Detection in Heterogeneous Remote Sens-ing Images,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 60, pp. 1–18, 2022. [8] X. Niu, M. Gong, T. Zhan, and Y. Yang, “A Conditional Adversarial Network for Change Detection in Heterogeneous Images,” IEEE Geo-science and Remote Sensing Letters , vol. 16, no. 1, pp. 45–49, 2019. [9] W. Dong, J. Ren, S. Xiao, L. Fang, J. Qu, and Y. Li, “Cycle Translation-Based Collaborative Training for Hyperspectral-RGB Mul-timodal Change Detection,” IEEE Transactions on Image Processing ,vol. 34, pp. 6347–6360, 2025. [10] Y. Pu, M. Gong, T. Liu, M. Zhang, T. Gao, F. Jiang, and X. Hu, “Adversarial Feature Equilibrium Network for Multimodal Change De-tection in Heterogeneous Remote Sensing Images,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–17, 2024. [11] W. Jing, H. Bai, B. Song, W. Ni, J. Wu, and Q. Wang, “HeteCD: Feature Consistency Alignment and difference mining for heterogeneous remote sensing image change detection,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 223, pp. 317–327, 2025. [12] F. Jiang, B. Huang, H. Wu, D. Feng, Y. Zhou, M. Zhang, M. Gong, W. Zhao, and Z. Guan, “Change Masked Modality Alignment Network for Multimodal Change Detection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–16, 2025. [13] Y. Chen, S. Feng, C. Zhao, N. Su, W. Li, R. Tao, and J. Ren, “High-Resolution Remote Sensing Image Change Detection Based on Fourier Feature Interaction and Multiscale Perception,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–15, 2024. 16
+
+[14] F. Bovolo and L. Bruzzone, “A Theoretical Framework for Unsupervised Change Detection Based on Change Vector Analysis in the Polar Do-main,” Geoscience and Remote Sensing, IEEE Transactions on , vol. 45, pp. 218 – 236, 02 2007. [15] J. S. Deng, K. Wang, Y. H. Deng, and G. J. Qi, “PCA-based land-use change detection and analysis using multitemporal and multisensor satellite data,” International Journal of Remote Sensing , vol. 29, no. 16, pp. 4823–4838, 2008. [16] C. Wu, H. Chen, B. Du, and L. Zhang, “Unsupervised Change Detection in Multitemporal VHR Images Based on Deep Kernel PCA Convolu-tional Mapping Network,” IEEE Transactions on Cybernetics , vol. 52, no. 11, pp. 12 084–12 098, 2022. [17] A. A. Nielsen, “The Regularized Iteratively Reweighted MAD Method for Change Detection in Multi- and Hyperspectral Data,” IEEE Trans-actions on Image Processing , vol. 16, no. 2, pp. 463–478, 2007. [18] R. Caye Daudt, B. Le Saux, and A. Boulch, “Fully Convolutional Siamese Networks for Change Detection,” in 2018 25th IEEE Interna-tional Conference on Image Processing (ICIP) , 2018, pp. 4063–4067. [19] S. Fang, K. Li, J. Shao, and Z. Li, “SNUNet-CD: A Densely Connected Siamese Network for Change Detection of VHR Images,” IEEE Geo-science and Remote Sensing Letters , vol. 19, pp. 1–5, 2022. [20] H. Chen, Z. Qi, and Z. Shi, “Remote Sensing Image Change Detection With Transformers,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–14, 2022. [21] W. G. C. Bandara and V. M. Patel, “A Transformer-Based Siamese Net-work for Change Detection,” in IGARSS 2022 - 2022 IEEE International Geoscience and Remote Sensing Symposium , 2022, pp. 207–210. [22] H. Chen, J. Song, C. Han, J. Xia, and N. Yokoya, “ChangeMamba: Remote Sensing Change Detection With Spatiotemporal State Space Model,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–20, 2024. [23] Z. Li, C. Tang, X. Liu, W. Zhang, J. Dou, L. Wang, and A. Y. Zomaya, “Lightweight Remote Sensing Change Detection with Progressive Ag-gregation and Supervised Attention,” IEEE Transactions on Geoscience and Remote Sensing , vol. 61, pp. 1–12, 2023. [24] Z.-H. You, S.-B. Chen, J.-X. Wang, and B. Luo, “Robust feature aggregation network for lightweight and effective remote sensing image change detection,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 215, pp. 31–43, 2024. [25] Z. Lv, T. Yang, P. Zhong, W. Sun, J. Atli Benediktsson, and J. Li, “Hierarchical Feature Fusion Triple Network for Change Detection With Bitemporal Remote Sensing Images,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–12, 2025. [26] X. He, S. Zhang, B. Xue, T. Zhao, and T. Wu, “Cross-modal change detection flood extraction based on convolutional neural network,” In-ternational Journal of Applied Earth Observation and Geoinformation ,vol. 117, p. 103197, 2023. [27] Y. Sun, L. Lei, X. Tan, D. Guan, J. Wu, and G. Kuang, “Structured graph based image regression for unsupervised multimodal change detection,” 
+
+ISPRS Journal of Photogrammetry and Remote Sensing , vol. 185, pp. 16–31, 2022. [28] Y. Sun, L. Lei, D. Guan, J. Wu, G. Kuang, and L. Liu, “Image Regression With Structure Cycle Consistency for Heterogeneous Change Detection,” 
+
+IEEE Transactions on Neural Networks and Learning Systems , vol. 35, no. 2, pp. 1613–1627, 2024. [29] J.-Y. Zhu, T. Park, P. Isola, and A. A. Efros, “Unpaired Image-to-Image Translation Using Cycle-Consistent Adversarial Networks,” in 
+
+2017 IEEE International Conference on Computer Vision (ICCV) , 2017, pp. 2242–2251. [30] D. Wang, G. Ma, H. Zhang, X. Wang, and Y. Zhang, “Refined change detection in heterogeneous low-resolution remote sensing images for disaster emergency response,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 220, pp. 139–155, 2025. [31] T. Liu, M. Zhang, M. Gong, Q. Zhang, F. Jiang, H. Zheng, and D. Lu, “Commonality Feature Representation Learning for Unsupervised Mul-timodal Change Detection,” IEEE Transactions on Image Processing ,vol. 34, pp. 1219–1233, 2025. [32] C. Zhang, Y. Feng, L. Hu, D. Tapete, L. Pan, Z. Liang, F. Cigna, and P. Yue, “A domain adaptation neural network for change detection with heterogeneous optical and SAR remote sensing images,” International Journal of Applied Earth Observation and Geoinformation , vol. 109, p. 102769, 2022. [33] S. Ji, S. Wei, and M. Lu, “Fully Convolutional Networks for Multisource Building Extraction From an Open Aerial and Satellite Imagery Data Set,” IEEE Transactions on Geoscience and Remote Sensing , vol. 57, no. 1, pp. 574–586, 2019. [34] M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, and L.-C. Chen, “MobileNetV2: Inverted Residuals and Linear Bottlenecks,” in 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2018, pp. 4510–4520. [35] Y. Ganin, E. Ustinova, H. Ajakan, P. Germain, H. Larochelle, F. Lavio-lette, M. March, and V. Lempitsky, “Domain-Adversarial Training of Neural Networks,” Journal of Machine Learning Research , vol. 17, no. 59, pp. 1–35, 2016. [36] Q. Zang, D. Zhao, S. Wang, D. Quan, and Z. Zhong, “Feature Spectrum Learning for Remote Sensing Change Detection,” in 2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2025, pp. 12 647–12 657. [37] Q. Hou, D. Zhou, and J. Feng, “Coordinate Attention for Efficient Mobile Network Design,” in 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2021, pp. 13 708–13 717. [38] Z. Li, S. Cao, J. Deng, F. Wu, R. Wang, J. Luo, and Z. Peng, “STADE-CDNet: Spatial–Temporal Attention With Difference Enhancement-Based Network for Remote Sensing Image Change Detection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–17, 2024. [39] X. Pan, J. Lai, Y. Jin, X. Zhou, and J. Zheng, “STENet: A Spatial Selection and Temporal Evolution Network for Change Detection in Remote Sensing Images,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–15, 2024. [40] Z. Ying, Z. Tan, Y. Zhai, X. Jia, W. Li, J. Zeng, A. Genovese, V. Piuri, and F. Scotti, “DGMA2-Net: A Difference-Guided Multiscale Aggregation Attention Network for Remote Sensing Change Detection,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1– 16, 2024. [41] Y. Liu, F. Zhang, S. Zhang, K. Zhang, J. Sun, and L. Bruzzone, “Content-Guided Spatial–Spectral Integration Network for Change Detection in HR Remote Sensing Images,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–16, 2024. [42] Q. Wang, M. Zhang, J. Ren, and Q. Li, “Exploring Context Alignment and Structure Perception for Building Change Detection,” IEEE Trans-actions on Geoscience and Remote Sensing , vol. 63, pp. 1–10, 2025. [43] F. Yang, M. Li, W. Shu, A. Qin, T. Song, C. Gao, and G.-S. Xia, “ConvFormer-CD: Hybrid CNN–Transformer With Temporal Attention for Detecting Changes in Remote Sensing Imagery,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–15, 2025. [44] M. Li, D. Ming, L. Xu, D. Dong, and Y. Zhang, “SFEARNet: A Network Combining Semantic Flow and Edge-Aware Refinement for Highly Efficient Remote Sensing Image Change Detection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–18, 2025. [45] Y. Liu, S. Li, Z. He, and K. Liu, “Edge and Flow Guided Iterative CNN for Remote Sensing Image Change Detection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–22, 2025. [46] Z. Li, C. Tang, X. Hu, N. Li, S. Xiang, C. Li, C. Li, and X. Liu, “Boosting Remote Sensing Change Detection via Hard Region Mining,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1– 12, 2025. [47] K. He, X. Zhang, S. Ren, and J. Sun, “Deep Residual Learning for Image Recognition,” in 2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , 2016, pp. 770–778. [48] M. Tan and Q. Le, “EfficientNet: Rethinking Model Scaling for Con-volutional Neural Networks,” in Proceedings of the 36th International Conference on Machine Learning , ser. Proceedings of Machine Learning Research, K. Chaudhuri and R. Salakhutdinov, Eds., vol. 97. PMLR, 09–15 Jun 2019, pp. 6105–6114. [49] S. Mehta and M. Rastegari, “MobileViT: Light-weight, General-purpose, and Mobile-friendly Vision Transformer,” in International Conference on Learning Representations , 2022. [50] Z. Liu, H. Mao, C.-Y. Wu, C. Feichtenhofer, T. Darrell, and S. Xie, “A ConvNet for the 2020s,” in 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 2022, pp. 11 966–11 976. [51] W. Lu, X. Yang, and S.-B. Chen, “LWGANet: Addressing Spatial and Channel Redundancy in Remote Sensing Visual Tasks with Light-Weight Grouped Attention,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 40, no. 9, 2026, pp. 7574–7582.

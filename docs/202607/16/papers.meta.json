@@ -1,0 +1,54 @@
+{
+  "label": "2026-07-16",
+  "date": "2026-07-16",
+  "generated_at": "2026-07-16T21:27:42",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202607/16/2607.07161v1-asfr-net-adversarial-alignment-and-spatio-frequency-refinement-network-for-heterogeneous-remote-sensing-image-change-detection",
+      "section": "quick",
+      "title_en": "ASFR-Net: Adversarial Alignment and Spatio-Frequency Refinement Network for Heterogeneous Remote Sensing Image Change Detection",
+      "authors": "Xin-Jie Wu, Zhi-Hui You, Si-Bao Chen, Qing-Ling Shu, Xiao Wang, Jin Tang, Bin Luo",
+      "date": "2026-07-08",
+      "pdf": "https://arxiv.org/pdf/2607.07161v1",
+      "score": "6.0",
+      "evidence": "多模态遥感图像变化检测的对抗对齐方法",
+      "tldr": "异质遥感图像变化检测因成像机制差异导致模态不一致，易引入伪变化。提出ASFR-Net，通过MIR-Learner提取模态不变特征，SFEM利用频域处理抑制残差噪声，HGFM融合多级特征生成变化图。在VisNIR-HCD和公开数据集上达到SOTA性能，并发布了新基准数据集。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "The core challenge of heterogeneous change detection in remote sensing imagery lies in effectively decoupling genuine land-cover changes from significant modal disparities caused by distinct imaging mechanisms. These intrinsic inconsistencies are prone to introducing pseudo-changes, thereby constraining detection accuracy. To address this, we propose a novel, end-to-end adversarial spatio-frequency refinement network (ASFR-Net). Initially, a modality-invariant representation learner (MIR-Learner) guides the backbone to extract modality-invariant features, effectively bridging the primary domain gap. Subsequently, to address persistent residual modal differences, we design an innovative spatio-frequency synergistic enhancement module (SFEM), which identifies and suppresses sensor-specific noise and artifacts that are difficult to discern in the spatial domain by leveraging frequency-domain processing. Multi-level difference features are then computed from these refined representations and fed into a decoder equipped with cascaded hierarchical guided fusion module (HGFM) blocks to generate precise change maps. To alleviate the data scarcity in heterogeneous tasks, we construct and release a new high-resolution benchmark specifically focused on building changes: the visible-near-infrared heterogeneous change detection (VisNIR-HCD) dataset. It presents unique scientific challenges arising from deceptive visual similarity and non-linear spectral inversions, providing a robust platform for evaluating model generalization. Extensive experiments on VisNIR-HCD and public datasets demonstrate that ASFR-Net achieves state-of-the-art (SOTA) performance, significantly outperforming existing methods. The source code and the VisNIR-HCD dataset are publicly available at https://github.com/LuoYang2024/ASFR-Net.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/16/2607.08076v1-ldfe-laplacian-decoupled-feature-enhancement-block-for-dual-stream-cnn-based-rgb-ir-object-detection",
+      "section": "quick",
+      "title_en": "LDFE: Laplacian Decoupled Feature Enhancement Block for Dual-Stream CNN-based RGB-IR Object Detection",
+      "authors": "Wenhao Dong, Xiaoyan Luo, Linlin Yang, Haodong Zhu, Xiaorong Shi, Guodong Guo, Baochang Zhang",
+      "date": "2026-07-09",
+      "pdf": "https://arxiv.org/pdf/2607.08076v1",
+      "score": "6.0",
+      "evidence": "提出双流多模态特征融合方法，可迁移至高光谱与LiDAR融合",
+      "tldr": "针对RGB-IR双模态目标检测中特征融合和噪声抑制难题，提出拉普拉斯解耦特征增强模块(LDFE)。通过拉普拉斯金字塔将特征分解为全局与局部分量，分别用全局状态空间增强模块(GS2E)和局部卷积相关增强模块(LC2E)进行去噪与融合。GS2E采用主辅模态交替注意力机制与状态空间模型捕获长程依赖，LC2E利用三维卷积提取细粒度细节。在M3FD、DroneVehicle等六个数据集上mAP超越现有方法2.0%-6.2%，显著提升极端环境下检测性能。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "The complementary information between RGB and IR images can significantly enhance object detection performance under extreme conditions. Existing methods prefer dual-stream CNN backbones built upon YOLO for feature extraction and focus on the design of feature fusion. In this paper, we introduce the Laplacian Decoupled Feature Enhancement block (LDFE) to fuse features from different stages of the dual-stream CNN backbone. By design, LDFE simultaneously considers the characteristics of modalities and structures for feature fusion by employing global-local decomposition, denoising, fusion, and reconstruction, sequentially. The LDFE first separates features into global and local components based on Laplacian Pyramid, and then performs denoising and fusion based on Global State Space Enhancement module (GS2E) and Local Convolutional Correlation Enhancement module (LC2E) separately. Specifically, the GS2E conducts a two-branch architecture for the main and auxiliary modalities. It dynamically suppresses noise in the main modality through cross-modal attention derived from the auxiliary modality, while employing a State Space Model to capture long-range dependencies within the global feature representations of the main modality. To obtain bidirectional interaction, the two modalities systematically alternate their main/auxiliary roles. Moreover, the LC2E suppresses noise in local features and leverages spatial and channel dimension along with triple convolution to extract fine-grained details for fusion. These innovative designs achieve a significant performance improvement, with mAP surpassing the SOTA methods 6.2%, 3.7%, 4.7%, 2.3%, 4.1% and 2.0% on M3FD, DroneVehicle, LLVIP, FLIR-Aligned, KAIST and VEDAI datasets,respectively.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/16/2607.11366v1-self-supervised-training-for-high-resolution-close-range-multispectral-remote-sensing-imagery",
+      "section": "quick",
+      "title_en": "Self-supervised training for high-resolution close-range multispectral remote sensing imagery",
+      "authors": "Leon-Friedrich Thomas, Mikael Änäkkälä, Antti Lajunen",
+      "date": "2026-07-13",
+      "pdf": "https://arxiv.org/pdf/2607.11366v1",
+      "score": "6.0",
+      "evidence": "多光谱遥感自监督预训练方法，可迁移至高光谱分类",
+      "tldr": "自监督学习（SSL）在精细农业的高分辨率多光谱无人机图像中应用不足。本研究使用MoCo-v3和MAE预训练Swin Transformer等模型，在融合msuav500K及芬兰农田数据的四光谱波段上预训练。在WeedMap的作物杂草分割任务中，Swin Transformer+MoCo-v3超越同类方法，并展现跨传感器与跨区域泛化能力。此外，公开了芬兰多年度无人机数据集以支持后续研究。",
+      "tags": "query:hsi",
+      "abstract_en": "Although self-supervised learning (SSL) offers a promising way to reduce annotation effort in close-range remote sensing, its effectiveness for high-resolution multispectral unmanned aerial vehicle (UAV) imagery remains underexplored due to limited data. This study evaluated SSL pretraining for precision agriculture using cm-scale multispectral drone imagery collected across multiple sensors, years, and regions. Transformer-based encoders were pretrained with Momentum Contrast v3 (MoCo-v3) and Masked Autoencoders on a harmonized dataset combining msuav500K with newly collected multi-year UAV imagery from agricultural fields in Finland. Pretraining used four spectral bands (Green, Red, Red-Edge, Near-Infrared) for cross-sensor compatibility. The models were evaluated on crop-weed semantic segmentation using the WeedMap dataset with 5--100% training data. The following two subsets served as downstream tasks: Task A (Germany, RedEdge-M), where all pretrained models were compared under partial and full fine-tuning, and Task B (Switzerland, Sequoia), where the best encoder from Task A was assessed. Our Swin Transformer pretrained with MoCo-v3 achieved the strongest performance on both tasks, surpassing the Swin Transformer model of Doornbos et al. pretrained on a pre-release of msuav500K. Our pretrained Swin Transformer further demonstrated cross-sensor and cross-region generalization. We additionally provide a public multi-year multispectral UAV dataset from Finland to support future research.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
