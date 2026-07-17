@@ -1,0 +1,176 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-17T21:26:39.244305+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 2,
+    "deep_cap": 7,
+    "deep_selected": 2,
+    "quick_candidates": 2,
+    "quick_skim_target": 12,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.15128v1",
+      "source": "arxiv",
+      "title": "DAPGNet: Dynamic Adaptive Physics-Guided Graph Diffusion Network for Hyperspectral Image Classification",
+      "abstract": "Hyperspectral image (HSI) classification requires reliable pixel-relation modeling under spectral variability, mixed pixels, and heterogeneous boundaries. Existing graph-based HSI classifiers usually construct graph topology from spatial proximity, superpixel connectivity, or learned feature affinity. However, the spectral physical prior carried by contiguous bands has limited influence on topology estimation and message propagation. This paper presents DAPGNet, a dynamic adaptive physics-guided graph diffusion network that injects a structure-constrained physical prior into relation-level graph learning. DAPGNet first encodes contiguous spectral responses into node-wise multiscale physical-prior representations. A two-stage graph constructor then combines spectral-spatial affinity, physical-prior consistency, and spatial distance to form a physical-prior-aware sparse topology. During graph diffusion, learned edge weights are transformed into additive attention biases, while a physical gate performs node-wise and feature-wise interpolation between graph-aggregated features and projected physical-prior features. Cross-scale fusion integrates node states from different diffusion depths, and the network is optimized with main classification, auxiliary supervision, and second-order spectral smoothness regularization. Experiments on Indian Pines, WHU-Hi-LongKou, Houston2013, and Houston2018 show that DAPGNet achieves the best OA, AA, and Kappa among representative CNN-, Transformer-, Mamba-, and graph-based baselines. It improves AA over the strongest competing method by 3.64 to 7.31 percentage points across the four datasets. Ablation and sensitivity analyses further support the complementary effects of physical-prior extraction, prior-aware topology construction, physics-gated propagation, and spectral smoothness regularization.",
+      "authors": [
+        "Pengkun Wang",
+        "Weijia Cao",
+        "Ning Wang",
+        "Xiaofei Yang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-16T15:37:32+00:00",
+      "link": "https://arxiv.org/pdf/2607.15128v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hyperspectral image classification using graph diffusion with physical prior",
+      "llm_evidence_cn": "基于物理先验的图扩散高光谱图像分类",
+      "llm_evidence": "基于物理先验的图扩散高光谱图像分类",
+      "canonical_evidence": "基于物理先验的图扩散高光谱图像分类",
+      "llm_tldr_en": "DAPGNet proposes a dynamic adaptive physics-guided graph diffusion network for HSI classification, injecting spectral physical priors into graph learning to improve pixel-relation modeling.",
+      "llm_tldr_cn": "高光谱图像分类面临光谱变异和混合像素等挑战，现有图模型缺乏物理先验。本文提出DAPGNet，将光谱物理先验注入图结构学习，通过动态自适应图扩散网络增强节点关系建模。在标准数据集上实验表明，该方法有效提升了分类精度，尤其是对异构边界区域。该工作展示了将物理知识融入深度学习进行高光谱分类的潜力。",
+      "llm_tldr": "高光谱图像分类面临光谱变异和混合像素等挑战，现有图模型缺乏物理先验。本文提出DAPGNet，将光谱物理先验注入图结构学习，通过动态自适应图扩散网络增强节点关系建模。在标准数据集上实验表明，该方法有效提升了分类精度，尤其是对异构边界区域。该工作展示了将物理知识融入深度学习进行高光谱分类的潜力。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.14463v1",
+      "source": "arxiv",
+      "title": "Depth-Dependent Hidden-State Collapse in Dynamical System Autoencoders for LiDAR Point-Cloud Classification",
+      "abstract": "We study Dynamical System Autoencoders (DSAE) for LiDAR point-cloud classification using spatial coordinates and Product Coefficient feature augmentations. The experiments compare separately trained DSAE architectures at encoder depths $K=1,\\ldots,5$ and evaluate the resulting hidden representations with Random Forest, kNN, and a majority-class Dummy baseline. The main finding is a hidden-state collapse at $K=5$. For both xyz and xyz plus Product Coefficient inputs, the hidden-state standard deviation falls to the order of $10^{-5}$, while all three classifiers attain the same macro F1 score of $0.224688$. We prove that between-class hidden scatter is bounded by total hidden scatter, which in turn is controlled by the reported hidden-state variance. Thus a nearly constant hidden representation cannot retain substantial class-separating structure. Product Coefficients neither improve pre-collapse macro F1 nor prevent the $K=5$ collapse in the present DSAE setting. These results identify large-depth representation collapse as a concrete failure mode for DSAE LiDAR classification.",
+      "authors": [
+        "Patricia Medina",
+        "Hy P. G. Lam"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV"
+      ],
+      "published": "2026-07-16T01:20:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.14463v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LiDAR point-cloud classification",
+      "llm_evidence_cn": "激光雷达点云分类",
+      "llm_evidence": "激光雷达点云分类",
+      "canonical_evidence": "激光雷达点云分类",
+      "llm_tldr_en": "Studies Dynamical System Autoencoders for LiDAR point-cloud classification; finds hidden-state collapse at depth 5 leading to poor performance.",
+      "llm_tldr_cn": "该论文研究了用于激光雷达点云分类的动态系统自编码器，发现当编码器深度达到5时会出现隐状态坍缩，导致分类性能急剧下降。作者通过理论分析证明了类间散度受限于总散度，但实验表明所有分类器在深度5时取得相同的低F1分数，揭示了深层编码器在LiDAR点云数据上的局限性。这项工作为LiDAR点云分类中的架构选择提供了重要警示。",
+      "llm_tldr": "该论文研究了用于激光雷达点云分类的动态系统自编码器，发现当编码器深度达到5时会出现隐状态坍缩，导致分类性能急剧下降。作者通过理论分析证明了类间散度受限于总散度，但实验表明所有分类器在深度5时取得相同的低F1分数，揭示了深层编码器在LiDAR点云数据上的局限性。这项工作为LiDAR点云分类中的架构选择提供了重要警示。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.12372v1",
+      "source": "arxiv",
+      "title": "UMSS: Towards Unsupervised Multi-modal Semantic Segmentation",
+      "abstract": "Multimodal semantic segmentation (MSS) is essential for robust perception in complex environments, yet its potential remains largely untapped because of the prohibitive cost of human annotations. While unsupervised semantic segmentation (USS) has achieved strong results on a single RGB modality, its naive extension to multimodal data is often hindered by fusion degradation. This occurs because, without explicit supervision, existing frameworks struggle to reconcile the heterogeneous structural patterns captured by different sensors and therefore fail to effectively exploit their complementary information. In this paper, we make the first attempt to address the novel problem of Unsupervised Multimodal Semantic Segmentation (UMSS), aiming to effectively exploit complementary sensor information in a fully label free setting. To this end, we propose UniM2 (Unified Multimodal), a novel framework built on DINOv3 that transforms conventional fusion methods into consistent performance gains. Our key idea is to learn a unified latent space driven by Cross Modal Correspondence Synergy (CMCS) to extract intrinsic shared semantic cues, bypassing the need for label guided adaptive fusion. To mitigate inherent intermodal conflicts, we introduce a Cross Modal Harmonizer (CMH) that designates RGB as a stable reference, effectively suppressing inconsistent relational supervision while guiding the model to exploit complementary structural features. Extensive experimental results on NYU Depth v2 and MFNet show that UniM2 improves mIoU by 6.4% and 9.8%, respectively, demonstrating clear advantages over existing frameworks for UMSS.",
+      "authors": [
+        "Haitian Zhang",
+        "Thai Duy Nguyen",
+        "Xiangyuan Wang",
+        "Mohan Liu",
+        "Lin Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-14T05:44:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.12372v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "addresses unsupervised multi-modal semantic segmentation enabling fusion of heterogeneous sensor data",
+      "llm_evidence_cn": "解决无监督多模态语义分割问题，有利于异构传感器数据融合",
+      "llm_evidence": "解决无监督多模态语义分割问题，有利于异构传感器数据融合",
+      "canonical_evidence": "解决无监督多模态语义分割问题，有利于异构传感器数据融合",
+      "llm_tldr_en": "First attempt at Unsupervised Multimodal Semantic Segmentation (UMSS) to exploit complementary information from multiple modalities without annotations, tackling fusion degradation via novel framework.",
+      "llm_tldr_cn": "多模态语义分割依赖昂贵标注，而无监督方法在单模态上成功但多模态下融合退化严重。本文首次提出无监督多模态语义分割问题（UMSS），设计框架有效利用异构传感器数据的互补信息。通过解决融合退化问题，在多个多模态数据集上取得令人鼓舞的结果。这项工作为遥感中无监督多模态分类提供了新思路。",
+      "llm_tldr": "多模态语义分割依赖昂贵标注，而无监督方法在单模态上成功但多模态下融合退化严重。本文首次提出无监督多模态语义分割问题（UMSS），设计框架有效利用异构传感器数据的互补信息。通过解决融合退化问题，在多个多模态数据集上取得令人鼓舞的结果。这项工作为遥感中无监督多模态分类提供了新思路。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.08198v1",
+      "source": "arxiv",
+      "title": "Unpaired Joint Distribution Modeling via Multi-Scale Image Representations",
+      "abstract": "This paper studies the problem of learning a joint distribution from marginal observations, which is inherently ill-posed due to the ambiguity of feasible couplings. We propose LUD-MSR, a latent-variable probabilistic framework that models the joint distribution via auxiliary representations and optimizes evidence lower bounds using only marginal data. Under mild assumptions, we establish an upper bound on the distribution approximation error. This analysis reveals a trade-off in representation learning between domain consistency and information preservation. To address this trade-off, we introduce a Multi-Scale image Representation (MSR) mapping that exploits structural similarity at coarse scales while suppressing domain-specific variations. We show that MSR achieves a more favorable balance of this trade-off compared to existing approaches. Experiments on real-world denoising benchmarks, including cryo-electron microscopy (cryo-EM), demonstrate the effectiveness of the proposed framework.",
+      "authors": [
+        "Yihang Zou",
+        "Hui Zhang",
+        "Zuowei Shen",
+        "Chenglong Bao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-09T07:54:45+00:00",
+      "link": "https://arxiv.org/pdf/2607.08198v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "learns joint distribution from multi-scale representations applicable to multimodal remote sensing",
+      "llm_evidence_cn": "学习多尺度表示的联合分布，可应用于多模态遥感图像分类",
+      "llm_evidence": "学习多尺度表示的联合分布，可应用于多模态遥感图像分类",
+      "canonical_evidence": "学习多尺度表示的联合分布，可应用于多模态遥感图像分类",
+      "llm_tldr_en": "Proposes LUD-MSR, a latent-variable probabilistic framework that models joint distribution from marginal observations via multi-scale representations, enabling multi-domain alignment with theoretical guarantees.",
+      "llm_tldr_cn": "针对多模态数据配准中缺少配对样本的问题，提出了一种基于潜变量概率框架的联合分布建模方法LUD-MSR。通过引入多尺度图像表示，该方法在保留结构相似性的同时抑制域特异变化，仅利用边缘数据优化证据下界。理论分析表明分布逼近误差可控，实验证明了其在域对齐任务中的有效性。这项工作为无配对多模态数据融合提供了新视角。",
+      "llm_tldr": "针对多模态数据配准中缺少配对样本的问题，提出了一种基于潜变量概率框架的联合分布建模方法LUD-MSR。通过引入多尺度图像表示，该方法在保留结构相似性的同时抑制域特异变化，仅利用边缘数据优化证据下界。理论分析表明分布逼近误差可控，实验证明了其在域对齐任务中的有效性。这项工作为无配对多模态数据融合提供了新视角。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

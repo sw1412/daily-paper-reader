@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-17",
+  "date": "2026-07-17",
+  "generated_at": "2026-07-17T21:34:43",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/17/2607.15128v1-dapgnet-dynamic-adaptive-physics-guided-graph-diffusion-network-for-hyperspectral-image-classification",
+      "section": "deep",
+      "title_en": "DAPGNet: Dynamic Adaptive Physics-Guided Graph Diffusion Network for Hyperspectral Image Classification",
+      "authors": "Pengkun Wang, Weijia Cao, Ning Wang, Xiaofei Yang",
+      "date": "2026-07-16",
+      "pdf": "https://arxiv.org/pdf/2607.15128v1",
+      "score": "9.0",
+      "evidence": "基于物理先验的图扩散高光谱图像分类",
+      "tldr": "高光谱图像分类需要可靠的像素关系建模，现有图方法基于空间或特征相似性构建拓扑，忽略了光谱连续带的物理先验。本文提出DAPGNet，通过编码光谱响应为多尺度物理先验、两阶段构造物理先验感知拓扑、物理门控图扩散及跨尺度融合，并结合光谱平滑正则化。在Indian Pines等四个数据集上OA、AA、Kappa均最优，AA相比最强方法提升3.64-7.31个百分点。该方法有效融合物理先验，显著提升图神经网络在高光谱分类中的性能。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Hyperspectral image (HSI) classification requires reliable pixel-relation modeling under spectral variability, mixed pixels, and heterogeneous boundaries. Existing graph-based HSI classifiers usually construct graph topology from spatial proximity, superpixel connectivity, or learned feature affinity. However, the spectral physical prior carried by contiguous bands has limited influence on topology estimation and message propagation. This paper presents DAPGNet, a dynamic adaptive physics-guided graph diffusion network that injects a structure-constrained physical prior into relation-level graph learning. DAPGNet first encodes contiguous spectral responses into node-wise multiscale physical-prior representations. A two-stage graph constructor then combines spectral-spatial affinity, physical-prior consistency, and spatial distance to form a physical-prior-aware sparse topology. During graph diffusion, learned edge weights are transformed into additive attention biases, while a physical gate performs node-wise and feature-wise interpolation between graph-aggregated features and projected physical-prior features. Cross-scale fusion integrates node states from different diffusion depths, and the network is optimized with main classification, auxiliary supervision, and second-order spectral smoothness regularization. Experiments on Indian Pines, WHU-Hi-LongKou, Houston2013, and Houston2018 show that DAPGNet achieves the best OA, AA, and Kappa among representative CNN-, Transformer-, Mamba-, and graph-based baselines. It improves AA over the strongest competing method by 3.64 to 7.31 percentage points across the four datasets. Ablation and sensitivity analyses further support the complementary effects of physical-prior extraction, prior-aware topology construction, physics-gated propagation, and spectral smoothness regularization.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/17/2607.14463v1-depth-dependent-hidden-state-collapse-in-dynamical-system-autoencoders-for-lidar-point-cloud-classification",
+      "section": "deep",
+      "title_en": "Depth-Dependent Hidden-State Collapse in Dynamical System Autoencoders for LiDAR Point-Cloud Classification",
+      "authors": "Patricia Medina, Hy P. G. Lam",
+      "date": "2026-07-16",
+      "pdf": "https://arxiv.org/pdf/2607.14463v1",
+      "score": "8.0",
+      "evidence": "激光雷达点云分类",
+      "tldr": "LiDAR点云分类中，动态系统自编码器（DSAE）的编码器深度对隐藏表示质量至关重要。研究发现当深度K=5时，隐藏状态发生严重坍塌，标准差降至10^-5量级，导致所有分类器（随机森林、kNN、基线）的macro F1分数相同（0.2247）。通过理论证明，类间散度受总散度控制，而总散度又与隐状态方差相关，因此近乎常数的隐藏表示无法保留类别信息。积系数特征既未改善坍塌前的性能，也无法阻止深度5时的坍塌。该结果揭示了深度过大引发表示坍塌的关键失败模式。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "We study Dynamical System Autoencoders (DSAE) for LiDAR point-cloud classification using spatial coordinates and Product Coefficient feature augmentations. The experiments compare separately trained DSAE architectures at encoder depths $K=1,\\ldots,5$ and evaluate the resulting hidden representations with Random Forest, kNN, and a majority-class Dummy baseline. The main finding is a hidden-state collapse at $K=5$. For both xyz and xyz plus Product Coefficient inputs, the hidden-state standard deviation falls to the order of $10^{-5}$, while all three classifiers attain the same macro F1 score of $0.224688$. We prove that between-class hidden scatter is bounded by total hidden scatter, which in turn is controlled by the reported hidden-state variance. Thus a nearly constant hidden representation cannot retain substantial class-separating structure. Product Coefficients neither improve pre-collapse macro F1 nor prevent the $K=5$ collapse in the present DSAE setting. These results identify large-depth representation collapse as a concrete failure mode for DSAE LiDAR classification.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/17/2607.12372v1-umss-towards-unsupervised-multi-modal-semantic-segmentation",
+      "section": "quick",
+      "title_en": "UMSS: Towards Unsupervised Multi-modal Semantic Segmentation",
+      "authors": "Haitian Zhang, Thai Duy Nguyen, Xiangyuan Wang, Mohan Liu, Lin Wang",
+      "date": "2026-07-14",
+      "pdf": "https://arxiv.org/pdf/2607.12372v1",
+      "score": "7.0",
+      "evidence": "解决无监督多模态语义分割问题，有利于异构传感器数据融合",
+      "tldr": "多模态语义分割依赖昂贵标注，现有无监督方法在单一RGB上表现好，但扩展到多模态时遭遇融合退化，无法利用互补信息。本文首次提出无监督多模态语义分割问题，并构建UniM2框架，基于DINOv3通过跨模态对应协同学习统一潜在空间，引入跨模态协调器以RGB为参考抑制冲突。在NYU Depth v2和MFNet上mIoU分别提升6.4%和9.8%，展示了无需标签即可有效利用多模态信息的潜力。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Multimodal semantic segmentation (MSS) is essential for robust perception in complex environments, yet its potential remains largely untapped because of the prohibitive cost of human annotations. While unsupervised semantic segmentation (USS) has achieved strong results on a single RGB modality, its naive extension to multimodal data is often hindered by fusion degradation. This occurs because, without explicit supervision, existing frameworks struggle to reconcile the heterogeneous structural patterns captured by different sensors and therefore fail to effectively exploit their complementary information. In this paper, we make the first attempt to address the novel problem of Unsupervised Multimodal Semantic Segmentation (UMSS), aiming to effectively exploit complementary sensor information in a fully label free setting. To this end, we propose UniM2 (Unified Multimodal), a novel framework built on DINOv3 that transforms conventional fusion methods into consistent performance gains. Our key idea is to learn a unified latent space driven by Cross Modal Correspondence Synergy (CMCS) to extract intrinsic shared semantic cues, bypassing the need for label guided adaptive fusion. To mitigate inherent intermodal conflicts, we introduce a Cross Modal Harmonizer (CMH) that designates RGB as a stable reference, effectively suppressing inconsistent relational supervision while guiding the model to exploit complementary structural features. Extensive experimental results on NYU Depth v2 and MFNet show that UniM2 improves mIoU by 6.4% and 9.8%, respectively, demonstrating clear advantages over existing frameworks for UMSS.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/17/2607.08198v1-unpaired-joint-distribution-modeling-via-multi-scale-image-representations",
+      "section": "quick",
+      "title_en": "Unpaired Joint Distribution Modeling via Multi-Scale Image Representations",
+      "authors": "Yihang Zou, Hui Zhang, Zuowei Shen, Chenglong Bao",
+      "date": "2026-07-09",
+      "pdf": "https://arxiv.org/pdf/2607.08198v1",
+      "score": "6.0",
+      "evidence": "学习多尺度表示的联合分布，可应用于多模态遥感图像分类",
+      "tldr": "从边际观测学习联合分布存在耦合不确定性，本文提出LUD-MSR潜变量概率框架，引入多尺度图像表示（MSR）以平衡领域一致性和信息保持。理论分析给出近似误差上界，揭示表示学习的权衡。实验在cryo-EM去噪等基准上验证有效性，表明MSR比现有方法更优。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "This paper studies the problem of learning a joint distribution from marginal observations, which is inherently ill-posed due to the ambiguity of feasible couplings. We propose LUD-MSR, a latent-variable probabilistic framework that models the joint distribution via auxiliary representations and optimizes evidence lower bounds using only marginal data. Under mild assumptions, we establish an upper bound on the distribution approximation error. This analysis reveals a trade-off in representation learning between domain consistency and information preservation. To address this trade-off, we introduce a Multi-Scale image Representation (MSR) mapping that exploits structural similarity at coarse scales while suppressing domain-specific variations. We show that MSR achieves a more favorable balance of this trade-off compared to existing approaches. Experiments on real-world denoising benchmarks, including cryo-electron microscopy (cryo-EM), demonstrate the effectiveness of the proposed framework.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

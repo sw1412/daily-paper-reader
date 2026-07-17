@@ -6,30 +6,32 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-16
-- 运行时间：2026-07-16 21:27:36 UTC
+- 最新运行日期：2026-07-17
+- 运行时间：2026-07-17 21:34:36 UTC
 - 运行状态：成功
-- 本次总论文数：3
-- 精读区：0
-- 速读区：3
+- 本次总论文数：4
+- 精读区：2
+- 速读区：2
 
 ### 今日简报（AI）
-今日速读3篇遥感与多模态检测论文，均获6分。重点推荐《ASFR-Net》的异构遥感变化检测和《LDFE》的RGB-IR目标检测方法。建议关注自监督训练在高分辨率多光谱遥感中的潜力，可减少标注成本。
-- 详情：[/202607/16/README](/202607/16/README)
+今日精读2篇高分论文（DAPGNet高光谱分类9.0分、点云分类8.0分），速读2篇语义分割与图像表示论文。最值得关注方向：动态自适应物理引导图网络用于高光谱图像分类，以及深度依赖隐状态坍塌对点云分类的影响。建议优先阅读DAPGNet，了解物理先验如何提升遥感分类性能。
+- 详情：[/202607/17/README](/202607/17/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [DAPGNet: Dynamic Adaptive Physics-Guided Graph Diffusion Network for Hyperspectral Image Classification](/202607/17/2607.15128v1-dapgnet-dynamic-adaptive-physics-guided-graph-diffusion-network-for-hyperspectral-image-classification)  
+   标签：评分：9.0/10、query:hsi-lidar
+   evidence：基于物理先验的图扩散高光谱图像分类
+2. [Depth-Dependent Hidden-State Collapse in Dynamical System Autoencoders for LiDAR Point-Cloud Classification](/202607/17/2607.14463v1-depth-dependent-hidden-state-collapse-in-dynamical-system-autoencoders-for-lidar-point-cloud-classification)  
+   标签：评分：8.0/10、query:hsi-lidar
+   evidence：激光雷达点云分类
 
 ### 速读区论文标签
-1. [ASFR-Net: Adversarial Alignment and Spatio-Frequency Refinement Network for Heterogeneous Remote Sensing Image Change Detection](/202607/16/2607.07161v1-asfr-net-adversarial-alignment-and-spatio-frequency-refinement-network-for-heterogeneous-remote-sensing-image-change-detection)  
+1. [UMSS: Towards Unsupervised Multi-modal Semantic Segmentation](/202607/17/2607.12372v1-umss-towards-unsupervised-multi-modal-semantic-segmentation)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：解决无监督多模态语义分割问题，有利于异构传感器数据融合
+2. [Unpaired Joint Distribution Modeling via Multi-Scale Image Representations](/202607/17/2607.08198v1-unpaired-joint-distribution-modeling-via-multi-scale-image-representations)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：多模态遥感图像变化检测的对抗对齐方法
-2. [LDFE: Laplacian Decoupled Feature Enhancement Block for Dual-Stream CNN-based RGB-IR Object Detection](/202607/16/2607.08076v1-ldfe-laplacian-decoupled-feature-enhancement-block-for-dual-stream-cnn-based-rgb-ir-object-detection)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：提出双流多模态特征融合方法，可迁移至高光谱与LiDAR融合
-3. [Self-supervised training for high-resolution close-range multispectral remote sensing imagery](/202607/16/2607.11366v1-self-supervised-training-for-high-resolution-close-range-multispectral-remote-sensing-imagery)  
-   标签：评分：6.0/10、query:hsi
-   evidence：多光谱遥感自监督预训练方法，可迁移至高光谱分类
+   evidence：学习多尺度表示的联合分布，可应用于多模态遥感图像分类
 
 
 <div class="dpr-home-promo-card">

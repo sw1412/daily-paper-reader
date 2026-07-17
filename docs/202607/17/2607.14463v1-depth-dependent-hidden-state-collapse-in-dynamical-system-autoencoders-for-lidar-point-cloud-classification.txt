@@ -1,0 +1,723 @@
+Title: Depth-Dependent Hidden-State Collapse in Dynamical System Autoencoders for LiDAR Point-Cloud Classification
+
+URL Source: https://arxiv.org/pdf/2607.14463v1
+
+Published Time: Fri, 17 Jul 2026 00:25:41 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+# Depth-Dependent Hidden-State Collapse in Dynamical System Autoencoders for LiDAR Point-Cloud Classification 
+
+Patricia Medina 
+
+Department of Mathematics New York City College of Technology, CUNY Brooklyn, NY, USA and The Graduate Center, CUNY New York, NY, USA Email: Patricia.Medina36@citytech.cuny.edu 
+
+Hy P. G. Lam 
+
+Department of Mathematical Sciences Worcester Polytechnic Institute Worcester, MA, USA Email: hlam@wpi.edu 
+
+Abstract —We study Dynamical System Autoencoders (DSAE) for LiDAR point-cloud classification using spatial coordinates and Product Coefficient feature augmentations. The experiments com-pare separately trained DSAE architectures at encoder depths 
+
+K = 1 , . . . , 5 and evaluate the resulting hidden representations with Random Forest, kNN, and a majority-class Dummy baseline. The main finding is a hidden-state collapse at K = 5 . For both xyz and xyz plus Product Coefficient inputs, the hidden-state standard deviation falls to the order of 10 −5, while all three classifiers attain the same macro F1 score of 0.224688 . We prove that between-class hidden scatter is bounded by total hidden scatter, which in turn is controlled by the reported hidden-state variance. Thus a nearly constant hidden representation cannot retain substantial class-separating structure. Product Coefficients neither improve pre-collapse macro F1 nor prevent the K = 5 
+
+collapse in the present DSAE setting. These results identify large-depth representation collapse as a concrete failure mode for DSAE LiDAR classification. 
+
+I. I NTRODUCTION 
+
+LiDAR point clouds contain geometric information at sev-eral scales, but their dimensionality makes learned repre-sentations important for classification. Autoencoders provide nonlinear latent representations, while Product Coefficients provide geometric feature augmentations developed in earlier LiDAR work [1]. LiDAR point clouds provide dense three-dimensional repre-sentations of natural and built environments. Although mod-ern LiDAR acquisitions typically include attributes such as intensity, return number, scan angle, and GPS time, this work focuses exclusively on the spatial coordinates (x, y, z ), making learned geometric representations particularly important for classification. In this paper, we study Dynamical System Autoencoders (DSAE) in this setting. A DSAE repeatedly applies a learned transformation before extracting the hidden representation used by a downstream classifier. The number of encoder iterations K is therefore a meaningful architectural parameter. Our experiments reveal a sharp depth-dependent failure. Models trained with K = 1 , . . . , 4 retain strong classification performance. At K = 5 , however, the hidden representation becomes nearly constant. The collapse occurs for both xyz and xyz plus Product Coefficient inputs. At the same depth, Random Forest, kNN, and a majority-class Dummy classifier all attain the same macro F1 score. We give a mathematical explanation of this behavior. Total hidden scatter decomposes into between-class and within-class scatter. Hence, when total hidden scatter approaches zero, between-class scatter must also approach zero. A nearly constant hidden representation therefore cannot preserve sub-stantial class separation. The paper makes three contributions. First, it evaluates DSAE depth across two LiDAR feature settings and two standard downstream classifiers. Second, it identifies a large-depth hidden-state collapse that persists across feature settings and random seeds. Third, it proves that the observed hidden variance bounds the class-separating scatter available to any downstream classifier. II. R ELATED WORK 
+
+Dimensionality reduction and representation learning meth-ods have become increasingly important in LiDAR point cloud classification due to the high dimensionality and geometric complexity of 3D spatial data. Classical approaches such as Principal Component Analysis (PCA), kernel approximations, and autoencoder-based latent representations have been widely studied for feature extraction and downstream classification tasks. Product Coefficients originate from a dyadic measure rep-resentation framework developed in harmonic analysis and subsequently extended to multiscale representations for gen-eral dyadic data structures [2]–[4]. More recently, they have been applied as geometric descriptors for LiDAR point cloud arXiv:2607.14463v1 [cs.LG] 16 Jul 2026 classification [1], [5]. That study demonstrated that incorpo-rating Product Coefficients alongside dimensionality reduction pipelines could improve classification accuracy relative to stan-dard feature configurations. The framework also highlighted the potential role of hierarchical geometric descriptors in learning latent representations for point cloud data. More recently, Dynamical System Autoencoders (DSAE) were introduced in [6] as an iterative latent representation framework motivated by dynamical systems formulations of autoencoder architectures. Unlike standard autoencoders, DSAE models apply iterative encoder compositions that may induce nontrivial latent geometric behavior across multiple iterations. In this paper, we connect these two directions by investi-gating how iterative DSAE latent representations behave in LiDAR classification settings both with and without Product Coefficient feature augmentations. In particular, we study how encoder iteration depth influences downstream classification performance under different classifiers and latent feature con-figurations. A continuation of this direction was further developed in [1], where Product Coefficients were investigated within expanded LiDAR classification pipelines and additional latent representation settings. That work explored how Product Co-efficients interact with dimensionality reduction methods and downstream classifiers in more complex experimental config-urations, further supporting their role as meaningful geometric descriptors for 3D point cloud data. The present paper extends these investigations into the setting of Dynamical System Autoencoders (DSAE), where the focus shifts from static latent reductions to iterative latent dynamical behavior across encoder compositions. Random Forest constructs ensembles of decision trees from coordinate-based partitions of the feature space [7], while kNN predicts from local neighborhoods [8]. We use these classifiers as distinct probes of the learned hidden representation. Their convergence to the majority-class Dummy baseline at K = 5 
+
+indicates that the failure occurs in the representation rather than in one particular classification rule. III. M ETHODOLOGY 
+
+A. Classical Autoencoders 
+
+An autoencoder is a neural network architecture designed to learn a lower-dimensional representation of input data by re-constructing the input from a compressed latent representation. Given data points x ∈ Rn, a classical autoencoder consists of two main maps: an encoder 
+
+E : Rn → Rm,
+
+where typically m < n , and a decoder 
+
+D : Rm → Rn.
+
+The encoder maps the input data to a latent variable 
+
+z = E(x),
+
+while the decoder attempts to reconstruct the original input through 
+
+ˆx = D(z) = D(E(x)) .
+
+The encoder and decoder are trained by minimizing areconstruction loss over a training data set {xi}Ni=1 . A common choice is the mean squared error loss 
+
+LMSE = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+∥xi − D(E(xi)) ∥22 .
+
+In this framework, the latent representation z is expected to retain the most relevant information needed to reconstruct the input. Autoencoders are therefore commonly used for nonlin-ear dimensionality reduction, feature learning, denoising, and visualization. In the context of this work, classical autoencoders provide a baseline method for reducing the dimension of feature vectors derived from 3D point cloud data. The learned latent variables can then be used as inputs for downstream classification tasks, allowing comparison with more structured approaches such as Dynamical System Autoencoders. 
+
+B. Dynamical System Autoencoders 
+
+Dynamical System Autoencoders, introduced by He et al. [6], extend classical autoencoders by repeatedly applying a learned transformation. In the implementation used here, the repeated map acts on an extended state. For an input feature vector xi ∈ Rd, let h(k) 
+
+> i
+
+∈ Rr denote the hidden state after iteration k. We write 
+
+u(k) 
+
+> i
+
+=
+
+
+
+x(k) 
+
+> i
+
+, h (k)
+
+> i
+
+
+
+∈ Rd+r .
+
+The initial state is 
+
+u(0)  
+
+> i
+
+= ( xi, 0) ,
+
+and the learned DSAE step is 
+
+Fθ : Rd+r −→ Rd+r .
+
+The iteration is 
+
+u(k+1)  
+
+> i
+
+= Fθ
+
+
+
+u(k)
+
+> i
+
+
+
+.
+
+After K iterations, 
+
+u(K) 
+
+> i
+
+= F Kθ
+
+
+
+u(0) 
+
+> i
+
+
+
+=
+
+bx(K) 
+
+> i
+
+, h (K)
+
+> i
+
+
+
+.
+
+The reconstruction loss is 
+
+LMSE = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+xi − bx(K)
+
+> i
+> 22
+
+,
+
+and the downstream classifiers are trained on h(K) 
+
+> i
+
+.Each point on a depth curve in this paper comes from a separately trained DSAE architecture. The curves therefore de-scribe an architecture-depth comparison. They do not represent intermediate states of one fixed learned map. The iterative structure of DSAEs naturally introduces a dy-namical systems perspective into latent representation learning. In this work, we investigate how repeated latent compositions influence LiDAR-derived feature representations, including both spatial coordinates and Product Coefficient augmenta-tions. C. Hidden-state scatter under DSAE depth 
+
+Let 
+
+h(K) 
+
+> i
+
+∈ Rr
+
+be the hidden representation of sample i, and let yi be its class label. For each class c, define 
+
+Cc = {i : yi = c}, Nc = |Cc|.
+
+The global hidden mean is 
+
+¯h(K) = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+h(K) 
+
+> i
+
+,
+
+and the class mean is 
+
+¯h(K) 
+
+> c
+
+= 1
+
+Nc
+
+X
+
+> i∈Cc
+
+h(K) 
+
+> i
+
+.
+
+Define the total hidden scatter 
+
+TK = 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+h(K) 
+
+> i
+
+− ¯h(K) 2
+
+,
+
+the between-class scatter 
+
+BK = X
+
+> c
+
+Nc
+
+N ¯h(K) 
+
+> c
+
+− ¯h(K) 2
+
+,
+
+and the within-class scatter 
+
+WK = 1
+
+N
+
+X
+
+> c
+
+X
+
+> i∈Cc
+
+h(K) 
+
+> i
+
+− ¯h(K)
+
+> c
+> 2
+
+.
+
+The scalar statistics reported in the experiments are 
+
+μK = 1
+
+N r 
+
+> N
+
+X
+
+> i=1
+> r
+
+X
+
+> j=1
+
+h(K)
+
+> ij
+
+and 
+
+σ2 
+
+> K
+
+= 1
+
+N r 
+
+> N
+
+X
+
+> i=1
+> r
+
+X
+
+> j=1
+
+
+
+h(K) 
+
+> ij
+
+− μK
+
+2
+
+.
+
+We report Hmean = μK , Hstd = σK .
+
+Proposition 1. For every depth K,
+
+0 ≤ BK ≤ TK ≤ rσ 2 
+
+> K
+
+.
+
+Proof. For i ∈ Cc,
+
+h(K) 
+
+> i
+
+− ¯h(K) =
+
+
+
+h(K) 
+
+> i
+
+− ¯h(K)
+
+> c
+
+
+
++
+
+¯h(K) 
+
+> c
+
+− ¯h(K)
+
+.
+
+The cross term vanishes after summation over Cc, since 
+
+X
+
+> i∈Cc
+
+
+
+h(K) 
+
+> i
+
+− ¯h(K)
+
+> c
+
+
+
+= 0 .
+
+Summing over classes gives 
+
+TK = BK + WK .
+
+Since WK ≥ 0,
+
+0 ≤ BK ≤ TK .
+
+Let 1r ∈ Rr denote the vector whose entries are all equal to 
+
+1. Since 
+
+h(K) 
+
+> i
+
+− μK 1r =
+
+
+
+h(K) 
+
+> i
+
+− ¯h(K)
+
++
+
+¯h(K) − μK 1r
+
+
+
+,
+
+we obtain 
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+h(K) 
+
+> i
+
+− μK 1r
+
+> 2
+
+= 1
+
+N
+
+> N
+
+X
+
+> i=1
+
+h(K) 
+
+> i
+
+− ¯h(K) 2
+
++ 2 
+
+*
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+
+
+h(K) 
+
+> i
+
+− ¯h(K)
+
+, ¯h(K) − μK 1r
+
++
+
++ ¯h(K) − μK 1r
+
+> 2
+
+.
+
+The middle term vanishes because 
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+
+
+h(K) 
+
+> i
+
+− ¯h(K)
+
+= 0 .
+
+Hence 
+
+1
+
+N
+
+> N
+
+X
+
+> i=1
+
+h(K) 
+
+> i
+
+− μK 1r
+
+> 2
+
+= TK + ¯h(K) − μK 1r
+
+> 2
+
+.
+
+By the definition of σ2 
+
+> K
+
+,
+
+σ2 
+
+> K
+
+= 1
+
+N r 
+
+> N
+
+X
+
+> i=1
+
+h(K) 
+
+> i
+
+− μK 1r
+
+> 2
+
+.
+
+Therefore 
+
+rσ 2 
+
+> K
+
+= TK + ¯h(K) − μK 1r
+
+> 2
+
+,
+
+and in particular 
+
+TK ≤ rσ 2 
+
+> K
+
+.
+
+If σK = 0 , then 
+
+h(K) 
+
+> i
+
+= μK 1r
+
+for every sample i. Hence any deterministic classifier whose input is only the hidden representation must assign the same label to every sample. At K = 5, the representation is nearly, rather than exactly, collapsed. The agreement of the Random Forest and kNN macro F1 scores with the majority-class Dummy baseline is therefore consistent with the exact collapse limit and provides empirical evidence that neither classifier extracts class-separating information from the hidden representation beyond the majority-class baseline. IV. E XPERIMENTAL RESULTS 
+
+A. Experimental Setup 
+
+We evaluate Dynamical System Autoencoders (DSAE) on LiDAR point cloud classification tasks using spatial coordi-nates (x, y, z ) and Product Coefficient feature augmentations. The experiments are conducted on a terrestrial LiDAR scan of a forest tree collected in Washington State (Fig. 1). The dataset was collected by Dr. Jonathan Batchelor while he was a member of the Remote Sensing and Geospatial Analysis 20 
+
+> 15
+> 10
+> 5
+> 0
+> 5
+> X
+> 15
+> 10
+> 5
+> 0
+> 5
+> 10
+> Y
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> Z
+
+Fig. 1. Terrestrial LiDAR point cloud of a forest scene collected in Washing-ton State. The point cloud contains 798,452 labeled points belonging to three semantic classes: ground, trunk/branches, and canopy, shown in gray, brown, and green, respectively. The dataset was collected by Dr. Jonathan Batchelor while a member of the Remote Sensing and Geospatial Analysis Laboratory (RSGAL) under the direction of Dr. L. Monika Moskal at the University of Washington. Although the original LiDAR data include additional attributes such as intensity, return number, scan angle, GPS time, and RGB values, only the spatial coordinates (x, y, z ) are used in the experiments. 
+
+Laboratory (RSGAL) under the direction of Dr. L. Monika Moskal at the University of Washington. The point cloud contains 798,452 labeled points belonging to three semantic classes: ground, trunk/branches, and canopy. Although the original LiDAR data include additional attributes such as intensity, return number, scan angle, GPS time, and RGB val-ues, this study intentionally uses only the spatial coordinates 
+
+(x, y, z ) in order to isolate the behavior of the learned latent representations and the effect of Product Coefficient feature augmentations. Each depth K ∈ { 1, 2, 3, 4, 5} was trained as a separate DSAE model from initialization. All runs used the same 80/20 stratified train-test split, with 638,761 training samples, 159,691 test samples, and 3 classes. Feature scaling was fitted on the training split and then applied unchanged to the test split. All DSAE models were trained for 25 epochs using the Adam optimizer with a learning rate of 10 −3 and a batch size of 256 . The hidden layer dimension was set to 3 for the XYZ feature representation and 10 for the combined XYZ + Product Coefficients (PCs) representation. Random Forest used 100 trees with the remaining hyper-parameters set to the scikit-learn defaults. The kNN classifier used k = 5 with the Euclidean distance metric (metric=’minkowski’ with p = 2 ) and uniform weight-ing. The Dummy baseline used the most-frequent training 1 2 3 4 5
+
+> Number of encoder iterations (K)
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> 0.9
+> 1.0
+> Macro F1 score
+> Effect of DSAE Encoder Iterations on Classification Performance
+> XYZ + RF
+> XYZ + KNN
+> XYZ + PCs + RF
+> XYZ + PCs + KNN
+> Collapse (K=5)
+
+Fig. 2. Macro F1 as a function of DSAE encoder depth for xyz and xyz plus Product Coefficient inputs. Models at each depth were trained separately. Performance remains high through K = 4 , while all feature-classifier configurations collapse to the majority-class Dummy baseline at 
+
+K = 5 .
+
+class. Macro F1 was computed on the same test split for every classifier. Hidden-state statistics were computed from the same test hidden representations used for downstream evaluation. We use the population standard deviation after flattening the hidden matrix, so Hmean = μK and Hstd = σK , with μK
+
+and σK defined in Section III-C. The experiments investigate how encoder iteration depth influences downstream classification performance. We evaluate the latent representations using both Random Forest (RF) and k-Nearest Neighbor (kNN) classifiers. Classification perfor-mance is measured using the macro F1 score. We consider multiple encoder iteration depths and hidden dimensions to study the stability of iterative latent representa-tions under different geometric feature settings. 
+
+B. Depth-Dependent Classification Performance 
+
+Figure 2 shows macro F1 across encoder depths and feature settings. For K = 1 , . . . , 4, the learned representations retain strong classification performance. At K = 5 , every configura-tion collapses to macro F1 0.224688 .Because each depth was trained as a separate DSAE model, this is an architecture-depth result rather than a trajectory result for one fixed learned map. The sharp transition at K = 5 
+
+shows that increasing DSAE depth can change the learned representation qualitatively rather than merely reducing clas-sification accuracy gradually. 
+
+C. K = 5 Hidden-State Collapse 
+
+To test whether the large-depth degradation is caused by col-lapse of the learned representation, we computed the hidden-state statistics and macro F1 scores at K = 5 . The results are shown in Table I. In both feature settings, the hidden-state standard deviation is on the order of 10 −5. At the same depth, Random Forest, kNN, and the majority-class Dummy classifier all attain macro F1 0.224688 .TABLE I HIDDEN -STATE COLLAPSE AT K = 5 . F OR BOTH FEATURE SETTINGS , THE HIDDEN -STATE STANDARD DEVIATION IS ON THE ORDER OF 10 −5 , AND ALL CLASSIFIERS ATTAIN THE MAJORITY -CLASS DUMMY MACRO F1. 
+
+Features Hmean Hstd RF macro F1 kNN macro F1 Dummy macro F1 xyz 0.999878 1.08 × 10 −5 0.224688 0.224688 0.224688 xyz + PCs 0.999752 2.95 × 10 −5 0.224688 0.224688 0.224688 
+
+This indicates that the K = 5 hidden representation is nearly constant. By Proposition 1, 
+
+B5 ≤ T5 ≤ rH 2std .
+
+Thus the between-class hidden scatter is also numerically negligible. The failure therefore occurs before classification. The downstream classifiers receive a hidden representation with essentially no usable class-separating variation. For the K = 5 latent representation, direct computation gives 
+
+T5 = 7 .74 × 10 −13 , B5 = 7 .74 × 10 −13 
+
+for xyz, and 
+
+T5 = 2 .00 × 10 −12 , B5 = 2 .00 × 10 −12 
+
+for xyz plus Product Coefficients. Both quantities are numer-ically close to zero. For the xyz K = 5 architecture, the collapse was also reproduced across five random seeds. RF macro F1 was 
+
+0.224688 for every seed, while 
+
+Hstd = (1 .33 ± 0.38) × 10 −5.
+
+The reconstruction loss varied across runs, but the collapsed hidden representation and downstream failure remained un-changed. 
+
+D. Role of Product Coefficients 
+
+Product Coefficients provide a second geometric feature setting for testing whether the collapse is specific to xyz input. In the present experiments, they do not prevent the K = 5 
+
+collapse. The xyz plus Product Coefficient representation also becomes nearly constant, and RF, kNN, and Dummy attain the same macro F1. Before collapse, Product Coefficients do not consistently improve macro F1 over xyz in this DSAE pipeline. We therefore do not claim a classification benefit from Product Coefficients in the present setting. Their role here is to show that the large-depth collapse is not confined to raw spatial coordinates. This result is specific to the current DSAE architecture and does not contradict earlier Product Coefficient gains obtained in different classification pipelines. V. D ISCUSSION 
+
+The experiments identify a depth-dependent failure of the learned representation. At K = 5 , both input feature settings produce hidden states with standard deviation on the order of 
+
+10 −5. The scatter bound 
+
+BK ≤ TK ≤ rH 2std 
+
+shows that such a representation cannot retain substantial between-class separation. The convergence of Random Forest, kNN, and Dummy macro F1 scores gives classifier-independent evidence for this interpretation. Random Forest and kNN use different decision rules, yet both attain the majority-class baseline macro F1 after the hidden representation collapses. The failure is therefore best understood as representation collapse rather than classifier failure. The present experiment does not prove why optimization produces collapse at K = 5 . It proves what the observed collapse implies for class separation, and it demonstrates that the same failure occurs across two feature settings. The depth curves also compare separately trained architectures. A fixed-map experiment evaluating intermediate states of one trained DSAE remains future work. VI. C ONCLUSION 
+
+We studied the effect of DSAE encoder depth on LiDAR point-cloud classification using xyz coordinates and Product Coefficient feature augmentations. Models trained with K =1, . . . , 4 retain strong macro F1 performance. At K = 5 , both feature settings undergo hidden-state collapse. The collapsed representations have standard deviation on the order of 10 −5, and Random Forest, kNN, and a majority-class Dummy classifier all attain macro F1 0.224688 . We proved that between-class scatter is bounded by total hidden scatter, which is itself controlled by the reported hidden-state variance. Thus the observed collapse removes the class-separating structure required for downstream classification. Product Coefficients do not prevent collapse or consistently improve pre-collapse macro F1 in the present DSAE setting. Future work will study the optimization mechanism causing collapse, fixed-map intermediate states, explicit regularization of hidden scatter, and geometry-aware reconstruction losses. ACKNOWLEDGMENTS 
+
+The authors thank Dr. Randy Paffenroth and Dr. Shiquan He of Worcester Polytechnic Institute for discussions concerning Dynamical System Autoencoders and learned latent represen-tations. The authors also thank Dr. Shiquan He for providing access to the DSAE implementation used in the experiments. REFERENCES [1] P. Medina and R. Karkare, “Integrating product coefficients for improved 3d lidar data classification (part ii),” arXiv preprint arXiv:2510.15219 ,2025, accepted for publication in the Proceedings of the International Conference on Data Management, Analytics and Innovation (ICDMAI 2026), Springer Lecture Notes in Networks and Systems (LNNS). [Online]. Available: https://arxiv.org/abs/2510.15219 [2] R. A. Fefferman, C. E. Kenig, and J. Pipher, “The theory of weights and the dirichlet problem for elliptic equations,” Annals of Mathematics , vol. 134, no. 1, pp. 65–124, 1991. [Online]. Available: https://doi.org/10.2307/2944333 [3] D. Bassu, P. W. Jones, L. Ness, and D. Shallcross, “Product formalisms for measures on spaces with binary tree structures: Representation, visualization, and multiscale noise,” 2020. [Online]. Available: https://arxiv.org/abs/1601.02946 [4] L. Ness, “Inference of a dyadic measure and its simplicial geometry from binary feature data and application to data quality,” 2017. [Online]. Available: https://arxiv.org/abs/1705.00970 [5] P. Medina, “Integrating product coefficients for improved 3d lidar data classification,” in Data Management, Analytics and Innovation ,S. Goswami, S. Saha, K. Basu, and R. S. Beed, Eds. Singapore: Springer Nature Singapore, 2026, pp. 359–372. [6] S. He, R. Paffenroth, O. Cava, and C. Dunham, “Dynamical system autoencoders,” in 2024 International Conference on Machine Learning and Applications (ICMLA) , 2024, pp. 1496–1503. [7] L. Breiman, “Random forests,” Machine Learning , vol. 45, pp. 5–32, 2001. [8] T. M. Cover and P. E. Hart, “Nearest neighbor pattern classification,” 
+
+IEEE Transactions on Information Theory , vol. 13, no. 1, pp. 21–27, 1967.
