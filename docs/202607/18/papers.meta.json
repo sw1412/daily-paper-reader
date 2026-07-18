@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-18",
+  "date": "2026-07-18",
+  "generated_at": "2026-07-18T21:18:03",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/18/2607.12959v1-vico3d-empowering-lidar-based-collaborative-3d-object-detection-with-vision-foundation-models",
+      "section": "quick",
+      "title_en": "ViCo3D: Empowering LiDAR-based Collaborative 3D Object Detection with Vision Foundation Models",
+      "authors": "Haojie Ren, Songrui Luo, Lingfeng Wang, Yan Xia, Yao Li, Jing Li, Lu Zhang, Jiajun Deng, Yanyong Zhang",
+      "date": "2026-07-14",
+      "pdf": "https://arxiv.org/pdf/2607.12959v1",
+      "score": "6.0",
+      "evidence": "基于LiDAR的协作3D目标检测",
+      "tldr": "针对现有LiDAR协作3D检测中BEV特征缺乏语义先验的问题，本文提出ViCo3D框架，将视觉基础模型DINOv2适配到协作感知。通过将点云投影为BEV图像、设计多尺度融合模块及自车中心跨代理融合，在DAIR-V2X和V2XSet上达到SOTA，协作增益提升1.8倍。工作表明VFM能有效弥合模态差距，增强协作检测性能。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "LiDAR-based collaborative 3D perception in Vehicle-to-Everything (V2X) systems typically relies on fusing bird's-eye-view (BEV) features across agents. However, current BEV representations, typically extracted by LiDAR backbones trained from scratch, are geometry-dominated and lack general semantic priors, inherently limiting the efficacy of feature-level collaboration. Meanwhile, vision foundation models (VFMs) pretrained on large-scale image data have demonstrated strong capability in learning general-purpose and informative visual representations for 2D tasks, and have the potential to enhance agent-wise LiDAR BEV representations for collaboration. Despite this potential, adapting VFMs to LiDAR-based 3D detection remains challenging due to the substantial image-point cloud modality gap. To bridge this gap, we propose ViCo3D, a collaborative 3D object detection framework powered by VFMs. Specifically, ViCo3D adapts VFMs to LiDAR-based collaborative perception from three aspects: First, ViCo3D projects point clouds onto the BEV plane as three-channel images, enabling DINOv2 to extract BEV-space visual features from LiDAR inputs. Besides, to effectively integrate these DINOv2-derived features with LiDAR geometric features, ViCo3D introduces a multi-scale BEV fusion module within the single-agent encoder. In addition, ViCo3D adopts an ego-centric cross-agent fusion strategy to aggregate complementary information from multiple agents. Experiments on DAIR-V2X and V2XSet demonstrate that ViCo3D achieves state-of-the-art 3D detection performance. Remarkably, it delivers up to 1.8x greater collaborative gains than prior methods on DAIR-V2X. The code will be made public available for future investigation.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
