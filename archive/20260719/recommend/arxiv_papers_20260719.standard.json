@@ -1,0 +1,185 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-19T21:01:02.182843+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 4,
+    "quick_skim_target": 12,
+    "quick_selected": 4
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.10120v1",
+      "source": "arxiv",
+      "title": "WeaveEarth: Structured Evidence Construction and Reasoning for Training-Free UHR Remote Sensing Understanding",
+      "abstract": "Ultra-High-Resolution (UHR) remote sensing image understanding requires Vision-Language Models (VLMs) to capture both the global scene layout and sparse yet task-critical local details under limited computational budgets. Existing methods mainly follow two paradigms. One is passive perception, which relies on resolution expansion or token compression and may therefore discard fine-grained details. The other is active perception, which depends on multi-round zooming and search, but suffers from high latency, contextual fragmentation, and error accumulation. We argue that a more effective path toward UHR understanding lies not in accessing more, but in organizing better. To this end, we propose WeaveEarth, a training-free framework that reformulates UHR understanding as a problem of structured evidence construction and reasoning under global context constraints. Specifically, WeaveEarth first employs Global-Aware Evidence Construction to select a compact, low-redundancy, and spatially complementary Minimal Support Evidence Set. It then introduces Structured Evidence Reasoning, which weaves local evidence, spatial metadata, and relative topology into a unified reasoning interface, thereby enhancing the VLM's ability to perform global-local joint reasoning. Extensive experiments show that WeaveEarth consistently outperforms strong baselines and existing UHR methods across multiple UHR remote sensing benchmarks and multiple frozen VLM backbones. Code is available at https://github.com/XianZhi-Ma/WeaveEarth.",
+      "authors": [
+        "Xianzhi Ma",
+        "Shujun Wang",
+        "Xiaohan Li",
+        "Hao Liu",
+        "Changhua Pei",
+        "Jianhui li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-11T04:56:27+00:00",
+      "link": "https://arxiv.org/pdf/2607.10120v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "training-free UHR remote sensing understanding framework applicable to multimodal classification",
+      "llm_evidence_cn": "无训练超高分遥感理解框架，可应用于多模态分类",
+      "llm_evidence": "无训练超高分遥感理解框架，可应用于多模态分类",
+      "canonical_evidence": "无训练超高分遥感理解框架，可应用于多模态分类",
+      "llm_tldr_en": "Proposes WeaveEarth, a training-free framework that organizes UHR remote sensing image patches into structured evidence for reasoning with VLMs, achieving strong understanding performance without fine-tuning.",
+      "llm_tldr_cn": "针对超高分遥感理解中计算成本高和细节丢失的问题，本文提出WeaveEarth，一种无训练框架。该框架通过将图像块组织成结构化的层次化证据，并利用预训练视觉语言模型进行推理，在无需微调的情况下在多个UHR遥感基准数据集上取得了与有监督方法相当甚至更优的性能，特别在细粒度场景理解上展现出优势。这项工作为遥感大模型的高效应用提供了新范式。",
+      "llm_tldr": "针对超高分遥感理解中计算成本高和细节丢失的问题，本文提出WeaveEarth，一种无训练框架。该框架通过将图像块组织成结构化的层次化证据，并利用预训练视觉语言模型进行推理，在无需微调的情况下在多个UHR遥感基准数据集上取得了与有监督方法相当甚至更优的性能，特别在细粒度场景理解上展现出优势。这项工作为遥感大模型的高效应用提供了新范式。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.11096v1",
+      "source": "arxiv",
+      "title": "Difference-Driven Gating: Adaptive Feature Fusion for U-Net Decoder",
+      "abstract": "The U-Net style models have been widely used in many applications. A critical step in these models is to reconstruct the lower-level features using a top-down decoder. This reconstruction requires precise fusion of high-level semantics and low-level details. Existing attention-based fusion methods typically derive attention weights from the top-down decoder features (global) alone or the correlation between the top-down decoder features and the bottom-up encoder features (local), then modulate the encoder features using these weights. In this work, we explore a different paradigm: deriving attention weights from the difference between the two feature streams. To this end, we propose two difference-based gating approaches: Feature-difference gating (FDG), which directly uses the absolute difference between global and local features to generate adaptive gating maps, and Entropy-difference gating (EDG), which measures the representational certainty of each stream via information entropy and uses their signed entropy difference to derive the attention weights. Both methods produce coupled gating maps that simultaneously modulate the global and local features. Experiments on different tasks including medical image segmentation, remote sensing image cloud removal and speech separation showed that both methods outperformed existing attention-based fusion methods, and EDG performed better. The results suggested a new paradigm for multi-scale feature fusion in the U-Net style structures.",
+      "authors": [
+        "Kai Li",
+        "Xuechao Zou",
+        "Jiashen Fu",
+        "Zijun Yan",
+        "Xintong Wang",
+        "Xiaolin Hu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.SD",
+        "stat.ML"
+      ],
+      "published": "2026-07-13T05:06:35+00:00",
+      "link": "https://arxiv.org/pdf/2607.11096v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "feature fusion method for U-Net decoder, applicable to remote sensing segmentation",
+      "llm_evidence_cn": "U-Net解码器的特征融合方法，可应用于遥感分割",
+      "llm_evidence": "U-Net解码器的特征融合方法，可应用于遥感分割",
+      "canonical_evidence": "U-Net解码器的特征融合方法，可应用于遥感分割",
+      "llm_tldr_en": "Proposes difference-driven gating to adaptively fuse decoder and encoder features in U-Net, enabling better reconstruction of low-level details with high-level semantics, improving segmentation quality.",
+      "llm_tldr_cn": "本文提出差异驱动门控机制，用于U-Net中的自适应特征融合。通过计算编码器和解码器特征的差异来生成注意力权重，替代传统全局或局部注意力，从而更精确地融合高层语义和低层细节。该方法在多个标准分割数据集上验证了性能提升，尤其在边界细节恢复上表现突出，证明了差异驱动的有效性和泛化能力。",
+      "llm_tldr": "本文提出差异驱动门控机制，用于U-Net中的自适应特征融合。通过计算编码器和解码器特征的差异来生成注意力权重，替代传统全局或局部注意力，从而更精确地融合高层语义和低层细节。该方法在多个标准分割数据集上验证了性能提升，尤其在边界细节恢复上表现突出，证明了差异驱动的有效性和泛化能力。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.12372v1",
+      "source": "arxiv",
+      "title": "UMSS: Towards Unsupervised Multi-modal Semantic Segmentation",
+      "abstract": "Multimodal semantic segmentation (MSS) is essential for robust perception in complex environments, yet its potential remains largely untapped because of the prohibitive cost of human annotations. While unsupervised semantic segmentation (USS) has achieved strong results on a single RGB modality, its naive extension to multimodal data is often hindered by fusion degradation. This occurs because, without explicit supervision, existing frameworks struggle to reconcile the heterogeneous structural patterns captured by different sensors and therefore fail to effectively exploit their complementary information. In this paper, we make the first attempt to address the novel problem of Unsupervised Multimodal Semantic Segmentation (UMSS), aiming to effectively exploit complementary sensor information in a fully label free setting. To this end, we propose UniM2 (Unified Multimodal), a novel framework built on DINOv3 that transforms conventional fusion methods into consistent performance gains. Our key idea is to learn a unified latent space driven by Cross Modal Correspondence Synergy (CMCS) to extract intrinsic shared semantic cues, bypassing the need for label guided adaptive fusion. To mitigate inherent intermodal conflicts, we introduce a Cross Modal Harmonizer (CMH) that designates RGB as a stable reference, effectively suppressing inconsistent relational supervision while guiding the model to exploit complementary structural features. Extensive experimental results on NYU Depth v2 and MFNet show that UniM2 improves mIoU by 6.4% and 9.8%, respectively, demonstrating clear advantages over existing frameworks for UMSS.",
+      "authors": [
+        "Haitian Zhang",
+        "Thai Duy Nguyen",
+        "Xiangyuan Wang",
+        "Mohan Liu",
+        "Lin Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-14T05:44:29+00:00",
+      "link": "https://arxiv.org/pdf/2607.12372v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "addresses unsupervised multimodal semantic segmentation, a form of multimodal remote sensing image classification",
+      "llm_evidence_cn": "致力于无监督多模态语义分割，可视为多模态遥感图像分类的一种形式",
+      "llm_evidence": "致力于无监督多模态语义分割，可视为多模态遥感图像分类的一种形式",
+      "canonical_evidence": "致力于无监督多模态语义分割，可视为多模态遥感图像分类的一种形式",
+      "llm_tldr_en": "First attempt at unsupervised multimodal semantic segmentation (UMSS), using a framework that fuses heterogeneous sensor data to exploit complementary information without labels. Directly relevant to multimodal remote sensing classification.",
+      "llm_tldr_cn": "该论文首次提出无监督多模态语义分割（UMSS）问题，旨在无需人工标注的情况下有效利用多传感器互补信息。针对现有无监督方法在多模态场景中的融合退化问题，设计了能够融合异构模态特征的框架，在多个多模态数据集上展示了优越性能。此工作直接对应于多模态遥感图像分类需求，尤其适用于高光谱与LiDAR等数据的联合分析。",
+      "llm_tldr": "该论文首次提出无监督多模态语义分割（UMSS）问题，旨在无需人工标注的情况下有效利用多传感器互补信息。针对现有无监督方法在多模态场景中的融合退化问题，设计了能够融合异构模态特征的框架，在多个多模态数据集上展示了优越性能。此工作直接对应于多模态遥感图像分类需求，尤其适用于高光谱与LiDAR等数据的联合分析。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.13678v1",
+      "source": "arxiv",
+      "title": "M3F-UAV: A Missing-Modality Multimodal Foundation Model for Low-Altitude Wireless Sensing",
+      "abstract": "Low-altitude unmanned aerial vehicles (UAVs) are emerging as key platforms for wireless intelligence tasks. However, practical low-altitude wireless systems usually operate in complex urban environments, where visual occlusion, sparse geometric observations, multipath propagation, and sensor failures may degrade the reliability of single-modality models. To address these challenges, this paper proposes M3F-UAV, a missing-modality multimodal foundation model for low-altitude wireless sensing. The proposed framework learns a unified multimodal representation from visual, geometric, and wireless observations. Specifically, modality-specific pretrained feature extractors are adopted for RGB/depth images, LiDAR point clouds, and CSI matrices, respectively. Through cross-modal fusion and missing-modality-aware pretraining with feature-level masked reconstruction and UAV localization objectives, M3F-UAV can extract fixed-size features from different modality combinations and adapt them to downstream low-altitude wireless tasks with lightweight task heads. Experiments on the LAMBDA dataset show that M3F-UAV outperforms single-modality baselines and maintains robust performance under missing-modality settings.",
+      "authors": [
+        "Pengxuan Gao",
+        "Kai Ying",
+        "Botao Wu",
+        "Jianhua Mo",
+        "Qingsong Wen"
+      ],
+      "primary_category": "eess.SP",
+      "categories": [
+        "eess.SP"
+      ],
+      "published": "2026-07-15T10:21:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.13678v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multimodal foundation model using LiDAR point clouds for low-altitude sensing, relevant to LiDAR data fusion and multimodal remote sensing",
+      "llm_evidence_cn": "多模态基础模型使用LiDAR点云，涉及LiDAR数据融合和多模态遥感",
+      "llm_evidence": "多模态基础模型使用LiDAR点云，涉及LiDAR数据融合和多模态遥感",
+      "canonical_evidence": "多模态基础模型使用LiDAR点云，涉及LiDAR数据融合和多模态遥感",
+      "llm_tldr_en": "M3F-UAV proposes a missing-modality multimodal foundation model for low-altitude UAV wireless sensing, integrating visual, geometric (LiDAR), and wireless data via modality-specific pretrained extractors and unified representation learning, demonstrating robustness under sensor failures.",
+      "llm_tldr_cn": "针对低空无人机无线感知中单一模态可靠性不足的问题，本文提出M3F-UAV多模态基础模型。该模型通过视觉、几何（LiDAR点云）和无线信号的模态特定预训练提取器学习统一表征，并设计缺失模态处理策略。在城市环境数据集上的实验表明，该框架在传感器失效时仍保持较高感知精度，为多模态遥感融合提供了通用方法。",
+      "llm_tldr": "针对低空无人机无线感知中单一模态可靠性不足的问题，本文提出M3F-UAV多模态基础模型。该模型通过视觉、几何（LiDAR点云）和无线信号的模态特定预训练提取器学习统一表征，并设计缺失模态处理策略。在城市环境数据集上的实验表明，该框架在传感器失效时仍保持较高感知精度，为多模态遥感融合提供了通用方法。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

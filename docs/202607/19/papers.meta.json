@@ -1,0 +1,69 @@
+{
+  "label": "2026-07-19",
+  "date": "2026-07-19",
+  "generated_at": "2026-07-19T21:02:41",
+  "count": 4,
+  "papers": [
+    {
+      "paper_id": "202607/19/2607.10120v1-weaveearth-structured-evidence-construction-and-reasoning-for-training-free-uhr-remote-sensing-understanding",
+      "section": "quick",
+      "title_en": "WeaveEarth: Structured Evidence Construction and Reasoning for Training-Free UHR Remote Sensing Understanding",
+      "authors": "Xianzhi Ma, Shujun Wang, Xiaohan Li, Hao Liu, Changhua Pei, Jianhui li",
+      "date": "2026-07-11",
+      "pdf": "https://arxiv.org/pdf/2607.10120v1",
+      "score": "7.0",
+      "evidence": "无训练超高分遥感理解框架，可应用于多模态分类",
+      "tldr": "超高分遥感图像理解需要视觉语言模型兼顾全局场景与稀疏局部细节，现有被动感知方法因分辨率扩大或token压缩丢失细节，主动感知方法多轮缩放导致高延迟与错误累积。WeaveEarth提出无训练框架，通过全局感知证据构建选取紧凑低冗余的局部证据集，再经结构化证据推理将空间元数据与拓扑关系融入推理，实现全局-局部联合推理。在多个基准与多种冻结VLM上，WeaveEarth一致超越强基线，证明“更好组织”比“更多获取”更有效。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Ultra-High-Resolution (UHR) remote sensing image understanding requires Vision-Language Models (VLMs) to capture both the global scene layout and sparse yet task-critical local details under limited computational budgets. Existing methods mainly follow two paradigms. One is passive perception, which relies on resolution expansion or token compression and may therefore discard fine-grained details. The other is active perception, which depends on multi-round zooming and search, but suffers from high latency, contextual fragmentation, and error accumulation. We argue that a more effective path toward UHR understanding lies not in accessing more, but in organizing better. To this end, we propose WeaveEarth, a training-free framework that reformulates UHR understanding as a problem of structured evidence construction and reasoning under global context constraints. Specifically, WeaveEarth first employs Global-Aware Evidence Construction to select a compact, low-redundancy, and spatially complementary Minimal Support Evidence Set. It then introduces Structured Evidence Reasoning, which weaves local evidence, spatial metadata, and relative topology into a unified reasoning interface, thereby enhancing the VLM's ability to perform global-local joint reasoning. Extensive experiments show that WeaveEarth consistently outperforms strong baselines and existing UHR methods across multiple UHR remote sensing benchmarks and multiple frozen VLM backbones. Code is available at https://github.com/XianZhi-Ma/WeaveEarth.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/19/2607.11096v1-difference-driven-gating-adaptive-feature-fusion-for-u-net-decoder",
+      "section": "quick",
+      "title_en": "Difference-Driven Gating: Adaptive Feature Fusion for U-Net Decoder",
+      "authors": "Kai Li, Xuechao Zou, Jiashen Fu, Zijun Yan, Xintong Wang, Xiaolin Hu",
+      "date": "2026-07-13",
+      "pdf": "https://arxiv.org/pdf/2607.11096v1",
+      "score": "6.0",
+      "evidence": "U-Net解码器的特征融合方法，可应用于遥感分割",
+      "tldr": "U-Net解码器需融合高层语义与低层细节，现有注意力方法多从单一特征流或其相关性提取权重。本文提出基于特征流差异的门控机制，包括直接绝对差的FDG和基于信息熵差异的EDG，生成耦合门控同时调制全局与局部特征。在医学分割、遥感去云和语音分离任务中均优于现有方法，EDG更优。该工作开辟了U-Net多尺度特征融合新范式。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "The U-Net style models have been widely used in many applications. A critical step in these models is to reconstruct the lower-level features using a top-down decoder. This reconstruction requires precise fusion of high-level semantics and low-level details. Existing attention-based fusion methods typically derive attention weights from the top-down decoder features (global) alone or the correlation between the top-down decoder features and the bottom-up encoder features (local), then modulate the encoder features using these weights. In this work, we explore a different paradigm: deriving attention weights from the difference between the two feature streams. To this end, we propose two difference-based gating approaches: Feature-difference gating (FDG), which directly uses the absolute difference between global and local features to generate adaptive gating maps, and Entropy-difference gating (EDG), which measures the representational certainty of each stream via information entropy and uses their signed entropy difference to derive the attention weights. Both methods produce coupled gating maps that simultaneously modulate the global and local features. Experiments on different tasks including medical image segmentation, remote sensing image cloud removal and speech separation showed that both methods outperformed existing attention-based fusion methods, and EDG performed better. The results suggested a new paradigm for multi-scale feature fusion in the U-Net style structures.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/19/2607.12372v1-umss-towards-unsupervised-multi-modal-semantic-segmentation",
+      "section": "quick",
+      "title_en": "UMSS: Towards Unsupervised Multi-modal Semantic Segmentation",
+      "authors": "Haitian Zhang, Thai Duy Nguyen, Xiangyuan Wang, Mohan Liu, Lin Wang",
+      "date": "2026-07-14",
+      "pdf": "https://arxiv.org/pdf/2607.12372v1",
+      "score": "6.0",
+      "evidence": "致力于无监督多模态语义分割，可视为多模态遥感图像分类的一种形式",
+      "tldr": "多模态语义分割依赖昂贵标注，无监督扩展至多模态面临融合退化。本文首次提出无监督多模态语义分割任务，构建UniM2框架，利用跨模态对应协同学习统一潜空间，并设计跨模态协调器以RGB为稳定参考抑制冲突。在NYU Depth v2和MFNet上分别提升mIoU 6.4%和9.8%，推动无监督多模态感知发展。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Multimodal semantic segmentation (MSS) is essential for robust perception in complex environments, yet its potential remains largely untapped because of the prohibitive cost of human annotations. While unsupervised semantic segmentation (USS) has achieved strong results on a single RGB modality, its naive extension to multimodal data is often hindered by fusion degradation. This occurs because, without explicit supervision, existing frameworks struggle to reconcile the heterogeneous structural patterns captured by different sensors and therefore fail to effectively exploit their complementary information. In this paper, we make the first attempt to address the novel problem of Unsupervised Multimodal Semantic Segmentation (UMSS), aiming to effectively exploit complementary sensor information in a fully label free setting. To this end, we propose UniM2 (Unified Multimodal), a novel framework built on DINOv3 that transforms conventional fusion methods into consistent performance gains. Our key idea is to learn a unified latent space driven by Cross Modal Correspondence Synergy (CMCS) to extract intrinsic shared semantic cues, bypassing the need for label guided adaptive fusion. To mitigate inherent intermodal conflicts, we introduce a Cross Modal Harmonizer (CMH) that designates RGB as a stable reference, effectively suppressing inconsistent relational supervision while guiding the model to exploit complementary structural features. Extensive experimental results on NYU Depth v2 and MFNet show that UniM2 improves mIoU by 6.4% and 9.8%, respectively, demonstrating clear advantages over existing frameworks for UMSS.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/19/2607.13678v1-m3f-uav-a-missing-modality-multimodal-foundation-model-for-low-altitude-wireless-sensing",
+      "section": "quick",
+      "title_en": "M3F-UAV: A Missing-Modality Multimodal Foundation Model for Low-Altitude Wireless Sensing",
+      "authors": "Pengxuan Gao, Kai Ying, Botao Wu, Jianhua Mo, Qingsong Wen",
+      "date": "2026-07-15",
+      "pdf": "https://arxiv.org/pdf/2607.13678v1",
+      "score": "6.0",
+      "evidence": "多模态基础模型使用LiDAR点云，涉及LiDAR数据融合和多模态遥感",
+      "tldr": "低空无人机在复杂城市环境中面临视觉遮挡、多径传播等挑战，导致单模态模型可靠性差。提出M3F-UAV多模态基础模型，学习视觉、几何和无线观测的统一表示，通过跨模态融合和缺失模态感知预训练实现鲁棒性能。在LAMBDA数据集上，M3F-UAV优于单模态基线，并在缺失模态下保持稳定。该工作为低空无线感知提供了缺失模态鲁棒的基础模型。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Low-altitude unmanned aerial vehicles (UAVs) are emerging as key platforms for wireless intelligence tasks. However, practical low-altitude wireless systems usually operate in complex urban environments, where visual occlusion, sparse geometric observations, multipath propagation, and sensor failures may degrade the reliability of single-modality models. To address these challenges, this paper proposes M3F-UAV, a missing-modality multimodal foundation model for low-altitude wireless sensing. The proposed framework learns a unified multimodal representation from visual, geometric, and wireless observations. Specifically, modality-specific pretrained feature extractors are adopted for RGB/depth images, LiDAR point clouds, and CSI matrices, respectively. Through cross-modal fusion and missing-modality-aware pretraining with feature-level masked reconstruction and UAV localization objectives, M3F-UAV can extract fixed-size features from different modality combinations and adapt them to downstream low-altitude wireless tasks with lightweight task heads. Experiments on the LAMBDA dataset show that M3F-UAV outperforms single-modality baselines and maintains robust performance under missing-modality settings.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

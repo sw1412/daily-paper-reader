@@ -1,0 +1,748 @@
+Title: M3F-UAV: A Missing-Modality Multimodal Foundation Model for Low-Altitude Wireless Sensing
+
+URL Source: https://arxiv.org/pdf/2607.13678v1
+
+Published Time: Thu, 16 Jul 2026 01:15:38 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+> 1
+
+# M3F-UAV: A Missing-Modality Multimodal Foundation Model for Low-Altitude Wireless Sensing 
+
+Pengxuan Gao, Kai Ying, Senior Member, IEEE , Botao Wu, Jianhua Mo, Senior Member, IEEE ,Qingsong Wen, Senior Member, IEEE 
+
+Abstract —Low-altitude unmanned aerial vehicles (UAVs) are emerging as key platforms for wireless intelligence tasks. How-ever, practical low-altitude wireless systems usually operate in complex urban environments, where visual occlusion, sparse ge-ometric observations, multipath propagation, and sensor failures may degrade the reliability of single-modality models. To address these challenges, this paper proposes M3F-UAV, a missing-modality multimodal foundation model for low-altitude wireless sensing. The proposed framework learns a unified multimodal representation from visual, geometric, and wireless observa-tions. Specifically, modality-specific pretrained feature extractors are adopted for RGB/depth images, LiDAR point clouds, and CSI matrices, respectively. Through cross-modal fusion and missing-modality-aware pretraining with feature-level masked reconstruction and UAV localization objectives, M3F-UAV can extract fixed-size features from different modality combinations and adapt them to downstream low-altitude wireless tasks with lightweight task heads. Experiments on the LAMBDA dataset show that M3F-UAV outperforms single-modality baselines and maintains robust performance under missing-modality settings. 
+
+Index Terms —Multimodal foundation model, low-altitude wireless sensing, UAV localization, beam prediction, CSI pre-diction, multimodal pretraining. 
+
+I. I NTRODUCTION 
+
+# LOw-altitude unmanned aerial vehicles (UAVs) have be-come an important component of emerging intelligent aerial systems, enabling applications such as urban inspection, emergency response, traffic monitoring, aerial communica-tion, and low-altitude airspace management [1]–[4]. Compared with conventional ground terminals, UAVs operate in highly dynamic three-dimensional environments, where sensing and communication systems have to deal with complex urban lay-outs, visual occlusion, non-line-of-sight propagation, multipath reflection, and rapidly time-varying wireless channels [5], [6]. These characteristics make robust UAV perception and wire-less intelligence essential for reliable low-altitude operations. With the rapid development of artificial intelligence, many wireless sensing and communication tasks have been increas-ingly integrated with data-driven learning methods, including UAV localization [7]–[9], beam prediction [10]–[13], and CSI prediction [14], [15]. Existing studies have explored different single-modality solutions for these tasks. For instance, RGB images have been used for UAV localization and vision-assisted beam prediction [8], [11], LiDAR observations have      
+
+> Pengxuan Gao, Kai Ying, Botao Wu, Jianhua Mo are with the School of Electronic Information and Electrical Engineering, Shanghai Jiao Tong University, Shanghai 200240, China (e-mail: gpx123456789@sjtu.edu.cn; yingkai0301@sjtu.edu.cn; wubt2002@sjtu.edu.cn; mjh@sjtu.edu.cn). Qingsong Wen is with Squirrel Ai Learning, Bellevue, WA 98004 USA (e-mail: qingsongedu@gmail.com). Kai Ying is the corresponding author.
+
+been adopted for sensing-aided beam prediction [12], [13], and CSI has been widely investigated for wireless localization and channel prediction [9], [14], [15]. Although these methods achieve promising results, their performance and robustness is inherently constrained by the sensing characteristics of the adopted modality. To improve robustness, recent studies have explored mul-timodal sensing for wireless intelligence. DeepSense 6G pro-vides synchronized multimodal sensing and communication data for joint sensing, communication, and positioning re-search [16]. Camera images, position information, LiDAR, and GPS have also been fused for beam prediction in ve-hicular, UAV, and 6G communication scenarios [17]–[21]. In UAV communications, multimodal information such as UAV-captured images, transmitter/receiver positions, and commu-nication settings has been used for channel prediction [22]. These works demonstrate the potential of multimodal fusion, but most of them are still designed for specific tasks. With the success of foundation models represented by large language models such as GPT-3, PaLM, and LLaMA [23]– [25], the learning paradigm has gradually shifted from de-signing isolated task-specific models to pretraining general-purpose backbones for downstream adaptation. Inspired by this trend, wireless foundation models have recently attracted increasing attention. Some studies adapt pretrained language models to wireless tasks, such as TelecomGPT for telecom-domain language modeling [26], LLM4CP for CSI sequence prediction [27], and LLM4WM for multi-task wireless mod-eling [28]. Other works develop wireless-native foundation models from wireless-domain data, such as LWM for universal channel embeddings [29], WiFo for space-time-frequency CSI prediction [30], AirFM-DDA for CSI estimation and predic-tion in the delay-Doppler-angle domain [31], and WavesFM for unified wireless sensing, communication, and localiza-tion [32]. Recent studies further explore CIR-CSI consistency for MIMO channel representation learning [33], environment-aware multi-task wireless foundation modeling [34], and multimodal mixture-of-experts fusion for low-altitude ISAC networks [35]. However, most existing wireless foundation models mainly focus on wireless-domain signals or predefined task settings, while missing-modality robustness in practical multimodal UAV sensing remains insufficiently explored. In real low-altitude systems, sensors may become unavailable due to occlusion, environmental degradation, hardware failure, or communication constraints. If a model cannot dynamically handle different modality combinations, a separate model has to be trained for each specific combination. As the number arXiv:2607.13678v1 [eess.SP] 15 Jul 2026 2
+
+of modalities increases, the number of required models grows rapidly, which makes model maintenance, deployment, and task adaptation inefficient. Some recent multimodal foundation models, such as MultiMAE [36], PhysioOmni [37], and X-Fi [38], have shown the importance of flexible modality combinations and missing-modality modeling. Nevertheless, a unified multimodal foundation model for low-altitude wireless tasks under missing-modality conditions remains to be further investigated. To address these limitations, we propose M3F-UAV, aMissing-Modality Multimodal Foundation Model for low-altitude wireless sensing. The proposed framework integrates RGB images, depth maps, LiDAR point clouds, and CSI matrices through modality-specific pretrained encoders, in-cluding a MobileNetV2-based [39] encoder-decoder network for RGB/depth modalities, a Point Transformer encoder [40] for LiDAR point clouds, and a Transformer-based encoder for antenna-domain CSI matrices. The extracted features are projected into a unified multimodal embedding space and fused by a cross-modal fusion backbone. M3F-UAV is pretrained under missing-modality conditions. Specifically, stochastic modality dropping is used to simulate unavailable sensors, and one remaining modality is selected as the target modality for feature-level masked reconstruction. Together with the UAV localization objective, this strategy encourages the model to learn cross-modal correspondences, scene-level spatial semantics, and UAV-related sensing rep-resentations from incomplete multimodal observations. Af-ter pretraining, the backbone can extract fixed-size unified features from different modality combinations and can be transferred to UAV localization, beam prediction, and CSI prediction by attaching lightweight MLP-based task heads. The main contributions of this paper are summarized as follows:  
+
+> •
+
+We propose M3F-UAV, a unified multimodal founda-tion model for low-altitude wireless tasks, which inte-grates RGB, depth, point-cloud, and CSI features through modality-specific pretrained encoders and a shared fusion backbone.  
+
+> •
+
+We design a joint multimodal pretraining strategy that combines feature-level masked reconstruction and UAV localization, enabling the model to learn cross-modal feature correspondence and UAV-related spatial represen-tations.  
+
+> •
+
+We introduce a missing-modality-robust fusion mech-anism based on stochastic modality dropping, target-modality masking, and adaptive token pooling, allowing the model to produce fixed-size fusion features from different available modality combinations. II. P ROPOSED METHOD 
+
+A. Overview of the Proposed Framework 
+
+To learn transferable representations for UAV sensing under heterogeneous and incomplete sensing conditions, we propose a unified multimodal pretraining framework that maps visual, geometric, and wireless modalities into a shared representation space. As shown in Fig. 1, the framework consists of three stages: modality-specific feature extraction, multimodal token adaptation and fusion pretraining, and downstream task fine-tuning. It supports both full-modality inputs and missing-modality scenarios. Given a training sample, the multimodal input is denoted as 
+
+X = {Xr , X d, X p, X c, v}, (1) where Xr , Xd, Xp, and Xc represent the RGB image, depth map, LiDAR point cloud, and CSI, respectively. The vector v
+
+denotes the base-station position, including 3-D position and quaternion-based orientation. The complete modality set is 
+
+M = {r, d, p, c }. (2) To improve robustness to incomplete observations, we in-troduce stochastic modality dropping during multimodal pre-training. A subset of modalities is randomly retained, denoted as S ⊆ M . Only the retained modalities are processed by their corresponding feature extractors: 
+
+Zm = Em(Xm), m ∈ S , (3) while discarded modalities are not fed into the multimodal backbone. This strategy simulates different missing-modality combinations and prevents the model from depending on complete modality inputs. For each retained modality, the extractor outputs latent tokens 
+
+Zm ∈ RB×Nm×Dm , (4) where B, Nm, and Dm denote the batch size, token number, and feature dimension, respectively. Since different modalities have heterogeneous token structures and feature dimensions, a modality-specific linear projection is introduced to map them into a unified dimension D:
+
+Tm = ZmWm + bm, Tm ∈ RB×Nm×D , m ∈ S . (5) Here, Wm ∈ RDm×D and bm ∈ RD are the learnable weight matrix and bias vector of the modality-specific projection for modality m, respectively. The projected tokens are then processed by the multimodal token adaptation module, which applies target-modality masking, positional encoding, modality embedding, and adaptive pooling to obtain fixed-size aligned multimodal tokens. After modality dropping, one retained modality t ∈ S is selected as the reconstruction target. Its tokens are masked, while the remaining modalities serve as visible context: 
+
+Svis = S \ { t}. (6) This enables the model to reconstruct a target modality from incomplete multimodal observations rather than from fixed full-modality inputs. The adapted tokens are fed into a Transformer-based cross-modal fusion encoder, where self-attention captures comple-mentary relationships among visual appearance, depth geom-etry, LiDAR point-cloud structure, and wireless propagation features. The resulting fusion tokens are optimized by two pretraining objectives: masked modality feature reconstruction and UAV localization. Instead of reconstructing raw modality 3Target 
+
+> Modality
+> Mask
+> Adaptive
+> Pooling
+> Positional
+> Encoding
+> Modality
+> Embedding
+
+(A) Multimodal Token Adaptation 
+
+> Image
+> Head
+> Depth
+> Head
+> LiDAR
+> Head
+> CSI
+> Head
+
+Masked Reconstruction Heads 
+
+> (only for target modality)
+
+UAV 
+
+Localization 
+
+Head 
+
+𝑥  𝑦 
+
+𝑧    
+
+> Multi -Head
+> Self -Attention
+> Add &
+> Norm
+> Feed
+> Forward
+> Add &
+> Norm
+> ×L Transformer Layers
+
+(B) Cross -Modal Fusion Encoder 
+
+(2) Multimodal Pretraining Backbone (1) Modality Feature Extractor 
+
+> RGB
+> Feature
+> Extractor
+> RGB
+> Linear
+> Projection
+> Depth
+> Feature
+> Extractor
+> Depth
+> Linear
+> Projection
+> Li DAR
+> Feature
+> Extractor
+> Li DAR
+> Linear
+> Projection
+
+UAV 
+
+Localization 
+
+Head 
+
+CSI 
+
+Prediction 
+
+Head 
+
+Beam 
+
+Prediction 
+
+Head 
+
+(3) Downstream Fine -Tuning 
+
+𝑥  𝑦 
+
+𝑧     
+
+> Top -k Beams
+> CSI Sequence
+> •Freeze (1) modality feature extractors
+> and (2) multimodal pretraining backbone
+> •Model supports inputs with missing
+> modality.
+> CSI
+> Feature
+> Extractor
+> CSI
+> Linear
+> Projection
+> Modality Feature Extractors are pretrained through
+> masked reconstruction and UAV localization tasks.
+> Modality
+> Tokens 𝑇
+> Support
+> missing
+> modality
+> Fusion
+> Tokens 𝐹
+> Fixed -size
+> feature
+
+(C) Fusion Model Pretraining Module        
+
+> BS Position Encoder BS Position Fusion Tokens
+> BS Position BS Position
+> Encoder
+> Legend
+> Concatenation Addition
+> Missing modality Available modality
+
+Fig. 1. Overall architecture of the proposed multimodal foundation model for low-altitude wireless tasks. The framework contains three stages: modality feature extraction, multimodal pretraining, and downstream fine-tuning. The input modalities may be incomplete, and the dashed CSI branch is shown as an example of a missing modality. 
+
+data, such as images, point clouds, or CSI matrices, the recon-struction head predicts the latent feature tokens of the masked target modality. This feature-level reconstruction encourages cross-modal correspondence learning under missing-modality conditions, while the localization objective preserves spatially discriminative information in the fused representation. After pretraining, the learned representation can be trans-ferred to downstream tasks such as UAV localization, beam prediction, and CSI prediction by attaching lightweight task-specific heads. Since the model has observed diverse modality combinations during pretraining, it can adapt to different available modality sets during fine-tuning. The modality ex-tractors and multimodal backbone can be frozen for efficient adaptation or partially fine-tuned when sufficient labeled data are available. In addition, we consider modality failure during deploy-ment. In practical UAV sensing systems, a modality may become unreliable due to hardware malfunction, occlusion, environmental interference, or adverse propagation conditions. To avoid corrupted inputs disturbing the fused representa-tion, we introduce a Failure-Aware Modality Gating (FAMG) mechanism. A modality failure discriminator estimates the reliability of each modality based on pretrained modality fea-tures. Reliable modalities are retained for fusion, while failed modalities are removed. Benefiting from the missing-modality-aware design, the framework can perform robust inference even when some modalities are unavailable or unreliable. 
+
+B. Modality Feature Extractors 
+
+The goal of the modality feature extractors is to trans-form different raw sensing signals into compact token rep-resentations while preserving their modality-specific physical structures. Unlike a single shared encoder, we use separate backbones for different modalities because RGB/depth images, LiDAR point clouds, and CSI measurements exhibit funda-mentally different data organizations. 
+
+1) RGB and Depth Feature Extractors: For the visual modalities, we adopt a lightweight convolutional encoder-decoder architecture for both RGB and depth feature extrac-tion. Convolutional neural networks are adopted because they efficiently capture local spatial patterns and hierarchical visual representations with relatively low computational complexity. As shown in Fig. 2 (a), The visual branch consists of a MobileNetV2-style encoder with inverted residual blocks and a U-Net-like decoder with skip connections, enabling efficient multi-scale spatial feature learning from dense visual observa-tions. Given a visual input 
+
+Xv ∈ RB×Cv ×H×W , v ∈ { r, d }, (7) where r and d denote RGB and depth modalities, respectively. Here, Cr = 3 for RGB images and Cd = 1 for single-channel depth maps.The input is first processed by a convolutional stem: 
+
+F v 
+
+> 0
+
+= ReLU6 (BN (Conv 3×3(Xv ))) . (8) The resulting feature is then fed into a sequence of Mo-bileNetV2 inverted residual (IR) stages. Each inverted residual block follows an expansion-depthwise-projection structure: 
+
+IR( F ) = Conv proj 
+
+> 1×1
+
+ DWConv 3×3
+
+ Conv exp 
+
+> 1×1
+
+(F ) , (9) where DWConv 3×3 denotes the 3 × 3 depthwise convolution (DWConv). A residual connection is used when the stride is one and the input and output dimensions are identical: 
+
+Fout = F + IR( F ). (10) This design reduces computational cost while maintaining sufficient representation capacity for visual UAV sensing. 41×Bottleneck          
+
+> Stage 1
+> 2×Bottleneck
+> Stage 2
+> 3×Bottleneck
+> Stage 3
+> 7×Bottleneck
+> Stage 4
+> Decoderblock
+> Upstage 4
+> Decoderblock
+> Upstage 3
+> Decoderblock
+> Upstage 2
+> Decoderblock
+> Upstage 1
+> 4×Bottleneck
+> Stage 5
+> Regression
+> Head
+> Reconstruction
+> Head
+> BS Pose BS Encoder
+> 𝑥 𝑦
+> 𝑧
+> Reconstructed Image
+> UAV Position
+> Image Masked Image
+> or Feed
+> Forward
+> Add & Norm
+> Add & Norm
+> Multi -Head
+> Attention
+> Positional
+> Encoding
+> N×
+> FPS Sampling
+> Input
+> Embedding
+> KNN Grouping
+> p0p1p2pn
+
+…   
+
+> Masked Patches
+> p0p1p2pn
+
+…    
+
+> Patches
+> or
+> Input Point Cloud
+> Regression
+> Head
+> 𝑥 𝑦
+> 𝑧
+> Reconstruction
+> Head
+> p0p1p2pn
+
+…        
+
+> Reconstructed Patches
+> BS Pose
+> BS
+> Encoder
+> Feed
+> Forward
+> Add & Norm
+> Add & Norm
+> Multi -Head
+> Attention
+> Positional
+> Encoding
+> N×
+> Input
+> Embedding
+> Regression
+> Head
+> 𝑥 𝑦
+> 𝑧
+> Reconstruction
+> Head
+> Reconstructed CSI BS Pose
+> BS
+> Encoder
+> CSI Masked CSI
+> or
+> (a) MobileNetV2 For Image and Depth (b) Transformer For CSI (c) PointTransformer For LiDAR
+> 𝐹 0
+> v
+> 𝐹 1
+> v
+> 𝐹 3
+> v
+> 𝐹 2
+> v
+> 𝐹 4
+> v
+> Encoder Decoder
+
+Fig. 2. Network architectures used for pretraining the image, depth, CSI, and LiDAR modalities. (a) MobileNetV2 for image and depth data, (b) Transformer for CSI data, and (c) Point Transformer for LiDAR point clouds. All modality-specific models are pretrained with reconstruction and UAV localization tasks. 
+
+The encoder produces hierarchical features: 
+
+{F v 
+
+> 0
+
+, F v 
+
+> 1
+
+, F v 
+
+> 2
+
+, F v 
+
+> 3
+
+, F v 
+
+> 4
+
+} = Ev (Xv ), (11) where shallow features preserve local spatial details and the deepest feature F v 
+
+> 4
+
+captures high-level semantic information. The visual encoder is pretrained with two objectives: block-level masked reconstruction and UAV coordinate regression. For masked reconstruction, the input image or depth map is divided into non-overlapping blocks, and a subset of blocks is randomly masked in the pixel space. A U-Net-style decoder reconstructs the original visual input by progressively upsam-pling the deepest feature and fusing it with the corresponding encoder features: 
+
+Dvi = ϕi
+
+h 
+
+Up( Dvi+1 ); F vi
+
+i 
+
+, (12) where Up( ·) denotes bilinear upsampling, [·; ·] denotes channel-wise concatenation, and ϕi(·) is a convolutional re-finement block. The reconstruction head predicts bXv , encour-aging the encoder to infer missing visual content from spatial context and improving robustness to occlusion and invalid depth regions. For UAV coordinate regression, the deepest feature F v 
+
+> 4
+
+is projected into a compact feature map Gvdeep , while the decoder provides a high-resolution feature Gvdec . These two features are aligned in resolution, concatenated, and fused: 
+
+Gvf use = ϕf use 
+
+  Gvdec ; Up( Gvdeep ) , (13) where ϕf use (·) denotes a convolutional fusion block. The fused feature is then converted into a compact visual repre-sentation by global average pooling (GAP): 
+
+f v = GAP( Gvf use ). (14) Here, GAP( ·) averages each feature channel over the spatial dimensions, thereby producing a fixed-dimensional feature vector for the visual modality. Meanwhile, the base-station position vector vBS is encoded by a lightweight MLP: 
+
+q = EBS (vBS ). (15) The visual feature and base-station position feature are con-catenated and fed into an MLP regression head: 
+
+byv = Fvreg ([ f v ; q]) , byv ∈ R3. (16) After pretraining, the reconstruction decoder and regression head are removed, and the MobileNetV2 encoder is retained as the visual feature extractor. For multimodal fusion, the deepest feature map F v 
+
+> 4
+
+is projected into the unified multimodal embedding space: 
+
+Tv = Fv 
+
+> 4
+
+Wp + bv , (17) where Tv is used as the visual token input to the multimodal token adaptation module. 
+
+2) CSI Feature Extractor: As shown in Fig. 2(b), for the wireless modality, we construct a Transformer-based CSI feature extractor to process the complex-valued channel matrix between the transmit and receive antenna arrays. Different from wideband CSI with an explicit subcarrier dimension, the CSI in this work is calculated only at the center frequency and is therefore represented as a single complex channel matrix. The Transformer architecture is adopted because its self-attention mechanism can effectively capture global depen-dencies and spatial correlations among antenna-domain CSI elements. Let the CSI matrix between the UAV transmitter and the base-station receiver be 
+
+Hc ∈ CNr ×Nt , (18) where Nt denotes the number of transmit antennas at the UAV, and Nr denotes the number of receive antennas at the base station. Each element Hci,j represents the complex channel coefficient from the j-th UAV transmit antenna to the i-th base-station receive antenna. To enable real-valued neural network processing, we concatenate the real and imaginary parts along the feature dimension: 
+
+Xc = [Re( Hc); Im( Hc)] ∈ RNr ×2Nt . (19) 5
+
+For a batch of samples, 
+
+Xc ∈ RB×Nr ×2Nt . (20) In this representation, each row corresponds to one receive antenna, while the feature dimension contains the real and imaginary channel coefficients associated with the transmit antenna array. This preserves amplitude-phase information without requiring complex-valued network operations. The CSI matrix is then converted into antenna-domain tokens by projecting each receive-antenna feature vector into a latent space: 
+
+Hc 
+
+> 0
+
+= XcWc + bc, Hc 
+
+> 0
+
+∈ RB×Nr ×Dc , (21) where Dc is the CSI token dimension. A learnable antenna positional embedding is added to preserve antenna-domain ordering: 
+
+Hc 
+
+> 0
+
+= Hc 
+
+> 0
+
++ Ecant . (22) The resulting CSI tokens are processed by a Transformer encoder: 
+
+Zc = TransformerEncoder c (Hc
+
+> 0
+
+) . (23) The output tokens Zc are used for CSI reconstruction and downstream wireless tasks. The CSI encoder is pretrained with two objectives: masked CSI reconstruction and UAV coordinate regression. For masked reconstruction, we perform feature-channel masking on the concatenated real-imaginary CSI representation. Asubset of feature channels is randomly masked across the antenna dimension, forcing the model to infer missing channel coefficients from the remaining observations. Let 
+
+Mc ∈ { 0, 1}B×Nr ×2Nt (24) denote the CSI mask, where 1 indicates masked entries. The masked input is formulated as 
+
+Xc = Xc ⊙ (1 − Mc) + νmask Mc, (25) where νmask is the mask value. The masked input is encoded by the CSI Transformer, and a lightweight decoder recon-structs the original real-valued CSI matrix: 
+
+bXc = Dc (Zc) . (26) This objective encourages the encoder to capture correlations among antenna responses and learn robust wireless represen-tations from incomplete channel observations. For UAV coordinate regression, the CSI tokens are first aggregated into a compact feature representation: 
+
+f c = GAP ( Zc) . (27) The base-station position vector vBS is encoded by alightweight MLP: 
+
+q = EBS (vBS ). (28) The CSI feature and base-station position feature are concate-nated and fed into an MLP regression head: 
+
+byc = Fcreg ([ f c; q]) , byc ∈ R3. (29) After pretraining, the reconstruction decoder and regression head are removed, and the CSI Transformer encoder is retained as the wireless feature extractor. For multimodal fusion, Zc is projected into the unified multimodal embedding space: 
+
+Tc = ZcWcp + bcp, (30) where Tc denotes the projected CSI feature used as the input of the multimodal token adaptation module. 
+
+3) LiDAR Point Cloud Feature Extractor: As shown in Fig. 2(c), for the LiDAR modality, the input is an unordered 3-D point cloud: 
+
+Xp = {xi}Ni=1 , xi ∈ R3, (31) where N denotes the number of LiDAR points. Since raw point clouds are irregular and unordered, we first partition them into local geometric patches using farthest point sam-pling (FPS) and K-nearest-neighbor (KNN) grouping. FPS selects G representative centers: 
+
+{sg }Gg=1 = FPS( Xp), (32) and KNN constructs a local patch around each center: 
+
+Pg = KNN( sg , X p, K ), (33) where K is the number of neighboring points. Each patch is represented by relative coordinates: 
+
+ePg = {xi − sg | xi ∈ P g }. (34) Each local patch is embedded into a patch token through a point-wise MLP followed by max pooling: 
+
+tpg = MaxPool 
+
+
+
+MLP p( ePg )
+
+
+
+. (35) The sampled center is further encoded as a positional embed-ding and added to the patch token: 
+
+hpg = tpg + ϕp(sg ), (36) where ϕp(·) is a lightweight MLP. The resulting point tokens are stacked as 
+
+Hp 
+
+> 0
+
+= [ hp
+
+> 1
+
+, hp
+
+> 2
+
+, . . . , hpG] ∈ RB×G×Dp . (37) To capture long-range geometric dependencies, the point tokens are processed by a Point Transformer encoder with relative positional encoding between patch centers: 
+
+Zp = TransformerEncoder p
+
+ Hp
+
+> 0
+
+, {sg }Gg=1 
+
+ . (38) The encoded tokens Zp preserve both local shape patterns and global geometric layouts of the LiDAR observation. The LiDAR encoder is pretrained with masked local patch reconstruction and UAV coordinate regression. For reconstruc-tion, a subset of point tokens is randomly masked and replaced by learnable mask tokens in the decoder. The reconstruction head predicts the local coordinates of masked patches: 
+
+bPg = Dp(zpg ), g ∈ Ωmask , (39) where Ωmask denotes the masked patch indices. The recon-struction loss is computed using Chamfer distance. 6
+
+For coordinate regression, mean-pooled and max-pooled point features are concatenated with the base-station position embedding: 
+
+f p = [MeanPool( Zp); MaxPool( Zp); EBS (vBS )] , (40) and fed into an MLP head: 
+
+byp = Fpreg (f p), byp ∈ R3. (41) After pretraining, the reconstruction decoder and regression head are removed, and the Point Transformer encoder is re-tained as the LiDAR feature extractor. For multimodal fusion, 
+
+Zp is projected into the unified multimodal embedding space: 
+
+Tp = ZpWp + bp, (42) where Tp denotes the projected point-cloud feature used as the input of the multimodal token adaptation module. 
+
+C. Multimodal Pretraining Backbone 
+
+After obtaining modality-specific representations, the mul-timodal pretraining backbone is introduced to learn a unified representation across visual, geometric, and wireless obser-vations. As illustrated in Fig. 1, the backbone consists of three components: multimodal token adaptation, cross-modal fusion encoder, and fusion model pretraining module. The key objective of this backbone is to learn transferable multimodal features under incomplete modality conditions. Therefore, the input of this stage is not necessarily a complete set of modality features. Instead, it is a retained modality set S ⊆ M , which is generated by stochastic modality dropping during pretraining. 
+
+1) Multimodal Token Adaptation: The modality feature ex-tractors produce heterogeneous representations with different feature dimensions and token organizations. In addition, due to stochastic modality dropping, the input of the multimodal token adaptation module may contain only a subset of the complete modality set. Therefore, the token adaptation mod-ule is designed to process incomplete modality features and transform the resulting variable-length multimodal sequence into a fixed-length token representation. Let the complete modality set be denoted as 
+
+M = {r, d, p, c }, (43) where r, d, p, and c represent RGB, depth, LiDAR point cloud, and CSI modalities, respectively. During multimodal pretraining, stochastic modality dropping is first applied to generate a retained modality set 
+
+S ⊆ M . (44) Only the modalities in S are processed by their corresponding feature extractors. For each retained modality m ∈ S , the unified multimodal feature map is denoted as Tm. Positional embeddings and modality embeddings are then added to the projected tokens: 
+
+Am = Tm + Empos + Emmod , m ∈ S . (45) Here, Empos encodes the internal token position of modality m,and Emmod is a learnable modality embedding that identifies the sensing source. After embedding, target-modality masking is performed for feature-level reconstruction. It should be emphasized that stochastic modality dropping and target-modality masking are two different operations. The former determines the retained modality set S, while the latter selects one modality from S
+
+as the reconstruction target. Each retained modality has the same probability of being selected: 
+
+P (t = m) = 1
+
+|S| , m ∈ S . (46) The selected modality t is masked by replacing its content tokens with learnable mask tokens, while its positional and modality embeddings are still retained: 
+
+At = Mt + Etpos + Etmod , (47) where Mt ∈ RB×Nt×D denotes the learnable mask to-ken sequence of the target modality. The remaining retained modalities are used as visible contextual modalities: 
+
+Svis = S \ { t}. (48) The multimodal token sequence before adaptive pooling is then formulated as 
+
+Avar =
+
+h
+
+{Am}m∈S vis ; Ati
+
+. (49) Due to missing modalities, the length of Avar is not fixed. Thus, different modality combinations lead to different input lengths for the multimodal fusion encoder. To obtain a consistent input size for subsequent cross-modal fusion, we apply an adaptive token pooling operation after modality embedding and target-modality masking: 
+
+A = ATP ( Avar ) , A ∈ RB×Ka×D , (50) where Ka is the predefined number of adapted multimodal tokens. Different from using pooling to balance the token length of each individual modality, the adaptive token pooling operation is applied to the concatenated multimodal sequence. Its purpose is to convert the variable-length token sequence caused by missing-modality inputs into a fixed-length repre-sentation. The resulting adapted tokens A contain information from the available visible modalities and the masked target modality. Since A has a fixed shape regardless of the retained modality set S, the subsequent cross-modal fusion encoder can use the same architecture for full-modality and missing-modality inputs. 
+
+2) Cross-Modal Fusion Encoder: After multimodal token adaptation, the variable-length multimodal sequence caused by missing modalities has been converted into a fixed-length representation A. Since A has a consistent size for different modality combinations, it can be directly fed into the cross-modal fusion encoder without additional token concatenation or modality-specific padding. To model the interactions among heterogeneous sensing modalities, we employ a multi-layer Transformer encoder as the cross-modal fusion encoder. The input of the first layer is defined as 
+
+F0 = A. (51) 7
+
+Then, the adapted multimodal tokens are processed by L
+
+stacked cross-modal fusion layers: 
+
+Fℓ = CFE ℓ (Fℓ−1) , ℓ = 1 , 2, . . . , L, (52) where CFE ℓ(·) denotes the ℓ-th cross-modal fusion layer. Each layer consists of multi-head self-attention, a feed-forward network, residual connections, and layer normalization. The multi-head self-attention operation allows each adapted token to attend to all other tokens, thereby establishing global de-pendencies among the available visual, geometric, and wireless features. The output of the final fusion layer is used as the unified multimodal representation: 
+
+F = FL ∈ RB×Ka×D . (53) Since both Ka and D are fixed, the fused representation 
+
+F has a consistent size regardless of which modalities are available. This property enables the same fusion backbone and downstream task heads to be applied to full-modality and missing-modality scenarios. A compact global feature can be further obtained by average pooling over the fused tokens: 
+
+f = AvgPool ( F) ∈ RB×D. (54) The token-level feature F is used for feature-level masked reconstruction, while the pooled feature f is used for UAV coordinate regression. 
+
+3) Fusion Model Pretraining Module: The fusion model pretraining module is designed to make the multimodal back-bone learn both cross-modal correspondence and task-relevant spatial information. It contains two pretraining tasks: feature-level masked reconstruction and UAV coordinate regression. Different from the single-modality reconstruction tasks that recover raw modality inputs, the multimodal masked recon-struction task reconstructs the latent feature of the selected target modality. This design avoids forcing the fusion back-bone to generate low-level modality-specific signals and in-stead encourages it to learn semantic, geometric, and wireless correspondences across modalities. For the feature-level masked reconstruction task, the target modality t is first selected from the retained modality set S.Its unmasked adapted feature eTt is used as the reconstruction target, while its input content in the fusion encoder is replaced by mask tokens. Given the fusion tokens F, a target-specific reconstruction head predicts the feature tokens of the target modality: 
+
+bTt = Rt(F), bTt ∈ RB×Kt×D . (55) The reconstruction loss is defined in the latent feature space: 
+
+Lf eat = 1
+
+BK tD bTt − eTt 22
+
+. (56) This objective requires the fusion encoder to infer the target modality representation from the remaining visible modalities. The second pretraining task is UAV coordinate regression. The pooled fusion representation f is concatenated with the base-station position feature to predict the 3-D UAV position: 
+
+q = EBS (vBS ), (57) 
+
+by = Floc ([ f ; q]) , by ∈ R3, (58) where vBS denotes the base-station position vector, q is the base-station position embedding, and Floc (·) is an MLP localization head. The localization loss is written as 
+
+Lloc = ∥by − y∥22 , (59) where y ∈ R3 is the ground-truth UAV position. Through this pretraining strategy, the fusion backbone learns to aggregate incomplete multimodal inputs, reconstruct miss-ing target-modality features, and preserve UAV-related spatial information. As a result, after pretraining, the model can be directly adapted to downstream tasks with different modality combinations. 
+
+D. Downstream Fine-Tuning 
+
+After multimodal pretraining, the modality feature extrac-tors, multimodal token adaptation module, and cross-modal fusion encoder are retained as the pretrained backbone. With stochastic modality dropping and adaptive token pooling, the backbone can produce fixed-size representations from differ-ent modality combinations. Given an available modality set 
+
+Sf t ⊆ M , the fused representation is obtained as 
+
+F = B  {Xm}m∈S f t 
+
+ ∈ RB×Ka×D , (60) where B(·) denotes the pretrained multimodal backbone. Since the shape of F is independent of the available modality set, the same downstream head can be used for both full-modality and missing-modality inputs. For downstream adaptation, all task heads are implemented as lightweight MLPs, allowing the pretrained representation to be evaluated without introducing complex task-specific de-signs. We adopt a two-stage fine-tuning strategy: the backbone is first frozen and only the task head is trained, and then the backbone is unfrozen and jointly optimized with a smaller learning rate. This stabilizes early fine-tuning while enabling task-specific adaptation. 
+
+E. Failure-Aware Modality Gating 
+
+In addition to missing-modality training, we further consider modality failure during practical deployment. In real UAV-related wireless systems, a sensor modality may become unreliable due to hardware malfunction, visual occlusion, environmental interference, or adverse propagation conditions. Directly feeding failed modality features into the multimodal fusion backbone may disturb the fused representation and degrade downstream performance. Therefore, we introduce a Failure-Aware Modality Gating (FAMG) module before multimodal fusion, as illustrated in Fig. 3. The proposed FAMG module is built upon the pretrained modality feature extractors. Specifically, after the modality-specific encoders are trained, an additional Modality Failure Discriminator (MFD) is trained to classify whether the input of each modality is normal or failed. In this work, a simple failure simulation strategy is adopted. For RGB and depth modalities, modality failure is simulated by fully occluding the input image or depth map to simulate the night or dark 8Multimodal 
+
+> Pretraining Backbone
+> Downstream
+> Fine -Tuning
+> Modality Failure
+> Discriminator
+
+Modality Feature Extractor 
+
+With Failure Discriminator   
+
+> RGB
+> Feature
+> Extractor
+> RGB
+> Linear
+> Projection
+> Depth
+> Feature
+> Extractor
+> Depth
+> Linear
+> Projection
+> Li DAR
+> Feature
+> Extractor
+> Li DAR
+> Linear
+> Projection
+> CSI
+> Feature
+> Extractor
+> CSI
+> Linear
+> Projection
+> 1000
+> labels
+> 𝑥 𝑦
+> 𝑧
+> Fig. 3. Overall architecture of the proposed Failure-Aware Modality Gating model. The dashed RGB branch is shown as an example of a failed modality.
+
+scenario. For LiDAR point clouds and CSI matrices, severe noise is added to simulate unreliable geometric and wireless observations. The MFD takes the modality features extracted by the pretrained encoders as input and predicts a binary reliability label: 
+
+sm = Dm(Zm), m ∈ M , (61) where Dm(·) denotes the failure discriminator for modality m,and sm ∈ { 0, 1} indicates whether the modality is reliable or failed. During inference, if a modality is predicted as failed, its feature is removed from the input feature set before being sent to the multimodal token adaptation module: 
+
+Srel = {m | sm = 0 , m ∈ M} , (62) where Srel denotes the set of reliable modalities. Only the features of reliable modalities are projected into the unified multimodal embedding space and processed by the pretrained multimodal backbone. Since M3F-UAV is pretrained with stochastic modality dropping and supports missing-modality inputs, no additional modification is required when failed modalities are actively suppressed. This design prevents cor-rupted modality features from degrading the fusion representa-tion and improves the robustness of the model under practical sensor failure conditions. III. E XPERIMENTAL SETUP AND RESULT 
+
+A. Dataset Description 1) Dataset Overview: The dataset used in this work is LAMBDA (Low-Altitude Multi-modal Base DAtaset), a com-prehensive dataset that fuses fine-grained electromagnetic sim-ulations with cinematic-quality visual rendering. It is specif-ically tailored for low-altitude UAV sensing scenarios. Dif-ferent from conventional single-modality datasets, LAMBDA                                
+
+> TABLE I MAIN SENSOR CONFIGURATIONS OF LAMBDA.
+> Sensor Configuration
+> Camera 1920 ×1080 ,100 ◦FOV, 60 Hz LiDAR 512 lines, 150 m, 20 Hz Wireless 4.9 GHz, CSI, τ, Doppler, AoD/AoA TABLE II URBAN SCENARIO SUBSET USED IN THE EXPERIMENTS .
+> Scenario Weather Time Trajectory Distance
+> 1Clear Daytime Type A 70–100 m 2Cloudy Daytime Type A 70–100 m 3Cloudy Daytime Type B 70–100 m 4Clear Dusk Type A 70–100 m
+
+provides synchronized visual, geometric, inertial, and electro-magnetic observations.The dataset used in this work is publicly available 1.
+
+2) Sensor Modalities and Configurations: LAMBDA con-tains complementary visual, geometric, and wireless sensing modalities, as summarized in Table I. The visual sensors provide RGB images and depth maps with a resolution of 
+
+1920 × 1080 , a 100 ◦ field of view, and a frame rate of 60 Hz. The LiDAR sensor generates 3-D point clouds with 512 scanning lines, a sensing range of 150 m, a horizontal field of view from −60 ◦ to +60 ◦, a vertical field of view from 0◦ to 
+
++90 ◦, and a scan rate of 20 Hz. For the wireless modality, LAMBDA provides measure-ments over multiple frequency bands, including 3.5 GHz, 4.9 GHz, 7 GHz, and 28 GHz. In this paper, the 4.9 GHz CSI is used for wireless-domain modeling, together with propagation parameters such as path delay τ , Doppler shift, AoD, and AoA. Since different sensors have different sampling rates and measurement mechanisms, LAMBDA applies spatio-temporal synchronization to align RGB images, depth maps, LiDAR point clouds, IMU data, CSI data, and FMCW LiDAR measurements using timestamps and spatial poses. 
+
+3) Urban Scenario Subset: In this work, experiments are conducted on the urban scenario subset of LAMBDA. This subset covers diverse urban layouts, including high-rise urban canyons, medium-density residential blocks, and open squares or harbor areas, providing complex propagation and perception conditions with blockage, multipath, visual occlusion, and geometric sparsity. The selected subset contains four scenarios with different weather, illumination, and UAV trajectories. Scenarios 1 and 2 are collected under clear daytime and cloudy daytime conditions with trajectory Type A, respectively. Scenario 3 adopts cloudy daytime conditions with trajectory Type B, while Scenario 4 is collected under clear dusk conditions with trajectory Type A. Each scenario includes UAV-camera distances of 70 m, 80 m, 90 m, and 100 m. Representative examples are shown in Fig. 4, and the detailed configurations are summarized in Table II.    
+
+> 1https://www.lambda6g.net/ 9
+> (a) Scene 1 (b) Scene 2
+> (c) Scene 3 (d) Scene 4 Fig. 4. Examples of the urban scenario subset used in this work. The four scenarios cover different weather, illumination, and UAV trajectory configurations.
+
+B. Task Definition 
+
+To evaluate the representation capability and transferability of the proposed multimodal foundation model, three down-stream tasks are considered in this work: UAV localization, beam prediction, and CSI prediction. These tasks correspond to different levels of low-altitude sensing and wireless in-telligence, including spatial perception, communication beam selection, and temporal channel prediction. 
+
+1) UAV Localization: UAV localization aims to estimate the 3-D position of the UAV from the available multimodal observations. Given an available modality set Sf t ⊆ M , the pretrained backbone extracts the fused representation F, which is then fed into a lightweight regression head to predict the UAV coordinate: 
+
+by = Hloc (Pool( F)) , by ∈ R3, (63) where Hloc (·) denotes the localization head. The model is optimized by the regression loss between the predicted and ground-truth UAV positions. This task evaluates whether the fused multimodal representation can preserve spatially dis-criminative information from visual, geometric, and wireless observations. 
+
+2) Beam Prediction: Beam prediction is formulated as a cross-band beam selection task in this work. The objective is to infer the optimal 28 GHz mmWave beam index from the aligned 4.9 GHz CSI and multimodal sensing observations. This setting exploits the spatial correlation between low-frequency and mmWave channels, where both bands share similar propagation geometry, while avoiding exhaustive beam sweeping at 28 GHz. Given a predefined beam codebook 
+
+B = {b1, b2, . . . , bNb }, (64) where Nb is the number of candidate beams, the beam prediction task is formulated as a classification problem: 
+
+bp = Hbeam (Pool( F)) , bp ∈ RNb . (65) The predicted beam is obtained by selecting the class with the maximum probability: 
+
+bb = arg max  
+
+> i
+
+bpi. (66) This task investigates whether the learned multimodal rep-resentation can support communication-oriented decision-making by exploiting environmental, geometric, and wireless propagation features. 
+
+3) CSI Prediction: CSI prediction aims to forecast the future wireless channel state from the current CSI observation. This task is important for time-varying wireless systems, where accurate channel prediction can reduce channel estima-tion overhead and support proactive communication optimiza-tion. In this work, the input is the CSI matrix at the current time step, and the target is the CSI matrix at the next time step: 
+
+bXct+1 = Hcsi (Pool( Ft)) , (67) where Ft is the fused feature extracted from the observations at time step t, and bXct+1 is the predicted CSI representation at the next time step. 
+
+C. Experimental Design 
+
+The experiments evaluate the proposed multimodal founda-tion model from four aspects: downstream task performance, missing-modality robustness, pretraining effectiveness, and failure-aware inference. All modality-specific feature extrac-tors are first pretrained on the available training data. The multimodal fusion model is then pretrained on the same data to obtain the foundation backbone. For downstream tasks, the pretrained backbone extracts fixed-size fusion features, followed by a lightweight MLP head for regression or classi-fication. To reduce experimental complexity, we assume that at most one modality is unavailable or failed at a time. Accordingly, five modality settings are considered, including the full-modality case and four single-missing-modality cases. 
+
+1) Downstream Task Evaluation: The pretrained foundation model is evaluated on each scenario under full-sample training and few-shot fine-tuning settings. Its performance is compared with single-modality baselines to verify whether the learned multimodal representation provides stronger transferability and better task performance than individual modality features. All baselines use the same architectures as the corresponding modality feature extractors. 
+
+2) Missing-Modality Evaluation: To evaluate robustness under incomplete sensing conditions, the pretrained foundation model is tested with different modality combinations. The five settings include full-modality input and four cases where RGB, depth, LiDAR point cloud, or CSI is missing. This experiment examines whether the backbone can still generate effective fixed-size fusion features when part of the sensing information is unavailable. 
+
+3) Pretraining Ablation Evaluation: Ablation experiments are conducted to validate the proposed pretraining strategy. The complete multitask-pretrained model is compared with variants trained using only one pretraining task. A model 10                  
+
+> TABLE III MODEL COMPLEXITY OF THE PROPOSED FRAMEWORK .
+> Module / Model Params FLOPs Inference Latency (M) (G) (ms/sample)
+> CSI Transformer 12.624 ––Point Transformer 13.669 ––MobileNetV2 8.697 ––M3F-UAV 99.138 21.938 27.667
+
+trained from scratch without pretrained parameters is also in-cluded. These comparisons demonstrate the contribution of the pretraining objectives and pretrained backbone to downstream performance. 
+
+4) Failure-Aware Modality Gating Evaluation: To further evaluate robustness under modality failure, we test the model with corrupted inputs. Image and depth failures are simulated by occlusion, while LiDAR point cloud and CSI failures are simulated by adding strong noise. The downstream model is trained on normal data and directly tested with one failed modality. We compare the standard M3F-UAV with its Failure-Aware Modality Gating (FAMG) variant to verify whether FAMG can suppress corrupted modality features and prevent them from degrading the fused representation. 
+
+D. Implementation Details 
+
+All experiments are conducted on a workstation equipped with an AMD Ryzen 9 9950X3D 16-Core Processor and an NVIDIA GeForce RTX 5090 GPU. The model complexity is reported in Table III. For all masked feature reconstruction tasks, the masking ratio is set to 50%. The CSI Transformer and Point Transformer both adopt 4 layers with 4 atten-tion heads, and the feature dimension is set to 512. The MobileNetV2-based visual encoder contains 5 stages, with the final feature dimension of 2560. For the multimodal fusion model, the fusion encoder consists of 4 Transformer layers with 4 attention heads, and the hidden feature dimension is set to 256. 
+
+E. UAV Localization 1) Downstream Task Evaluation: Table IV compares M3F-UAV with single-modality baselines on the UAV localization task. The single-modality baselines are trained with all avail-able samples, while 100% and 10% denote M3F-UAV fine-tuned with all samples and only 10% samples, respectively. Compared with single-modality baselines, M3F-UAV achieves the best localization performance in most scenar-ios, showing that multimodal fusion can effectively exploit complementary visual, geometric, and wireless information. Moreover, M3F-UAV-10% outperforms all single-modality baselines on average, demonstrating the data efficiency of the pretrained backbone. Scene 1 obtains the lowest errors due to favorable clear daytime conditions, whereas Scenes 2 and 3 show larger errors under cloudy and more challenging sensing environments. 
+
+2) Missing-Modality Evaluation: Table IV also evalu-ates M3F-UAV under single-missing-modality settings, where “W/o” means that the corresponding modality is unavailable during fine-tuning. Compared with the full-modality setting, most missing-modality variants show only limited performance degradation, and some even achieve better results in certain scenarios. This indicates that the proposed backbone can still generate effective fixed-size fusion representations when one modality is missing. Among the missing-modality cases, removing LiDAR usu-ally causes relatively small degradation, possibly because UAV-related point-cloud observations are sparse and mainly provide auxiliary geometric cues. In contrast, removing image or depth information often leads to larger errors, suggesting the importance of visual cues for UAV localization. 
+
+3) Pretraining Ablation Evaluation: Table IV further com-pares different pretraining settings. W/o PT denotes training from scratch without pretrained parameters, while W/o Rec and W/o Reg remove the feature-level reconstruction task and the UAV localization regression task during pretraining, respectively. W/o Rec achieves the best localization performance, which is reasonable because it is pretrained only with the regression objective and is therefore more aligned with the downstream localization task. Nevertheless, the complete M3F-UAV re-mains competitive, indicating that feature-level reconstruction does not severely weaken localization performance while improving cross-modal representation learning. In contrast, W/o PT performs much worse, confirming the importance of pretraining. W/o Reg also suffers from clear degradation, showing that UAV-related localization supervision is necessary for learning task-relevant spatial representations. 
+
+4) Failure-Aware Modality Gating Evaluation: Table V compares the localization performance of M3F-UAV with and without the FAMG module under modality failure conditions. Here, the modality listed in the left column denotes the failed modality, “W/o” indicates that the corrupted modality feature is still fed into the fusion backbone, and “W/” denotes that the failed modality is detected and removed before multimodal fusion. The results show that FAMG consistently improves lo-calization performance across all failed-modality cases and scenarios. When the image or depth modality fails, FAMG effectively reduces the localization error by suppressing cor-rupted visual features. Similar improvements are also observed when LiDAR or CSI fails, indicating that unreliable geometric or wireless features may disturb the fused representation if they are directly used for fusion. By removing the failed modality and relying on the remaining reliable modalities, FAMG produces more robust fusion features and improves the accuracy of UAV localization. 
+
+F. Beam Prediction 1) Downstream Task Evaluation: Table VI compares M3F-UAV with single-modality baselines on the beam prediction task using Top-1 and Top-5 accuracy. Overall, M3F-UAV 11          
+
+> TABLE IV UAV LOCALIZATION PERFORMANCE COMPARISON UNDER SINGLE -MODALITY ,MISSING -MODALITY ,PRETRAINING -ABLATION ,AND FINE -TUNING SETTINGS (NMSE ×10 2). B EST AND SECOND -BEST RESULTS ARE HIGHLIGHTED BY BOLD AND UNDERLINE .
+
+Scene Single-modality Missing-modality Pretraining-tasks M3F-UAV Image Depth LiDAR CSI W/o Image W/o Depth W/o LiDAR W/o CSI W/o PT W/o Reg W/o Rec 10% 100% 1 0.169 0.094 0.101 0.125 0.084 0.061 0.056 0.049 0.367 0.397 0.044 0.060 0.048 2 0.693 0.699 1.067 0.359 0.243 0.185 0.117 0.214 0.343 0.450 0.094 0.148 0.145 3 0.566 0.523 0.809 0.304 0.222 0.304 0.288 0.287 0.441 0.516 0.166 0.236 0.210 4 0.450 0.277 0.375 0.151 0.191 0.079 0.080 0.078 0.157 0.256 0.065 0.133 0.076 Avg. 0.469 0.398 0.588 0.235 0.185 0.157 0.135 0.152 0.327 0.405 0.092 0.144 0.121                                                    
+
+> TABLE V EFFECT OF THE FAMG MODULE UNDER MODALITY FAILURE CONDITIONS ON THE UAV LOCALIZATION TASK (NMSE ×10 2). B EST RESULTS ARE HIGHLIGHTED BY BOLD .
+> Scene Failed Modality Image Depth LiDAR CSI W/o FAMG W/ FAMG W/o FAMG W/ FAMG W/o FAMG W/ FAMG W/o FAMG W/ FAMG 10.112 0.084 0.079 0.061 0.055 0.046 0.052 0.039
+> 20.249 0.243 0.304 0.185 0.146 0.117 0.328 0.214
+> 30.317 0.222 0.421 0.304 0.218 0.188 0.336 0.287
+> 40.248 0.191 0.108 0.069 0.078 0.070 0.086 0.068
+> Avg. 0.232 0.185 0.228 0.155 0.124 0.105 0.201 0.152
+
+achieves the best performance in most scenarios, especially in Scenes 2–4, where it obtains the highest Top-1 and Top-5 accuracies. This demonstrates that the proposed multimodal foundation model can effectively integrate complementary en-vironmental and wireless features for communication-oriented decision-making. It is also observed that the CSI baseline is the strongest single-modality method and achieves performance close to M3F-UAV. In Scene 1, CSI even obtains higher Top-1 accuracy than the full multimodal model. This result is reasonable because beam prediction is directly related to wireless channel characteristics, and CSI contains the most task-relevant prop-agation information for optimal beam selection. However, M3F-UAV-10% shows a clear performance drop compared with the fully fine-tuned M3F-UAV. This indicates that beam prediction is more sensitive to downstream labeled data than UAV localization. A possible reason is that beam prediction is a fine-grained classification task, where the deci-sion boundary between adjacent beams can be highly sensitive to small changes in position, orientation, and channel state. 
+
+2) Missing-Modality Evaluation: Table VI evaluates M3F-UAV under different single-missing-modality settings on the beam prediction task. The full-modality M3F-UAV achieves the best overall performance across all scenarios, demonstrat-ing the effectiveness of fused multimodal features for optimal beam selection. This indicates that visual, geometric, and wireless modalities can provide complementary information for communication-oriented prediction. When image, depth, or LiDAR is removed, the performance remains close to that of the full-modality model in most cases, showing that the proposed backbone can still extract effective representations under missing-modality conditions. However, removing CSI causes the most obvious performance degrada-tion, especially in Scene 4 where the Top-1 accuracy drops from 77.41% to 53.53%. This confirms that CSI is the most critical modality for beam prediction, since it directly reflects wireless propagation and channel characteristics related to the optimal beam. 
+
+3) Pretraining Ablation Evaluation: As shown in Table VI, the complete M3F-UAV achieves the best overall performance on the beam prediction task, reaching the highest average Top-1 and Top-5 accuracies. In contrast, all pretraining ablation variants show performance degradation, indicating that the proposed pretraining strategy is important for learning beam-discriminative multimodal representations. Specifically, W/o PT performs unstably across different scenarios, showing that directly training without pretraining is insufficient for robust beam prediction. W/o Reg also suffers a clear accuracy drop, which suggests that the UAV localization objective provides useful spatial supervision for beam selection. Although W/o Rec performs better than the other incomplete variants, it still remains inferior to the complete M3F-UAV. These results confirm that jointly using reconstruction and UAV localiza-tion objectives can better exploit multimodal information and improve beam prediction accuracy. 
+
+4) Failure-Aware Modality Gating Evaluation: Table VII evaluates the effectiveness of FAMG on the beam prediction task under modality failure conditions. Compared with the set-ting without FAMG, the model equipped with FAMG consis-tently achieves much higher Top-1 and Top-5 accuracies across all failed-modality cases. This shows that actively detecting and removing unreliable modality features can effectively mitigate the performance degradation caused by modality failure. It can also be observed that CSI failure leads to the most se-vere performance drop when FAMG is not used, especially in Scenes 2 and 4. After introducing FAMG, the performance is significantly recovered, indicating that corrupted CSI features can seriously disturb beam prediction if directly fused. This further confirms the importance of CSI for beam prediction and demonstrates that FAMG improves the robustness of multimodal fusion under practical sensor or signal failure conditions. 12 
+
+TABLE VI BEAM PREDICTION PERFORMANCE COMPARISON UNDER SINGLE -MODALITY , MISSING -MODALITY , PRETRAINING -ABLATION , AND FINE -TUNING SETTINGS (T OP -1 AND TOP -5 A CCURACY %). B EST AND SECOND -BEST RESULTS ARE HIGHLIGHTED BY BOLD AND UNDERLINE .                                                      
+
+> Scene Single-modality Missing-modality Pretraining-tasks M3F-UAV Image Depth LiDAR CSI W/o Image W/o Depth W/o LiDAR W/o CSI W/o PT W/o Reg W/o Rec 10% 100% T1 T5 T1 T5 T1 T5 T1 T5 T1 T5 T1 T5 T1 T5 T1 T5 T1 T5 T1 T5 T1 T5 T1 T5 T1 T5 180.89 99.13 79.63 99.31 70.59 97.59 88.40 99.78 83.22 99.06 83.65 99.08 84.26 99.08 78.93 99.23 81.92 98.61 64.78 92.34 82.40 99.26 77.16 96.48 84.41 99.28 283.21 99.31 69.39 88.56 45.13 73.74 93.71 100.0 94.79 100.0 92.38 99.98 95.16 100.0 90.39 99.80 93.79 100.0 88.60 99.85 94.35 100.0 82.48 99.36 95.45 100.0
+> 385.69 99.31 66.24 92.96 43.22 71.75 89.10 99.80 85.44 99.36 89.39 99.59 89.55 99.73 88.15 99.70 84.88 99.48 75.55 98.34 88.09 99.48 68.06 97.02 91.04 99.98
+> 464.58 92.44 66.31 89.71 42.22 70.75 75.19 95.70 64.16 94.23 73.22 98.64 75.69 98.48 53.53 95.20 76.36 98.53 47.03 83.99 55.94 87.50 51.42 89.13 86.04 99.67
+> Avg. 78.59 97.53 70.39 92.63 50.29 78.46 86.62 98.82 81.90 98.16 84.66 99.32 86.16 99.32 78.25 98.48 61.02 74.41 68.99 93.63 80.19 96.56 69.78 95.50 89.24 99.73
+
+TABLE VII EFFECT OF THE FAMG MODULE UNDER MODALITY FAILURE CONDITIONS ON THE BEAM PREDICTION TASK (T OP -1 AND TOP -5 A CCURACY %). BEST RESULTS ARE HIGHLIGHTED BY BOLD .                                                                                        
+
+> Scene Metric Failed Modality Image Depth LiDAR CSI w/o FAMG w/ FAMG w/o FAMG w/ FAMG w/o FAMG w/ FAMG w/o FAMG w/ FAMG 1T1 52.06 83.22 66.72 83.65 76.54 84.26 65.47 78.93
+> T5 90.92 99.06 95.45 99.08 97.00 99.08 93.30 99.23
+> 2T1 77.29 94.79 59.82 92.38 84.55 95.16 15.41 90.39
+> T5 99.22 100.0 95.40 99.98 99.60 100.0 41.39 99.80
+> 3T1 28.31 85.44 34.20 89.39 78.70 89.55 51.72 88.15
+> T5 56.79 99.36 81.32 99.59 99.06 99.73 92.81 99.70
+> 4T1 56.54 64.16 47.42 73.22 69.69 75.69 26.31 55.53
+> T5 88.19 94.23 86.77 98.64 97.79 98.48 63.47 95.20
+> Avg. T1 53.55 81.90 52.04 84.66 77.37 86.16 39.73 78.25
+> T5 83.78 98.16 89.73 99.32 98.36 99.32 72.74 98.48
+
+TABLE VIII PERFORMANCE COMPARISON OF M3F-UAV WITH THE CSI BASELINE AND PRETRAINING ABLATIONS ON THE CSI PREDICTION TASK (NMSE 
+
+dB ). B EST AND SECOND -BEST RESULTS ARE HIGHLIGHTED BY BOLD AND UNDERLINE .Scene Single-modality Pretraining-tasks M3F-UAV CSI W/o PT W/o Reg W/o Rec 10% 100% 1 -4.398 -6.280 -4.075 -7.337 -3.523 -7.472 
+
+2 -13.42 -16.02 -13.92 -15.41 -9.442 -17.71 
+
+3 -11.94 -11.55 -8.587 -9.873 -5.772 -13.63 
+
+4 -1.986 -0.750 -1.249 -1.549 -0.314 -1.611 Avg. -7.936 -8.650 -6.958 -8.542 -4.763 -10.11 
+
+G. CSI Prediction 1) Downstream Task Evaluation: Table VIII compares M3F-UAV with the CSI single-modality baseline and related ablation variants on the CSI prediction task. Overall, the fully fine-tuned M3F-UAV achieves the best average performance and obtains the best results in most scenarios. Compared with the CSI baseline, M3F-UAV achieves lower NMSE in Scenes 1–3, indicating that additional environmental modalities provide useful spatial and geometric context for modeling channel evolution. In Scene 4, the CSI baseline performs best, suggesting that CSI alone may be sufficient when the channel dynamics are mainly dominated by wireless observations. M3F-UAV-10% shows a clear performance drop compared with the fully fine-tuned model, indicating that CSI prediction is sensitive to downstream labeled data due to its fine-grained temporal and propagation-dependent nature. 
+
+2) Pretraining Ablation Evaluation: Among the pretraining ablations, W/o Reg achieves the second-best average perfor-mance, while W/o PT shows unstable results across different scenarios. This confirms that pretraining is generally beneficial for CSI prediction, but the contribution of each pretraining objective depends on its consistency with the downstream task. In particular, the complete M3F-UAV achieves the best overall result, indicating that jointly using reconstruction and UAV localization objectives can improve the generality of the learned multimodal representation. IV. C ONCLUSION 
+
+In this paper, we proposed M3F-UAV, a missing-modality multimodal foundation model for low-altitude wireless sens-ing. The model integrates RGB images, depth maps, LiDAR point clouds, and CSI matrices through modality-specific pretrained feature extractors and a unified cross-modal fusion backbone, enabling fixed-size feature extraction from different modality combinations. By jointly using feature-level masked reconstruction and UAV localization for pretraining, M3F-UAV learns cross-modal correspondences and UAV-related spatial representations. Experimental results demonstrate its effectiveness in UAV localization and beam prediction, as well as its robustness under missing-modality and modality-failure settings. Future work will extend the framework to more sensing modalities, more challenging multi-modality missing cases, and broader downstream UAV-related wireless tasks. REFERENCES [1] A. AboElfotouh, E. Mohammed, and H. Abou-Zeid, “6g wavesfm: A foundation model for sensing, communication, and localization,” IEEE Open J. Commun. Soc. , vol. 6, pp. 6792–6807, 2025. [2] L. Gupta, R. Jain, and G. Vaszkun, “Survey of important issues in UAV communication networks,” IEEE Commun. Surv. Tutorials , vol. 18, no. 2, pp. 1123–1152, 2016. [3] H. Liu, Q. Long, B. Yi et al. , “A survey of sensors based autonomous unmanned aerial vehicle UAV localization techniques,” Complex Intell. Syst. , vol. 11, no. 8, p. 371, 2025. [4] J. Wu, Y. Yang, W. Yuan et al. , “Low-altitude wireless networks: A comprehensive survey,” 2026, arXiv:2509.11607. [5] A. A. Khuwaja, Y. Chen, N. Zhao et al. , “A survey of channel modeling for UAV communications,” IEEE Commun. Surv. Tutorials , vol. 20, no. 4, pp. 2804–2821, 2018. 13 
+
+[6] X. Yan, T. Fu, H. Lin et al. , “UAV detection and tracking in urban en-vironments using passive sensors: A survey,” Applied Sciences , vol. 13, no. 20, p. 11320, 2023. [7] U. Olawoye and J. N. Gross, “UAV position estimation using a LiDAR-based 3d object detection method,” CoRR , vol. abs/2504.07028, 2025. [8] R. P. Padhy, S. Ahmad, S. Verma et al. , “Localization of unmanned aerial vehicles in corridor environments using deep learning,” 2019. [9] X. Wang, L. Gao, S. Mao et al. , “CSI-based fingerprinting for indoor localization: A deep learning approach,” 2016. [10] G. Charan, A. Hredzak, C. Stoddard et al. , “Towards real-world 6G drone communication: Position and camera aided beam prediction,” in 
+
+Proc. IEEE Global Commun. Conf. , 2022, pp. 2951–2956. [11] B. Salehi, M. Belgiovine, S. G. Sanchez et al. , “Machine learning on camera images for fast mmwave beamforming,” in MASS , 2020, pp. 338–346. [12] S. Jiang, G. Charan, and A. Alkhateeb, “LiDAR aided future beam prediction in real-world millimeter wave V2I communications,” 2022, arXiv:2203.05548. [13] U. Demirhan and A. Alkhateeb, “Radar aided 6G beam prediction: Deep learning algorithms and real-world demonstration,” in Proc. IEEE Wireless Commun. Netw. Conf. , 2022, pp. 2655–2660. [14] H. Yang, “Deep learning-based channel prediction for TDD MIMO systems with imperfect channel reciprocity,” ICT Express , vol. 11, no. 3, pp. 590–596, 2025. [15] X. Tong and S. Sun, “Long short-term memory network for wireless channel prediction,” in Proc. Int. Conf. Signal Inf. Process., Netw. Comput. , 2018, pp. 19–26. [16] A. Alkhateeb, G. Charan, T. Osman et al. , “Deepsense 6G: A large-scale real-world multi-modal sensing and communication dataset,” IEEE Commun. Mag. , vol. 61, no. 9, pp. 122–128, 2023. [17] G. Charan, T. Osman, A. Hredzak et al. , “Vision-position multi-modal beam prediction using real millimeter wave datasets,” in Proc. IEEE Wireless Commun. Netw. Conf. , 2022, pp. 2727–2731. [18] I. Ahmad, A. R. Khan, R. N. B. Rais et al. , “Vision-assisted beam prediction for real world 6G drone communication,” in Proc. IEEE 34th Annu. Int. Symp. Pers., Indoor Mobile Radio Commun. , 2023, pp. 1–7. [19] Y. Tian, Q. Zhao, Z. el abidine Kherroubi et al. , “Multimodal trans-formers for wireless communications: A case study in beam prediction,” 2023. [20] Y. Yeo, J. Kim, J. Kim et al. , “Multi-modal sensing-assisted beam prediction using real-world dataset,” J. Commun. Networks , vol. 27, no. 5, pp. 412–419, 2025. [21] C. Zheng, J. He, C. G. Kang et al. , “M2BeamLLM: Multimodal sensing-empowered mmwave beam prediction with large language models,” 2025, arXiv:2506.14532. [22] Z. Xin, Y. Liu, J. Xing et al. , “A novel multimodal fusion sensing-based channel prediction method for uav communications,” IEEE Internet Things J. , vol. 12, no. 4, pp. 3948–3960, 2025. [23] T. B. Brown, B. Mann, N. Ryder et al. , “Language models are few-shot learners,” in Proc. Adv. Neural Inf. Process. Syst. , 2020. [24] A. Chowdhery, S. Narang, J. Devlin et al. , “PaLM: Scaling language modeling with pathways,” J. Mach. Learn. Res. , vol. 24, pp. 1–113, 2023. [25] H. Touvron, T. Lavril, G. Izacard et al. , “LLaMA: Open and efficient foundation language models,” 2023, arXiv:2302.13971. [26] H. Zou, Q. Zhao, Y. Tian et al. , “TelecomGPT: A framework to build telecom-specific large language models,” IEEE Trans. Mach. Learn. Commun. Netw. , vol. 3, pp. 948–975, 2025. [27] B. Liu, X. Liu, S. Gao et al. , “LLM4CP: adapting large language models for channel prediction,” J. Commun. Inf. Networks , vol. 9, no. 2, pp. 113–125, 2024. [28] X. Liu, S. Gao, B. Liu et al. , “LLM4WM: Adapting llm for wireless multi-tasking,” IEEE Trans. Mach. Learn. Commun. Netw. , vol. 3, pp. 835–847, 2025. [29] S. Alikhani, G. Charan, and A. Alkhateeb, “Large Wireless Model (LWM): A foundation model for wireless channels,” 2025, arXiv:2411.08872. [30] B. Liu, S. Gao, X. Liu et al. , “WiFo: wireless foundation model for channel prediction,” Sci. China Inf. Sci. , vol. 68, no. 6, 2025. [31] K. Bian, M. Tao, J. Mo et al. , “AirFM-DDA: Air-interface foundation model in the delay-doppler-angle domain for AI-native 6G,” 2026. [32] A. AboElfotouh, E. Mohammed, and H. Abou-Zeid, “6G WavesFM: A foundation model for sensing, communication, and localization,” IEEE Open J. Commun. Soc. , vol. 6, pp. 6792–6807, 2025. [33] J. Jiang, W. Yu, Y. Li et al. , “A MIMO wireless channel foundation model via CIR-CSI consistency,” 2025. [34] T. Zheng, J. Guo, L. Dai et al. , “MUSE-FM: Multi-task environment-aware foundation model for wireless communications,” 2026. [35] K. Zhang, W. Yu, H. He et al. , “Multimodal mixture-of-experts for ISAC in low-altitude wireless networks,” 2025. [36] R. Bachmann, D. Mizrahi, A. Atanov et al. , “MultiMAE: Multi-modal multi-task masked autoencoders,” in Proc. Eur. Conf. Comput. Vis. , 2022, pp. 348–367. [37] W.-B. Jiang, X. Fu, Y. Ding et al. , “Towards robust multimodal physio-logical foundation models: Handling arbitrary missing modalities,” 2026, arXiv:2504.19596. [38] X. Chen and J. Yang, “X-Fi: A modality-invariant foundation model for multimodal human sensing,” in Proc. 13th Int. Conf. Learn. Represent. ,2025. [39] M. Sandler, A. G. Howard, M. Zhu et al. , “MobileNetV2: Inverted residuals and linear bottlenecks,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit. , 2018, pp. 4510–4520. [40] Y. Pang, W. Wang, F. E. H. Tay et al. , “Masked autoencoders for point cloud self-supervised learning,” in Proc. Eur. Conf. Comput. Vis. , 2022, pp. 604–621.
