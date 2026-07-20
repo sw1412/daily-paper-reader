@@ -1,0 +1,135 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-20T21:43:08.795227+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 12,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2607.15639v1",
+      "source": "arxiv",
+      "title": "BCG-Former: Toward Pareto-Efficient Hyperspectral Image Classification via Band-Contextual Gating",
+      "abstract": "Hyperspectral image (HSI) classification systems are increasingly deployed on platforms with strict computational budgets, such as UAVs and small spaceborne sensors. In these settings, accuracy alone is not enough; the model must also run within tight latency and memory constraints. Most recent HSI classifiers, however, focus on accuracy and pay relatively little attention to these constraints. We propose BCG-Former, a lightweight CNN-Transformer hybrid that targets this trade-off. The model introduces three innovations: (1) Band-Contextual Gating (BCG) for adaptive spectral recalibration using local inter-band context and learnable temperature sharpening, (2) a spectral summary token that bridges spectral and spatial features, and (3) single-pass Band-RoPE combined with linear attention for efficient joint representation learning. Evaluated on classical airborne (Pavia University, Salinas, Indian Pines, Houston 2013/2018) and UAV-borne benchmark datasets (WHU-Hi-LongKou, HongHu, and HanChuan), BCG-Former achieves over-all accuracy ranging from 91.51% on Houston 2018 to 99.49% on Houston 2013, while maintaining sub-millisecond inference latency (0.91-0.95ms) and using only 0.10-0.23M parameters. Across all eight benchmarks, BCG-Former consistently resides on or near the Pareto frontier of accuracy versus latency, outperforming or matching recent CNN-, Transformer-, and Mamba-based methods at a fraction of their computational cost. Ablation studies confirm that all three components are complementary, with BCG providing the largest individual contribution. These results establish BCG-Former as a strong accuracy-efficiency Pareto candidate for real-time and large-scale remote sensing applications.",
+      "authors": [
+        "Gaurav Sharma",
+        "Eungjoo Lee"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T05:29:18+00:00",
+      "link": "https://arxiv.org/pdf/2607.15639v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hyperspectral image classification method",
+      "llm_evidence_cn": "高光谱图像分类方法",
+      "llm_evidence": "高光谱图像分类方法",
+      "canonical_evidence": "高光谱图像分类方法",
+      "llm_tldr_en": "Proposes BCG-Former, a lightweight CNN-Transformer hybrid for hyperspectral image classification, introducing Band-Contextual Gating and spectral summary token for efficient spectral-spatial feature extraction.",
+      "llm_tldr_cn": "本文提出BCG-Former轻量级CNN-Transformer混合模型用于高光谱图像分类，创新包括波段上下文门控机制实现自适应光谱重校准，以及光谱摘要令牌桥接光谱与空间特征。在多个HSI数据集上，模型以较低计算成本达到高精度，适合无人机等资源受限平台。",
+      "llm_tldr": "本文提出BCG-Former轻量级CNN-Transformer混合模型用于高光谱图像分类，创新包括波段上下文门控机制实现自适应光谱重校准，以及光谱摘要令牌桥接光谱与空间特征。在多个HSI数据集上，模型以较低计算成本达到高精度，适合无人机等资源受限平台。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.12110v1",
+      "source": "arxiv",
+      "title": "ACZ-GSeg: Adaptive Concentric Zone-based Two-stage Ground Segmentation for LiDAR Point Clouds",
+      "abstract": "Ground segmentation is a fundamental prerequisite for autonomous navigation, environmental perception, and object detection in ground mobile platforms. To address the under-segmentation of ground points caused by sparse long-range point clouds, ground undulations, and interference from non-ground structures in complex road scenarios, this paper proposes a two-stage ground segmentation method based on the Adaptive Concentric Zone Model. First, an Adaptive Concentric Zone Model is constructed to dynamically determine the number of sectors in each ring, thereby forming local zones with more balanced point distributions. Based on this model, a two-stage ground segmentation method is developed. In the coarse segmentation stage, a lowest-height seed constraint and height-decay weighting are introduced to establish a weighted principal component analysis plane fitting model, from which ground candidate points are extracted. In the fine segmentation stage, a reflectance intensity consistency constraint is employed to distinguish high-confidence ground points from uncertain points, and the uncertain points are further refined based on the local height stability of high-confidence neighborhoods. Experimental results show that the proposed method achieves Precision, Recall, and F1-score values of 99.12%, 96.24%, and 97.66% on the SemanticKITTI dataset, and 98.72%, 100.00%, and 99.36%, respectively, on a self-collected point cloud acquired using a RUBY-PLUS. The results demonstrate that the proposed method can effectively adapt to the range-dependent distribution characteristics of LiDAR point clouds, which are dense at near ranges and sparse at far ranges. It reduces the misclassification of non-ground points while maintaining ground point recall, thereby effectively improving the stability of ground segmentation.",
+      "authors": [
+        "Ge Zhang Chunyang Wang Bin Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-13T19:38:13+00:00",
+      "link": "https://arxiv.org/pdf/2607.12110v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LiDAR point cloud ground segmentation method",
+      "llm_evidence_cn": "激光雷达点云地面分割方法",
+      "llm_evidence": "激光雷达点云地面分割方法",
+      "canonical_evidence": "激光雷达点云地面分割方法",
+      "llm_tldr_en": "Proposes an adaptive concentric zone model for two-stage ground segmentation from LiDAR point clouds, addressing sparse long-range points and ground undulations.",
+      "llm_tldr_cn": "该论文针对激光雷达点云地面分割中长距离点云稀疏、地面起伏等问题，提出了一种自适应同心圆环模型的两阶段地面分割方法。方法先构建自适应同心圆环以平衡点分布，再通过两阶段分割提高精度。实验表明该方法能有效处理复杂道路场景下地面分割的挑战，为LiDAR数据后续分类和目标检测提供基础。",
+      "llm_tldr": "该论文针对激光雷达点云地面分割中长距离点云稀疏、地面起伏等问题，提出了一种自适应同心圆环模型的两阶段地面分割方法。方法先构建自适应同心圆环以平衡点分布，再通过两阶段分割提高精度。实验表明该方法能有效处理复杂道路场景下地面分割的挑战，为LiDAR数据后续分类和目标检测提供基础。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.16056v1",
+      "source": "arxiv",
+      "title": "Multi-Modal Semantic Segmentation of Electrolyzer Components for Sustainable Hydrogen Technologies: A Dual-Branch Deep Learning Approach",
+      "abstract": "Accurate segmentation of electrolyzer materials is essential for automated disassembly, sustainable recycling, and circular manufacturing in hydrogen technologies. However, this task is challenging due to strong visual similarity between materials, spectral overlap, irregular shapes, and severe class imbalance. To address these challenges, we propose an AI-driven dual-branch framework, Hyperspectral-RGB Electrolyzer Materials Network (HREM-Net), that combines hyperspectral imaging (HSI) and RGB images for electrolyzer material segmentation. We implemented several innovative modules, including Efficient Channel Attention, Coordinate Attention, Mobile Inverted Bottleneck blocks, and Atrous Spatial Pyramid Pooling to capture spectral and spatial features from HSI, and RGB images. With an adaptive gated cross-modal fusion module and composite loss function, HREM-Net achieves a mean class accuracy of 91.66% and a mean Intersection over Union (mIoU) of 0.82 on the Electrolyzers-HSI dataset, outperforming baseline segmentation models. Cross-dataset validation on the PCB-Vision dataset demonstrates strong generalization with 96.91% accuracy and 0.93 mIoU. This work poses its potential as an industrial application to improve electrolyzer efficiency, thereby improving the predictive maintenance of hydrogen production.",
+      "authors": [
+        "Wasimul Karim",
+        "Nur Mohammad Fahad",
+        "Abdul Hasib Siddique",
+        "Md Rafiqul Islam",
+        "Hooman Mehdizadeh-Rad",
+        "Asif Karim",
+        "Sami Azam"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T15:34:20+00:00",
+      "link": "https://arxiv.org/pdf/2607.16056v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "hyperspectral image classification using HSI and RGB",
+      "llm_evidence_cn": "使用HSI和RGB的高光谱图像分类",
+      "llm_evidence": "使用HSI和RGB的高光谱图像分类",
+      "canonical_evidence": "使用HSI和RGB的高光谱图像分类",
+      "llm_tldr_en": "Proposes HREM-Net, a dual-branch deep learning framework combining hyperspectral and RGB images for semantic segmentation of electrolyzer materials, addressing spectral overlap and class imbalance.",
+      "llm_tldr_cn": "本文提出HREM-Net双分支深度学习框架，融合高光谱和RGB图像进行电解槽材料语义分割，解决光谱重叠和类别不平衡问题。该方法利用通道注意力和坐标注意力等模块提升分割精度，在电解槽数据集上验证了有效性，为多模态高光谱图像分割提供了新思路。",
+      "llm_tldr": "本文提出HREM-Net双分支深度学习框架，融合高光谱和RGB图像进行电解槽材料语义分割，解决光谱重叠和类别不平衡问题。该方法利用通道注意力和坐标注意力等模块提升分割精度，在电解槽数据集上验证了有效性，为多模态高光谱图像分割提供了新思路。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

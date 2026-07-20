@@ -1,0 +1,262 @@
+Title: BCG-Former: Toward Pareto-Efficient Hyperspectral Image Classification via Band-Contextual Gating
+
+URL Source: https://arxiv.org/pdf/2607.15639v1
+
+Published Time: Mon, 20 Jul 2026 00:28:59 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+> 1
+
+# BCG-Former: Toward Pareto-Efficient Hyperspectral Image Classification via Band-Contextual Gating 
+
+Gaurav Sharma, Eungjoo Lee, Member, IEEE 
+
+Abstract —Hyperspectral image (HSI) classification systems are increasingly deployed on platforms with strict computational budgets, such as UAVs and small spaceborne sensors. In these settings, accuracy alone is not enough; the model must also run within tight latency and memory constraints. Most recent HSI classifiers, however, focus on accuracy and pay relatively little attention to these constraints. We propose BCG-Former, a lightweight CNN-Transformer hybrid that targets this trade-off. The model introduces three innovations: (1) Band-Contextual Gating (BCG) for adaptive spectral recalibration using local inter-band context and learnable temperature sharpening, (2) a spectral summary token that bridges spectral and spatial features, and (3) single-pass Band-RoPE combined with linear attention for efficient joint representation learning. Evaluated on classical airborne (Pavia University, Salinas, Indian Pines, Hous-ton 2013/2018) and UAV-borne benchmark datasets (WHU-Hi-LongKou, HongHu, and HanChuan), BCG-Former achieves over-all accuracy ranging from 91.51% on Houston 2018 to 99.49% on Houston 2013, while maintaining sub-millisecond inference latency (0.91–0.95ms) and using only 0.10–0.23M parameters. Across all eight benchmarks, BCG-Former consistently resides on or near the Pareto frontier of accuracy versus latency, outper-forming or matching recent CNN-, Transformer-, and Mamba-based methods at a fraction of their computational cost. Ablation studies confirm that all three components are complementary, with BCG providing the largest individual contribution. These results establish BCG-Former as a strong accuracy-efficiency Pareto candidate for real-time and large-scale remote sensing applications. 
+
+Index Terms —Hyperspectral image classification; band-contextual gating; linear attention; spectral-spatial transformer; lightweight remote sensing; rotary positional encoding. 
+
+I. I NTRODUCTION 
+
+Hyperspectral image (HSI) classification is a cornerstone of modern remote sensing, leveraging rich spectral signatures from hundreds of contiguous narrow bands to enable fine-grained material discrimination beyond the capabilities of multispectral sensors [1], [2]. This makes it essential for applications such as land-cover mapping, precision agriculture, urban analysis, and environmental monitoring. However, effec-tively modeling the 3D HSI datacube remains challenging, as it requires the joint extraction of local spatial textures and long-range spectral dependencies [3]. These challenges are further compounded by the high dimensionality of hyperspectral data, which introduces strong spectral redundancy and highly corre-lated feature spaces, aggravating the curse of dimensionality. 
+
+G. Sharma is with the College of Information Science, University of Arizona, Tucson, AZ, USA. E. Lee is with the Department of Electrical and Computer Engineer-ing, University of Arizona, Tucson, AZ, USA (corresponding author: eu-ngjoolee@arizona.edu). 
+
+Additionally, the limited availability of labeled samples in standard benchmarks increases the risk of overfitting and necessitates compact yet expressive models [4], [5]. Early deep learning methods primarily relied on convolu-tional neural networks (CNNs) such as MobileNet [6] and HybridSN [7]. While computationally efficient, CNNs are inherently limited by their fixed receptive fields, struggling to capture long-range spectral dependencies. Vision Trans-formers (ViTs)-based models like SSFTT [8] address this limitation through global self-attention, but their quadratic complexity O(N 2) becomes prohibitive as sequence lengths grow. Recent hybrid approaches, such as HiT [9] and Swin-HSI [10], attempt to balance efficiency and performance, yet they often discard important spectral ordering due to fixed patch tokenization. More recently, state-space models such as SpectralMamba [11] have achieved linear complexity for spectral modeling, but they provide limited spatial reasoning capability. Despite these advances, a significant gap remains where, to the best of our knowledge, no existing method simultane-ously achieves high classification accuracy, sub-millisecond to low-millisecond inference latency, and with only 0.10-0.23 M parameters consistently across multiple diverse HSI bench-marks. Critically, prior works optimize accuracy in isolation, neglecting the accuracy-latency Pareto frontier that determines real-world deployability. To address this gap, we propose 
+
+BCG-Former (Fig. 1), a lightweight CNN-Transformer hybrid for HSI classification. The model is built around hardware-friendly operations and HSI-specific inductive biases, rather than scaled depth or parameter count. We evaluate BCG-Former on eight benchmark hyperspectral datasets covering both airborne (Pavia University [12], Salinas [13], Indian Pines [14], Houston 2013 [15]/2018 [16]) and UAV-borne (WHU-Hi-LongKou [17], HongHu [17], and HanChuan [17]) sensing scenarios. The main contributions of this work are:  
+
+> •
+
+Band-Contextual Gating (BCG) , an HSI-specific spec-tral recalibration module that adaptively re-weights chan-nels using local inter-band context and learnable temper-ature sharpening, providing consistent accuracy improve-ments with negligible computational overhead.  
+
+> •
+
+A spectral summary token that pools the BCG-gated features into a single global descriptor and is concate-nated with the spatial tokens. This gives the transformer direct access to aggregated spectral information when it computes attention.  
+
+> •
+
+Single-pass Band-RoPE with ELU-kernel linear atten-tion. Rotary positional encoding is adapted to the ordered spectral-band token sequence and applied once before arXiv:2607.15639v1 [cs.CV] 17 Jul 2026 2
+
+Fig. 1: Overview of the proposed BCG-Former framework for efficient hyperspectral image classification, highlighting the Band-Contextual Gating module, spectral summary token, and single-pass Band-RoPE with linear attention. the Transformer blocks, enabling efficient relative inter-band positional modeling. Combined with ELU-kernel linear attention, this reduces complexity from O(N 2D)
+
+to O(N D 2). 
+
+> •
+
+A strong accuracy-efficiency trade-off , validated across five airborne datasets (Pavia University, Salinas, Indian Pines, Houston 2013/2018) and three UAV-borne datasets (WHU-Hi-LongKou, HongHu, HanChuan). Across all eight benchmarks, BCG-Former achieves the lowest in-ference latency while reaching state-of-the-art competi-tive accuracy, using only 0.10–0.23 M parameters (up to 24 × fewer than prior methods), thereby demonstrating a strong accuracy-efficiency trade-off across diverse bench-marks. II. M ETHODOLOGY 
+
+Let the input hyperspectral patch be X ∈ RB×C×H×W ,where B is the batch size, C is the number of spectral bands, and H × W is the patch size. The overall architecture consists of five main stages as follows: (1) CNN stem for initial spatial feature extraction, (2) Band-Contextual Gating, (3) token fusion and positional encoding and single-pass band rotational positional encoding (RoPE), (4) linear spectral-spatial attention, and (5) the final classification head. 
+
+A. CNN Stem 
+
+A two-layer CNN stem extracts local spatial features while preserving spectral information: F = Stem (X), where Stem (·)
+
+comprises two 3 × 3 convolutions (first with C → D,where D is the embedding dimension, followed by a second depthwise convolution), each followed by Batch Normaliza-tion and Sigmoid Linear Unit (SiLU) activation. The output 
+
+F ∈ RB×D×H×W serves as the base spatial features. 
+
+B. Band-Contextual Gating (BCG) 
+
+To adaptively emphasize informative spectral features in the embedded space using local channel context, we introduce Band-Contextual Gating (BCG). First, global average pooling produces a spectral descriptor: 
+
+s = 1
+
+H × W
+
+> H
+
+X
+
+> h=1
+> W
+
+X
+
+> w=1
+
+F:,:,h,w ∈ RB×D. (1) Following this, a 1D convolution with kernel size 7 is applied along the spectral dimension (after transposing s to shape RB×1×D) to capture local band context s′, followed by a two-layer bottleneck to obtain the logits L:
+
+s′ = Conv1D (s⊤) ∈ RB×D, L = W2 · SiLU (W1s′), (2) where W1 ∈ RD×(D/ 4) and W2 ∈ R(D/ 4) ×D.An exponentially learnable temperature parameter τ =exp( θ) (with θ clamped so τ ≤ 10 ) sharpens the sigmoid gat-ing σ(·). The gating vector is then reshaped to g ∈ RB×D×1×1
+
+for broadcasting, to obtain the gated features F ′:
+
+g = σ(L · τ ) ∈ RB×D, F′ = F ⊙ g. (3) This mechanism performs band-informed channel gating in the learned embedding space (dimension D), extending Squeeze-and-Excitation concepts to hyperspectral imagery by leverag-ing local spectral context along the embedded channels with temperature sharpening. 
+
+C. Spectral Summary Token and Token Construction 
+
+The F′ is then used to create the learnable spectral sum-mary tokens that bridge spectral and spatial information. The summary is computed as: 
+
+ssum = 1
+
+H × W
+
+X
+
+> h,w
+
+F′ 
+
+> :,:,h,w
+
+∈ RB×D (4) 3
+
+tspec = pspec + ssum ∈ RB×1×D, (5) where pspec ∈ R1×1×D is a learnable parameter. This spectral summary token acts as a compact global spectral prior, allow-ing direct interaction between aggregated spectral information and local spatial tokens within the attention mechanism. By injecting this learned spectral representation, the model estab-lishes a stronger spectral-spatial bridge compared to purely spatial tokenization approaches. Spatial tokens are obtained by flattening the gated features: 
+
+Tspat = Flatten (F′)⊤ ∈ RB×N ×D , (6) with N = H × W = 25 . The full token sequence is the concatenation of the spectral summary token and spatial tokens, plus a learnable positional embedding: 
+
+T0 = Concat (tspec , Tspat ) + P ∈ RB×(1+ N )×D, (7) where P ∈ R1×(1+ N )×D is a learnable position parameter. Dropout is applied after addition. After adding the learnable positional embedding, we apply a single-pass Band-RoPE to the entire token sequence T0. Unlike conventional RoPE [18] that is typically applied inside each attention layer on queries and keys, our implementation applies Band-RoPE once to all tokens before entering the Transformer blocks. Specifi-cally, Band-RoPE treats the spectral tokens as an ordered band sequence and applies rotary positional encoding along the spectral dimension, while the spectral summary token is assigned a dedicated global position index to preserve its role as a scene-level aggregation token. The resulting position-aware tokens are then directly used to compute queries, keys, and values in the linear attention. This design combines ab-solute positional information from the learnable embedding P
+
+with relative positional encoding from Band-RoPE, providing richer positional awareness while maintaining computational efficiency through single-pass processing. 
+
+D. Linear Spectral-Spatial Attention and Classification Head 
+
+The model stacks three Transformer blocks using efficient linear attention with an ELU-based kernel, achieving lin-ear complexity in the sequence length O(N ) (specifically 
+
+O(N D 2) overall, where D is the embedding dimension). For each block, layer normalization is applied, followed by a linear projection to obtain queries, keys, and values: 
+
+[Q, K, V] = Linear (LayerNorm (T)) ∈ RB×(1+ N )×3D. (8) After reshaping to multi-head form ( M = 4 heads, head dimension d = D/M ), we apply the Exponential Linear Unit (ELU) kernel on Queries and Keys: 
+
+Q′ = ELU (Q) + 1 , K′ = ELU (K) + 1 . (9) The keys are then normalized over the sequence dimension (N ): 
+
+K′′ = K′
+
+PNi=1 K′ 
+
+> :,i, :
+
++ ϵ , (10) where the summation is performed along the token (sequence) dimension. The context matrix and output are computed as: 
+
+C = ( K′′ )⊤V, O = Q′C. (11) The output is then passed through a projection and residual connection, each block also includes a standard MLP (GELU, ratio 2.0) with residual connection and LayerNorm. After L
+
+blocks, the final tokens TL are normalized. The classification logit is obtained by fusing the spectral token and the mean of spatial tokens: 
+
+z = TL[: , 0] + Mean (TL[: , 1 :]) ∈ RB×D, (12) 
+
+y = Whead z ∈ RB×K , (13) where K is the number of classes and Whead is the classi-fication head. The model is trained with cross-entropy loss. All weights are initialized with truncated normal distribution (σ = 0 .02 ). This design achieves strong spectral-spatial fusion with low computational cost due to linear attention and single-pass RoPE, while the BCG and spectral summary token provide explicit spectral guidance. III. E XPERIMENTS AND RESULTS 
+
+A. Experimental Setup 
+
+All experiments were conducted on a workstation with an NVIDIA RTX A6000 GPU (48 GB VRAM), AMD EPYC 9354 32-core CPU, and 755 GB RAM. The proposed BCG-Former and all baselines were evaluated under identical hard-ware and software settings on eight hyperspectral benchmarks spanning airborne (Houston 2013 [15], Houston 2018 [16], Pavia University [12], Salinas [13], and Indian Pines [14]), and UAV-borne sensing scenarios (three UAV-borne datasets: WHU-Hi-LongKou [17], HongHu [17], and HanChuan [17]). For each dataset, 5 × 5 spatial patches were extracted using reflected padding at the image boundaries. Following recent HSI literature [8], [9], we adopt a fixed 200 samples-per-class training protocol with spatial exclusion to prevent overlap between training and test patch centers. For Houston 2013, we use the official GRSS 2013 Data Fusion Contest fixed split (2,832 train / 12,197 test) [15]; for Houston 2018, no pixel-level official split is publicly available as the contest test ground truth was withheld during the competition, so we apply the standard 200 samples-per-class protocol consistent with recent literature [16]; for all remaining six datasets, the same 200 samples-per-class protocol is applied. This class-balanced setup is preferred over percentage-based splits, particularly for imbalanced datasets such as Indian Pines where several minority classes contain fewer than 50 total labeled samples. All results are reported as mean ± standard deviation over five independent runs; for Houston 2013, run-to-run variance reflects model initialization stochasticity rather than data par-titioning, consistent with the standard evaluation protocol for this dataset [15], whereas for all remaining seven datasets, variance reflects both split and initialization randomness. BCG-Former is configured with a 64-dimensional embed-ding size, 3 transformer blocks, 4 attention heads, and an MLP ratio of 2.0, resulting in 0.10-0.23 M trainable parameters. It is trained for 50 epochs using AdamW with a learning rate of 3 × 10 −4, a weight decay of 10 −2, cosine scheduling with 10% warmup, a batch size of 32, gradient clipping (norm 1.0), and label smoothing of 0.1. All results are reported as mean 4
+
+TABLE I: Comprehensive Performance and Efficiency Comparison on Classical (PU: Pavia University [12], SA: Salinas [13], IN: Indian Pines [14], H13: Houston 13 [15], and H18: Houston 18 [16]) and UAV-borne Datasets (HH: WHU-Hi-HongHu [17], HC: WHU-Hi-HanChuan [17], and LK: WHU-Hi-LongKou [17]). 
+
+(a) Classification Performance (OA, AA, and Kappa) 
+
+Model PU SA IN H13 H18 HH HC LK 
+
+Overall Accuracy (OA %) 
+
+HiT [9] 98.00 94.30 95.40 98.62 89.30 92.99 92.06 98.07 HybridSN [7] 97.70 93.24 86.99 98.03 87.29 91.17 90.23 97.49 SpectralMamba [11] 97.47 94.12 95.76 98.77 90.28 91.24 90.40 98.32 SSFTT [8] 97.20 93.71 84.88 98.04 87.24 90.44 88.90 97.22 Swin-HSI [10] 97.71 94.10 95.35 98.86 91.10 90.99 91.51 98.15 
+
+BCG-Former (Ours) 99.08 96.44 96.07 99.49 91.51 93.86 91.87 99.43 
+
+Average Accuracy (AA %) 
+
+HiT [9] 98.13 97.26 81.44 98.64 89.21 93.93 91.46 97.77 HybridSN [7] 97.62 96.61 81.09 98.09 82.50 91.48 89.84 97.28 SpectralMamba [11] 97.27 97.23 80.40 98.79 85.65 91.31 89.64 98.25 SSFTT [8] 97.03 96.84 82.86 98.05 86.06 90.08 86.71 96.98 Swin-HSI [10] 97.51 97.17 93.00 98.86 89.65 91.36 90.91 97.87 
+
+BCG-Former (Ours) 99.02 99.87 85.16 99.52 87.40 93.39 90.76 99.16 
+
+Kappa Coefficient 
+
+HiT [9] 0.977 0.938 0.949 0.986 0.831 0.914 0.909 0.978 HybridSN [7] 0.973 0.926 0.853 0.979 0.793 0.892 0.888 0.970 SpectralMamba [11] 0.969 0.936 0.951 0.987 0.843 0.892 0.890 0.981 SSFTT [8] 0.966 0.931 0.829 0.979 0.794 0.882 0.872 0.967 Swin-HSI [10] 0.973 0.935 0.948 0.988 0.858 0.890 0.900 0.979 
+
+BCG-Former (Ours) 0.994 0.958 0.952 0.994 0.844 0.918 0.902 0.991 
+
+(b) Computational Efficiency (Complexity, Speed, and Size) 
+
+Model PU SA IN H13 H18 HH HC LK 
+
+Computational Complexity (GFLOPs) 
+
+HiT [9] 0.0213 0.0432 0.0425 0.0114 0.0114 0.0515 0.0523 0.0515 HybridSN [7] 0.2004 0.4348 0.4271 0.0939 0.0939 0.5239 0.5317 0.5239 SpectralMamba [11] 0.0039 0.0046 0.0046 0.0035 0.0035 0.0049 0.0049 0.0049 
+
+SSFTT [8] 0.1157 0.1468 0.1458 0.1015 0.1015 0.1586 0.1597 0.1586 Swin-HSI [10] 0.0089 0.0093 0.0093 0.0088 0.0088 0.0095 0.0095 0.0095 
+
+BCG-Former (Ours) 0.0065 0.0100 0.0099 0.0049 0.0049 0.0113 0.0114 0.0113 
+
+Inference Speed (Latency in ms ) 
+
+HiT [9] 1.1916 1.7716 1.7538 1.1848 1.1805 2.0286 2.0522 2.0356 HybridSN [7] 2.0320 4.2525 4.1883 0.9807 0.9824 5.0771 5.1470 5.0691 SpectralMamba [11] 1.4445 1.3880 1.3868 1.4413 1.4553 1.4042 1.3874 1.4118 SSFTT [8] 5.5391 5.8103 5.8601 5.5734 5.4998 5.9280 5.8626 5.9404 Swin-HSI [10] 1.3976 1.3855 1.3512 1.3358 1.4073 1.3548 1.3853 1.3764 
+
+BCG-Former (Ours) 0.9398 0.9352 0.9347 0.9271 0.9528 0.9115 0.9371 0.9366 
+
+Network Size (Parameters in Mil) 
+
+HiT [9] 0.33 0.57 0.57 0.21 0.21 0.67 0.68 0.67 HybridSN [7] 2.36 4.59 4.52 1.35 1.35 5.44 5.52 5.44 SpectralMamba [11] 0.15 0.16 0.16 0.14 0.14 0.17 0.17 0.17 
+
+SSFTT [8] 1.11 1.66 1.65 0.85 0.85 1.88 1.90 1.87 Swin-HSI [10] 0.58 0.58 0.58 0.57 0.57 0.59 0.59 0.59 
+
+BCG-Former (Ours) 0.13 0.20 0.20 0.10 0.10 0.23 0.23 0.23 
+
+± standard deviation over five runs with different random seeds, and performance is evaluated using Overall Accuracy (OA), Average Accuracy (AA), Cohen’s Kappa ( κ), inference latency, parameter count, and GFLOPs. 
+
+B. Classification Performance 
+
+As shown in Table I(a), BCG-Former achieves the highest overall accuracy on seven of eight benchmarks. On airborne datasets, it records 99.08%, 96.44%, 99.49%, and 91.51% OA on PU, SA, H13, and H18, consistently outperforming all CNN-, Transformer-, and Mamba-based competitors. On Indian Pines, BCG-Former achieves the best OA of 96.07%, confirming strong discrimination despite high spectral sim-ilarity among crop classes, and significant intra-class vari-ability. Although AA on Indian Pines and Houston 2018 (85.16% and 87.40%) remains below the strongest baseline (93.00% and 89.65%) due to minority-class imbalance, OA and Kappa remain highly competitive, reflecting strong overall discrimination. Across UAV-borne benchmarks, BCG-Former achieves 93.86%, 91.87%, and 99.43% OA on HH, HC, and LK respectively, the highest on HH and LK. Although AA on HongHU and HanChuan remains marginally below HiT (by 5
+
+Fig. 2: Accuracy-latency Pareto frontier plots across all eight benchmark datasets. BCG-Former (Ours) consistently resides on or near the Pareto frontier, achieving competitive or state-of-the-art accuracy at the lowest inference latency. SSFTT is excluded from the plots as its substantially higher inference latency (5.5-5.9 ms) renders it a clear outlier and compresses the visualization of the remaining methods. 0.54% and 0.70% respectively), OA and Kappa remain leading on HH and LK, reflecting strong overall discrimination; the narrow AA gap on these UAV-borne benchmarks is consistent with the dense spatial overlap and high spectral complexity characteristic of low-altitude urban sensing. All results are reported as mean ± standard deviation over five independent runs. BCG-Former demonstrates stable optimization across all benchmarks, with OA standard deviations of ±0.26%, 
+
+±0.13%, ±0.27%, ±0.23%, ±0.98%, ±0.24%, ±0.57%, and 
+
+±0.11% on PU, SA, IN, H13, H18, HH, HC, and LK respectively, indicating that the proposed method provides a strong and reliable inductive bias across diverse scene types. The highest variance is observed on Houston 2018 ( ±0.98% ), attributable to the absence of a fixed official split, where both data partitioning and model initialisation contribute to run-to-run variation. Figs. 3 and 4 represent the classification maps of both airborne and UAV-borne datasets, respectively. 
+
+C. Computational Efficiency 
+
+Table I(b) presents a detailed comparison of computational efficiency across all eight benchmarks. BCG-Former achieves low computational complexity, with GFLOPs ranging from 0.0049 to 0.0114, while consistently delivering the lowest inference latency (0.91–0.95 ms) on all datasets compared to other methods. Notably, GFLOPs and latency are not always directly correlated, as GFLOPs measure theoretical computa-tion, whereas latency reflects actual hardware execution time. Although SpectralMamba reports the lowest GFLOPs, its se-quential scanning operation limits GPU parallelism and results in higher latency; this dissociation underscores why wall-clock inference time is a more reliable efficiency metric than arithmetic operation count for deployment-oriented evaluation. HybridSN attains reasonably competitive latency by leveraging optimized 3D convolutions; however, this comes at the expense of significantly larger model sizes (up to 5.52 M parameters, almost 24 × that of BCG-Former), and its parameter count grows further as spectral dimensionality increases. BCG-Former avoids these trade-offs by utilizing fully paral-lelizable operations: depthwise convolution, single-pass Band-RoPE, and ELU-kernel linear attention. This formulation further reduces self-attention complexity from O(N 2D) to 
+
+O(N D 2). While the token count remains small at N = 26 
+
+for patch-based classification, this architecture is extensible to larger spatial contexts without modification. Consequently, BCG-Former maintains a compact parameter footprint of 0.10–0.23 M (second only to SpectralMamba on five datasets) while achieving the lowest latency across all eight benchmarks without requiring dataset-specific architectural modifications. Considered jointly across latency, parameters, and classifi-cation accuracy, BCG-Former is the only model that simul-taneously achieves sub-millisecond inference, a sub-0.24 M parameter count, and state-of-the-art accuracy on seven of eight benchmarks. This balanced profile firmly places BCG-Former on the Pareto frontier of accuracy, model size, and inference efficiency among existing CNN-, Transformer-, and Mamba-based HSI classification methods, as illustrated in Fig. 2. D. Ablation Study 
+
+To evaluate the contribution of each component, we per-formed ablation studies by systematically removing: (1) Band-Contextual Gating (BCG), (2) the spectral summary token with spectral-spatial fusion, and (3) linear attention, which was replaced by standard softmax attention. Parameter count re-mains nearly unchanged across all variants ( ∼0.13 M for Pavia University), since the novel components contribute negligible parameters by design, BCG adds only ∼2,100 parameters through a lightweight 1D convolution and two-layer MLP, the spectral summary token adds only 64 learnable param-eters, and replacing linear with softmax attention changes zero parameters as both share identical QKV projections. 6
+
+TABLE II: Comprehensive Ablation Study on Classical (PU: Pavia University [12], SA: Salinas [13], IN: Indian Pines [14], H13: Houston 13 [15], and H18: Houston 18 [16]) and UAV-borne Datasets (HH: WHU-Hi-HongHu [17], HC: WHU-Hi-HanChuan [17], and LK: WHU-Hi-LongKou [17]).                                                                                                                                                                                                                    
+
+> (a) Classification Performance Ablation (OA, AA, and Kappa)
+> Model Variant PU SA IN H13 H18 HH HC LK
+> Overall Accuracy (OA %)
+> w/o BCG 97.94 94.59 94.58 99.33 90.18 91.72 90.13 98.84 w/o Linear Spec-Spat Attn 97.93 94.48 94.15 99.33 90.15 91.22 89.51 98.82 w/o Fusion & Pos Enc 97.82 94.64 93.41 99.47 89.96 91.73 90.29 98.88
+> BCG-Former (Full) 99.08 96.44 96.07 99.49 91.51 93.86 91.87 99.43
+> Average Accuracy (AA %)
+> w/o BCG 98.00 97.93 84.08 99.37 86.97 91.70 89.14 98.32 w/o Linear Spec-Spat Attn 97.96 97.89 79.84 99.36 82.18 90.66 88.20 98.65 w/o Fusion & Pos Enc 97.95 97.97 76.15 99.50 84.75 91.36 89.18 98.48
+> BCG-Former (Full) 99.02 99.87 85.16 99.52 87.40 93.39 90.76 99.16
+> Kappa Coefficient
+> w/o BCG 0.972 0.940 0.938 0.992 0.836 0.896 0.885 0.985 w/o Linear Spec-Spat Attn 0.972 0.938 0.933 0.992 0.837 0.890 0.878 0.985 w/o Fusion & Pos Enc 0.971 0.940 0.925 0.994 0.834 0.896 0.887 0.985
+> BCG-Former (Full) 0.994 0.958 0.952 0.994 0.844 0.918 0.902 0.991
+> (b) Computational Efficiency Ablation (Complexity, Speed, and Size)
+> Model Variant PU SA IN H13 H18 HH HC LK
+> Computational Complexity (GFLOPs ↓)
+> w/o BCG 0.0065 0.0100 0.0099 0.0049 0.0049 0.0113 0.0114 0.0113 w/o Linear Spec-Spat Attn 0.0065 0.0100 0.0099 0.0049 0.0049 0.0113 0.0114 0.0113 w/o Fusion & Pos Enc 0.0064 0.0099 0.0097 0.0048 0.0048 0.0112 0.0113 0.0112
+> BCG-Former (Full) 0.0065 0.0100 0.0099 0.0049 0.0049 0.0113 0.0114 0.0113
+> Inference Speed (Latency in ms ↓)
+> w/o BCG 0.9317 0.9799 0.9408 0.9811 0.9504 0.9677 0.8846 0.8594
+> w/o Linear Spec-Spat Attn 1.0441 0.9791 0.9683 0.9947 1.0054 1.0127 0.9145 0.8886 w/o Fusion & Pos Enc 1.0889 1.0410 1.0335 1.0265 1.0924 0.9340 0.9746 0.9489
+> BCG-Former (Full) 0.9398 0.9352 0.9347 0.9271 0.9528 0.9115 0.9371 0.9366
+> Network Size (Parameters in M ↓)
+> w/o BCG 0.130 0.199 0.199 0.099 0.099 0.218 0.218 0.218
+> w/o Linear Spec-Spat Attn 0.130 0.200 0.200 0.100 0.100 0.230 0.230 0.230 w/o Fusion & Pos Enc 0.130 0.200 0.200 0.100 0.100 0.230 0.230 0.230
+> BCG-Former (Full) 0.130 0.200 0.200 0.100 0.100 0.230 0.230 0.230
+
+This confirms that BCG-Former’s accuracy gains arise from architectural inductive bias rather than parameter scaling. GFLOPs similarly remain near-identical across variants, since the dominant arithmetic cost lies in the shared transformer blocks; the marginal reduction in the w/o Fusion & Pos Enc 
+
+variant simply reflects the removal of one token from the sequence length. A notable observation is that BCG-Former (Full) achieves lower inference latency than several ablated variants on six of eight datasets, despite incorporating all components. This is explained by three complementary effects: BCG suppresses redundant spectral channels before tokenization, reducing un-informative activation flow through the transformer; the spec-tral summary token concentrates cross-modal reasoning into a single dedicated token, reducing the representational burden on spatial tokens; and linear attention avoids materializing the full 
+
+N ×N matrix and eliminates softmax normalisation overhead, enabling GPU kernel fusion that softmax prevents. Removing components therefore does not reduce latency, the full model is faster because its components produce a more hardware-efficient computation graph. Table II summarizes accuracy impact across all eight bench-marks. The full model consistently achieves the best accuracy-efficiency trade-off, confirming complementary and mutually beneficial interactions among all components. Removing BCG causes the largest degradation, OA drops by up to 1.49% on airborne and 2.14% on UAV-borne datasets, delivered through only ∼2,100 parameters, making it the highest accuracy-per-parameter component in the architecture. Removing linear attention produces the second-largest drop, particularly on Indian Pines and Houston 2018, while disabling the spectral summary token causes consistent decline on spectrally com-plex scenes. Across all ablation settings, BCG-Former (Full) achieves the highest accuracy while incurring lower latency than ablated counterparts on six of eight datasets, confirming that its Pareto-optimal position emerges from the synergistic interaction of three physically motivated, parameter-efficient components rather than any single design choice. IV. C ONCLUSION 
+
+This paper presents BCG-Former , a lightweight CNN-Transformer designed to explicitly optimize the accuracy-7
+
+Fig. 3: Predicted classification maps generated by BCG-Former on airborne datasets (Pavia University, Salinas, Indian Pines, Houston 2013, and Houston 2018). For each dataset, the ground truth (GT) map is shown on the left and the corresponding predicted map on the right. latency Pareto frontier in hyperspectral image classifica-tion. Through three physically motivated components—Band-Contextual Gating, a spectral summary token, and single-pass Band-RoPE with linear spectral-spatial attention—BCG-Former achieves the lowest inference latency across all eight benchmark datasets while delivering state-of-the-art or highly competitive accuracy, using only 0.10–0.23 M parameters without dataset-specific tuning. Ablation studies confirm that Band-Contextual Gating provides the largest individual con-tribution to spectral discrimination, while all components act synergistically to maintain Pareto optimality across diverse airborne and UAV-borne scenes. Overall, BCG-Former demon-strates that accuracy and efficiency are not mutually exclusive; carefully designed inductive biases aligned with the physical structure of hyperspectral data are sufficient to outperform larger and more complex state-of-the-art methods on both axes, establishing a strong efficiency-aware baseline for real-time geospatial remote sensing. Future work will explore hard band selection within the BCG framework, extension to multitemporal and multimodal HSI fusion, and adaptation to full-image inference where the linear attention formulation offers direct scalability advantages. REFERENCES [1] J. A. Richards, Remote Sensing Digital Image Analysis: An Introduction .Springer, 2013. [2] L. Zhang, L. Zhang, D. Tao, and X. Huang, “Hyperspectral remote sensing image classification via multiple feature learning,” IEEE Trans-actions on Geoscience and Remote Sensing , vol. 53, no. 3, pp. 1592– 1606, 2015. [3] B. Yun, B. Lei, J. Chen, H. Wang, S. Qiu, W. Shen, Q. Li, and Y. Wang, “Spectr: Spectral transformer for microscopic hyperspectral pathology image segmentation,” IEEE Transactions on Circuits and Systems for Video Technology , vol. 34, no. 6, pp. 4610–4624, 2023. [4] H. Liu, K. Xia, T. Li, J. Ma, and E. Owoola, “Dimensionality reduction of hyperspectral images based on improved spatial–spectral weight manifold embedding,” Sensors , vol. 20, no. 16, p. 4413, 2020. [5] B. Demir and L. Bruzzone, “A novel active learning method for hyperspectral image classification,” IEEE Transactions on Geoscience and Remote Sensing , vol. 52, no. 11, pp. 7046–7061, 2014. [6] A. G. Howard, M. Zhu, B. Chen, D. Kalenichenko, W. Wang, T. Weyand, M. Andreetto, and H. Adam, “Mobilenets: Efficient convolutional neural networks for mobile vision applications,” Remote Sensing , vol. 14, no. 13, p. 3035, 2022. [7] A. Roy, S. Krishna, and M. M. R. Krishna, “Hybridsn: Exploring 3d–2d cnn feature hierarchy for hyperspectral image classification,” 
+
+IEEE Geoscience and Remote Sensing Letters , vol. 17, no. 2, pp. 277– 281, 2020. [8] L. Sun, G. Zhao, Z. Wu, T. Zhan, W. Liu, and J. Luo, “Spectral–spatial feature tokenization transformer for hyperspectral image classification,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1– 14, 2022. [9] X. Yang, W. Cao, Y. Lu, and Y. Zhou, “Hyperspectral image transformer classification networks,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–15, 2022. [10] H. Cao, Y. Wang, J. Chen, and J. Wang, “Swin-hsi: A tiny swin transformer for hyperspectral image classification,” Remote Sensing ,vol. 14, no. 13, p. 3035, 2022. [11] J. Yao, D. Hong, C. Li, and J. Chanussot, “Spectralmamba: Efficient mamba for hyperspectral image classification,” 2024. [Online]. Available: https://arxiv.org/abs/2404.08489 [12] D. Landgrebe, “Hyperspectral image data analysis,” IEEE Signal Pro-cessing Magazine , vol. 19, no. 1, pp. 17–28, 2002, pavia University dataset collected by the ROSIS-3 sensor, University of Pavia, Italy. [13] AVIRIS, “Salinas hyperspectral dataset,” 1998. [14] M. F. Baumgardner, L. L. Biehl, and D. A. Landgrebe, “220 band aviris hyperspectral image data set: June 12, 1992 indian pine test site 3,” https://purr.purdue.edu/publications/1947/1, 2015. 8
+
+Fig. 4: Predicted classification maps generated by BCG-Former on UAV-borne datasets (WHU-Hi-HongHu, WHU-Hi-HanChuan, and WHU-Hi-LongKou). For each dataset, the ground truth (GT) map is shown on the left and the corresponding predicted map on the right. 
+
+[15] C. Debes, A. Merentitis, R. Heremans, J. Hahn, N. Frangiadakis, T. van Kasteren, W. Liao, R. Bellens, A. Pizurica, S. Gautama, W. Philips, S. Prasad, Q. Du, and F. Pacifici, “Hyperspectral and lidar data fusion: Outcome of the 2013 grss data fusion contest,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 7, no. 6, pp. 2405–2418, 2014. [16] NCALM, U. of Houston, and I. GRSS, “2018 ieee grss data fusion challenge – fusion of multispectral lidar and hyperspectral data,” 2020. [Online]. Available: https://ieee-dataport.org/open-access/ 2018-ieee-grss-data-fusion-challenge-fusion-multispectral-lidar-and-hyperspectral-data [17] Y. Zhong, X. Hu, C. Luo, X. Wang, J. Zhao, and L. Zhang, “Whu-hi: Uav-borne hyperspectral with high spatial resolution (h2) benchmark datasets and classifier for precise crop identification based on deep convolutional neural network with crf,” Remote Sensing of Environment , vol. 250, p. 112012, 2020. [Online]. Available: https://www.sciencedirect.com/science/article/pii/S0034425720303825 [18] J. Su, Y. Lu, S. Pan, B. Wen, and Y. Liu, “Roformer: Enhanced trans-former with rotary position embedding,” CoRR , vol. abs/2104.09864, 2021. [Online]. Available: https://arxiv.org/abs/2104.09864 
+
+Gaurav Sharma Fifth-year Ph.D. candidate at the University of Arizona, USA, majoring in the College of Information Science with a minor in Statis-tics. Primarily, research centers on Large Vision(Video)-Language Models, Generative and Agentic AI, Natural Language Processing, Computer Vision, and Graph Neural Networks, with applications in Medical Surgical AI and Education AI. 
+
+Eungjoo Lee (Member, IEEE) received a Ph.D. degree from the University of Maryland, College Park, MD, USA, in 2021. Following his doctoral studies, he served as a postdoctoral research fellow at Massachusetts General Hospital/Harvard Medical School. He is currently an Assistant Professor in the Department of Electrical and Computer Engineering and Division Chief of Ophthalmic AI in the Department of Ophthalmology and Vision Science at the University of Arizona, Tucson, AZ, USA. He is also affiliated with the BIO5 Institute and the UA Cancer Center, and serves as a scientific advisor to the Brain & Body Imaging Center. He conducts research on grounded intelligence systems that bridge perception and reliable decision-making in real-world environments.
