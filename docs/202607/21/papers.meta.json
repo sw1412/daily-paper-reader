@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-21",
+  "date": "2026-07-21",
+  "generated_at": "2026-07-21T21:46:21",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/21/2607.16007v1-beyond-unfolding-60x-faster-one-stage-unmixing-for-closely-spaced-infrared-small-targets",
+      "section": "quick",
+      "title_en": "Beyond Unfolding: 60x Faster One-Stage Unmixing for Closely-Spaced Infrared Small Targets",
+      "authors": "Ximeng Zhai, Zheng Wang, Yaohong Chen, Hao Wang, Ming-Ming Cheng, Yimian Dai",
+      "date": "2026-07-17",
+      "pdf": "https://arxiv.org/pdf/2607.16007v1",
+      "score": "6.0",
+      "evidence": "通过解混方法处理目标检测，与高光谱目标检测相关",
+      "tldr": "针对邻近红外小目标因能量重叠导致传统检测失效的问题，现有深度展开网络存在高延迟和结构僵化。本文提出FOCUS，一种一阶段轻量级解混范式，通过将超分辨率任务转化到目标解混领域，采用粗到细的单次映射逐步精化定位，并引入通量守恒补偿稀疏正则化导致的信号衰减。实验表明，FOCUS在定位和解混精度上匹配或超越现有方法，推理速度提升60倍，首次实现无需迭代展开的快速解混。",
+      "tags": "query:hsi",
+      "abstract_en": "Due to the optical diffraction limit and long imaging distances, Closely-Spaced Infrared Small Targets (CSIST) typically exhibit energy overlap, manifesting as indistinguishable blobs in infrared images. This ambiguity invalidates the one-to-one mapping assumption of traditional detection, thereby necessitating a paradigm shift towards CSIST Unmixing, which decomposes these blobs into discrete sub-targets. However, the dominant paradigm deep unfolding networks are shackled by the high latency and structural inflexibility intrinsic to their repetitively iterative architecture. To this end, we propose the Fast One-stage CSIST Unmixing Scheme (FOCUS), a one-stage lightweight paradigm which demonstrates that deep unfolding is not necessary. Motivated by the key observation that image super-resolution (SR) and CSIST Unmixing share an isomorphic degradation model, our insight is that it is possible to achieve a paradigm shift from image SR to CSIST Unmixing via completely transforming the label space, loss functions, and evaluation criteria. Specifically, to avoid entangling geometric recovery with artifact suppression, FOCUS adopts a single pass mapping with an internal coarse-to-fine flow that progressively refines target localization from coarse spatial distributions to finer sub-pixel precision. While sparsity regularization suppresses background clutter, it also attenuates target intensities. To compensate for this attenuation of valid signals, flux conservation is introduced as a competing constraint that restores signal energy back to target centers. To the best of our knowledge, this work is the first attempt to address this task via a lightweight one-stage framework without the DUN paradigm. Experiments demonstrate that our method matches or surpasses the state-of-the-art unfolding approaches in both localization and unmixing accuracy, while boosting the inference speed by 60x.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

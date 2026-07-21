@@ -1,0 +1,432 @@
+Title: Beyond Unfolding: 60x Faster One-Stage Unmixing for Closely-Spaced Infrared Small Targets
+
+URL Source: https://arxiv.org/pdf/2607.16007v1
+
+Published Time: Mon, 20 Jul 2026 01:17:01 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+1
+
+# Beyond Unfolding: 60 × Faster One-Stage Unmixing for Closely-Spaced Infrared Small Targets 
+
+Ximeng Zhai, Zheng Wang, Yaohong Chen, Hao Wang, Ming-Ming Cheng, Yimian Dai 
+
+Abstract —Due to the optical diffraction limit and long imaging distances, Closely-Spaced Infrared Small Targets (CSIST) typically exhibit energy overlap, manifesting as indistinguishable blobs in infrared images. This ambiguity invalidates the one-to-one mapping assumption of traditional detection, thereby necessitating a paradigm shift towards CSIST Unmixing, which decomposes these blobs into discrete sub-targets. However, the dominant paradigm deep unfolding networks (DUNs) are shackled by the high latency and structural inflexibility intrinsic to their repetitively iterative architecture. To this end, we propose the Fast One-stage CSIST Unmixing Scheme (FOCUS), a one-stage lightweight paradigm which demonstrates that deep unfolding is not necessary for CSIST Unmixing. Motivated by the key observation that image super-resolution (SR) and CSIST Unmixing share an isomorphic degradation model, our insight is that it is possible to achieve a paradigm shift from image SR to CSIST Unmixing via completely transforming the label space, loss functions, and evaluation criteria. Specifically, to avoid entangling geometric recovery with artifact suppression, FOCUS adopts a single pass mapping with an internal coarse-to-fine flow that progressively refines target localization from coarse spatial distributions to finer sub-pixel precision. While sparsity regularization suppresses background clutter, it also attenuates target intensities. To compensate for this attenuation of valid signals, flux conservation is introduced as a competing constraint that restores signal energy back to target centers. To the best of our knowledge, this work is the first attempt to address the CSIST Unmixing task via a lightweight one-stage framework without the DUN paradigm. Experiments demonstrate that our method matches or surpasses the state-of-the-art unfolding approaches in both localization and unmixing accuracy, while boosting the inference speed by 60 ×. Code is available at https://github.com/GrokCV/GrokCSO. 
+
+Index Terms —Closely-spaced infrared small target unmixing, one-stage lightweight inference, flux conservation, deep learning 
+
+I. I NTRODUCTION This work was supported by the National Science Foundation of China (No. 62301261, No. 62225604), the Tianjin Natural Science Foundation Project (No. 25JCQNJC01370), the West Light Foundation of the Chinese Academy of Sciences (XAB2022YN06), the Shenzhen Science and Technology Program (No. JCYJ20240813114237048), the Fundamental Research Funds for the Central Universities (No. 63253217, No. 63253217), and the Supercomputing Center of Nankai University (NKSC). (Corresponding author: Yimian Dai). 
+
+Ximeng Zhai, Yaohong Chen, and Hao Wang are with Xi’an Institute of Optics and Precision Mechanics, Chinese Academy of Sciences, Xi’an 710119, China. Zhai is also with the University of Chinese Academy of Sciences, Beijing 100049, China (e-mail: zhaiximeng23@mails.ucas.ac.cn). Zheng Wang is with Beijing Institute of Astronautical Systems Engineering, Beijing 100094, China (e-mail: wangzhengjack@163.com). Ming-Ming Cheng and Yimian Dai are with VCIP, College of Computer Science, Nankai University, Tianjin 300071, China. They are also affiliated with the NKIARI, Shenzhen Futian, Shenzhen 518045, China (e-mail: cmm@nankai.edu.cn; yimian.dai@gmail.com). CSIST Unmixing 
+
+Input  Prediction 
+
+> Unmix
+> One -to -Many
+> Sub -pixel Points
+> Detect
+> One -to -One
+> Bounding box
+> IRSTD
+
+Prediction Input 
+
+> SR
+> Restore
+> One -to -One
+> Abundance ↑
+
+Input  Prediction 
+
+Fig. 1. Conceptual comparison of IRSTD, SR, and CSIST Unmixing. IRSTD utilizes a one-to-one paradigm to identify targets through bounding boxes. SR focuses on visual restoration while still maintaining a one-to-one correspondence. In contrast, CSIST Unmixing adopts a one-to-many paradigm to recover discrete sub-pixel point sources from overlapped energy regions. 
+
+# INFRARED imaging plays an indispensable role in critical fields such as early warning systems, maritime surveillance, and border protection, owing to its robust capability to operate under low-light conditions and penetrate atmospheric obscurants [1]. However, with the increasing demand for long-distance detection [2], targets of interest, such as distant aircraft, often manifest as dim spots with faint intensity and low contrast due to the long imaging distance [3]. This imposes stringent requirements on the accuracy and robustness of Infrared Small Target Detection (IRSTD) systems. Nevertheless, current IRSTD research mainly focuses on target localization (i.e., “where is the target?”). Existing research has spanned from classical filtering [4] and decom-position [5] to deep learning architectures [6], where the core attempts are to pop out the dim targets while suppressing false alarms. This status quo (task formulation) is restricted by a default assumption of strict one-to-one mapping between diffraction spots and targets, where each spot in the image arXiv:2607.16007v1 [cs.CV] 17 Jul 2026 2
+
+corresponds to exactly one real-world target [7]. However, in practice, as the targets become dense, such as drone swarms, and imaging distance becomes larger, the optical energy diffusion causes multiple adjacent targets to merge into a single overlapping blob [8], which leads to the so-called Closely-Spaced Infrared Small Target (CSIST) scenarios. Traditional IRSTD methods suffer from missed counts and lost coordinates in these scenarios because of the one-to-one assumption, as illustrated in Fig. 1. To surpass this constraint, research has transitioned from coarse detection toward precise unmixing, which constitutes the specialized task termed CSIST Unmixing [7]. The task is to disentangle energy-overlapped blobs into discrete point sources at the sub-pixel level, thereby recovering their precise coordinates and intensities. Therefore, very different from target detection, CSIST Unmixing is in essence a one-to-many inverse mapping problem. 
+
+Current CSIST Unmixing schemes rely on deep unfolding paradigm by mapping iterative algorithms into unrolled layers. For example, DISTA-Net [9] unrolled iterative shrinkage thresholding into a dynamic framework. DeRefNet [7] extended this paradigm to sequential data by employing inter-frame alignment. These two methods laid the foundation for single-frame and multi-frame CSIST Unmixing. Recently, STSA-Net [10] refined this paradigm by incorporating target sensitive convolutions and pixel wise adaptive thresholds within an unfolding structure. Later, DSCSNet [11] utilized an alternating direction method of multipliers (ADMM) [12] based unrolled architecture with strict sparsity constraints to protect radiant energy peaks. These models collectively demonstrate that the deep unfolding paradigm provides an effective approach for resolving CSIST scenarios. Despite their effectiveness, the reliance on unrolled iterations imposes structural constraints [13]. Recursive applications of operators result in high computational overhead, which leads to inference delays. Moreover, the coupling between network layers and mathematical steps limits the flexibility for modular design or lightweight optimization. These drawbacks necessitate a direct mapping architecture capable of high speed inference without the computational overhead of iterative loops. In this paper, we propose a paradigm shift, which demon-strates that unfolding is not necessary for CSIST Unmixing. 
+
+Indeed, while unfolding provides a path for unmixing, it represents one possible choice rather than a unique solution. This stance originates from our key observation that CSIST Unmixing and image super-resolution (SR) share a common mathematical basis, as both tasks reconstruct the original scene from the isomorphic degradation model ( Y = Hx + n). Accordingly, a natural question araises, can we discard the cumbersome DUNs paradigm and instead leverage the highly efficient, lightweight end-to-end networks from the SR field to solve the CSIST Unmixing problem? 
+
+Our answer is affirmative. By transforming the label space, loss functions, and evaluation criteria, we successfully achieve a paradigm shift, wherein the image SR paradigm is modified to resolve the CSIST Unmixing problem. This transition redirects the optimization of generic convolutional networks from reconstructing visual textures toward the precise inversion of discrete point sources. In addition, the strategy eliminates the dependency on iterative unfolding structures, which ensures architectural flexibility while improving inference speed. To this end, we propose FOCUS (Fast One-stage CSIST Unmixing Scheme), a lightweight one-stage architecture, which consists of two dedicated modules underpinned by a shared isomorphic unit. Distinct from generic image SR networks that conflate spatial reconstruction with artifact suppression, FOCUS adopts a coarse-to-fine internal flow that explicitly separates the two objectives: the first module recovers spatial topology from low-resolution observations, while the second performs residual refinement to suppress upsampling artifacts at full resolution. To concentrate signal energy into precise target locations, a dual-branch gated structure with sparsity regularization suppresses background responses while preserving target centroids at sub-pixel resolution. However, sparsity enforcement inevitably attenuates target signal amplitudes alongside background suppression. Flux conservation is therefore introduced as a competing constraint that anchors total reconstructed energy to its physical ground truth, ensuring that suppressed energy is restored to target centers rather than lost. Experiments demonstrate that FOCUS achieves a 60 × speedup over iterative baselines while maintaining competitive unmixing precision. Our main contributions are summarized as follows: 1) Novel Paradigm: We reformulate CSIST Unmixing as one-stage mapping, replacing iterative DUNs with lightweight feed-forward inference. 2) Constrained Design: We propose FOCUS with sparsity regularization and flux conservation constraints, jointly mitigating background interference and amplitude attenu-ation through balanced constraint trade-offs. 3) Efficiency Improvement: FOCUS achieves a 60 ×
+
+speedup over iterative paradigms while maintaining com-petitive unmixing accuracy. II. R ELATED WORK 
+
+A. Image Super-Resolution 
+
+As a fundamental low-level vision task [14], image SR aims to reconstruct high-fidelity details from degraded observations, where the lost high-frequency information recovers from incomplete measurements [15]. Since the pioneering work of SRCNN [16], which established the paradigm of end-to-end convolutional mapping, the field has witnessed a rapid evolution in architectural design. Subsequent research has largely bifurcated into two directions: maximizing reconstruction quality through deeper residual networks (e.g., SAN [17], SRResNet [18]) and optimizing inference efficiency via lightweight structure (e.g., IMDN [19], RFDN [20]). These advances have endowed modern SR networks with powerful non-linear fitting capabilities and efficient feature extraction mechanisms. Nevertheless, as shown in Fig. 1, while image SR aims to overcome resolution limits, its primary objective is visual restoration [21], enhancing textural richness to generate con-tinuous and aesthetically pleasing images. If a blurred infrared blob is fed into a standard SR system, the output remains a refined blob with smoother edges and higher granularity, rather 3
+
+than physically separated point sources as CSIST Unmixing does [22]. Driven by these divergent objectives, the technical trajectories of SR and CSIST Unmixing have bifurcated. The SR commu-nity has largely embraced purely data-driven convolutional neural networks (CNNs) (e.g., ESPCN [23], DBPN [24]). In contrast, the CSIST Unmixing community predominantly favors model-driven deep learning, particularly DUNs (e.g., DISTA-Net [9], DeRefNet [7]). These methods unroll iterative optimization algorithms into neural layers, embedding sparse priors to solve the imaging inverse problem. Our work bridges this gap through the following two highlights: 1) Cross Field Adaptation: Unlike conventional image SR models limited to low level visual restoration, this scheme repurposes SR mapping for high level CSIST Unmixing to recover discrete point objects. 2) Flux-Preserving Sparse Strategy: Compared to generic image SR methods that rely solely on smoothness opti-mization, this work pioneers the integration of structural sparsity and flux conservation as competing training constraints, achieving a balance between source sharpness and amplitude fidelity. 
+
+B. Closely-Spaced Infrared Small Target Unmixing 
+
+Over the past decade, Model-Driven Deep Learning, specifi-cally DUNs, has established itself as the dominant paradigm for solving inverse problems in computational imaging [25]. By unrolling iterative optimization algorithms (e.g., ISTA [26], ADMM [12]) into cascade neural architectures, DUNs integrate the interpretability of physical models with the learning capability of deep networks [27], [28]. In the specific domain of CSIST Unmixing, pioneering works like DISTA-Net [9] and DeRefNet [7] have crystallized a rigorous paradigm: reformulating the unmixing task as a sparsity-driven signal recovery problem within a deep learning framework. Subsequently, this paradigm is extended by STSA-Net [10] with target-sensitive proximal operators and by DSCSNet [11] via an ADMM-based unrolling with strict 
+
+ℓ1-norm sparsity constraints. Fundamentally, these methods explicitly construct the sensing matrix based on the Point Spread Function (PSF) [29]. By unrolling the alternation between data fidelity and sparsity regularization into learnable network stages, they effectively guide the latent features to migrate from the diffuse observation domain towards a high-dimensional discrete solution space. This mechanism allows for interpretable source disentanglement, and has demonstrated the potential to overcome the diffraction limit. Although these CSIST Unmixing methods provide theo-retical guarantees, they share a common limitation: they are constrained by the rigidity of the physical operators and the recurrent nature of iterative structure. The explicit reliance on fixed degradation operators makes it difficult to adapt to spatially variant energy distributions, while the depth of the network directly correlates with inference latency. Our work addresses these structural bottlenecks through the following two highlights: 1) Paradigm Shift: We transition from the rigid, multi-stage iterative architecture of DUNs to a flexible, single-stage feed-forward paradigm. This fundamental shift eliminates recurrent optimization bottlenecks, yielding a streamlined architecture that is significantly easier to optimize and adapt. 2) Inference Acceleration: By replacing heavy recurrent operators with a streamlined one-stage feed-forward pipeline, we achieve a drastic reduction in computational burden. This approach dramatically reduces computational latency without sacrificing sub-pixel localization accuracy. III. R EVISITING CSIST U NMIXING : A N ISOMORPHIC 
+
+PERSPECTIVE FROM IMAGE SUPER -R ESOLUTION Ground Truth          
+
+> X
+> Energy Diffusion
+> 𝒦 𝑖 𝑋 𝑖 =𝑋 𝑖 ∗ℎ𝑖
+> Quantization
+> 𝒬 ⋅
+> Post -Processing
+> 𝒯 𝑖 ⋅
+> Observation
+> Gaussian Blur
+> Linear Blur
+> Disk Blur
+> 𝑿 𝑺𝑹
+> High Frequency Info Loss
+> The cell integration acts as a
+> low -pass filter, smoothing edge
+> textures.
+> Post -processing
+> Typically process, like
+> compression, leads to fidelity loss.
+> 𝒀 𝑺𝑹
+> 𝑿 𝑪𝑺𝑰𝑺𝑻
+> Point Spread Function (PSF)
+> Ideal system PSF.
+> Sub -pixel Positional Erasure
+> Grid integration further hides
+> critical sub -pixel position.
+> 𝒀 𝑪𝑺𝑰𝑺𝑻
+> Electronic processing
+> Only internal camera algorithms.
+> Fig. 2. A visual comparison of the isomorphic forward imaging pipelines for image Super-Resolution (left) and CSIST unmixing (right). Both tasks share a unified mathematical structure composed of energy diffusion ( K), spatial quantization ( Q), and post-processing ( T), while diverging in their physical priors and latent signal characteristics.
+
+Both image SR and CSIST Unmixing seek to reconstruct a high-resolution signal X from a degraded low-resolution observation Y. Despite differing application contexts, the imaging processes of two tasks share a unified mathematical framework [30]. As illustrated in Fig. 2, the forward imaging processes of these two tasks follow a parallel structure. Let the subscript 
+
+i ∈ { SR , CSIST } denote the specific task. The generalized observation model is formulated as: 
+
+Yi = Di(Xi) + ni (1) where ni ∈ Rh×w represents the additive system noise and Di : RH×W → Rh×w is the composite degradation operator. Based on imaging system theory [31], the operator 
+
+Di can be decomposed into a sequential chain of isomorphic transformations: 
+
+Di = Ti ◦ Q i ◦ K i. (2) 4
+
+While the structural mapping remains identical across both domains, the physical interpretation and the resulting latent priors diverge during the instantiation of each operator. 
+
+1) Optical Blur ( K): The operator Ki models the spatial dispersion of radiant energy. This process is generalized as a convolution between the ground truth signal and a specific kernel: 
+
+Ki(Xi) = Xi ∗ hi. (3) In Image SR, the kernel hSR is generally artificially simulated to mimic resolution loss, employing mathematical proxies such as Gaussian kernels for isotropic blur, directional linear kernels for motion blur, or disk kernels for defocus. In contrast, for CSIST unmixing, the degradation hCSIST is a physical PSF inherent to the optical assembly. It encapsulates complex wave-optical artifacts including wavefront aberrations, coma, and field-dependent distortions that perturb the sub-pixel energy distribution. 
+
+2) Quantization ( Q): The operator Qi describes the map-ping from the continuous optical domain to the discrete digital domain. Both tasks involve grid level integration over the detector photosensitive area Ω:
+
+Qi(·)[ j, k ] = 
+
+Z Z 
+
+> Ωj,k
+
+(·) dxdy. (4) While both tasks suffer from the loss of information during this sampling, the implications differ. In SR, this discretization filters out high-frequency textural details. In CSIST Unmixing, the integration of overlapped energy distributions into pixel intensities further destroys the sub-pixel positional information. This shared degradation structure renders both tasks a highly underdetermined inverse problem. 
+
+3) Post-processing ( T ): For SR, TSR often involves al-gorithmic level processing such as compression for storage efficiency or augment training robustness, which usually leads to digital smoothing, contrast adjustment, or downsampling. For unmixing, TCSIST is primarily restricted to electronic-level degradation, reflecting the readout circuitry’s impact on the infrared signal before it reaches the digital interface. 
+
+4) Additive System Noise ( n): The noise term n further differentiates the tasks. In SR pipelines, nSR frequently includes both natural sensor noise and artificially injected noise (e.g., JPEG artifacts or synthetic Gaussian noise) to improve model generalization. Conversely, nCSIST is strictly modeled based on natural stochastic processes within the infrared detector, such as dark current and thermal fluctuations. 
+
+5) Theoretical Basis for Paradigm Transfer : The structural isomorphism between DSR and DCSIST suggests that the feature extraction architectures perfected for image restoration can be repurposed for physical unmixing. By respecting the underlying sparsity and radiant flux conservation, the paradigm can shift from visual aesthetics toward the precise parameter inversion of discrete radiant sources. IV. FOCUS: F AST ONE -S TAGE CSIST U NMIXING SCHEME 
+
+A. Overall Framework: A Progressive One-Stage Paradigm 
+
+Given the degradation model y = Φ( x) + n, the goal of CSIST Unmixing is to reconstruct the high-resolution sparse source map x ∈ RrH ×rW from the observed low-resolution input y ∈ RH×W , where r is the upscaling factor. This constitutes a severe ill-posed inverse problem [32]. To solve this efficiently, we propose the FOCUS framework. As illustrated in Fig. 3 (a), FOCUS is structured as a One-Stage Progressive Coarse-to-Fine Flow. It is crucial to distinguish our one-stage paradigm from traditional one-stage networks (e.g., standard SRCNN [16] or RCAN [33]). Distinct from conventional black box paradigms where upsampling and restoration are inextricably entangled, FOCUS adopts a strati-fied strategy to explicitly decouple geometric recovery from physical fidelity rectification, thereby reducing optimization complexity to achieve rigorous physical precision within a unified feed-forward flow. Thus, implementing the Decoupled Reconstruction-Rectification (DRR) strategy, we formulate the overall mapping FΘ as a global learning process. Firstly, the input is projected into the high-resolution space via the Digital Microscope Module (GDMM ) to obtain a coarse geometric estimation. Subsequently, to suppress the upsampling artifacts inherent in this estimation, the Spatial Modulator Module (RSMM ) acts as a residual learner. It predicts a sparse correction map, which is then superimposed onto the coarse estimation via a global skip connection. Mathematically, we encapsulate this progressive coarse-to-fine evolution into a unified mapping function: 
+
+ˆx = FΘ(y) = RSMM 
+
+σ(GDMM (y)) 
+
+| {z }
+
+> Coarse Estimation
+
+| {z }
+
+> Fine-grained Rectification
+
+(5) where FΘ denotes the overall mapping function parameterized by Θ. σ(·) represents the PReLU [34] activation, which serves to rectify the geometric estimation into a valid non-negative feature space before residual learning. The flow consists of two physically distinct phases: 
+
+Digital Microscope Module (DMM): Analogous to an optical microscope that magnifies tiny specimens, this module (GDMM ) acts as a geometric projector. It is responsible for the inverse projection of the signal from the low-dimensional observation space to the high-dimensional target space ( 11 ×
+
+11 → 33 × 33 ), establishing the spatial topology of point sources. 
+
+Spatial Modulator Module (SMM): Analogous to a spatial light modulator that shapes wavefronts without changing magnification, this module ( RSMM ) acts as a sparsity rectifier. Operating within the fixed high-resolution space ( Scale = 1 ), it focuses solely on filtering out upsampling artifacts (e.g., ringing effects) and modulating the energy distribution to fit the sharp Dirac delta prior. 
+
+B. Isomorphic Source-Generation Unit (ISGU) 
+
+As shown in Fig. 3 (b), the atomic computational engine underpinning both DMM and SMM is the Isomorphic Source-Generation Unit (ISGU). We term it isomorphic because both stages share an identical topological architecture, reflecting our insight that the physical retrieval of a point source, whether 5     
+
+> Fig. 3. Overview of the FOCUS framework and its physics-constrained optimization strategy. (a-b) The architecture utilizes a coarse-to-fine flow via DMM and SMM modules, incorporating Isomorphic Source-Generation Units (ISGU) that bifurcate intensity and mask paths to ensure discrete source recovery. (c-e) Comparison of label characteristics and predictive evolution between standard super-resolution (SR) and the proposed unmixing paradigm. The evolution under joint LMSE ,LSparsity , and LEnergy constraints, visualized through the optimization vectorgraph, illustrates the competitive equilibrium achieved to maintain structural sparsity and flux conservation for high-fidelity signal reconstruction.
+
+from background noise or from calculation artifacts, relies on the same sparsity structure. Let Zin be the input feature. The ISGU introduces a structural sparsity induction architecture that bifurcates the flow into: 
+
+Zint = Cint (Zin ), Zmask = Cmask (Zin ). (6) The Intensity Path (Zint ) estimates the potential radiant energy, while the Mask Path (Zmask ) estimates the spatial existence probability. The final sparse output is generated via a gated projection: 
+
+Zout = UP ×s(Zint ) ⊙ ς(UP ×s(Zmask )) (7) here, UP ×s denotes the sub-pixel convolution with scale factor 
+
+s (s = 3 for DMM, s = 1 for SMM), ς is the Sigmoid activation, and ⊙ is the Hadamard product. By using the mask to physically gate the intensity, ISGU explicitly enforces structural sparsity at the architectural level. 
+
+1) Dynamic Physics-Constrained : To guide the lightweight network towards physically valid solutions, we introduce a composite loss function that orchestrates a dynamic game among three constraints. This process is not a simple summation of errors, but a competitive equilibrium of forces, as visualized in Fig. 3 (c–e). The optimization is fundamentally anchored by the Re-construction Loss ( Jrec ), for which we employ Focal Mean Squared Error (MSE). Mathematically, it minimizes the vari-ance between the prediction ˆx and the ground truth x:
+
+Jrec = 1
+
+N
+
+X
+
+> i
+
+|ˆxi − xi|γ
+
+| {z }
+
+> Focal Weight
+
+·(ˆ xi − xi)2. (8) This term acts as a spatial anchor. By penalizing deviations in intensity distribution, it forces the centroid of the predicted spot to align with the ground truth. However, to minimize the spatial penalty of slight misalignments, MSE inherently favors a smooth, Gaussian-like distribution over a sharp Dirac delta, leading to the smoothness bias. To counteract this smoothing and eliminate background noise, the Structural Sparsity Enforcement term ( Jsse ) imposes an 
+
+ℓ1-regularization: 
+
+Jsse = 1
+
+N ∥ˆx∥1, with gradient ∇J sse = sign (ˆ x). (9) Unlike ℓ2 penalties where the gradient vanishes as intensity approaches zero, the ℓ1 gradient remains constant ( ±1). This exerts a uniform suppressive force across the entire image plane. It aggressively truncates background noise and artifacts to zero, but inevitably, it also applies the same downward pressure on the target signal, causing amplitude attenuation. Crucially, to resolve the conflict between suppression and fidelity, we introduce the physics-constrained flux alignment (Jpcf a ): 
+
+Jpcf a = X
+
+> i
+
+ˆxi − E ref , where Eref = X
+
+> j
+
+yclean j . (10) This term acts as a global flux anchor. Since Jsse has suppressed the background to zero and Jrec has locked the spatial topology to the target location, the system creates a restorative force driven by the energy deficit ( Eref − P ˆx). Because the background regions are strongly inhibited by the sparsity term, the optimization landscape forces this missing energy to be poured back into the only active region allowed by the spatial anchor–the target centroid. Consequently, this structure sharpens the peak and restores physical intensity without causing energy drift to the background. The final objective represents the equilibrium of these conflicting yet complementary forces: 
+
+Jtotal = Jrec + λ1Jsse + λ2Jpcf a . (11) 6
+
+This mechanism ensures that the final output is not only spatially accurate but also physically sparse and energetically conserved. V. E XPERIMENT 
+
+In this section, we conduct a comprehensive evaluation of the proposed FOCUS framework. The core objective is to verify whether a lightweight one-stage direct inversion paradigm can transcend the limitations of the traditional unfolding paradigm. We argue that FOCUS not only maintains the physical precision of iterative solvers but also achieves a significant leap in inference efficiency. 
+
+A. Experimental Settings 
+
+Metrics: The evaluation considers both unmixing fidelity and computational efficiency to assess the performance of the proposed one-stage paradigm. To quantify the real time capa-bility and architectural ligthweightness, inference throughput in frames per second (FPS) and floating point operations (FLOPs) are reported. To assess the fidelity of sub-pixel unmixing, we adopt the Mean Average Precision ( mAP ) as the primary evalu-ation metric, following the protocol in [9]. The mAP is defined as the mean of Average Precision ( AP d) calculated at five sub-pixel distance thresholds: d ∈ { 0.05 , 0.10 , 0.15 , 0.20 , 0.25 }
+
+pixels. This multi-threshold approach strictly penalizes both spatial localization deviations and radiant intensity estimation errors, reflecting the one-to-many decomposition accuracy. 
+
+Training Settings: The FOCUS framework is implemented in PyTorch and optimized via the composite loss Jtotal =
+
+Jrec +λ1Jsse +λ2Jpcf a . Through cross-validation, the penalty coefficients are set to λ1 = 1 × 10 −4 for structural sparsity and λ2 = 0 .1 for flux calibration. The model is trained for 300 epochs using the Adam optimizer with a batch size of 64 and the initial learning rate is 1 × 10 −3. To ensure the fairness of the throughput comparison, all models (including baselines) are evaluated on a single NVIDIA GeForce RTX 4090 GPU. num = 1             
+
+> 6.65%
+> num = 2
+> 24.01%
+> num = 3
+> 38.32%
+> num = 4
+> 24.41%
+> num = 5
+> 6.62%
+> 80000
+> frames
+> (a) Proportion by target count (b) Sample count by target count
+> 5318
+> 19204
+> 30655
+> 19531
+> 5292
+> 0
+> 5000
+> 10000
+> 15000
+> 20000
+> 25000
+> 30000
+> 35000
+> One Two Three Four Five
+> NUMBER OF IMAGES
+> TARGET CATEGORY
+> Fig. 4. Target count distribution of the CSIST-100K training set. (a) Proportion by target count. (b) Absolute sample count per category. The distribution follows an approximate binomial pattern, with 2–4 target scenarios dominating (86.7%).
+
+Dataset: We evaluate on the CSIST-100K dataset [9], a large-scale synthetic benchmark for CSIST Unmixing comprising 80,000 training samples, 10,000 validation samples, and 10,000 test samples. Each sample consists of an 11 × 11 low-resolution infrared observation and a corresponding 33 × 33 
+
+high-resolution ground truth, synthesized via a Gaussian PSF degradation model with σ = 0 .5. Beyond the original data description, we further analyze the target count distribution, finding that it follows an approximate binomial pattern (Fig. 4): 2–4 target scenarios dominate (86.7%), consistent with the realistic frequency of closely-spaced targets within a sub-pixel distance, while single-target and five-target scenarios are retained at approximately 6.6% each to enhance generalization across density extremes. The validation and test sets follow the same distribution. 
+
+B. Comparison with State-of-the-Arts 1) Comparison with Deep Unfolding Networks : The upper part of Table I evaluates FOCUS against the deep unfolding paradigm. ISTANet is utilized as the foundational baseline, as it represents the prototypical recursive architecture that governs current CSIST unmixing research. Although recent extensions like DISTANet introduce dynamic parameters to improve accuracy, the fundamental computational tax remains an inherent property of the underlying ISTANet based recursion. By comparing FOCUS to this foundational framework, the approx. 60 × speedup (122,522 vs 2,127 FPS) highlights the efficiency leap provided by eliminating the iterative loop itself. While standard FOCUS yields a competitive mAP of 45.50%, the iterative variant FOCUS+ is evaluated to explore the performance ceiling. At an equivalent throughput to DISTANet (approx. 11,000 FPS), FOCUS+ achieves a higher mAP compared to DISTANet. This verifies that the parameter driven isomorphic logic, specifically the integration of adaptive thresholds and learnable step sizes, provides a more precise representation for source recovery than traditional unrolling units. The results confirm that unfolding is not essential for achieving high unmixing fidelity, provided the network logic is guided by appropriate structural constraints. This efficiency gain establishes FOCUS as a viable solution for high speed infrared sensing where traditional iterative loops become the primary delay. 
+
+2) Comparison with Modified Super-Resolution Paradigms :
+
+Compared to modified image SR paradigms, where the label spaces, loss functions, and evaluation metrics have been reformulated for the unmixing task, FOCUS establishes a superior balance among precision, computational cost, and inference throughput. Standard reconstruction models are inherently optimized for visual textures, which leads to a smoothness bias that merges discrete radiant sources into continuous energy clusters. While modern architectures such as CAMixerSR and EDSR achieve resolution enhancement, they often lag in unmixing fidelity due to the lack of explicit sparsity constraints. For example, CAMixerSR yields an mAP of 44.87%, which is lower than FOCUS despite requiring a much higher computational budget (20.42G vs 1.63G FLOPs). Crucially, the throughput of FOCUS reaches 122,522 FPS, 
+
+which is over 100 × faster than CAMixerSR (1,138 FPS) and 60 × faster than the precise CGA scheme (1,784 FPS) .Even when compared to lightweight models like SSIU, FOCUS maintains a 17 × speed advantage while providing a nearly 2% gain in mAP. On the other end of the spectrum, models like RLFN fail to capture the sparse nature of infrared targets despite 7          
+
+> TABLE I QUANTITATIVE COMPARISON WITH STATE -OF -THE -A RT DEEP UNFOLDING AND SUPER -R ESOLUTION PARADIGMS ON THE CSIST-100K DATASET .BOLD
+> AND *VALUES DENOTE THE BEST RESULTS AND THE PERFORMANCE UPPER BOUND ,RESPECTIVELY . T HEY ARE HIGHLIGHTED IN THE BOTTOM ROW .
+
+## MODEL mAP AP 05 AP 10 AP 15 AP 20 AP 25 FPS FLOPs 
+
+## Deep Unfolding Paradigms for CSIST Unmixing 
+
+## LIHT [35] 10.35 0.06 0.92 4.99 14.74 30.50 46009 1.36 G LAMP [36] 14.22 0.05 1.11 7.31 21.56 41.06 12625 0.28 G LISTA [37] 30.13 0.25 4.13 22.29 51.18 72.82 34111 1.36 G ISTANet [27] 44.99 0.40 7.10 40.10 82.60 94.80 2127 11.37 G ISTANet+ [27] 45.57 0.30 6.70 40.40 84.30 96.00 1696 24.33 G DISTA-Net [9] 46.47 0.30 6.70 41.20 86.40 97.60 10992 35.10 G FISTANet [38] 44.97 0.50 7.70 40.40 81.80 94.50 12516 18.96 G TiLISTA [39] 14.95 0.06 1.23 7.72 22.50 46.23 9408 0.28 G USRNet [40] 41.82 0.30 6.80 35.70 75.70 90.50 1084 36.02 G RPCANet [41] 45.47 0.30 6.60 40.20 83.80 96.40 1892 47.39 G 
+
+## Modified Image Super-Resolution Paradigms for CSIST Unmixing 
+
+## RLFN [42] 29.03 0.20 3.40 20.00 48.60 73.00 22330 3.86 G SMFANet [43] 28.01 0.20 3.40 19.60 47.10 69.80 12889 1.29 G CGA [44] 45.22 0.40 7.20 39.70 83.00 95.90 1784 11.95 G RDN [45] 45.57 0.30 7.20 40.60 83.50 96.20 5050 0.17 T EDSR [46] 45.41 0.40 7.50 41.00 82.90 95.30 28075 3.02 G ASSA [47] 43.50 0.30 6.30 37.20 79.70 94.00 2138 12.74 G PFT [48] 45.34 0.40 8.10 39.50 82.30 96.40 1076 9.78 G SSIU [49] 43.73 0.40 7.00 38.90 79.70 92.70 7187 0.46 G CAMixerSR [50] 44.87 0.40 7.20 40.10 82.30 94.40 1138 20.42G 
+
+## FOCUS (Ours) 45.50 0.40 7.30 41.00 83.20 95.50 122522 1.63 G 
+
+## FOCUS+ (Ours)* 46.53 0.40 7.40 42.20 85.60 97.00 11003 41.49 G 
+
+their high speed, resulting in a sever drop in mAP compared to FOCUS. The superiority of FOCUS is attributed to the ISGU architecture, where the mask path explicitly gates the intensity path to enforce structural sparsity. This design represents a successful adaptation of reconstruction principles for the inversion of discrete point sources. By injecting task specific constraints into a feedforward flow, FOCUS allows a 1.63G FLOPs model to resolve aliased energy regions with accuracy and speed that outperform both heavy iterative and visual restoration paradigms, proving that architectural efficiency does not necessitate a sacrifice in source recovery precision. 
+
+C. Visual Analysis 
+
+Fig. 5 presents the qualitative comparison of reconstruction results on the CSIST-100K dataset across different target densities. Overall, FOCUS achieves a significant reduction in model parameters while maintaining high reconstruction accuracy, a balance that is visually apparent across all test scenarios. Specifically, the single-target results indicate that the reso-lution enhancement provided by FOCUS does not introduce spatial distortions or compromise the localization accuracy of isolated infrared targets. This demonstrates that the model effectively preserves the point-like characteristics of infrared signals during the upscaling process. In comparison with deep unfolding methods such as ISTA-Net and FISTA-Net, FOCUS exhibits higher precision in recovering target intensities and sharp edges. Furthermore, a distinct performance gap emerges when comparing FOCUS to SR methods like ESPCN, SRCNN, and CAMixerSR. As the number of aliased targets increases from three to five, these SR-based approaches suffer from severe patchy artifacts and blurred energy distributions, failing to distinguish closely spaced targets. In contrast, FOCUS consistently produces clear and distinct reconstructions even in highly congested scenarios. In summary, these visual results confirm that FOCUS effectively balances model efficiency with high-fidelity reconstruction. It remains robust against aliasing interference, making it a reliable solution for infrared compressed sensing reconstruction. 
+
+D. Ablation Study 
+
+We structure the ablation study along three progressive dimensions: the rationality of architectural design, the effec-tiveness of physics-guided constraints, and the generalization capability across diverse scenarios. 
+
+1) Impact of Different Designs : To evaluate the individual contribution of each component within FOCUS, an incremental ablation study is conducted on the CSIST 100K dataset. A generic one-stage regression network serves as the baseline, yielding an mAP of 42.61% and an AP 25 of 89.70%. The 8GT  PhiX  ISTA -Net  SOURCE RLFN  CAMixerSR SMFANet  SSIU 
+
+> One Target Two Targets Three Targets Four Targets Five Targets
+> FISTA -Net
+
+Fig. 5. Visual comparison of unmixing results on the CSIST-100K dataset across varying target densities. Each row represents a specific scenario ranging from a single target to five congested targets, while the columns display the reconstruction outcomes of different paradigms. The red boxes highlight the zoomed-in details of sub-pixel target clusters. These results confirm that the proposed framework maintain robust unmixing performance and precise localization even in highly congested scenarios. TABLE II ABLATION STUDY OF THE PROPOSED COMPONENTS ON THE CSIST-100K 
+
+> DATASET
+
+.
+
+Baseline SSE PGFC HCF mAP (%) AP 20 AP 25 
+
+✓ 42.61 77.30 89.70 
+
+✓ ✓ 43.74 (+1.13) 79.30 90.00 
+
+✓ ✓ ✓ 44.10 (+0.36) 79.90 91.30 
+
+✓ ✓ ✓ ✓ 45.50 (+1.40) 83.20 95.60 
+
+results summarized in Table II verify that each design element is necessary for resolving subpixel radiant sources. The integration of Structural Sparsity Enforcement (SSE) through the ISGU mask path yields a 1.13% mAP increase. This mechanism introduces a suppressive force that pushes low intensity background clutter toward zero, facilitating the formation of sharper target centroids. The benefit of this sparsity induction is reflected in the sub-pixel localization precision, where the AP 20 score rises from 77.30% to 79.30%. By penalizing the absolute sum of output intensities, SSE ensures that the network prioritizes a sparse solution to counter the energy diffusion typical of convolutional layers. However, the downward gradient of the L1 norm may also leads to target signal attenuation alongside background suppression. Physics Guided Flux Calibration (PGFC) resolves this attenuation by anchoring radiant energy to the reference level. By forming an equilibrium with the suppressive force of SSE, PGFC reallocates energy back to the identified target coordinates. This process improves mAP to 44.10% and 9
+
+increases AP 25 to 91.30%. This outcome confirms that flux conservation is necessary to maintain the radiant fidelity of discrete sources while enforcing sparsity. The interaction between SSE and PGFC ensures that the model sharpens the target response without sacrificing its radiant magnitude.                     
+
+> TABLE III AVERAGE INTENSITY DEVIATION BETWEEN TP DETECTIONS AND GT
+> UNDER DIFFERENT CONSTRAINT CONFIGURATIONS . L OWER ABSOLUTE VALUE INDICATES BETTER AMPLITUDE RECOVERY .
+> Constraints ∆Amplitude Relative Improvement
+> AP 05 AP 10 AP 05 AP 10
+> LM SE -66.223 -68.061 ––
+> LSparsity -52.478 -54.873 20.76% ( ↑)19.38% ( ↑)
+> LEnergy -49.036 -53.366 6.56% ( ↑)2.75% ( ↑)
+
+The introduction of the HCF flow yields the most measurable performance gain, raising the mAP by 1.40% to reach 45.50%. This strategy decouples coarse spatial topology recovery from subpixel coordinate refinement into dedicated modules. Isolating geometric estimation from artifact suppression reduces optimization entanglement compared to undifferentiated one-stage architectures. The efficacy of this stratified approach is evidenced by the increase in strict localization metrics, where 
+
+AP 20 reaches 83.20% and AP 25 attains 95.60%. This hierarchy ensures that the network logic converges toward a sharp Dirac delta prior. Collectively, these results justify the transition from iterative unfolding to a task specific direct mapping paradigm. 
+
+2) Impact of Constraints : Table III examines the amplitude recovery fidelity of detections relative to the ground truth under progressive constraint integration. The individual impact of  
+
+> Fig. 6. Changes in energy intensity after gradually adding constraints.
+
+these constraints is visualized through a representative case study in Fig. 6. Theoretically, sparsity regularization exerts a uniform downward pressure that would attenuate signal intensities if utilized in isolation. However, as an auxiliary constraint alongside the spatial anchoring of mean square error, sparsity enforcement primarily suppresses diffuse background noise and low intensity false alarms. This competitive inter-action forces the network to concentrate radiant flux toward the predicted target coordinates, which results in the intensity growth observed in Table III. Specifically, the amplitude error at the 0.05 pixel threshold improves from 66.22% to 52.48%, representing a 20.76% gain. Subsequently, flux conservation provides targeted energy calibration to further eliminate residual false alarms. By anchoring the total predicted flux to the reference level, this constraint facilitates the reallocation of energy from suppressed artifacts back to the target centroids. This restorative process reduces the amplitude deficit by an additional 6.56% at the 0.05 pixel threshold and 2.75% at the 0.10 pixel threshold. The diminishing returns at relaxed thresholds are consistent with the focus of flux conservation on fine grained amplitude fidelity rather than coarse localization. While the 3D visualizations in Fig. 6 illustrate this energy redistribution for a specific instance, the statistical data in Table III confirms that these constraints act as complementary forces across the entire dataset. The synergy between sparsity and energy conservation establishes a restorative equilibrium that ensures unmixing fidelity by maintaining both spatial discreteness and radiant accuracy.                                                      
+
+> TABLE IV ROBUSTNESS EVALUATION UNDER DIFFERENT GAUSSIAN NOISE LEVELS .
+> σFOCUS ASSA CAMixer CGA ISTANet USRNet 045.50 43.50 44.87 45.22 44.99 41.82 0.05 45.45 36.44 44.80 20.93 44.94 41.74 0.1 45.37 36.43 44.61 19.92 44.81 41.51 0.3 44.51 35.88 42.98 17.58 43.72 39.24 0.6 41.87 34.54 38.48 16.12 40.24 32.48 1.0 37.12 31.53 33.10 14.98 34.89 23.04 00.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1
+> Gaussian Noise Level ( <)
+> 10 15 20 25 30 35 40 45 50
+> Performance (mAP)
+
+Robustness to Gaussian Noise  
+
+> FOCUS (Ours) ISTANet CAMixer ASSA USRNet CGA
+> Fig. 7. Robustness to Gaussian noise. FOCUS maintains a consistently higher performance trajectory across all noise levels, while competing methods exhibit steeper degradation beyond the training distribution.
+
+3) Generalization–Robustness to Gaussian Noise : The re-silience of unmixing schemes against additive noise corruption is evaluated by injecting Gaussian noise into test inputs with standard deviations σ ranging from 0 to 1.0. This selection 10 
+
+spans from ideal observations to degraded conditions that extend far outside the training distribution, which is limited to 
+
+σ ≤ 0.05 . The quantitative results summarized in Table IV and the performance trajectories illustrated in Fig. 7 confirm that FOCUS maintains a consistent lead across all noise intensities. Under noise free conditions ( σ = 0 ), FOCUS achieves an mAP of 45.50%, which is superior to both the best reconstruction model CAMixer and the strongest unfolding baseline ISTANet. A detailed analysis of the degradation curves reveals a clear divergence in generalization capability between the proposed paradigm and existing models. As noise intensity increases beyond the training boundary, all competing methods exhibit steep performance drops. The fragility of generic architectures is most evident in CGA, which suffers an immediate precision collapse from 45.22% at σ = 0 to 20.93% at σ = 0 .05 ,eventually reaching a floor of 14.98%. Similarly, SR based models such as USRNet and ASSA show rapid downward trajectories, indicating that pure data driven fitting fails to maintain signal integrity under out of distribution perturbations. In contrast, FOCUS demonstrates a characteristic of graceful degradation, preserving an mAP of 37.12% even at the highest noise level. This robust performance indicates that the integration of radiant flux conservation and structural sparsity provides a restorative equilibrium that prevents the unmixing logic from failing. By anchoring the optimization to radiant ground truth levels rather than relying solely on learned textural patterns, FOCUS effectively distinguishes radiant target spikes from stochastic background fluctuations. The widening performance gap between FOCUS and the next best competitor, ISTANet, at σ = 1 .0 (37.12% vs 34.89%) further confirms the advantage of the onestage mapping architecture in ensuring consistent unmixing fidelity. Collectively, these results verify that a well constrained direct mapping paradigm can provide stable source recovery across diverse sensor environments without the requirement for iterative solvers or retraining.                                      
+
+> TABLE V ROBUSTNESS EVALUATION UNDER DIFFERENT POISSON NOISE LEVELS .Peak FOCUS ASSA CAMixer CGA ISTANet USRNet 10000 44.38 42.28 43.54 43.39 43.85 40.42 5000 43.36 41.06 42.35 41.93 42.73 39.11 1000 35.98 34.03 34.98 32.98 35.71 31.65 500 30.08 28.41 29.22 27.08 30.01 25.89 255 23.58 21.79 23.17 21.49 23.02 20.09
+
+4) Generalization–Robustness to Poisson Noise : Poisson noise, which originates from the discrete quantum nature of photon detection, represents the primary source of interference in low light infrared imaging. This evaluation considers representative comparison schemes across a spectrum of peak photon counts, ranging from scientific grade sensors at peak 10000 to severely photon starved conditions at peak 255. As detailed in Table V, FOCUS maintains the highest mAP scores across all noise intensities. To further quantify this robustness, Fig. 8 illustrates the performance deviation of various models relative to the ISTANet baseline. While ISTANet provides 10000 5000 1000 500 255  
+
+> Poisson Peak Intensity (Photon Count)
+> -4 -3 -2 -1 012
+> " mAP relative to ISTANet (%)
+> FOCUS (Ours) ASSA CAMixer CGA USRNet
+> Fig. 8. Generalization to Poisson noise. FOCUS consistently leads all competing methods across the full range of peak photon counts, from scientific-grade sensors (peak=10000) to severely photon-starved conditions (peak=255).
+
+a stable iterative reference, FOCUS consistently produces a positive margin above this baseline, which confirms that the one-stage mapping architecture can generalize reliably across diverse sensor states. The advantage of the proposed framework becomes in-creasingly measurable as the photon count decreases. At a peak intensity of 1000, FOCUS achieves an mAP of 35.98%, maintaining a consistent lead over both CAMixer and CGA. Under the extreme conditions of peak 255, where the signal to noise ratio is severely compromised, generic reconstruction models such as USRNet and ASSA suffer from precision collapse and fall well below the ISTANet baseline. In contrast, FOCUS preserves an mAP of 23.58%, which represents a 0.56% gain over the second best iterative model. This resilience is attributed to the competitive equilibrium between flux conservation and structural sparsity. By anchoring the total energy to the radiant ground truth, FOCUS prevents the excessive attenuation of target spikes that typically occurs in generic restoration models during background suppression. These results collectively verify that the direct mapping paradigm ensures superior signal integrity without the recursive delays of iterative solvers, establishing FOCUS as a robust solution for unmixing under adverse sensing environments.                                       
+
+> TABLE VI UNMIXING ACCURACY OF FOCUS ACROSS DIFFERENT TARGET COUNTS .
+> Nums mAP AP 05 AP 10 AP 15 AP 20 AP 25
+> 151.10 0.60 10.40 51.50 93.20 100.00 249.40 0.50 9.70 47.00 90.50 99.10 347.60 0.40 8.70 44.90 86.40 97.60 442.70 0.30 5.90 36.60 78.00 92.60 538.10 0.10 4.40 31.60 68.40 86.20
+
+5) Generalization–Performance Across Target Densities :
+
+To evaluate the robustness of FOCUS under varying target densities, we conduct experiments on scenarios containing one 11 
+
+to five spatially proximate targets. The quantitative results are detailed in Table VI and further visualized through the sector heatmap in Fig. 9. 51.1 0.6 10.4 51.5 93.2 100.0 49.4 0.5 9.7 47.0 90.5 99.1 47.6 0.4 8.7 44.9 86.4 97.6 42.7 0.3 5.9 36.6 78.0 92.6 38.1 0.1 4.4 31.6 68.4 86.2  
+
+> mAP AP 05
+> AP 10
+> AP 15
+> AP 20
+> AP 25
+> Nums 1 Nums 2 Nums 3 Nums 4 Nums 5
+> Fig. 9. Visualization of unmixing precision across different target counts. The sector map illustrates the distribution of AP scores across five distance thresholds (inner to outer rings) for Nums 1 to 5 (angular segments).
+
+The results indicate that FOCUS yields superior unmixing fidelity across all density levels. For isolated targets (Nums 1), the model achieves an mAP of 51.10% and reaches a perfect 100% accuracy at the AP 25 threshold. As the target count increases from 1 to 5, the performance exhibits a graceful degradation rather than a sharp collapse. Specifically, even in congested scenarios with 5 targets, FOCUS maintains an mAP of 38.10% and an AP 25 of 86.20%. This downward trend aligns with the physical nature of the CSIST task, where higher target density leads to severe energy aliasing and overlapping point spread functions, which elevates the difficulty of source separation. The superiority of the proposed framework is particularly evident in high precision localization. As shown in the sector heatmap, while the AP 05 remains low due to the extreme challenge of 0.05 pixel accuracy, the scores for AP 20 and 
+
+AP 25 remain consistently high even as targets become denser. This performance indicates that the isomorphic unit and physics guided constraints effectively concentrate radiant energy into discrete coordinates, preventing the smoothing bias common in standard architectures. The ability to resolve 86.20% of targets within a 0.25 pixel radius under the highest density (Nums 5) confirms that SOURCE provides a reliable solution for congested infrared source recovery. 
+
+6) Scalability to Higher Upsampling Factors : The re-silience of FOCUS is further examined at higher upsampling factors of c = 5 and c = 7 . These scales increase the ill posed nature of the unmixing task by quadratically expanding the latent space required for subpixel localization. As reported in Table VII, the onestage paradigm consistently provides superior precision at both resolution settings. FOCUS achieves an mAP of 64.61% at c = 5 and 73.28% at c = 7 , which represents a measurable improvement over the strongest unfolding baseline ISTANet+. A detailed analysis indicates that the precision lead of the proposed framework becomes more distinct as the upsampling factor grows. The performance margin between FOCUS and ISTANet+ increases from 1.16% at c = 5 to 2.19% at 
+
+c = 7 . This trend suggests that the coarse to fine hierarchy                                                
+
+> TABLE VII PERFORMANCE COMPARISON AT HIGHER UPSAMPLING FACTORS .
+> Model #P FLOPs mAP AP 10 AP 15
+> c= 5
+> ISTANet 0.171M 39.54G 62.57 53.8 80.5 ISTANet+ 0.225M 48.16G 63.45 53.2 81.9 FISTANet 0.038M 55.99G 61.53 50.7 79.0 FOCUS (Ours) 0.055M 4.26G 64.61 54.6 83.7
+> c= 7
+> ISTANet 0.171M 89.51G 68.87 74.6 81.1 ISTANet+ 0.255M 103.00G 71.09 74.9 84.9 FISTANet 0.038M 0.12T 67.81 71.7 80.3 FOCUS (Ours) 0.069M 8.19G 73.28 79.6 86.7
+
+is more robust to the dimensionality challenges inherent in high resolution mapping compared to the repetitive loops of unfolding architectures. By isolating the spatial topology recovery from the coordinate refinement, FOCUS avoids the optimization entanglement that often affects recursive models in highly underdetermined scenarios. Furthermore, the computational scaling of FOCUS exhibits a clear advantage over iterative schemes. While the FLOPs of baselines such as FISTANet and ISTANet+ escalate sharply, with FISTANet reaching 0.12T at c = 7 , FOCUS maintains a highly efficient footprint of only 8.19G. This disparity confirms that the direct mapping paradigm resolves the computational tax of iterative solvers, which typically scale poorly as resolution demands increase. The ability of a lightweight network to outperform heavy iterative models while utilizing a fraction of the computational budget verifies the efficacy of the physics guided mapping logic. Collectively, these results confirm that FOCUS generalizes gracefully across diverse upsampling factors, maintaining a restorative equilibrium between unmixing fidelity and inference efficiency. VI. C ONCLUSION 
+
+To resolve the computational overhead and latency charac-teristic of iterative unfolding methods, this paper introduces 
+
+FOCUS , a one-stage feed-forward CSIST Unmixing paradigm. By identifying the mathematical isomorphism between the degradation models of image SR and CSIST Unmixing, we establish a theoretical basis for adapting efficient convolu-tional architectures to unmixing. Integrating structural sparsity and flux conservation redirects the optimization from visual smoothness toward the precise inversion of discrete radiant sources. Quantitative evaluations confirm that FOCUS yields an approximate 60 × speedup over the ISTANet baseline, while the unrolled variant FOCUS+ reaches a higher precision record by outperforming current state of the art unfolding models. This transition from iterative solvers to direct mapping establishes a practical pathway for high speed CSIST Unmixing in time sensitive scenarios. REFERENCES [1] M. Zhang, X. Li, J. Guo, Y. Li, and X. Gao, “Wmrnet: Wavelet mamba with reversible structure for infrared small target detection,” 12 
+
+IEEE Transactions on Image Processing , vol. 34, pp. 8229–8242, 2025. 1[2] Z. Xiong, F. Zhou, F. Wu, S. Yuan, M. Fu, Z. Peng, J. Yang, and Y. Dai, “Drpca-net: Make robust pca great again for infrared small target detection,” IEEE Transactions on Geoscience and Remote Sensing , 2025. 1[3] S. Chen, L. Ji, J. Zhu, M. Ye, and X. Yao, “Sstnet: Sliced spatio-temporal network with cross-slice convlstm for moving infrared dim-small target detection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–12, 2024. 1 [4] C. P. Chen, H. Li, Y. Wei, T. Xia, and Y. Y. Tang, “A local contrast method for small infrared target detection,” IEEE Transactions on Geoscience and Remote Sensing , vol. 52, no. 1, pp. 574–581, 2013. 1 [5] S. Feng, R. Feng, D. Wu, C. Zhao, W. Li, and R. Tao, “A coarse-to-fine hyperspectral target detection method based on low-rank tensor decomposition,” IEEE Transactions on Geoscience and Remote Sensing ,vol. 61, pp. 1–13, 2023. 1 [6] F. Wu, S. Liu, H. Wang, B. Tao, J. Luo, and Z. Peng, “Neural spatial– temporal tensor representation for infrared small target detection,” Pattern Recognition , vol. 169, p. 111929, 2026. 1 [7] X. Zhai, B. Xu, Y. Chen, H. Wang, K. Guo, and Y. Dai, “Seqcsist: Sequen-tial closely-spaced infrared small target unmixing,” IEEE Transactions on Geoscience and Remote Sensing , 2025. 2, 3 [8] D. Macumber, S. Gadaleta, A. Floyd, and A. Poore, “Hierarchical closely spaced object (CSO) resolution for ir sensor surveillance,” in Signal and Data Processing of Small Targets 2005 , vol. 5913. SPIE, 2005, pp. 32–46. 2 [9] S. Han, S. Yang, Y. Li, X. Zhang, X. Li, J. Yang, M.-M. Cheng, and Y. Dai, “Dista-net: Dynamic closely-spaced infrared small target unmixing,” in 
+
+Proceedings of the IEEE/CVF International Conference on Computer Vision , 2025, pp. 14 655–14 664. 2, 3, 6, 7 [10] X. Xiao, Y. Xiao, L. Xu, and L. Peng, “Stsa-net: Small target sensitive and adaptive sparse network for infrared reconstruction,” IEEE Signal Processing Letters , vol. 33, pp. 1486–1490, 2026. 2, 3 [11] Z. Tang, Y. Zhu, R. Huang, M. Yang, Y. Ma, J. Huang, and F. Fan, “Dscsnet: A dynamic sparse compression sensing network for closely-spaced infrared small target unmixing,” arXiv preprint arXiv:2603.21192 ,2026. 2, 3 [12] P. Neal, C. Eric, P. Borja, and E. Jonathan, “Distributed optimization and statistical learning via the alternating direction method of multipliers,” 
+
+Foundations and Trends® in Machine Learning , vol. 3, no. 1, pp. 1–122, 2011. 2, 3 [13] C. He, R. Zhang, F. Xiao, C. Fang, L. Tang, R. Zhang, and S. Farsiu, “Unfoldir: Rethinking deep unfolding network in illumination degradation image restoration,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2026, pp. 5003–5013. 2 [14] J. Pan, S. Liu, D. Sun, J. Zhang, Y. Liu, J. Ren, Z. Li, J. Tang, H. Lu, Y.-W. Tai et al. , “Learning dual convolutional neural networks for low-level vision,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2018, pp. 3070–3079. 2 [15] W. Wen, T. Zhang, Q. Zhao, Z. Zheng, C. Guo, X. Shao, and C. Li, “Incorporating uncertainty-guided and top-k codebook matching for real-world blind image super-resolution,” IEEE Transactions on Image Processing , 2026. 2 [16] C. Dong, C. C. Loy, K. He, and X. Tang, “Image super-resolution using deep convolutional networks,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 38, no. 2, pp. 295–307, 2015. 2, 4 [17] T. Dai, J. Cai, Y. Zhang, S.-T. Xia, and L. Zhang, “Second-order attention network for single image super-resolution,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2019, pp. 11 065–11 074. 2 [18] C. Ledig, L. Theis, F. Huszár, J. Caballero, A. Cunningham, A. Acosta, A. Aitken, A. Tejani, J. Totz, Z. Wang et al. , “Photo-realistic single image super-resolution using a generative adversarial network,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition ,2017, pp. 4681–4690. 2 [19] Z. Hui, X. Gao, Y. Yang, and X. Wang, “Lightweight image super-resolution with information multi-distillation network,” in Proceedings of the 27th ACM International Conference on Multimedia (ACM MM) ,2019, pp. 2024–2032. 2 [20] J. Liu, J. Tang, and G. Wu, “Residual feature distillation network for lightweight image super-resolution,” in European Conference on Computer Vision . Springer, 2020, pp. 41–55. 2 [21] C. Mou, X. Wang, Y. Wu, Y. Shan, and J. Zhang, “Empowering real-world image super-resolution with flexible interactive modulation,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 46, no. 11, pp. 7317–7330, 2024. 2 [22] Y. Blau and T. Michaeli, “The perception-distortion tradeoff,” in 
+
+Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2018, pp. 6228–6237. 3 [23] W. Shi, J. Caballero, F. Huszár, J. Totz, A. P. Aitken, R. Bishop, D. Rueckert, and Z. Wang, “Real-time single image and video super-resolution using an efficient sub-pixel convolutional neural network,” in 
+
+Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2016, pp. 1874–1883. 3 [24] M. Haris, G. Shakhnarovich, and N. Ukita, “Deep back-projection networks for super-resolution,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2018, pp. 1664–1673. 3 [25] V. Monga, Y. Li, and Y. C. Eldar, “Algorithm unrolling: Interpretable, efficient deep learning for signal and image processing,” IEEE Signal Processing Magazine , vol. 38, no. 2, pp. 18–44, 2021. 3 [26] I. Daubechies, M. Defrise, and C. De Mol, “An iterative thresholding algorithm for linear inverse problems with a sparsity constraint,” Com-munications on Pure and Applied Mathematics: A Journal Issued by the Courant Institute of Mathematical Sciences , vol. 57, no. 11, pp. 1413–1457, 2004. 3 [27] J. Zhang and B. Ghanem, “Ista-net: Interpretable optimization-inspired deep network for image compressive sensing,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2018, pp. 1828–1837. 3, 7 [28] Y. Yang, J. Sun, H. Li, and Z. Xu, “ADMM-CSNet: A deep learning approach for image compressive sensing,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 42, no. 3, pp. 521–538, 2018. 3 [29] S. K. Nayar and M. Ben-Ezra, “Motion-based motion deblurring,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 26, no. 6, pp. 689–698, 2004. 3 [30] J. Yang, J. Wright, T. S. Huang, and Y. Ma, “Image super-resolution via sparse representation,” IEEE Transactions on Image Processing , vol. 19, no. 11, pp. 2861–2873, 2010. 3 [31] K. Zhang, J. Liang, L. Van Gool, and R. Timofte, “Designing a practical degradation model for deep blind image super-resolution,” in Proceedings of the IEEE/CVF International Conference on Computer Vision , 2021, pp. 4791–4800. 3 [32] M. Bertero, P. Boccacci, and C. De Mol, Introduction to inverse problems in imaging . CRC press, 2021. 4 [33] Y. Zhang, K. Li, K. Li, L. Wang, B. Zhong, and Y. Fu, “Image super-resolution using very deep residual channel attention networks,” in 
+
+Proceedings of the European Conference on Computer Vision , 2018, pp. 286–301. 4 [34] K. He, X. Zhang, S. Ren, and J. Sun, “Delving deep into rectifiers: Surpassing human-level performance on imagenet classification,” in 
+
+Proceedings of the IEEE International Conference on Computer Vision ,2015, pp. 1026–1034. 4 [35] Z. Wang, Q. Ling, and T. Huang, “Learning deep ℓ0 encoders,” in 
+
+Proceedings of the AAAI Conference on Artificial Intelligence , vol. 30, no. 1, 2016. 7 [36] C. Metzler, A. Mousavi, and R. Baraniuk, “Learned d-amp: Principled neural network based compressive image recovery,” Advances in Neural Information Processing Systems , vol. 30, 2017. 7 [37] K. Gregor and Y. LeCun, “Learning fast approximations of sparse coding,” in 27th International Conference on Machine Learning , 2010, pp. 399– 406. 7 [38] J. Xiang, Y. Dong, and Y. Yang, “FISTA-Net: Learning a fast iterative shrinkage thresholding network for inverse problems in imaging,” IEEE Transactions on Medical Imaging , vol. 40, no. 5, pp. 1329–1339, 2021. 7[39] J. Liu and X. Chen, “ALISTA: Analytic weights are as good as learned weights in lista,” in International Conference on Learning Representations , 2019. 7 [40] K. Zhang, L. V. Gool, and R. Timofte, “Deep unfolding network for image super-resolution,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2020, pp. 3217–3226. 7 [41] F. Wu, T. Zhang, L. Li, Y. Huang, and Z. Peng, “RPCANet: Deep unfolding RPCA based infrared small target detection,” in Proceedings of the IEEE Winter Conference on Applications of Computer Vision ,2024, pp. 4809–4818. 7 [42] F. Kong, M. Li, S. Liu, D. Liu, J. He, Y. Bai, F. Chen, and L. Fu, “Residual local feature network for efficient super-resolution,” in Proceedings of the IEEE/CVF conference on computer vision and pattern recognition ,2022, pp. 766–776. 7 [43] M. Zheng, L. Sun, J. Dong, and J. Pan, “Smfanet: A lightweight self-modulation feature aggregation network for efficient image super-resolution,” in ECCV , 2024. 7 13 
+
+[44] M. W. Aslam, S. U. Rehman, A. M. M. Tayyab, M. Hamza, X. Li, and Y. Li, “Cga: Curvature-guided attention for remote sensing image super-resolution,” IEEE Transactions on Geoscience and Remote Sensing ,pp. 1–14, 2026. 7 [45] Y. Zhang, Y. Tian, Y. Kong, B. Zhong, and Y. Fu, “Residual dense network for image super-resolution,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2018, pp. 2472–2481. 7 [46] B. Lim, S. Son, H. Kim, S. Nah, and K. Mu Lee, “Enhanced deep residual networks for single image super-resolution,” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition Workshops , 2017, pp. 136–144. 7 [47] G. Qian, H. Hammoud, G. Li, A. Thabet, and B. Ghanem, “Assanet: An anisotropic separable set abstraction for efficient point cloud represen-tation learning,” Advances in Neural Information Processing Systems ,vol. 34, pp. 28 119–28 130, 2021. 7 [48] W. Long, X. Zhou, L. Zhang, and S. Gu, “Progressive focused transformer for single image super-resolution,” in Proceedings of the Computer Vision and Pattern Recognition Conference , 2025, pp. 2279–2288. 7 [49] Z. Ni, Y. Zhang, W. Yang, H. Wang, S. Wang, and S. Kwong, “Structural similarity-inspired unfolding for lightweight image super-resolution,” 
+
+IEEE Transactions on Image Processing , 2025. 7 [50] Y. Wang, Y. Liu, S. Zhao, J. Li, and L. Zhang, “Camixersr: Only details need more" attention",” in Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition , 2024, pp. 25 837–25 846. 7 
+
+Ximeng Zhai received the B.S. degree from Tianjin University. He is currently a Ph.D. Candidate at the Xi’an Institute of Optics and Precision Mechanics (XIOPM), University of Chinese Academy of Sci-ences, China. His research interests encompass infrared image processing and object detection. 
+
+Zheng Wang received the B.S. degree from Beijing Institute of Technology. He currently works at the Beijing Institute of Astronautical Systems Engineering. His research interests include measurement system and TT&C systems design. 
+
+Yaohong Chen received his M.S. and Ph.D. degree from Xi’an Jiaotong University and University of Chinese Academy of Sciences in 2013 and 2022, respectively. He was a visiting scholar in the Department of Electrical and Computer Engineering of Johns Hopkins University during the 2019 to 2020. He is currently an associate research fellow with the Xi’an Institute of Optics and Precision Mechanics, Chinese Academy of Sciences. His research interests include the infrared imaging systems, infrared image processing and infrared imaging circuit. 
+
+Hao Wang received his M.S. and Ph.D. degrees from the University of Electronic Science and Technology and the University of Chinese Academy of Sciences in 2008 and 2017, respectively. He is currently a research fellow at the Xi’an Institute of Optics and Precision Mechanics, Chinese Academy of Sciences. His research focuses on aerospace visual imaging and image processing. 
+
+Ming-Ming Cheng received his PhD degree from Tsinghua University in 2012. Then he did two years research fellow with Prof. Philip Torr in Oxford. He is now a professor at Nankai University, leading the Media Computing Lab. His research interests include computer graphics, computer vision, and image processing. He received research awards, in-cluding ACM China Rising Star Award, IBM Global SURAward,andCCF-Intel Young Faculty Researcher Program. He is on the editorial boards of IEEE TPAMI/TIP. 
+
+Yimian Dai (Member, IEEE) received the B.E. degree in information engineering and the Ph.D. degree in signal and information processing from Nanjing University of Aeronautics and Astronautics, Nanjing, China, in 2013 and 2020, respectively. From 2021 to 2024, he was a Postdoctoral Re-searcher with the School of Computer Science and Engineering, Nanjing University of Science and Tech-nology, Nanjing, China. He is currently an Associate Professor with the College of Computer Science, Nankai University, Tianjin, China. His research inter-ests include computer vision, deep learning, and their applications in remote sensing. For more information, please visit the link (https://yimian.grokcv.ai/).

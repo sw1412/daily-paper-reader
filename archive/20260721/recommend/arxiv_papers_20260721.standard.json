@@ -1,0 +1,59 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-21T21:45:26.043308+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.16007v1",
+      "source": "arxiv",
+      "title": "Beyond Unfolding: 60x Faster One-Stage Unmixing for Closely-Spaced Infrared Small Targets",
+      "abstract": "Due to the optical diffraction limit and long imaging distances, Closely-Spaced Infrared Small Targets (CSIST) typically exhibit energy overlap, manifesting as indistinguishable blobs in infrared images. This ambiguity invalidates the one-to-one mapping assumption of traditional detection, thereby necessitating a paradigm shift towards CSIST Unmixing, which decomposes these blobs into discrete sub-targets. However, the dominant paradigm deep unfolding networks are shackled by the high latency and structural inflexibility intrinsic to their repetitively iterative architecture. To this end, we propose the Fast One-stage CSIST Unmixing Scheme (FOCUS), a one-stage lightweight paradigm which demonstrates that deep unfolding is not necessary. Motivated by the key observation that image super-resolution (SR) and CSIST Unmixing share an isomorphic degradation model, our insight is that it is possible to achieve a paradigm shift from image SR to CSIST Unmixing via completely transforming the label space, loss functions, and evaluation criteria. Specifically, to avoid entangling geometric recovery with artifact suppression, FOCUS adopts a single pass mapping with an internal coarse-to-fine flow that progressively refines target localization from coarse spatial distributions to finer sub-pixel precision. While sparsity regularization suppresses background clutter, it also attenuates target intensities. To compensate for this attenuation of valid signals, flux conservation is introduced as a competing constraint that restores signal energy back to target centers. To the best of our knowledge, this work is the first attempt to address this task via a lightweight one-stage framework without the DUN paradigm. Experiments demonstrate that our method matches or surpasses the state-of-the-art unfolding approaches in both localization and unmixing accuracy, while boosting the inference speed by 60x.",
+      "authors": [
+        "Ximeng Zhai",
+        "Zheng Wang",
+        "Yaohong Chen",
+        "Hao Wang",
+        "Ming-Ming Cheng",
+        "Yimian Dai"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-17T14:42:51+00:00",
+      "link": "https://arxiv.org/pdf/2607.16007v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "addresses target detection via unmixing, relevant to hyperspectral target detection",
+      "llm_evidence_cn": "通过解混方法处理目标检测，与高光谱目标检测相关",
+      "llm_evidence": "通过解混方法处理目标检测，与高光谱目标检测相关",
+      "canonical_evidence": "通过解混方法处理目标检测，与高光谱目标检测相关",
+      "llm_tldr_en": "FOCUS proposes a one-stage lightweight unmixing scheme for closely-spaced infrared small targets, achieving 60x speedup over deep unfolding methods while maintaining accuracy.",
+      "llm_tldr_cn": "该论文针对红外弱小目标能量重叠导致的检测难题，提出FOCUS单阶段轻量级解混方案。与深度展开网络相比，该方法避免了迭代结构的高延迟，在保持精度的同时实现60倍加速。实验表明该方法在CSIST解混任务上具有优越性，其解混思想可推广至高光谱图像目标检测等领域。",
+      "llm_tldr": "该论文针对红外弱小目标能量重叠导致的检测难题，提出FOCUS单阶段轻量级解混方案。与深度展开网络相比，该方法避免了迭代结构的高延迟，在保持精度的同时实现60倍加速。实验表明该方法在CSIST解混任务上具有优越性，其解混思想可推广至高光谱图像目标检测等领域。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral target detection algorithms",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
