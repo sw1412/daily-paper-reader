@@ -6,24 +6,22 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-21
-- 运行时间：2026-07-21 21:46:16 UTC
+- 最新运行日期：2026-07-22
+- 运行时间：2026-07-22 21:42:42 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：0
 - 精读区：0
-- 速读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读1篇关于红外小目标分离的论文，速度提升60倍。最值得关注的是“单阶段解混”方法，对密集小目标效果显著。建议了解该方法的原理和应用场景，以评估是否适用于自己的目标检测任务。
-- 详情：[/202607/21/README](/202607/21/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202607/22/README](/202607/22/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Beyond Unfolding: 60x Faster One-Stage Unmixing for Closely-Spaced Infrared Small Targets](/202607/21/2607.16007v1-beyond-unfolding-60x-faster-one-stage-unmixing-for-closely-spaced-infrared-small-targets)  
-   标签：评分：6.0/10、query:hsi
-   evidence：通过解混方法处理目标检测，与高光谱目标检测相关
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
