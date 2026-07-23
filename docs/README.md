@@ -6,22 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-22
-- 运行时间：2026-07-22 21:42:42 UTC
+- 最新运行日期：2026-07-23
+- 运行时间：2026-07-23 21:02:05 UTC
 - 运行状态：成功
-- 本次总论文数：0
-- 精读区：0
-- 速读区：0
+- 本次总论文数：2
+- 精读区：1
+- 速读区：1
 
 ### 今日简报（AI）
-> 今日无新推荐，系统未产出可展示论文。
-- 详情：[/202607/22/README](/202607/22/README)
+1) 今日精读点云分类鲁棒性微调框架（8.0分），速读无学习激光雷达位置识别方法（7.0分）。  
+2) 最值得关注：基于点选择的微调策略提升点云分类鲁棒性，以及混合基关键点令牌化实现跨传感器位置识别。  
+3) 下一步可尝试将鲁棒分类与无学习定位结合，用于自动驾驶点云感知任务。
+- 详情：[/202607/23/README](/202607/23/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Point-Selection Fine-Tuning Framework for Robust Point Cloud Classification](/202607/23/2607.19711v1-point-selection-fine-tuning-framework-for-robust-point-cloud-classification)  
+   标签：评分：8.0/10、query:hsi-lidar
+   evidence：点云分类用于LiDAR数据
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [InLiER: Learning-Free Heterogeneous LiDAR Place Recognition via Intermediate Mixed-Radix Structural Keypoint Tokenization](/202607/23/2607.16862v1-inlier-learning-free-heterogeneous-lidar-place-recognition-via-intermediate-mixed-radix-structural-keypoint-tokenization)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：使用结构关键点标记化的LiDAR位置识别
 
 
 <div class="dpr-home-promo-card">

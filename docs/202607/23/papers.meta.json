@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-23",
+  "date": "2026-07-23",
+  "generated_at": "2026-07-23T21:02:13",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/23/2607.19711v1-point-selection-fine-tuning-framework-for-robust-point-cloud-classification",
+      "section": "deep",
+      "title_en": "Point-Selection Fine-Tuning Framework for Robust Point Cloud Classification",
+      "authors": "Da Li, Chang Ma, Dongfu Yin",
+      "date": "2026-07-22",
+      "pdf": "https://arxiv.org/pdf/2607.19711v1",
+      "score": "8.0",
+      "evidence": "点云分类用于LiDAR数据",
+      "tldr": "噪声和离群点严重降低点云识别性能，全微调会放大离群点影响并覆盖预训练鲁棒先验，参数高效微调对损坏标记敏感。提出PSFT框架，通过点选择估计影响力并保留最小影响点抑制离群点，基于子集生成提示令牌注入冻结骨干进行轻量适配，并附加Beta门控残差混合特征滤波器。在ModelNet-C和ModelNet40-C上一致降低损坏误差，在ScanObjectNN-C上取得最强结果，首个结合点选择与提示微调的鲁棒点云分类参数高效微调框架。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Noisy and corrupted points can substantially degrade point cloud recognition performance, especially under challenging corruption settings. In particular, full fine-tuning of 3D pre-trained models may amplify the influence of outliers and overwrite robustness priors learned during pre-training, while naive parameter-efficient adaptation remains sensitive to corrupted tokens. To address this issue, we propose PSFT, a point-selection fine-tuning framework that improves robustness while remaining parameter-efficient. PSFT first estimates point-wise influence from pre-pooling features and adaptively retains minimally influential points to suppress outliers. Based on the selected subset, a prompt generation branch predicts layer-wise prompt tokens and injects them into a frozen backbone for lightweight downstream adaptation. To further mitigate residual noise after selection, we append a lightweight feature filter with bottleneck MLP transformation and Beta-gated residual blending to refine patch-token representations before prediction. Extensive experiments show that PSFT consistently reduces corruption error on ModelNet-C and ModelNet40-C across all tested 3D pre-trained backbones, while achieving the strongest ScanObjectNN-C results with ULIP-2 and Uni3D-B among the evaluated tuning strategies. Our implementation can be found at https://github.com/CVChMA/PSFT/tree/master.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/23/2607.16862v1-inlier-learning-free-heterogeneous-lidar-place-recognition-via-intermediate-mixed-radix-structural-keypoint-tokenization",
+      "section": "quick",
+      "title_en": "InLiER: Learning-Free Heterogeneous LiDAR Place Recognition via Intermediate Mixed-Radix Structural Keypoint Tokenization",
+      "authors": "Nikolaos Stathoulopoulos, George Nikolakopoulos",
+      "date": "2026-07-18",
+      "pdf": "https://arxiv.org/pdf/2607.16862v1",
+      "score": "7.0",
+      "evidence": "使用结构关键点标记化的LiDAR位置识别",
+      "tldr": "异构LiDAR地点识别因传感器视场、分辨率和扫描模式的差异而性能下降。InLiER提出无学习流水线，通过中间混合基数标记化将结构关键点编码为紧凑的亚2KB表示，并采用三阶段检索（高度直方图快速筛选、二进制位掩码航向估计、令牌引导几何验证）实现旋转不变和6自由度位姿估计。在HeLiPR数据集和实地实验中，该方法超越现代手工方法，并在多数跨传感器配置下优于学习基基线，提供了轻量、传感器无关的通用方案。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "LiDAR place recognition supports loop closure, relocalization, and multi-agent map management. As robotic platforms increasingly combine LiDARs with different fields of view, resolutions, and scanning patterns, existing descriptors degrade because they are tightly coupled to sensor-specific characteristics. We present InLiER, a learning-free pipeline based on an intermediate tokenization step. Height-sliced keypoints from structural elements receive mixed-radix token IDs encoding height, radial distance, local shape, and azimuth from local 3D geometry, in a compact sub-2KB representation. The same vocabulary is reorganized across three retrieval stages: height-ceiling histogram intersection for fast rotation-invariant shortlisting, binary bitmask alignment for yaw estimation and reranking, and token-guided geometric verification for 6-DoF pose estimation. InLiER achieves state-of-the-art performance on the HeLiPR dataset and in real-world field experiments, among modern handcrafted methods and outperforms the learning-based baseline on most cross-sensor configurations.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

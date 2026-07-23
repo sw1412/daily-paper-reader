@@ -1,0 +1,95 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-23T21:00:04.664555+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.19711v1",
+      "source": "arxiv",
+      "title": "Point-Selection Fine-Tuning Framework for Robust Point Cloud Classification",
+      "abstract": "Noisy and corrupted points can substantially degrade point cloud recognition performance, especially under challenging corruption settings. In particular, full fine-tuning of 3D pre-trained models may amplify the influence of outliers and overwrite robustness priors learned during pre-training, while naive parameter-efficient adaptation remains sensitive to corrupted tokens. To address this issue, we propose PSFT, a point-selection fine-tuning framework that improves robustness while remaining parameter-efficient. PSFT first estimates point-wise influence from pre-pooling features and adaptively retains minimally influential points to suppress outliers. Based on the selected subset, a prompt generation branch predicts layer-wise prompt tokens and injects them into a frozen backbone for lightweight downstream adaptation. To further mitigate residual noise after selection, we append a lightweight feature filter with bottleneck MLP transformation and Beta-gated residual blending to refine patch-token representations before prediction. Extensive experiments show that PSFT consistently reduces corruption error on ModelNet-C and ModelNet40-C across all tested 3D pre-trained backbones, while achieving the strongest ScanObjectNN-C results with ULIP-2 and Uni3D-B among the evaluated tuning strategies. Our implementation can be found at https://github.com/CVChMA/PSFT/tree/master.",
+      "authors": [
+        "Da Li",
+        "Chang Ma",
+        "Dongfu Yin"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-22T03:27:18+00:00",
+      "link": "https://arxiv.org/pdf/2607.19711v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "point cloud classification for LiDAR data",
+      "llm_evidence_cn": "点云分类用于LiDAR数据",
+      "llm_evidence": "点云分类用于LiDAR数据",
+      "canonical_evidence": "点云分类用于LiDAR数据",
+      "llm_tldr_en": "Proposes PSFT, a point-selection fine-tuning framework for robust point cloud classification that selectively retains minimally influential points to suppress outliers and uses prompt tokens for efficient adaptation.",
+      "llm_tldr_cn": "针对噪声点云导致分类性能下降的问题，提出PSFT点选择微调框架。该方法从预池化特征估计点级影响力，自适应保留最小影响点以抑制离群值，并通过提示生成分支预测层提示令牌实现参数高效微调。在多个点云分类基准上，PSFT在多种噪声环境下都取得了鲁棒性提升，且仅需少量可训练参数。",
+      "llm_tldr": "针对噪声点云导致分类性能下降的问题，提出PSFT点选择微调框架。该方法从预池化特征估计点级影响力，自适应保留最小影响点以抑制离群值，并通过提示生成分支预测层提示令牌实现参数高效微调。在多个点云分类基准上，PSFT在多种噪声环境下都取得了鲁棒性提升，且仅需少量可训练参数。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.16862v1",
+      "source": "arxiv",
+      "title": "InLiER: Learning-Free Heterogeneous LiDAR Place Recognition via Intermediate Mixed-Radix Structural Keypoint Tokenization",
+      "abstract": "LiDAR place recognition supports loop closure, relocalization, and multi-agent map management. As robotic platforms increasingly combine LiDARs with different fields of view, resolutions, and scanning patterns, existing descriptors degrade because they are tightly coupled to sensor-specific characteristics. We present InLiER, a learning-free pipeline based on an intermediate tokenization step. Height-sliced keypoints from structural elements receive mixed-radix token IDs encoding height, radial distance, local shape, and azimuth from local 3D geometry, in a compact sub-2KB representation. The same vocabulary is reorganized across three retrieval stages: height-ceiling histogram intersection for fast rotation-invariant shortlisting, binary bitmask alignment for yaw estimation and reranking, and token-guided geometric verification for 6-DoF pose estimation. InLiER achieves state-of-the-art performance on the HeLiPR dataset and in real-world field experiments, among modern handcrafted methods and outperforms the learning-based baseline on most cross-sensor configurations.",
+      "authors": [
+        "Nikolaos Stathoulopoulos",
+        "George Nikolakopoulos"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-07-18T15:55:36+00:00",
+      "link": "https://arxiv.org/pdf/2607.16862v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "LiDAR place recognition using structural keypoint tokenization",
+      "llm_evidence_cn": "使用结构关键点标记化的LiDAR位置识别",
+      "llm_evidence": "使用结构关键点标记化的LiDAR位置识别",
+      "canonical_evidence": "使用结构关键点标记化的LiDAR位置识别",
+      "llm_tldr_en": "InLiER proposes a learning-free LiDAR place recognition method using mixed-radix tokenization of structural keypoints, achieving robust retrieval across heterogeneous LiDAR sensors with a compact representation.",
+      "llm_tldr_cn": "针对不同LiDAR传感器之间描述子退化的问题，本文提出InLiER，一种无需学习的LiDAR位置识别方法。它通过混合进制标记化结构关键点，生成紧凑的子2KB表示，并利用三级检索机制实现跨异构LiDAR的高效且鲁棒的场景识别。实验表明该方法在多种LiDAR配置下均表现优异，为多机器人系统提供了可靠的闭环检测方案。",
+      "llm_tldr": "针对不同LiDAR传感器之间描述子退化的问题，本文提出InLiER，一种无需学习的LiDAR位置识别方法。它通过混合进制标记化结构关键点，生成紧凑的子2KB表示，并利用三级检索机制实现跨异构LiDAR的高效且鲁棒的场景识别。实验表明该方法在多种LiDAR配置下均表现优异，为多机器人系统提供了可靠的闭环检测方案。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
