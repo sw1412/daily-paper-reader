@@ -1,0 +1,39 @@
+{
+  "label": "2026-07-24",
+  "date": "2026-07-24",
+  "generated_at": "2026-07-24T21:34:43",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202607/24/2607.21032v1-spectral-spatial-synergistic-guided-network-for-hyperspectral-salient-object-detection",
+      "section": "deep",
+      "title_en": "Spectral-Spatial Synergistic Guided Network for Hyperspectral Salient Object Detection",
+      "authors": "Yanyan Peng, Tingfa Xu, Yao Xiao, Peifu Liu, Shuyan Bai, Fengxiang Xu, Jianan Li",
+      "date": "2026-07-23",
+      "pdf": "https://arxiv.org/pdf/2607.21032v1",
+      "score": "9.0",
+      "evidence": "高光谱显著目标检测的光谱-空间协同方法",
+      "tldr": "高光谱显著目标检测常因混淆光照变化与物质属性差异而导致预测噪声。本文提出S3GNet，以结构感知为核心构建闭环信息流：无参光谱结构感知模块通过导数与区域分层建模提取照度鲁棒特征；流感知注意力模块实现跨流协同；渐进式门控精化解码器优化多尺度特征恢复边界细节。实验表明，S3GNet在效率和精度上均超越现有方法，为高光谱视觉任务提供了新范式。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Hyperspectral salient object detection aims to identify visually salient regions from hyperspectral images. Existing methods often fail because they fundamentally misunderstand the data, confusing incidental spectral variations caused by external factors such as illumination with essential spectral differences caused by the intrinsic material properties of the object. This leads to fragile representations and noisy predictions. To this end, we propose a lightweight and efficient Spectral-Spatial Synergistic Guided Network (S3GNet), with structure perception as the core, to build a closed-loop information flow around spectrum robust modeling, cross-stream co-perception and multi-scale refinement decoding. S3GNet introduces a parameter-free Spectral Structure-Aware Module that leverages spectral derivatives and regional hierarchical modeling to extract intrinsic features of robustness against illumination variations. Our Stream-Aware Attention Module achieves effective spectral-spatial collaboration through inter-stream global interaction and intra-stream spatial guidance. Furthermore, a Progressive Gated Refinement Decoder ensures precise object boundaries and detail recovery by optimally integrating multi-scale features. Experimental results show that S3GNet achieves superior performance in both computational efficiency and detection accuracy compared to existing methods.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202607/24/2607.21050v1-hyperimagenet-a-large-scale-high-spatial-resolution-hyperspectral-imagery-classification-benchmark",
+      "section": "deep",
+      "title_en": "HyperImageNet: A Large-Scale High-Spatial Resolution Hyperspectral Imagery Classification Benchmark",
+      "authors": "Chuguang Zeng, Jingtao Li, Yinhe Liu, Yanfei Zhong",
+      "date": "2026-07-23",
+      "pdf": "https://arxiv.org/pdf/2607.21050v1",
+      "score": "9.0",
+      "evidence": "大规模高光谱图像分类基准数据集",
+      "tldr": "现有高光谱数据集多规模小、空间分辨率低且缺乏细粒度类别与实例标注。本文提出HyperImageNet，包含26084张224波段的高空间分辨率影像块，覆盖138种精细地物，并提供像素级语义标签和实例掩码。通过严格空间分离的开放环境基准，评估了经典方法与HyperFree基础模型，结果证实该数据集能有效支持细粒度高光谱分类与开放环境遥感研究。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "We present HyperImageNet, a large-scale benchmark for fine-grained hyperspectral land-cover understanding. The dataset contains 26,084 airborne hyperspectral image patches with 224 spectral bands and 138 fine-grained land-cover categories. Unlike existing datasets, HyperImageNet provides raw imagery, pixel-level semantic labels, and object-level instance masks, supporting both semantic and instance segmentation. Furthermore, we establish an open-environment benchmark with strict spatial separation to evaluate representative methods and the HyperFree foundation model. Experimental results demonstrate the effectiveness of HyperImageNet for fine-grained hyperspectral understanding and open-environment remote sensing research.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
