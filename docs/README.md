@@ -6,27 +6,28 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-24
-- 运行时间：2026-07-24 21:34:38 UTC
+- 最新运行日期：2026-07-25
+- 运行时间：2026-07-25 21:09:08 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：2
-- 速读区：0
+- 本次总论文数：1
+- 精读区：0
+- 速读区：1
 
 ### 今日简报（AI）
-今天精读了两篇高光谱领域高分论文，分别聚焦显著目标检测和分类基准。最值得关注的是光谱-空间协同引导的网络设计，以及填补空白的大规模高分辨率数据集。下一步建议优先尝试这两个模型与数据集在实际遥感任务中的适配性。
-- 详情：[/202607/24/README](/202607/24/README)
+今日速读1篇论文，聚焦3D点云分割中类别不平衡下简单基线为何依然有效。
+
+最值得关注的是：论文从损失景观拓扑角度解释，简单基线在类别不平衡时具有竞争性，揭示了模型鲁棒性的几何根源。
+
+建议普通读者关注其拓扑分析思路，可尝试用类似方法评估自己模型在长尾数据上的表现。
+- 详情：[/202607/25/README](/202607/25/README)
 
 ### 精读区论文标签
-1. [Spectral-Spatial Synergistic Guided Network for Hyperspectral Salient Object Detection](/202607/24/2607.21032v1-spectral-spatial-synergistic-guided-network-for-hyperspectral-salient-object-detection)  
-   标签：评分：9.0/10、query:hsi-lidar
-   evidence：高光谱显著目标检测的光谱-空间协同方法
-2. [HyperImageNet: A Large-Scale High-Spatial Resolution Hyperspectral Imagery Classification Benchmark](/202607/24/2607.21050v1-hyperimagenet-a-large-scale-high-spatial-resolution-hyperspectral-imagery-classification-benchmark)  
-   标签：评分：9.0/10、query:hsi-lidar
-   evidence：大规模高光谱图像分类基准数据集
+- 本次无精读推荐。
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Loss Landscape Topology Reveals Why Simple Baselines are Competitive at 3D Point Cloud Segmentation Under Class Imbalance](/202607/25/2607.21089v1-loss-landscape-topology-reveals-why-simple-baselines-are-competitive-at-3d-point-cloud-segmentation-under-class-imbalance)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：与LiDAR数据相关的点云语义分割
 
 
 <div class="dpr-home-promo-card">

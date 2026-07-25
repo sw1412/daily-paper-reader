@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-25",
+  "date": "2026-07-25",
+  "generated_at": "2026-07-25T21:09:13",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/25/2607.21089v1-loss-landscape-topology-reveals-why-simple-baselines-are-competitive-at-3d-point-cloud-segmentation-under-class-imbalance",
+      "section": "quick",
+      "title_en": "Loss Landscape Topology Reveals Why Simple Baselines are Competitive at 3D Point Cloud Segmentation Under Class Imbalance",
+      "authors": "Antonis Savva, Christos Kyrkou, Theocharis Theocharides",
+      "date": "2026-07-23",
+      "pdf": "https://arxiv.org/pdf/2607.21089v1",
+      "score": "7.0",
+      "evidence": "与LiDAR数据相关的点云语义分割",
+      "tldr": "3D点云语义分割面临严重类别不平衡，但2D不平衡处理方法在3D中效果不明。系统评估11种方法发现标准交叉熵均匀加权与专门方法性能接近（差距0.8-3.3% mIoU）。机制分析表明不平衡严重性塑造优化景观拓扑：极端不平衡产生窄解盆地，中等不平衡形成平坦高原，限制了损失级修改效果。首次解释2D方法不直接迁移的原因，提供实践指导。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Semantic segmentation of 3D point clouds faces severe class imbalance, yet the effectiveness of specialized imbalance-aware methods from 2D computer vision remains unclear in 3D contexts. We systematically evaluate 11 imbalance mitigation approaches across datasets with extreme (641:1) and moderate (56:1) imbalance ratios, revealing a surprising finding: standard cross-entropy with uniform weighting achieves competitive performance, typically within 0.8-3.3% mIoU of specialized methods across architectures and datasets. Through multifaceted mechanistic analysis of error patterns, decision boundaries, and the geometry of the optimization landscape, our analyses suggest that imbalance severity shapes the topology, creating narrow solution basins under extreme imbalance and flat plateaus under moderate imbalance. This appears to constrain the effectiveness of loss-level modifications, as all methods must navigate these geometric constraints. Our findings offer practical guidance; standard cross-entropy provides a robust baseline, with specialized methods offering modest improvements (0.8-3.3% mIoU) that vary by architecture and dataset but risk substantial degradation if poorly tuned. This work provides the first mechanistic explanation for why techniques proven effective in 2D do not readily transfer to point-based 3D point cloud segmentation, validated across two representative architectures.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
