@@ -6,28 +6,22 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-25
-- 运行时间：2026-07-25 21:09:08 UTC
+- 最新运行日期：2026-07-26
+- 运行时间：2026-07-26 21:10:16 UTC
 - 运行状态：成功
-- 本次总论文数：1
+- 本次总论文数：0
 - 精读区：0
-- 速读区：1
+- 速读区：0
 
 ### 今日简报（AI）
-今日速读1篇论文，聚焦3D点云分割中类别不平衡下简单基线为何依然有效。
-
-最值得关注的是：论文从损失景观拓扑角度解释，简单基线在类别不平衡时具有竞争性，揭示了模型鲁棒性的几何根源。
-
-建议普通读者关注其拓扑分析思路，可尝试用类似方法评估自己模型在长尾数据上的表现。
-- 详情：[/202607/25/README](/202607/25/README)
+> 今日无新推荐，系统未产出可展示论文。
+- 详情：[/202607/26/README](/202607/26/README)
 
 ### 精读区论文标签
 - 本次无精读推荐。
 
 ### 速读区论文标签
-1. [Loss Landscape Topology Reveals Why Simple Baselines are Competitive at 3D Point Cloud Segmentation Under Class Imbalance](/202607/25/2607.21089v1-loss-landscape-topology-reveals-why-simple-baselines-are-competitive-at-3d-point-cloud-segmentation-under-class-imbalance)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：与LiDAR数据相关的点云语义分割
+- 本次无速读推荐。
 
 
 <div class="dpr-home-promo-card">
