@@ -1,0 +1,55 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-27T21:19:36.482399+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 0,
+    "quick_skim_target": 12,
+    "quick_selected": 0
+  },
+  "deep_dive": [
+    {
+      "id": "2607.22272v1",
+      "source": "arxiv",
+      "title": "Efficient Spatial-Spectral Feature Extraction in Hyperspectral Images via Holistic Multivariance Decomposition",
+      "abstract": "Tensor decomposition serves as a foundational tool for feature extraction in hyperspectral image classification, a domain classically dominated by the Tucker and Canonical Polyadic decompositions. Although widely adopted, these schemes often struggle to fully encapsulate the deeply coupled geometric and intrinsic structures inherent to multidimensional hyperspectral data. Their structural reliance on rigid low-rank approximations successfully captures independent mode variations but systematically neglects complex, cross-domain spatial and spectral interdependencies. To overcome this limitation, we introduce the Holistic Multivariance Decomposition framework to achieve highly discriminative hyperspectral feature extraction. The Holistic Multivariance Decomposition provides a novel, structurally flexible tensor algorithm that explicitly models isolated spatial and spectral behaviors, alongside intricate, higher dimensional cooperative interactions. Comprehensive experimental evaluations across four benchmark hyperspectral datasets demonstrate that the proposed Holistic Multivariance Decomposition approximants consistently yield superior classification accuracy compared to conventional Tucker and Canonical Polyadic decomposition methods across diverse supervised learning algorithms. By effectively preserving essential joint multivariance features even under severe subspace compression, these results establish the Holistic Multivariance Decomposition as a robust, high fidelity computational framework for resolving complex multidimensional data structures in hyperspectral analysis.",
+      "authors": [
+        "Süha Tuna"
+      ],
+      "primary_category": "cs.CE",
+      "categories": [
+        "cs.CE",
+        "math.NA",
+        "math.RT"
+      ],
+      "published": "2026-07-24T13:08:42+00:00",
+      "link": "https://arxiv.org/pdf/2607.22272v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "spectral-spatial feature extraction in hyperspectral images via tensor decomposition",
+      "llm_evidence_cn": "通过张量分解进行高光谱图像空谱特征提取",
+      "llm_evidence": "通过张量分解进行高光谱图像空谱特征提取",
+      "canonical_evidence": "通过张量分解进行高光谱图像空谱特征提取",
+      "llm_tldr_en": "Proposes Holistic Multivariance Decomposition for hyperspectral feature extraction, overcoming limitations of Tucker and CP decompositions by capturing cross-domain spatial-spectral interdependencies, improving classification accuracy.",
+      "llm_tldr_cn": "针对传统张量分解方法无法充分刻画高光谱数据中空间与谱间复杂耦合结构的问题，本文提出整体多变量分解框架。该方法通过联合建模空间和谱间的交叉依赖关系，提取更具判别性的特征。实验表明，该方法在分类精度上显著优于Tucker和CP等经典分解方法。该工作为高光谱图像的高效空谱特征提取提供了新思路。",
+      "llm_tldr": "针对传统张量分解方法无法充分刻画高光谱数据中空间与谱间复杂耦合结构的问题，本文提出整体多变量分解框架。该方法通过联合建模空间和谱间的交叉依赖关系，提取更具判别性的特征。实验表明，该方法在分类精度上显著优于Tucker和CP等经典分解方法。该工作为高光谱图像的高效空谱特征提取提供了新思路。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "spectral-spatial feature extraction for hyperspectral data",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": []
+}

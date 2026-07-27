@@ -1,0 +1,24 @@
+{
+  "label": "2026-07-27",
+  "date": "2026-07-27",
+  "generated_at": "2026-07-27T21:21:07",
+  "count": 1,
+  "papers": [
+    {
+      "paper_id": "202607/27/2607.22272v1-efficient-spatial-spectral-feature-extraction-in-hyperspectral-images-via-holistic-multivariance-decomposition",
+      "section": "deep",
+      "title_en": "Efficient Spatial-Spectral Feature Extraction in Hyperspectral Images via Holistic Multivariance Decomposition",
+      "authors": "Süha Tuna",
+      "date": "2026-07-24",
+      "pdf": "https://arxiv.org/pdf/2607.22272v1",
+      "score": "9.0",
+      "evidence": "通过张量分解进行高光谱图像空谱特征提取",
+      "tldr": "高光谱图像分类中，传统张量分解（Tucker和CP）因刚性低秩近似而忽略空间-光谱相互依赖。本文提出Holistic Multivariance Decomposition（HMD）框架，灵活建模孤立模式与跨域协同交互。在四个基准数据集上，HMD特征提取显著提升分类精度，尤其在强压缩下仍保持判别性。HMD为复杂多维数据结构提供高保真计算方案。",
+      "tags": "query:hsi",
+      "abstract_en": "Tensor decomposition serves as a foundational tool for feature extraction in hyperspectral image classification, a domain classically dominated by the Tucker and Canonical Polyadic decompositions. Although widely adopted, these schemes often struggle to fully encapsulate the deeply coupled geometric and intrinsic structures inherent to multidimensional hyperspectral data. Their structural reliance on rigid low-rank approximations successfully captures independent mode variations but systematically neglects complex, cross-domain spatial and spectral interdependencies. To overcome this limitation, we introduce the Holistic Multivariance Decomposition framework to achieve highly discriminative hyperspectral feature extraction. The Holistic Multivariance Decomposition provides a novel, structurally flexible tensor algorithm that explicitly models isolated spatial and spectral behaviors, alongside intricate, higher dimensional cooperative interactions. Comprehensive experimental evaluations across four benchmark hyperspectral datasets demonstrate that the proposed Holistic Multivariance Decomposition approximants consistently yield superior classification accuracy compared to conventional Tucker and Canonical Polyadic decomposition methods across diverse supervised learning algorithms. By effectively preserving essential joint multivariance features even under severe subspace compression, these results establish the Holistic Multivariance Decomposition as a robust, high fidelity computational framework for resolving complex multidimensional data structures in hyperspectral analysis.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
