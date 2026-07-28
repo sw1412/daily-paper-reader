@@ -1,0 +1,1814 @@
+Title: Calibrated Tree-Neural Fusion for Fine-Grained Vegetation Community Classification
+
+URL Source: https://arxiv.org/pdf/2607.24160v1
+
+Published Time: Tue, 28 Jul 2026 01:42:48 GMT
+
+Number of Pages: 48
+
+Markdown Content:
+# Calibrated Tree–Neural Fusion for Fine-Grained Vegetation Community Classification 
+
+## Dristi Datta a,∗, Md Khalid Hasan Sakib b and Manoranjan Paul c
+
+> a
+
+School of Information Technology and Engineering, Sydney Metropolitan Institute of Technology (SydneyMet), Sydney, NSW, 2000, Australia 
+
+> b
+
+Department of Electrical & Electronic Engineering, Rajshahi University of Engineering & Technology, Rajshahi, Bangladesh 
+
+> c
+
+School of Computing, Mathematics and Engineering, Charles Sturt University, Bathurst, NSW, 2795, Australia 
+
+A R T I C L E I N F O 
+
+Keywords :vegetation classification LiDAR hyperspectral indices tree–neural fusion probability calibration ecological remote sensing 
+
+A B S T R A C T 
+
+Accurate vegetation-community classification is essential for ecological monitoring, habitat assessment, and evidence-based environmental management in heterogeneous landscapes. Ex-isting studies often rely on standalone tree ensembles or generic neural networks, although fine-grained ecological classes frequently exhibit overlapping spectral, topographic, and structural characteristics. Many frameworks also provide limited protection against stacking leakage, insufficient probability calibration, weak minority-class evaluation, and little evidence of sta-bility across repeated data splits. To address these limitations, this study proposes Calibrated EcoTreeFuseNet-Plus, a tree–neural probability-fusion framework that combines out-of-fold tree probabilities, EcoFuseNet-V2 outputs, validation-selected meta-learning, and post-hoc temperature scaling. Raster values from six LiDAR-derived terrain and canopy variables and two hyperspectral vegetation indices were extracted at coordinate-based reference locations. Quality control removed 26 samples with missing elevation and one sample with non-finite NDWI, producing 1,833 complete records across 29 vegetation and non-vegetation classes. On the held-out test set, the proposed model achieved an accuracy of 0.8000, a macro F1-score of 0.7768, a balanced accuracy of 0.7903, and an MCC of 0.7903. Calibration reduced the expected calibration error from 0.3866 to 0.0651 without changing class predictions. Five-seed evaluation yielded a macro F1-score of 0.7717 ± 0 .0112 , indicating stable performance across repeated splits. The results demonstrate a reliable discrimination–calibration trade-off for small-sample, fine-grained ecological classification. 
+
+## 1. Introduction 
+
+Accurate vegetation-community classification is important for biodiversity assessment, habitat monitoring, wa-tershed management, ecosystem restoration, and evidence-based conservation planning. Vegetation communities reflect interacting gradients of species composition, moisture availability, elevation, landform, solar exposure, canopy structure, and disturbance history rather than differences in surface cover alone. Reliable discrimination among these communities is therefore valuable for characterizing ecological organization and monitoring environmental change. The increasing availability of airborne and satellite observations has expanded the capacity to examine such patterns across spatially heterogeneous landscapes (Cavender-Bares, Schneider, Santos, Armstrong, Carnaval, Dahlin, Figueiredo, Loarie, Purvis, Schimel, Townsend, Ustin, Wang, Wilson et al., 2022; Cavender-Bares, Meireles, Pinto-Ledezma, Reich, Schuman, Townsend and Trowbridge, 2025; Foody, 2002; Stehman and Foody, 2019). Fine-grained vegetation-community classification nevertheless remains more difficult than conventional broad land-cover mapping. Ecologically distinct communities may exhibit similar spectral responses, whereas observations from the same community may vary because of phenology, canopy density, water availability, terrain illumination, substrate, and local environmental conditions. These difficulties are particularly relevant in mountainous landscapes, where vegetation distributions are strongly associated with topographic and moisture gradients. A single predictor family may therefore provide an incomplete representation of the ecological setting. Spectral variables can characterize vegetation greenness and moisture-related response, while LiDAR-derived products can provide complementary information on terrain configuration and canopy structure. Integrating these information domains consequently offers a physically meaningful basis for fine-grained ecological classification (Talukdar, Singha, Mahato, Shahfahad, Pal, Liou and Rahman, 2020; Cavender-Bares et al., 2022, 2025; Albanwan, Qin and Tang, 2024). 
+
+> ∗
+
+Corresponding author 
+
+dristi.datta@sydneymet.edu.au (D. Datta); khalidsakib121@gmail.com (M.K.H. Sakib); mpaul@csu.edu.au (M. Paul) 
+
+> ORCID
+
+(s): 
+
+First Author et al.: Preprint submitted to Elsevier Page 1 of 48 arXiv:2607.24160v1 [cs.LG] 27 Jul 2026 Short Title of the Article 
+
+Remote-sensing vegetation analysis has long benefited from physically interpretable spectral measurements and vegetation indices. Normalized-difference formulations based on red, near-infrared, and shortwave-infrared reflectance provide indicators related to vegetation greenness, photosynthetic activity, and liquid-water conditions (Rouse, Haas, Schell and Deering, 1974; Bannari, Morin, Bonn and Huete, 1995; Gao, 1996). More recent remote-sensing studies have further demonstrated that vegetation interference, soil–vegetation spectral interactions, and the design or transfor-mation of spectral representations can substantially influence environmental information retrieval from multispectral and hyperspectral observations (Datta, Paul, Murshed, Teng and Schmidtke, 2023b, 2024, 2026). Although such indices remain ecologically useful, individual spectral indicators or manually defined thresholds are insufficient when numerous communities occupy overlapping regions of spectral feature space. Fine-class discrimination therefore increasingly relies on supervised learning methods capable of modelling nonlinear relationships among multiple environmental predictors. Tree-based ensemble methods have become particularly effective for this type of structured classification problem. Random Forest combines bootstrap aggregation and randomized feature selection (Breiman, 2001), gradient boosting sequentially combines weak learners to reduce predictive error (Friedman, 2001), and Extremely Randomized Trees increases ensemble diversity through additional randomization of candidate splits (Geurts, Ernst and Wehenkel, 2006). These approaches are well suited to heterogeneous tabular predictors because they can accommodate nonlinear responses, interactions, non-Gaussian distributions, and comparatively limited sample sizes. Their effectiveness in remote sensing and environmental classification makes them important reference models for evaluating more complex learning systems (Rodriguez-Galiano, Ghimire, Rogan, Chica-Olmo and Rigol-Sanchez, 2012; Talukdar et al., 2020; Venter and Sydenham, 2021). Subsequent boosting implementations further strengthened tabular learning. XGBoost introduced scalable regular-ized gradient boosting (Chen and Guestrin, 2016), LightGBM improved computational efficiency through histogram-based learning and leaf-wise tree growth (Ke, Meng, Finley, Wang, Chen, Ma, Ye and Liu, 2017), and CatBoost introduced ordered boosting procedures intended to reduce prediction shift (Prokhorenkova, Gusev, Vorobev, Dorogush and Gulin, 2018). Together with Random Forest, ExtraTrees, and histogram-based gradient boosting, these methods form a diverse set of strong nonlinear classifiers. However, conventional tree ensembles operate primarily through recursive partitioning of the available predictors and do not naturally provide modality-specific latent representations, adaptive feature-fusion mechanisms, or prototype-based representation structures. Neural models offer complementary representational capabilities. Deep learning has enabled hierarchical feature learning from spectral, spatial, temporal, and multimodal remote-sensing observations (Ball, Anderson and Chan, 2017; Li, Song, Fang, Chen, Ghamisi and Benediktsson, 2019). Recent environmental remote-sensing studies have also combined attention mechanisms with probabilistic neural modelling to emphasize informative spectral variables and quantify predictive uncertainty, while transformer-guided learning has been investigated for detecting and correcting noisy spectral observations (Datta, Paul, Murshed, Teng and Schmidtke, 2025; Paul, Datta, Murshed, Teng and Schmidtke, 2025). In hyperspectral and multitemporal classification, neural architectures have been used to model complex spectral dependence and temporal or spatial context (Jia, Jiang, Lin, Li, Xu and Yu, 2021; Mazzia, Khaliq and Chiaberge, 2020). Their advantages, however, are most apparent when sufficiently large and representative labelled datasets are available. This requirement creates an important distinction for ecological tabular classification. Many ecological studies contain limited labelled observations, numerous imbalanced classes, and compact predictor matrices derived from physically different environmental sources. Under these conditions, neural superiority cannot be assumed. Several architectures have attempted to improve neural learning for tabular data, including Neural Oblivious Decision Ensembles (Popov, Morozov and Babenko, 2020), TabNet (Arik and Pfister, 2021), and TabTransformer (Huang, Khetan, Cvitkovic and Karnin, 2020), while broader comparisons have evaluated multilayer perceptrons, residual networks, and transformer-based models for structured datasets (Gorishniy, Rubachev, Khrulkov and Babenko, 2021). Model-comparison studies using hyperspectral-derived environmental predictors have likewise shown that predictive performance depends strongly on both the learning algorithm and the representation of the available spectral information (Datta, Paul, Murshed, Teng and Schmidtke, 2023a). Large empirical studies nevertheless show that tree-based ensembles frequently remain highly competitive, and often more stable, on small- and medium-scale tabular problems (Shwartz-Ziv and Armon, 2022; Grinsztajn, Oyallon and Varoquaux, 2022). This evidence suggests that, for limited ecological datasets, combining tree and neural information may be more defensible than assuming that a standalone neural architecture should replace strong tree learners.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 2 of 48 Short Title of the Article
+
+Multimodal learning provides a broader conceptual basis for such integration. Information from different sensing or feature domains may be combined at the input, representation, decision, or hybrid level (Baltrušaitis, Ahuja and Morency, 2019). In remote sensing, hyperspectral and LiDAR observations are especially complementary: hyperspectral measurements characterize wavelength-dependent surface response, whereas LiDAR provides elevation and structural information that may help distinguish spectrally similar classes. Previous studies have investigated attention-based hyperspectral–LiDAR fusion (Feng, Gao, Fang and Dong, 2021), LiDAR-guided cross-attention and autoencoder strategies (Yang, Zhou, Wang, Tian and Liew, 2024a,b), and the effect of spectral-band organization on LiDAR-assisted classification (Yang, Wang, Li, Sui, Long and Zhou, 2025). Related vegetation studies have also demonstrated the usefulness of structural information. Airborne LiDAR and deep learning have been applied to tree-species discrimination using three-dimensional canopy geometry (Vermeer, Hay, Völgyes, Koma, Breidenbach and Fantin, 2023; Lin, Nazari and Zheng, 2024), while multitemporal spectral methods have addressed species classification under class imbalance (Mouret, Morin, Planells and Vincent-Barbaroux, 2024). Sensor-agnostic geometric representations have additionally been investigated for transfer between mobile and airborne laser-scanning systems (Korkeala, Muhojoki, Taher, Salolahti, Hyyppä, Kukko and Hyyppä, 2025). These advances demonstrate the value of multisensor vegetation analysis, but most operate on image patches, temporal sequences, or point-cloud representations. They do not directly address the smaller tabular regime considered here, in which LiDAR-derived terrain and canopy rasters and hyperspectral-derived vegetation indices are sampled at labelled geographic reference locations. This distinction has methodological consequences. A coordinate-based ecological table does not preserve the dense spatial neighbourhood of an image patch or the three-dimensional geometry of a raw point cloud. Instead, each observation is represented by a small number of physically interpretable environmental variables. Tree ensembles can model nonlinear thresholds and interactions among these variables, whereas a compact neural branch can provide modality-specific transformations, learned embeddings, and auxiliary representation structure. A hybrid strategy can therefore exploit complementary model behaviours, provided that the additional complexity is evaluated against strong standalone tree baselines rather than assumed to be beneficial. Evaluation design is equally important. Ecological observations are spatially structured, and geographically nearby samples may share environmental characteristics. Unconstrained random splitting can therefore provide optimistic estimates when training and test samples are spatially close. Spatially structured resampling and blocked cross-validation have consequently been recommended for ecological and geospatial prediction (Roberts, Bahn, Ciuti, Boyce, Elith, Guillera-Arroita, Hauenstein, Lahoz-Monfort, Schröder, Thuiller, Warton, Wintle, Hartig and Dormann, 2017; Valavi, Elith, Lahoz-Monfort and Guillera-Arroita, 2019; Ploton, Mortier, Réjou-Méchain, Baraloto and Pélissier, 2020). However, strict geographic separation can be difficult in a small-sample, 29-class problem because rare classes may become absent from one or more partitions. A class-preserving, spatially informed partition combined with explicit spatial-proximity diagnostics provides a practical compromise, although it should not be interpreted as a strict geographical extrapolation experiment. Stacking introduces a separate source of possible optimism. If a meta-classifier is trained using branch predictions generated by models fitted directly on those same observations, the resulting meta-features contain information unavailable for unseen cases. Stacked generalization therefore relies on held-out predictions for higher-level learning (Wolpert, 1992), while the Super Learner framework formalized cross-validated ensemble construction (van der Laan, Polley and Hubbard, 2007). Out-of-fold prediction is consequently important for defensible tree–neural fusion. A separate validation partition is also useful for selecting candidate meta-classifiers, soft-voting strategies, checkpoints, and calibration parameters without directly optimizing those choices against the final test labels. Probability reliability constitutes another important but often distinct aspect of classifier evaluation. Accuracy and macro F1 describe discrimination, but they do not indicate whether predictions assigned a confidence of 0.90 are correct approximately 90% of the time. This distinction matters in ecological applications because confidence estimates may be used to prioritize field verification or identify predictions requiring additional scrutiny. Supervised classifiers can differ substantially in the quality of their probability estimates (Niculescu-Mizil and Caruana, 2005), and modern learning systems may produce systematically miscalibrated confidence scores (Guo, Pleiss, Sun and Weinberger, 2017). Probability calibration should therefore be assessed alongside discrimination using measures such as expected calibration error, Brier score, negative log-likelihood, and reliability diagrams. Taken together, these developments identify a specific methodological gap. Fine-grained ecological classification from compact multisource tables lies between conventional tabular machine learning and high-dimensional multi-modal deep learning. Strong tree ensembles provide competitive discrimination, whereas neural models can offer   
+
+> First Author et al.: Preprint submitted to Elsevier Page 3 of 48 Short Title of the Article
+
+complementary probability and representation information; however, the usefulness of combining these sources must be established under a leakage-aware fusion protocol and evaluated against strong tree baselines. At the same time, spatially informed partitioning, class-sensitive evaluation, probability calibration, statistical comparison, and repeated-split stability are required to avoid drawing conclusions from a favourable partition or from hard-label performance alone. Accordingly, this study proposes Calibrated EcoTreeFuseNet-Plus for fine-grained vegetation-community classi-fication using LiDAR-derived terrain and canopy variables and hyperspectral-derived vegetation indices. Coordinate-based raster sampling and systematic quality control produced 1,833 complete observations representing 29 vegetation and non-vegetation classes. The eight predictors comprised elevation, slope, curvature, Topographic Position Index, solar insolation, canopy height, NDVI, and NDWI. Geographic coordinates and reference-source information were retained for spatial and source diagnostics but were excluded from the predictor matrix. The framework combines six tree-probability branches—Random Forest, XGBoost, ExtraTrees, HistGradient-Boosting, LightGBM, and CatBoost—with EcoFuseNet-V2, a compact neural branch that separately processes terrain, canopy, and spectral predictors. Leakage-aware out-of-fold generation provides tree probabilities and neural outputs for meta-learning. The complete meta-representation contains the standardized original predictors, six tree-probability vectors, EcoFuseNet-V2 class probabilities, its ecological embedding, gate representation, and prototype-distance features. Candidate meta-classifiers and a validation-weighted soft-voting alternative are evaluated using the predefined validation partition, after which the selected raw probability source is calibrated using temperature scaling. The resulting model is evaluated on an untouched test partition using class-balanced discrimination metrics, probability-reliability measures, class-wise analysis, paired statistical comparisons, architectural and modality ablations, neural diagnostics, and repeated-seed/split evaluation. The principal contributions of this study are as follows: 
+
+• A quality-controlled ecological modelling dataset is constructed from six LiDAR-derived terrain and canopy predictors and two hyperspectral-derived vegetation indices sampled at labelled reference locations, yielding 1,833 complete observations across 29 fine ecological classes. 
+
+• EcoFuseNet-V2 is developed as a compact modality-aware neural branch that separately processes terrain, canopy structure, and spectral information before gated fusion, ecological embedding, and prototype-based auxiliary representation learning. 
+
+• EcoTreeFuseNet-Plus is formulated as a leakage-aware hybrid probability-fusion framework that combines six strong tree ensembles with EcoFuseNet-V2 outputs through out-of-fold meta-feature construction, validation-selected meta-learning, and a competing validation-weighted soft-voting strategy. 
+
+• Post-hoc temperature scaling is incorporated into the principal model so that probability reliability is evaluated jointly with predictive discrimination rather than treating hard-label accuracy as the sole performance criterion. 
+
+• The experimental protocol combines spatially informed class-preserving partitioning, training-derived prepro-cessing, class-sensitive learning, untouched test evaluation, bootstrap confidence intervals, paired statistical comparisons, class-wise analysis, ablation experiments, and neural-branch diagnostic analyses. 
+
+• Five independently repeated seed/split experiments are used to assess sensitivity to data partitioning and stochastic training, while the final interpretation explicitly distinguishes calibration benefits from discrimination gains relative to the strongest standalone tree baseline. The remainder of this manuscript is organized as follows. Section 2 introduces the East River study area, the NEON Airborne Observation Platform dataset, the reference observations, the target-class structure, and the final predictor set. Section 3 describes geospatial data organization, coordinate-based raster extraction, quality control, and construction of the final modelling table. Section 4 presents the research design, feature transformations, spatially informed stratified partitioning, class weighting, evaluation metrics, statistical procedures, and reproducibility controls. Section 5 describes Calibrated EcoTreeFuseNet-Plus, including EcoFuseNet-V2, the tree-probability branches, leakage-aware out-of-fold feature generation, hybrid meta-learning, validation-weighted soft voting, calibration, and the secondary model variants. Section 6 reports the experimental results, including baseline comparisons, calibration performance, statistical comparisons, ablation analyses, class-wise behaviour, meta-feature and neural diagnostics, and repeated-split stability. Section 7 interprets the findings in relation to fine-grained ecological classification, tabular learning,   
+
+> First Author et al.: Preprint submitted to Elsevier Page 4 of 48 Short Title of the Article
+
+multisource fusion, probability reliability, model interpretation, uncertainty, and computational considerations. Finally, Section 8 summarizes the principal findings, remaining limitations, future research directions, and practical relevance of the proposed framework. 
+
+## 2. Study Area and Dataset 
+
+2.1. Study Area and Airborne Observations 
+
+The study was conducted in the East River watershed near Crested Butte, Colorado, USA. This mountainous headwater catchment forms part of the Upper Colorado River system and is characterized by pronounced topographic relief, complex geological conditions, seasonally snow-dominated hydrology, and strong spatial gradients in elevation, solar exposure, soil moisture, and vegetation structure Hubbard, Williams, Agarwal, Banfield, Beller, Bouskill, Brodie, Carroll, Dafflon, Dwivedi, Falco, Faybishenko, Maxwell, Nico, Steefel, Steltzer, Tokunaga, Tran, Wainwright and Varadharajan (2018). These interacting environmental controls support a heterogeneous landscape composed of alpine and subalpine communities, wet and dry meadows, herb-, shrub-, and grass-dominated vegetation, exposed geological surfaces, water bodies, snow-covered areas, and developed surfaces. The environmental complexity of the watershed creates a demanding setting for fine-grained ecological classi-fication. Communities with similar spectral characteristics may occur under contrasting topographic, geological, or moisture conditions, whereas observations belonging to the same community may vary because of phenology, canopy density, illumination, and local environmental heterogeneity. Consequently, no single information domain can be expected to characterize all ecological classes adequately. The remote-sensing observations were acquired by the National Ecological Observatory Network Airborne Observation Platform during a survey conducted in June 2018 Falco et al. (2023). The NEON airborne system integrates hyperspectral imaging, LiDAR, and high-resolution photography to provide spatially coordinated measurements of vegetation properties, terrain, and landscape structure Kampe, Johnson, Kuester and Keller (2010); Musinsky, Goulden, Wirth, Leisso, Krause, Haynes and Chapman (2022). Hyperspectral observations characterize surface-reflectance variations associated with vegetation condition, while LiDAR provides complementary information on terrain elevation and three-dimensional vegetation structure Lefsky, Cohen, Parker and Harding (2002). This complementarity provides the observational basis for the multisource classification framework developed in this study. 
+
+2.2. Data Source and Reference Observations 
+
+The study used the publicly available East River vegetation-classification and environmental-covariate dataset distributed through the Environmental Systems Science Data Infrastructure for a Virtual Ecosystem repository Falco et al. (2023). The source package integrates labelled ecological observations with spatially aligned vegetation maps, LiDAR-derived terrain and canopy products, hyperspectral-derived vegetation indices, quality-control masks, and broader environmental covariates. Only the coordinate-based reference observations and selected terrain, canopy, and spectral products were used to construct the predictive dataset. The vegetation-classification map and ancillary masks were retained as contextual products rather than model inputs. This separation avoided circular use of an existing classification product as a predictor of its associated ecological labels. The reference information included sample identifiers, geographic and projected coordinates, fine-class labels, numerical class codes, subclass information, broader ecological types, and reference-source metadata. Projected coordinates in WGS 84 / UTM Zone 13N were used for spatial sampling and subsequent proximity diagnostics. Geographic and projected coordinates were excluded from the predictor matrix to prevent the models from learning direct location-based shortcuts. The source reference set contained 1,860 observations. After coordinate-based extraction and quality screening, 1,833 complete observations were retained for modelling. The screening procedure and exclusion criteria are described in Section 3. 
+
+2.3. Target-Class Structure 
+
+The primary prediction task comprised 29 vegetation and non-vegetation classes derived from the source classification system Falco et al. (2023). The target structure included alpine and subalpine communities, wetland and meadow communities, herbaceous, shrub, and grass classes, exposed geological materials, water, snow, and developed or transportation surfaces.         
+
+> First Author et al.: Preprint submitted to Elsevier Page 5 of 48 Short Title of the Article
+> Table 1
+> Predictor domains used in the vegetation-community classification framework.
+> Information domain Predictors Principal ecological information
+> Terrain Elevation, slope, curvature, Topographic Position Index, and solar insolation Elevational gradients, terrain configuration, relative landscape position, water redistribution, and potential energy exposure Canopy structure Canopy Height Model Vegetation structural height and differentiation among low-growing, taller, and non-vegetated surfaces Spectral response Normalized Difference Vegetation Index and Normalized Difference Water Index Vegetation greenness, photosynthetic activity, and moisture-related spectral response
+
+The class distribution was uneven, with individual class sizes ranging from 16 to 178 observations. The largest-to-smallest class ratio was therefore 
+
+178 16 = 11 .125 . (1) This imbalance motivated the use of stratified partitioning, class-sensitive training, macro-averaged evaluation, balanced accuracy, and class-wise performance analysis. Each fine class was additionally associated with one of five broader ecological categories: Community , Non-vegetated , Herbs , Shrubs , and Grasses . The 29 fine classes defined the principal training and evaluation objective. The coarse categories were retained only for auxiliary coarse-consistency learning and secondary hierarchy-aware analysis; they did not replace or modify the fine-class target. 
+
+2.4. Predictor Variables 
+
+Eight predictors were selected to represent complementary terrain, canopy-structure, and spectral characteristics. The terrain domain comprised elevation, slope, curvature, Topographic Position Index, and solar insolation. Canopy structure was represented by the Canopy Height Model, while spectral vegetation response was characterized using the Normalized Difference Vegetation Index and the Normalized Difference Water Index. Terrain attributes provide information on landform configuration and environmental gradients that influence water redistribution, energy availability, soil development, and vegetation organization Moore, Grayson and Ladson (1991). Elevation represents broad climatic and ecological zonation, while slope, curvature, and relative topographic position describe local terrain conditions. Solar insolation characterizes potential energy exposure. The Canopy Height Model contributes a structural dimension that cannot be represented directly by spectral vegetation indices Lefsky et al. (2002). NDVI summarizes vegetation greenness and photosynthetic activity through red and near-infrared reflectance, whereas NDWI represents vegetation liquid-water and moisture-related spectral responses Rouse et al. (1974); Gao (1996). Their combination with terrain and canopy measurements was intended to provide a more complete ecological representation than either modality alone. The final predictor vector for observation 𝑖 was defined as 
+
+𝐱 𝑖 =
+
+[
+
+𝑥 elev  
+
+> 𝑖
+
+, 𝑥 slope  
+
+> 𝑖
+
+, 𝑥 curv  
+
+> 𝑖
+
+, 𝑥 tpi  
+
+> 𝑖
+
+, 𝑥 solar  
+
+> 𝑖
+
+, 𝑥 chm  
+
+> 𝑖
+
+, 𝑥 ndvi  
+
+> 𝑖
+
+, 𝑥 ndwi 
+
+> 𝑖
+
+]𝖳 
+
+∈ ℝ8. (2) Table 1 summarizes the three information domains and their roles in the classification framework. For modality-specific experiments, the six LiDAR-derived terrain and canopy variables formed the structural– topographic feature group, the two vegetation indices formed the spectral feature group, and all eight predictors formed the fused feature group. These definitions were maintained consistently across the baseline models, EcoFuseNet-V2, modality ablations, and the final tree–neural fusion framework.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 6 of 48 Short Title of the Article
+
+2.5. Dataset Quality and Analytical Scope 
+
+All 1,833 retained observations contained finite values for the eight predictors. Missing or invalid predictor values were not replaced using synthetic, interpolated, or model-generated estimates. The complete coordinate-based extraction, screening, and verification procedure is described in Section 3. The analytical unit of the study is a labelled geographical reference observation rather than an image patch, point-cloud segment, or complete raster scene. The task is therefore formulated as fine-grained ecological tabular classification. The combination of a limited sample size, 29 target classes, uneven class frequencies, overlapping ecological characteristics, and spatial dependence provides a challenging test case for evaluating calibrated tree–neural fusion under realistic small-sample conditions. 
+
+## 3. Geospatial Data Preparation and Feature Extraction 
+
+3.1. Extraction Workflow and Source Selection 
+
+A coordinate-based workflow was implemented to transform the distributed airborne products into a machine-learning-ready tabular dataset. The principal steps comprised source-data organization, selection of spatially referenced ecological observations, verification of the predictor rasters, point-wise feature extraction, and systematic quality control. The source products were obtained from the East River vegetation-classification and environmental-covariate dataset described in Section 2 Falco et al. (2023). The downloaded materials were organized into classification-reference data, LiDAR-derived terrain and canopy products, hyperspectral-derived vegetation indices, classification maps, spatial masks, and metadata. Only the coordinate-based reference observations and eight predictor rasters were required for model development; the remaining products were retained for contextual verification. The initially reviewed vegetation-reference table contained thematic class information but no geographic or projected coordinates. It could therefore describe the classification system but could not support direct point-to-raster extraction. A coordinate-complete reference table containing unique sample identifiers, fine-class labels, longitude, latitude, projected Easting and Northing, class metadata, coarse ecological types, and reference-source information was consequently selected. Eight predictors were extracted: elevation, slope, curvature, Topographic Position Index, solar insolation, Canopy Height Model, NDVI, and NDWI. The first six represented LiDAR-derived terrain or structural information, while the final two represented hyperspectral-derived vegetation response. 
+
+3.2. Spatial Verification and Raster Sampling 
+
+The reference observations and selected raster products were represented in WGS 84 / UTM Zone 13N (EPSG:32613). This projected coordinate reference system expresses Easting and Northing in metres and is appropriate for coordinate-based analysis within the study region IOGP Geomatics Committee (2022). Projected coordinates were therefore used for raster sampling, whereas longitude and latitude were retained only as reference metadata. Before extraction, the coordinate reference system, spatial resolution, raster bounds, affine transformation, data type, and declared no-data metadata of each layer were inspected GDAL/OGR Contributors (2026). Because each raster was sampled independently at the same real-world locations, identical raster dimensions or grid origins were not required. Instead, the procedure required compatible coordinate systems and valid spatial coverage. For observation 𝑖 and predictor 𝑗 , the extracted value was defined as 
+
+𝑥 𝑖𝑗 = 𝑅 𝑗 
+
+(𝐸 𝑖 , 𝑁 𝑖 
+
+) , 𝑗 = 1 , … , 8, (3) where 𝑅 𝑗 denotes the georeferenced raster and (𝐸 𝑖 , 𝑁 𝑖 ) denotes the projected coordinate of the reference observation. The raster cell containing each coordinate was sampled using the native affine transformation of the corresponding layer Gillies and Contributors (2026). No additional spatial interpolation or neighbourhood averaging was introduced during extraction. Declared no-data values, masked cells, and locations outside valid raster coverage were treated as missing observations. Numerical zeros were retained as valid source values. The initial extraction produced 1,860 observations, with explicit missingness and finite-value indicators generated for subsequent screening.                                                 
+
+> First Author et al.: Preprint submitted to Elsevier Page 7 of 48 Short Title of the Article
+> Table 2
+> Distribution of the 29 fine target classes after quality control.
+> Class 𝑛 Class 𝑛
+> IrrigLawnPasture 178 WetMeadowAlluv 50 DrySubalpShale 166 DrySubalpSandstone 42 AlpineSandstone 127 AspenFringe 40 AlpineGranite 109 GraniteTalus 40 DrySubalpTill 97 StreamSandGravel 37 AlpineShale 91 GravelRoadTrail 33 Artemisia 77 ShaleBarren 32 WetMeadowTill 73 Paved 30 EmergentWetland 73 Wyethia 29 DrySubalpGranite 72 SandstoneOutcrop 26 Festuca 70 Snow 24 GraniteOutcrop 70 Frasera 18 WetAlpine 70 SandstoneTalus 18 Water 66 BareSoil 16 Lupinus 59
+
+3.3. Quality Control and Final Dataset 
+
+Quality control was applied sequentially to the eight extracted predictors. Of the initial 1,860 reference obser-vations, 26 contained missing elevation values and were removed, reducing the dataset to 1,834 observations. A subsequent finite-value screening identified one additional observation with a negative-infinite NDWI value. Removal of this observation yielded the final modelling sample: 
+
+1860 − 26 − 1 = 1833 . (4) No missing or non-finite predictor values were imputed, interpolated, synthetically generated, or replaced through model-based estimation. The resulting modelling table contained 1,833 observations and 21 analytical fields, compris-ing: 
+
+• a unique sample identifier and the fine-class target; 
+
+• projected spatial coordinates and coordinate-reference information; 
+
+• eight terrain, canopy-structure, and spectral predictors; 
+
+• two quality-control indicators; and 
+
+• auxiliary reference metadata describing geographic coordinates, numerical class information, subclass, coarse ecological type, and reference source. Only the eight environmental predictors were used as model inputs. Projected and geographic coordinates, quality-control fields, coarse ecological types, subclass information, and reference-source metadata were retained exclusively for traceability, spatial diagnostics, and post hoc descriptive analyses. The final predictor matrix contained no missing, positive-infinite, or negative-infinite values. No duplicated sample identifiers, projected-coordinate pairs, or complete observations were detected. Blank subclass entries were retained as valid auxiliary metadata because subclass information was not used for model fitting or prediction. 
+
+3.4. Class and Reference Distributions 
+
+The final dataset comprised 29 fine vegetation and non-vegetation classes. Class frequencies ranged from 16 observations for BareSoil to 178 observations for IrrigLawnPasture, yielding a largest-to-smallest ratio of 11.125. This imbalance motivated the stratified, class-sensitive, and macro-averaged evaluation procedures introduced in Section 4. The coarse ecological-type and reference-source distributions are summarized in Table 3. These variables were retained for descriptive and post hoc diagnostic analyses but were excluded from the predictor matrix.                                                          
+
+> First Author et al.: Preprint submitted to Elsevier Page 8 of 48 Short Title of the Article
+> Table 3
+> Coarse ecological-type and reference-source distributions.
+> Grouping Category 𝑛 Percentage (%)
+> Coarse type Community 1,188 64.81 Non-vegetated 392 21.39 Herbs 106 5.78 Shrubs 77 4.20 Grasses 70 3.82 Reference source Supplemental 1,580 86.20 Digitized 253 13.80
+> Table 4
+> Descriptive statistics of the eight retained predictors in their native numerical units.
+> Predictor Mean SD Minimum Maximum
+> Elevation 3,093.6127 353.6971 2,684.3799 3,999.4800 Slope 14.3934 12.0482 0.0000 62.7826 Curvature 0.0010 0.0159 −0 .1028 0.0776 TPI 0.0048 0.0719 −0 .5376 0.8853 Solar insolation 865,114.5820 270,289.8564 144,270.6563 1,249,377.2500 CHM 0.0385 0.6052 0.0000 16.8799 NDVI 0.4297 0.2870 −1 .1194 0.8660 NDWI −0 .0660 0.1899 −3 .2500 4.7143
+
+3.5. Exploratory Predictor Analysis 
+
+Descriptive statistics were calculated before the model-specific transformations described in Section 4. The predictors differed substantially in scale and distribution, supporting the later use of training-set-based preprocessing for neural and meta-learning components. The finite NDVI and NDWI ranges extended beyond the interval commonly associated with their standard normalized-difference formulations Rouse et al. (1974); Gao (1996). These values were retained because they originated from the distributed products and passed the finite-value checks. Arbitrary clipping was avoided because it would have introduced an additional transformation without an independently defined quality threshold. The Canopy Height Model was strongly zero-inflated: 1,744 observations had a value of zero, corresponding to 95.14% of the final dataset, while 89 observations contained positive values. These zeros were retained as valid source measurements. The pronounced sparsity and right-skewness motivated the logarithmic transformation and restrained canopy contribution described in the EcoFuseNet-V2 methodology. Pairwise Pearson correlations were also calculated using the untransformed predictor values. The strongest positive relationship occurred between elevation and slope ( 𝑟 = 0 .627 ). Slope was negatively related to solar insolation ( 𝑟 =−0 .488 ), elevation was moderately negatively related to solar insolation ( 𝑟 = −0 .390 ), and curvature was moderately positively related to TPI ( 𝑟 = 0 .378 ). Other associations were weaker, including elevation–NDVI ( 𝑟 = −0 .183 ), solar insolation–NDVI ( 𝑟 = 0 .132 ), and NDVI–NDWI ( 𝑟 = −0 .114 ). Because the maximum absolute correlation was 0.627, no predictor pair exhibited a near-perfect linear relationship, and all eight variables were retained for subsequent modelling. 
+
+## 4. Research Design and Experimental Protocol 
+
+4.1. Overall Research Workflow 
+
+The experimental design was constructed to evaluate predictive discrimination, probability reliability, spatially informed partition robustness, and repeated-split stability under a common protocol. The workflow comprised the following stages: formation of modality-specific feature groups; transformation and training-only standardization of the predictors; spatially aware stratified partitioning; training of standalone baselines and EcoFuseNet-V2; generation   
+
+> First Author et al.: Preprint submitted to Elsevier Page 9 of 48 Short Title of the Article
+
+of out-of-fold branch outputs for the hybrid framework; validation-based model selection and calibration; and final evaluation on an untouched test partition. The training subset was used to estimate model parameters, preprocessing statistics, and class weights. The validation subset controlled checkpoint selection, meta-model selection, voting weights, temperature calibration, and other explicitly defined model-selection decisions. The test subset was withheld until the complete configuration had been fixed, thereby reducing selection bias in the final performance estimate Cawley and Talbot (2010). Calibrated EcoTreeFuseNet-Plus was treated as the principal proposed model, while the raw, bias-tuned, and hierarchy-aware variants were retained as secondary comparisons. 
+
+4.2. Feature Groups 
+
+Three feature configurations were defined to quantify the contribution of spectral and LiDAR-derived information under an identical experimental setting. 
+
+4.2.1. Spectral-Only Group 
+
+The spectral-only configuration contained NDVI and NDWI: 
+
+𝐱 𝑆 𝑖 = [𝑥 ndvi  
+
+> 𝑖
+
+, 𝑥 ndwi 
+
+> 𝑖
+
+]𝖳 ∈ ℝ2. (5) This configuration measured the predictive information available from vegetation greenness and moisture-related spectral response without terrain or structural variables. 
+
+4.2.2. LiDAR-Derived Group 
+
+The LiDAR-derived configuration comprised elevation, slope, curvature, Topographic Position Index, solar insolation, and Canopy Height Model: 
+
+𝐱 𝐿 𝑖 =
+
+[
+
+𝑥 elev  
+
+> 𝑖
+
+, 𝑥 slope  
+
+> 𝑖
+
+, 𝑥 curv  
+
+> 𝑖
+
+, 𝑥 tpi  
+
+> 𝑖
+
+, 𝑥 solar  
+
+> 𝑖
+
+, 𝑥 chm 
+
+> 𝑖
+
+]𝖳 
+
+∈ ℝ6. (6) This group represented terrain configuration, environmental exposure, and vegetation structural height without spectral indices. 
+
+4.2.3. Fused Group 
+
+The fused configuration combined all eight predictors: 
+
+𝐱 𝐹 𝑖 =
+
+[(𝐱 𝐿 𝑖 
+
+)𝖳 , (𝐱 𝑆 𝑖 
+
+)𝖳 ]𝖳 
+
+∈ ℝ8. (7) The fused group was used by the principal baseline comparisons and the proposed tree–neural framework. Within EcoFuseNet-V2, it was further separated into a five-variable terrain branch, a one-variable canopy branch, and a two-variable spectral branch, as described in Section 5.2. 
+
+4.3. Data Transformation and Standardization 
+
+4.3.1. Canopy-Height Transformation 
+
+The Canopy Height Model exhibited a sparse and strongly right-skewed distribution. It was therefore transformed before standardization using 
+
+𝑥 log  
+
+> 𝑖, chm
+
+= log (1 + 𝑥 𝑖, chm 
+
+) . (8) The log1p transformation preserved valid zero values while compressing the influence of the relatively small number of large canopy-height observations. No equivalent nonlinear transformation was applied to the remaining predictors.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 10 of 48 Short Title of the Article
+
+4.3.2. Training-Only Standardization 
+
+For each feature 𝑗 , the mean and standard deviation were estimated exclusively from the training partition: 
+
+𝜇 𝑗 = 1
+
+𝑁 tr 
+
+∑
+
+> 𝑖 ∈tr
+
+𝑥 𝑖𝑗 , (9) 
+
+𝜎 𝑗 =
+
+√ 1
+
+𝑁 tr 
+
+∑
+
+> 𝑖 ∈tr
+
+(𝑥 𝑖𝑗 − 𝜇 𝑗 
+
+)2 + 𝜀, (10) ̂𝑥 𝑖𝑗 = 𝑥 𝑖𝑗 − 𝜇 𝑗 
+
+𝜎 𝑗 
+
+. (11) The same training-derived 𝜇 𝑗 and 𝜎 𝑗 were then applied to the validation and test partitions. Validation and test observations therefore contributed no information to the preprocessing statistics. A corresponding training-only standardization procedure was later applied to the hybrid meta-feature matrix. 
+
+4.4. Spatially Aware Stratified Partitioning 
+
+Ecological observations may exhibit spatial dependence, such that nearby samples share environmental conditions and are consequently more similar than geographically distant observations. Unconstrained random splitting can therefore place closely related observations in both training and test subsets and may yield optimistic estimates of geographical generalization (Roberts et al., 2017; Valavi et al., 2019). Conversely, imposing strictly separated spatial blocks can substantially reduce class coverage in a limited-sample problem containing 29 fine classes, particularly for low-frequency categories. A class-preserving, spatially informed partitioning strategy was therefore adopted. Let 𝐬 𝑖 = ( 𝐸 𝑖 , 𝑁 𝑖 ) denote the projected UTM Easting and Northing coordinates of observation 𝑖 . The projected study domain was divided into a 
+
+5 × 5 quantile grid by partitioning the Easting and Northing coordinate distributions independently into five quantile intervals. This produced 25 spatial blocks for the present dataset. Each observation was assigned to the block defined by its corresponding Easting- and Northing-bin indices. Spatial coordinates were used only for partition construction and subsequent proximity diagnostics; they were not included in the predictor matrix. Within each spatial block, observations were allocated to training, validation, and test subsets using fine-class stratification whenever the available class counts permitted the requested subdivision. The test subset was first separated using a nominal test fraction of 0.20. The remaining observations were then divided so that the validation subset represented approximately 0.10 of the complete dataset, corresponding to a validation fraction of 0.10∕(0 .70 + 0 .10) = 0.125 within the remaining training–validation pool. When a spatial block did not contain sufficient observations or class support for stratified subdivision, the implementation used a seed-controlled random fallback within that block. Blocks containing fewer than three observations were assigned entirely to the training partition. For the primary seed-42 partition, one of the 25 spatial blocks contained fewer than three observations. Among the remaining 24 blocks, stratified subdivision was feasible in 18 blocks, whereas the random fallback was required in six blocks. No observations were duplicated, interpolated, or synthetically generated during this procedure. The intended global allocation proportions were approximately 
+
+||tr || ≈ 0 .70 𝑁, ||val || ≈ 0 .10 𝑁, ||te || ≈ 0 .20 𝑁, (12) where 𝑁 denotes the total number of observations. Because allocation was performed independently within spatial blocks and was constrained by the available class support, the realized proportions could deviate slightly from these nominal targets through block-level rounding. After block-wise allocation, the training partition was checked to ensure representation of every fine class. If a class had been absent from the training subset, one observation of that class would have been transferred from the validation subset, or from the test subset if necessary, into the training subset. For the primary seed-42 partition, all 29 fine classes were already represented in the training subset, so no such transfer was required. The resulting subsets were mutually exclusive and collectively exhaustive:             
+
+> First Author et al.: Preprint submitted to Elsevier Page 11 of 48 Short Title of the Article
+> Table 5
+> Training, validation, and test partition sizes for the primary seed-42 experiment.
+> Partition Observations Percentage (%)
+> Training 1,273 69.45 Validation 190 10.37 Test 370 20.19 Total 1,833 100.00
+
+ = tr ∪ val ∪ te , 𝑎 ∩ 𝑏 = ∅ (𝑎 ≠ 𝑏 ). (13) Seed 42 defined the primary partition used for the principal model comparison. For the repeated-split analysis, the same 5 × 5 quantile-grid construction and allocation procedure was rerun independently using seeds 42, 101, 202, 303, and 404. The spatial partitioning logic and nominal allocation fractions were therefore held constant, while seed-controlled within-block assignments were allowed to vary. The resulting experiments assess sensitivity to both data allocation and stochastic model training rather than repeatedly evaluating an identical test subset. This procedure should be interpreted as a spatially informed, class-preserving partition rather than a strictly geographically isolated or spatial-extrapolation design. Spatial separation was therefore evaluated independently using the test-to-training nearest-neighbour diagnostic reported in Section 4.6. 
+
+4.5. Training, Validation, and Test Partitions 
+
+Seed 42 defined the primary outer partition used for the principal model comparison. Following the spatially informed, class-preserving partitioning procedure described in Section 4.4, the 1,833 observations were allocated to training, validation, and test subsets containing 1,273, 190, and 370 observations, respectively. The realized partition sizes and proportions are reported in Table 5. The training subset was used to estimate model parameters, training-derived preprocessing statistics, class weights, and out-of-fold branch models. The validation subset was used exclusively for model-selection decisions, including neural checkpoint selection, meta-classifier selection, soft-voting weights, calibration temperature, and the parameters of the secondary bias-tuned and hierarchy-aware variants. The test subset remained untouched during all preprocessing, training, model-selection, and calibration decisions and was used only after the complete predictive configuration had been fixed. The spatial distribution of the three subsets is shown in Figure 1. Training, validation, and test observations were distributed across the study domain rather than being concentrated in isolated portions of the coordinate space. This pattern reflects the intended spatially informed, class-preserving design and maintains geographical coverage for the 29-class classification problem. The figure is provided to document the geometry of the primary partition and should not be interpreted as evidence of strict geographical independence between the three subsets. Because spatially distributed subsets can still contain geographically proximate observations, partition quality was additionally evaluated using the test-to-training nearest-neighbour distance diagnostic described in Section 4.6.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 12 of 48
+
+Short Title of the Article 
+
+Figure 1: Spatial distribution of the training, validation, and test observations for the primary seed-42 partition in the East River study area. The partition contained 1,273 training, 190 validation, and 370 test observations. The three subsets retained broad coverage of the study domain under the spatially informed, class-preserving partitioning strategy. The visualization documents the partition geometry and does not imply strict geographical isolation between training, validation, and test observations. First Author et al.: Preprint submitted to Elsevier Page 13 of 48 Short Title of the Article 
+
+4.6. Spatial Leakage Diagnostic 
+
+Partition quality was examined using the Euclidean distance from each test observation to its nearest training observation in projected coordinate space: 
+
+𝑑 NN  
+
+> 𝑖
+
+= min 
+
+> 𝑗 ∈tr
+
+‖‖‖𝐬 te  
+
+> 𝑖
+
+− 𝐬 tr 
+
+> 𝑗
+
+‖‖‖2 , (14) where 𝐬 denotes the projected spatial coordinate. The implemented diagnostic raised a proximity flag when the median nearest-neighbour distance was below 1 m: 
+
+𝐼 prox = 𝕀 [median (𝑑 NN 
+
+> 𝑖
+
+) < 1 m ] . (15) For the seed-42 split, the median test-to-training nearest-neighbour distance was 36.86 m and the proximity flag was false. This result indicates that the partition did not contain widespread near-duplicate train–test locations under the implemented rule. It does not, however, establish complete spatial independence, and the split is therefore reported conservatively as spatially aware rather than strictly spatially isolated. 
+
+4.7. Class-Weight Calculation 
+
+Class weights were derived from the training labels only, preventing validation or test frequencies from influencing model fitting. Let 𝑛 𝑘 denote the number of training observations in class 𝑘 , and let 
+
+𝑛 max = max  
+
+> 1≤𝑘 ≤𝐾
+
+𝑛 𝑘 . (16) The initial square-root inverse-frequency weight was 
+
+𝑟 𝑘 =
+
+√ 𝑛 max 
+
+max( 𝑛 𝑘 , 1) . (17) The weights were then normalized to have a mean of one: 
+
+𝑤 𝑘 = 𝑟 𝑘 
+
+1
+
+𝐾 
+
+> 𝐾
+
+∑
+
+> 𝑗 =1
+
+𝑟 𝑗 
+
+. (18) The square-root form reduced majority-class dominance without applying the more aggressive amplification produced by full inverse-frequency weighting, a relevant consideration for small and imbalanced multiclass data He and Garcia (2009). These weights were used in the class-balanced neural classification and prototype losses. Model-specific balancing options were used for conventional classifiers where supported. 
+
+4.8. Reproducibility Controls 
+
+The complete experimental pipeline was implemented in Python, with PyTorch used for EcoFuseNet-V2 and estab-lished tabular-learning libraries used for the tree, boosting, and meta-classification components. Numerical processing, statistical analysis, data management, and visualization were performed using standard scientific-computing libraries. Framework-level architecture, optimization, out-of-fold, calibration, and secondary-variant constants are summarized in Table 7. Estimator-specific hyperparameters, neural-training settings, and software versions were fixed within the executable configuration and retained with the reproducibility package. Seed 42 was used for the primary experiment. Random states were propagated, wherever supported, to the outer data partition, conventional learners, neural initialization, mini-batch ordering, out-of-fold partitioning, and validation-based ensemble search. The complete calibrated pipeline was subsequently rerun using seeds 42, 101, 202, 303, and 404 to evaluate repeated-split stability. All reported experiments were executed in a CPU environment without GPU acceleration.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 14 of 48 Short Title of the Article
+
+Preprocessing parameters were estimated from training data only. The outer predictor scaler was fitted using the outer training partition, whereas the hybrid meta-feature scaler was fitted using the out-of-fold training meta-features. Validation data were used only for predefined model-selection decisions, including neural checkpoint selection, meta-classifier selection, soft-voting weights, temperature calibration, and the secondary-variant parameters. Test observations were not used for preprocessing, model selection, fusion selection, or calibration. For each experiment, the implementation retained the partition metadata, validation-selected neural checkpoints, out-of-fold features, refitted branch outputs, EcoFuseNet-V2 representations, meta-feature scaler, selected meta-classifier, soft-voting weights, calibration parameters, final probability arrays, predicted labels, and statistical outputs. This saved-output design allowed the principal metrics, tables, figures, and paired statistical analyses to be regenerated from fixed predictions without retraining the complete pipeline. 
+
+4.9. Baseline Comparison Protocol 
+
+All standalone baselines, neural variants, modality ablations, and proposed-model variants used the same seed-specific outer training, validation, and test observations. Target encoding and predictor definitions were also held constant. Consequently, performance differences within a seed were not confounded by alternative test samples. Model fitting and hyperparameter or checkpoint selection were restricted to the training and validation partitions. Test labels were not used to choose a baseline, fusion strategy, calibration temperature, class adjustment, or hierarchy parameter. The frozen models produced class probabilities and labels for the same test observations, enabling paired statistical comparisons. The main statistical reference was Calibrated EcoTreeFuseNet-Plus. Raw EcoTreeFuseNet-Plus, bias-tuned EcoTreeFuseNet-Plus, and hierarchy-aware EcoTreeFuseNet-Plus were treated as secondary variants rather than alternative primary models. 
+
+4.10. Evaluation Metrics 
+
+Let 𝐾 = 29 denote the number of fine classes and 𝑁 the number of test observations. For class 𝑘 , precision, recall, and F1-score were defined as 
+
+𝑃 𝑘 = 𝑇 𝑃 𝑘 
+
+𝑇 𝑃 𝑘 + 𝐹 𝑃 𝑘 
+
+, (19) 
+
+𝑅 𝑘 = 𝑇 𝑃 𝑘 
+
+𝑇 𝑃 𝑘 + 𝐹 𝑁 𝑘 
+
+, (20) 
+
+𝐹 1𝑘 = 2𝑃 𝑘 𝑅 𝑘 
+
+𝑃 𝑘 + 𝑅 𝑘 
+
+. (21) Undefined divisions were assigned zero consistently with the evaluation implementation. 
+
+4.10.1. Discrimination Metrics 
+
+Overall accuracy measured the proportion of correctly classified observations: 
+
+Accuracy = 1
+
+𝑁 
+
+> 𝑁
+
+∑
+
+> 𝑖 =1
+
+𝕀 (̂𝑦 𝑖 = 𝑦 𝑖 
+
+) . (22) Macro F1 assigned equal importance to each of the 𝐾 classes: 
+
+MacroF1 = 1
+
+𝐾 
+
+> 𝐾
+
+∑
+
+> 𝑘 =1
+
+𝐹 1𝑘 , (23) whereas weighted F1 accounted for the test-set support 𝑛 𝑘 of each class: 
+
+WeightedF1 = 
+
+> 𝐾
+
+∑
+
+> 𝑘 =1
+
+𝑛 𝑘 
+
+𝑁 𝐹 1𝑘 . (24)   
+
+> First Author et al.: Preprint submitted to Elsevier Page 15 of 48 Short Title of the Article
+
+Balanced accuracy was defined as the mean recall across classes: 
+
+BA = 1
+
+𝐾 
+
+> 𝐾
+
+∑
+
+> 𝑘 =1
+
+𝑅 𝑘 . (25) Macro F1 and balanced accuracy were emphasized because they reduce the dominance of high-frequency classes in imbalanced multiclass evaluation (Sokolova and Lapalme, 2009; Brodersen, Ong, Stephan and Buhmann, 2010). For the multiclass confusion matrix 𝐌 , let 𝑟 𝑘 and 𝑐 𝑘 denote the true and predicted marginal totals for class 𝑘 ,respectively, and let 𝑛 = ∑𝑖𝑗 𝑀 𝑖𝑗 = 𝑁 . The multiclass Matthews correlation coefficient was calculated as 
+
+MCC = 𝑛 ∑𝑘 𝑀 𝑘𝑘 − ∑𝑘 𝑟 𝑘 𝑐 𝑘 
+
+√(𝑛 2 − ∑𝑘 𝑐 2
+
+> 𝑘
+
+) ( 𝑛 2 − ∑𝑘 𝑟 2
+
+> 𝑘
+
+) . (26) MCC summarizes the complete multiclass confusion structure and remains informative when class frequencies are unequal (Gorodkin, 2004). Cohen’s kappa was calculated as 
+
+𝜅 = 𝑝 𝑜 − 𝑝 𝑒 
+
+1 − 𝑝 𝑒 
+
+, 𝑝 𝑜 =
+
+∑𝑘 𝑀 𝑘𝑘 
+
+𝑁 , 𝑝 𝑒 =
+
+∑𝑘 𝑟 𝑘 𝑐 𝑘 
+
+𝑁 2 , (27) where 𝑝 𝑜 denotes the observed agreement and 𝑝 𝑒 denotes the agreement expected from the true and predicted marginal distributions (Cohen, 1960). 
+
+4.10.2. Probability-Reliability Metrics 
+
+For predicted class probabilities 𝑝 𝑖𝑘 , the maximum predictive confidence and correctness indicator for observation 
+
+𝑖 were defined as 
+
+𝑞 𝑖 = max  
+
+> 𝑘
+
+𝑝 𝑖𝑘 , 𝑎 𝑖 = 𝕀 (̂𝑦 𝑖 = 𝑦 𝑖 
+
+) . (28) Expected calibration error (ECE) was computed using 𝐵 = 10 equal-width confidence bins over the interval [0 , 1] .Consistent with the fixed implementation, the bins were left-closed and right-open: 
+
+𝐼 𝑏 =
+
+{
+
+𝑖 ∶ 𝑏 − 1 10 ≤ 𝑞 𝑖 < 𝑏 
+
+10 
+
+}
+
+, 𝑏 = 1 , … , 10 . (29) Thus, the implemented intervals were [0 , 0.1) , [0 .1, 0.2) , … , [0 .9, 1.0) . A confidence value exactly equal to 1.0 was therefore not assigned to a bin under the implemented convention. The same binning rule was applied consistently to every model and calibration state. For each non-empty bin, empirical accuracy and mean confidence were 
+
+acc( 𝐼 𝑏 ) = 1
+
+|𝐼 𝑏 |∑
+
+> 𝑖 ∈𝐼 𝑏
+
+𝑎 𝑖 , conf( 𝐼 𝑏 ) = 1
+
+|𝐼 𝑏 |∑
+
+> 𝑖 ∈𝐼 𝑏
+
+𝑞 𝑖 . (30) ECE was then calculated as 
+
+ECE = 
+
+> 10
+
+∑
+
+> 𝑏 =1
+
+|𝐼 𝑏 |
+
+𝑁 ||acc( 𝐼 𝑏 ) − conf( 𝐼 𝑏 )|| . (31)   
+
+> First Author et al.: Preprint submitted to Elsevier Page 16 of 48 Short Title of the Article
+
+Empty bins contributed zero to the summation. Lower ECE indicates closer agreement between predictive confidence and observed correctness (Guo et al., 2017). The multiclass Brier score evaluated the complete predicted probability vector: 
+
+Brier = 1
+
+𝑁 
+
+> 𝑁
+
+∑
+
+> 𝑖 =1
+> 𝐾
+
+∑
+
+> 𝑘 =1
+
+(𝑝 𝑖𝑘 − 𝕀 [𝑦 𝑖 = 𝑘 ])2 . (32) The implementation used the summed multiclass form above and did not divide the per-observation squared error by 𝐾 .Negative log-likelihood was computed from the probability assigned to the true class: 
+
+NLL = − 1
+
+𝑁 
+
+> 𝑁
+
+∑
+
+> 𝑖 =1
+
+log 
+
+(
+
+max{ 𝑝 𝑖,𝑦 𝑖 , 10 −8 }
+
+)
+
+. (33) The lower clipping value of 10 −8 prevented numerical singularities when evaluating probabilities approaching zero. Both the Brier score and NLL are proper probabilistic measures that assess the complete predictive distribution, whereas ECE summarizes confidence agreement within bins (Brier, 1950; Guo et al., 2017; Gneiting and Raftery, 2007). Lower values indicate better probability quality for all three reliability metrics. 
+
+4.11. Statistical Evaluation 
+
+Statistical analyses were designed to quantify uncertainty in the principal performance estimates, compare models on identical test observations, and evaluate the diagnostic behaviour of the EcoFuseNet-V2 neural branch. Unless otherwise stated, the primary statistical analyses used the seed-42 test partition. 
+
+4.11.1. Bootstrap Confidence Intervals 
+
+Uncertainty in the principal discrimination metrics was estimated using 𝐵 = 1000 bootstrap resamples of the seed-42 test observations. Each bootstrap sample contained 𝑁 te indices drawn with replacement from the original test set. For metric 𝑚 , the 𝑏 th bootstrap estimate was 
+
+𝑚 (𝑏 ) = 𝑚 
+
+(
+
+𝐲 𝐼 𝑏 ,̂ 𝐲 𝐼 𝑏 
+
+)
+
+, 𝑏 = 1 , … , 𝐵, (34) where 𝐼 𝑏 denotes the resampled test indices. The bootstrap procedure used a fixed random seed of 42 for reproducibility. A two-sided 95% percentile confidence interval was calculated as 
+
+CI 95% (𝑚 ) = [𝑄 0.025 
+
+(𝑚 (1) , … , 𝑚 (𝐵 )) , 𝑄 0.975 
+
+(𝑚 (1) , … , 𝑚 (𝐵 ))] , (35) where 𝑄 𝛼 denotes the empirical 𝛼 -quantile (Efron, 1979). Confidence intervals were reported for macro F1 and balanced accuracy, the two principal class-balanced discrimination measures. 
+
+4.11.2. Paired Bootstrap Comparisons 
+
+Because competing models generated predictions for the same test observations, model comparisons were performed using paired bootstrap resampling. For every bootstrap iteration, identical resampled indices were applied to both models. The metric difference was therefore 
+
+Δ(𝑏 ) = 𝑚 (𝑏 ) 
+
+> 𝐴
+
+− 𝑚 (𝑏 ) 
+
+> 𝐵
+
+, 𝑏 = 1 , … , 𝐵, (36) where model 𝐴 was Calibrated EcoTreeFuseNet-Plus and model 𝐵 was the corresponding baseline, ablation, or secondary variant. The observed difference on the original test set was   
+
+> First Author et al.: Preprint submitted to Elsevier Page 17 of 48 Short Title of the Article
+
+Δobs = 𝑚 𝐴 − 𝑚 𝐵 . (37) The 95% confidence interval for the paired difference was obtained from the 2.5th and 97.5th percentiles of 
+
+{Δ (𝑏 )}𝐵 𝑏 =1 . The implementation used small-sample-corrected bootstrap tail probabilities. For the directional alternative 
+
+𝐴 > 𝐵 , the one-sided probability was 
+
+𝑝 one = 1 + ∑𝐵 𝑏 =1 𝕀 (Δ(𝑏 ) ≤ 0)
+
+𝐵 + 1 , (38) and the reported two-sided probability was 
+
+𝑝 two = min 
+
+{
+
+1, 2 min 
+
+[ 1 + ∑𝐵 𝑏 =1 𝕀 (Δ(𝑏 ) ≤ 0)
+
+𝐵 + 1 , 1 + ∑𝐵 𝑏 =1 𝕀 (Δ(𝑏 ) ≥ 0)
+
+𝐵 + 1 
+
+]} 
+
+. (39) Pairing preserves the dependence between predictions made on the same observations and is therefore preferable to treating model-level scores as independent. The reported model-comparison 𝑝 -values were not adjusted for multiplicity and are interpreted as model-specific evidence rather than simultaneous family-wise tests. 
+
+4.11.3. McNemar Test 
+
+Pairwise differences in test-set correctness were additionally examined using a two-sided McNemar test (McNemar, 1947). Let model 𝐴 denote Calibrated EcoTreeFuseNet-Plus and model 𝐵 the comparator. The discordant counts were defined as 
+
+𝑛 01 =
+
+> 𝑁 te
+
+∑
+
+> 𝑖 =1
+
+𝕀 (̂𝑦 𝐴,𝑖 = 𝑦 𝑖 ,̂𝑦 𝐵,𝑖 ≠ 𝑦 𝑖 
+
+) , (40) and 
+
+𝑛 10 =
+
+> 𝑁 te
+
+∑
+
+> 𝑖 =1
+
+𝕀 (̂𝑦 𝐴,𝑖 ≠ 𝑦 𝑖 ,̂𝑦 𝐵,𝑖 = 𝑦 𝑖 
+
+) . (41) When the total number of discordant observations satisfied 
+
+𝑛 01 + 𝑛 10 < 25 , (42) the implementation used the exact two-sided binomial form of McNemar’s test. Otherwise, the continuity-corrected chi-square statistic was 
+
+𝜒 2 =
+
+(|𝑛 01 − 𝑛 10 | − 1 )2
+
+𝑛 01 + 𝑛 10 
+
+, (43) with one degree of freedom. If no discordant observations were present, the comparison was assigned 𝑝 = 1 .McNemar’s test therefore complemented metric-level bootstrap comparisons with an observation-level assessment of paired classification correctness. 
+
+4.11.4. Neural-Branch Diagnostic Analyses 
+
+Additional analyses were performed to characterize the internal behaviour and uncertainty signal of EcoFuseNet-V2. These diagnostics were exploratory analyses of the standalone neural branch and were not used to select or modify the final calibrated EcoTreeFuseNet-Plus predictions.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 18 of 48 Short Title of the Article
+
+Gate–CHM association. For each test observation, the 64-dimensional gate representation 𝐠 𝑖 was reduced to a scalar by averaging across its gate dimensions: ̄𝑔 𝑖 = 1
+
+𝑑 𝑓 𝑑 𝑓 
+
+∑
+
+> 𝑗 =1
+
+𝑔 𝑖𝑗 , 𝑑 𝑓 = 64 . (44) Ecological validation was performed using the true fine-class labels. For each class 𝑘 represented in the test set, the class-level mean gate value was ̄𝑔 𝑘 = 1
+
+𝑛 𝑘 
+
+∑
+
+> 𝑖 ∶𝑦 𝑖 =𝑘
+
+̄𝑔 𝑖 , (45) the mean raw canopy height was 
+
+CHM 𝑘 = 1
+
+𝑛 𝑘 
+
+∑
+
+> 𝑖 ∶𝑦 𝑖 =𝑘
+
+CHM 𝑖 , (46) and the proportion of observations with positive CHM was 
+
+𝑟 + 
+
+> 𝑘
+
+= 1
+
+𝑛 𝑘 
+
+∑
+
+> 𝑖 ∶𝑦 𝑖 =𝑘
+
+𝕀 (CHM 𝑖 > 0) . (47) Spearman rank correlations were then calculated across represented classes between ̄𝑔 𝑘 and CHM 𝑘 , and between ̄𝑔 𝑘 and 𝑟 + 
+
+> 𝑘
+
+. The predefined ecological gate-validity criterion required a positive and statistically significant association between class-level mean gate value and mean CHM at the conventional 𝑝 < 0.05 level. The positive-CHM-rate correlation was retained as an additional diagnostic because the CHM variable was highly zero-inflated. 
+
+Prototype compactness diagnostic. Prototype quality was assessed using the deterministic EcoFuseNet-V2 test embeddings and the learned fine-class prototypes. For each class 𝑘 , the within-class radius was defined as the mean Euclidean distance between test embeddings belonging to class 𝑘 and their corresponding learned prototype: 
+
+𝑅 intra  
+
+> 𝑘
+
+= 1
+
+𝑛 𝑘 
+
+∑
+
+> 𝑖 ∶𝑦 𝑖 =𝑘
+
+‖‖𝐞 𝑖 − 𝐏 𝑘 ‖‖2 . (48) The nearest inter-prototype distance for class 𝑘 was 
+
+𝑅 inter  
+
+> 𝑘
+
+= min 
+
+> 𝑗 ≠𝑘
+
+‖‖‖𝐏 𝑘 − 𝐏 𝑗 
+
+‖‖‖2 . (49) A class-specific compactness ratio was then calculated as 
+
+CR 𝑘 = 𝑅 inter 
+
+> 𝑘
+
+𝑅 intra  
+
+> 𝑘
+
++ 10 −8 , (50) and the reported macro compactness ratio was 
+
+CR macro = 1
+
+𝐾 
+
+> 𝐾
+
+∑
+
+> 𝑘 =1
+
+CR 𝑘 . (51) The reported mean within-class distance was the arithmetic mean of 𝑅 intra  
+
+> 𝑘
+
+across the 29 classes, whereas the reported between-prototype distance was the mean of the nearest inter-prototype distances 𝑅 inter  
+
+> 𝑘
+
+. These quantities were treated as exploratory representation diagnostics rather than as measures of final-model feature contribution.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 19 of 48 Short Title of the Article
+
+MC-dropout predictive uncertainty. Predictive uncertainty for EcoFuseNet-V2 was estimated using Monte Carlo dropout. For the standard experiment, dropout was kept active during inference and 𝑇 MC = 50 stochastic forward passes were performed for every seed-42 test observation. Let 𝑝 (𝑡 ) 
+
+> 𝑖𝑘
+
+denote the predicted probability for class 𝑘 in stochastic pass 𝑡 . The MC-averaged probability was ̄𝑝 𝑖𝑘 = 1
+
+𝑇 MC 
+
+> 𝑇 MC
+
+∑
+
+> 𝑡 =1
+
+𝑝 (𝑡 ) 
+
+> 𝑖𝑘
+
+, 𝑇 MC = 50 . (52) Predictive entropy was calculated in natural-logarithm units as 
+
+𝐻 𝑖 = − 
+
+> 𝐾
+
+∑
+
+> 𝑘 =1
+
+̄𝑝 𝑖𝑘 log (̄𝑝 𝑖𝑘 + 10 −8 ) . (53) Test observations were then separated according to whether the standalone EcoFuseNet-V2 prediction was correct or incorrect. The prespecified directional hypothesis was 
+
+𝐻 1 ∶ 𝐻 incorrect > 𝐻 correct , (54) reflecting the expectation that incorrect neural predictions would, on average, exhibit greater predictive uncertainty. The two entropy distributions were compared using a one-sided Mann–Whitney 𝑈 test with the alternative that the entropy of incorrect predictions was greater than that of correct predictions. A standardized mean difference was additionally calculated using the same implementation as the reported results. Let ̄ 𝐻 𝐼 and ̄ 𝐻 𝐶 denote the mean entropies of incorrect and correct predictions, respectively, and let 𝑠 𝐼 and 𝑠 𝐶 denote their population standard deviations (i.e., calculated with the 𝑛 denominator). Cohen’s 𝑑 was defined as 
+
+𝑑 =̄ 𝐻 𝐼 −̄ 𝐻 𝐶 
+
+√(𝑠 2 
+
+> 𝐼
+
++ 𝑠 2
+
+> 𝐶
+
+) ∕2 + 10 −8 
+
+. (55) This definition uses the square root of the average of the two population variances rather than the conventional pooled sample-variance estimator. It is stated explicitly so that the reported effect size is reproducible from the saved entropy arrays. The MC-dropout uncertainty analysis applies exclusively to EcoFuseNet-V2 and should not be interpreted as an uncertainty estimate for Calibrated EcoTreeFuseNet-Plus. 
+
+4.12. Repeated-Seed and Split Stability 
+
+The complete proposed-model pipeline was repeated independently using the seeds 
+
+ = {42 , 101 , 202 , 303 , 404} . (56) For each seed, the spatially aware partition, model initialization, out-of-fold generation, validation-based source selection, calibration, and test evaluation were rerun. This protocol assessed sensitivity to both data partitioning and stochastic training rather than repeating only the final classifier on a fixed split. For metric 𝑅 𝑠 obtained under seed 𝑠 , stability was summarized using 
+
+𝑅 = 1
+
+𝑆 
+
+> 𝑆
+
+∑
+
+> 𝑠 =1
+
+𝑅 𝑠 , (57) 
+
+𝑠 𝑅 =
+
+√√√√ 1
+
+𝑆 − 1 
+
+> 𝑆
+
+∑
+
+> 𝑠 =1
+
+(
+
+𝑅 𝑠 − 𝑅 
+
+)2
+
+, 𝑆 = 5 . (58) Results were reported as mean ± sample standard deviation for the principal discrimination and calibration metrics. Because the outer test membership and ordering could differ across seeds, these runs were interpreted as repeated-seed/split stability evidence rather than as a probability ensemble.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 20 of 48 Short Title of the Article
+
+## 5. Proposed Calibrated EcoTreeFuseNet-Plus Framework 
+
+5.1. Framework Overview 
+
+Calibrated EcoTreeFuseNet-Plus was developed as a hybrid probability-fusion framework for fine-grained eco-logical classification from small-sample tabular data. The framework integrates coordinate-based geospatial feature extraction, complementary LiDAR-derived and hyperspectral-derived predictors, tree-ensemble probability branches, the EcoFuseNet-V2 neural branch, leakage-aware out-of-fold feature generation, validation-based fusion selection, and post-hoc temperature scaling. The complete methodological framework is illustrated in Figure 2. For observation 𝑖 , the standardized predictor vector was partitioned as ̂
+
+𝐱 𝑖 =
+
+[(̂ 𝐱 𝑇 𝑖 
+
+)𝖳 , (̂
+
+𝐱 𝐶 𝑖 
+
+)𝖳 , (̂
+
+𝐱 𝑆 𝑖 
+
+)𝖳 ]𝖳 
+
+, (59) where ̂
+
+𝐱 𝑇 𝑖 = [elevation , slope , curvature , TPI , solar insolation] 𝖳 ∈ ℝ5, (60) ̂
+
+𝐱 𝐶 𝑖 = [log(1 + CHM)] ∈ ℝ1, (61) ̂
+
+𝐱 𝑆 𝑖 = [NDVI , NDWI] 𝖳 ∈ ℝ2. (62) The principal output of the complete framework is the calibrated fine-class probability distribution. Raw EcoTreeFuseNet-Plus, Bias-Tuned EcoTreeFuseNet-Plus, and Hierarchy-Aware EcoTreeFuseNet-Plus were retained as secondary variants for comparison and sensitivity analysis.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 21 of 48
+
+Short Title of the Article 
+
+Figure 2: Overview of the proposed Calibrated EcoTreeFuseNet-Plus framework. Coordinate-based raster extraction and quality control produce eight predictors from LiDAR-derived terrain and canopy products and hyperspectral-derived vegetation indices. Following spatially informed partitioning and training-set preprocessing, parallel tree-probability and EcoFuseNet-V2 branches generate the inputs to the 432-dimensional hybrid meta-representation. Candidate meta-classification and validation-weighted soft-voting routes are evaluated in parallel, and the source with the higher validation macro F1 defines the raw EcoTreeFuseNet-Plus probabilities. The selected probability source is subsequently temperature-scaled to generate calibrated probabilities and final predictions for the 29 fine ecological classes. First Author et al.: Preprint submitted to Elsevier Page 22 of 48 Short Title of the Article 
+
+5.2. EcoFuseNet-V2 Neural Branch 
+
+5.2.1. Modality-Specific Encoders and Gated Fusion 
+
+EcoFuseNet-V2 processes terrain, canopy, and spectral predictors through separate encoders. The terrain and spectral pathways use compact multilayer representations comprising linear projection, layer normalization, GELU activation, and dropout. Because CHM was highly sparse, its structural encoder was deliberately kept low-capacity and did not use dropout. The three encoded representations were 
+
+𝐡 𝑇 𝑖 = 𝑓 𝑇 
+
+(̂ 𝐱 𝑇 𝑖 
+
+) , 𝐡 𝐶 𝑖 = 𝑓 𝐶 
+
+(̂
+
+𝐱 𝐶 𝑖 
+
+) , 𝐡 𝑆 𝑖 = 𝑓 𝑆 
+
+(̂
+
+𝐱 𝑆 𝑖 
+
+) , (63) where 
+
+𝐡 𝑇 𝑖 , 𝐡 𝐶 𝑖 , 𝐡 𝑆 𝑖 ∈ ℝ𝑑 𝑓 , 𝑑 𝑓 = 64 . (64) A dimension-wise gate was computed from the concatenated modality representations: 
+
+𝐠 𝑖 = 𝜎 (GateNet [𝐡 𝐶 𝑖 ; 𝐡 𝑇 𝑖 ; 𝐡 𝑆 𝑖 
+
+]) ∈ (0 , 1) 𝑑 𝑓 , (65) where 𝜎 (⋅) denotes the sigmoid function. The initial fused representation was then obtained as 
+
+𝐳 0,𝑖 = 𝐠 𝑖 ⊙ 𝐡 𝑇 𝑖 + (𝟏 − 𝐠 𝑖 
+
+) ⊙ 𝐡 𝑆 𝑖 + 𝛼 CHM 𝐡 𝐶 𝑖 , (66) where ⊙ denotes element-wise multiplication. The learnable scalar 𝛼 CHM was initialized at 0.05 so that the sparse CHM representation could contribute without dominating the terrain–spectral fusion. The fused vector was refined through a residual transformation: 
+
+𝐳 𝑖 = LN [𝐳 0,𝑖 + FusionRef ine (LN( 𝐳 0,𝑖 ))] , (67) where LN( ⋅) denotes layer normalization. 
+
+5.2.2. Ecological Embedding and Fine-Class Prediction 
+
+The refined representation was projected into a 128-dimensional ecological embedding: 
+
+𝐞 𝑖 = LN (𝐖 𝑒 𝐳 𝑖 + 𝐛 𝑒 
+
+) ∈ ℝ𝑑 𝑒 , 𝑑 𝑒 = 128 . (68) Fine-class logits and probabilities were calculated as 
+
+𝐚 𝑖 = 𝐖 𝑦 𝐞 𝑖 + 𝐛 𝑦 ∈ ℝ𝐾 , (69) 
+
+𝑝 Eco  
+
+> 𝑖𝑘
+
+= exp( 𝑎 𝑖𝑘 )
+
+∑𝐾 𝑟 =1 exp( 𝑎 𝑖𝑟 ) , 𝐾 = 29 . (70) The standalone EcoFuseNet-V2 prediction was ̂𝑦 Eco  
+
+> 𝑖
+
+= arg max  
+
+> 𝑘
+
+𝑝 Eco  
+
+> 𝑖𝑘
+
+. (71) 
+
+First Author et al.: Preprint submitted to Elsevier Page 23 of 48 Short Title of the Article 
+
+5.2.3. Fine and Coarse Prototype Representation 
+
+EcoFuseNet-V2 additionally maintained a fine-class prototype 𝐏 𝑘 ∈ ℝ𝑑 𝑒 for each of the 𝐾 = 29 classes and a coarse prototype 𝐐 𝑐 ∈ ℝ𝑑 𝑒 for each of the 𝐶 = 5 ecological groups. Prototype-based representations provide an auxiliary geometric structure in which observations can be compared with class centres Snell, Swersky and Zemel (2017). The squared distance between observation 𝑖 and fine prototype 𝑘 was 
+
+𝑑 𝑖𝑘 = ‖‖𝐞 𝑖 − 𝐏 𝑘 ‖‖22 . (72) A strictly positive prototype temperature was defined as 
+
+𝜏 = 𝜏 min + sof tplus (𝜏 raw 
+
+) , 𝜏 min = 0 .1, (73) giving distance-based logits 
+
+𝑠 𝑖𝑘 = − 𝑑 𝑖𝑘 
+
+𝜏 . (74) After the initial cross-entropy warm-up, the fine prototypes were initialized from training embeddings: 
+
+𝐏 𝑘 ← 1
+
+𝑛 𝑘 
+
+∑
+
+> 𝑖 ∈tr
+> 𝑦 𝑖 =𝑘
+
+𝐞 𝑖 , (75) and the coarse prototypes were initialized from the corresponding fine prototypes: 
+
+𝐐 𝑐 ← 1
+
+|𝑐 |∑
+
+> 𝑘 ∈𝑐
+
+𝐏 𝑘 , 𝑐 = { 𝑘 ∶ 𝜙 (𝑘 ) = 𝑐 }, (76) where 𝜙 (𝑘 ) maps fine class 𝑘 to its coarse ecological category. All available training embeddings were used for classes with limited representation. EcoFuseNet-V2 exported four quantities for subsequent fusion: 
+
+{𝐩 Eco  
+
+> 𝑖
+
+, 𝐞 𝑖 , 𝐠 𝑖 , 𝐝 𝑖 
+
+} , (77) corresponding to 29 class probabilities, a 128-dimensional embedding, a 64-dimensional gate vector, and 29 prototype distances. 
+
+5.3. EcoFuseNet-V2 Objective and Training 
+
+5.3.1. Learning Objective 
+
+Class imbalance was handled using the training-derived weights defined in Section 4.7. With label-smoothing parameter 𝜀 , the smoothed target was 
+
+𝑞 𝑖𝑘 = (1 − 𝜀 )𝕀 [𝑘 = 𝑦 𝑖 ] + 𝜀 𝐾 , 𝜀 = 0 .03 . (78) Label smoothing was used to reduce excessively concentrated target distributions during neural training Szegedy, Vanhoucke, Ioffe, Shlens and Wojna (2016). The weighted label-smoothed cross-entropy was 
+
+CE = − 1
+
+𝐵 
+
+> 𝐵
+
+∑
+
+> 𝑖 =1
+
+𝑤 𝑦 𝑖 
+
+> 𝐾
+
+∑
+
+> 𝑘 =1
+
+𝑞 𝑖𝑘 log 𝑝 Eco  
+
+> 𝑖𝑘
+
+, (79)   
+
+> First Author et al.: Preprint submitted to Elsevier Page 24 of 48 Short Title of the Article
+
+where 𝐵 denotes the mini-batch size. The prototype contrastive loss was 
+
+proto = 1
+
+𝐵 
+
+> 𝐵
+
+∑
+
+> 𝑖 =1
+
+𝑤 𝑦 𝑖 
+
+[
+
+−𝑠 𝑖,𝑦 𝑖 + log 
+
+( 𝐾 ∑
+
+> 𝑘 =1
+
+exp( 𝑠 𝑖𝑘 )
+
+)] 
+
+. (80) The coarse-consistency loss encouraged embeddings to remain close to the prototype of their correct coarse category: 
+
+coarse = 1
+
+𝐵 
+
+> 𝐵
+
+∑
+
+> 𝑖 =1
+
+‖‖‖𝐞 𝑖 − 𝐐 𝑐 𝑖 
+
+‖‖‖ 
+
+> 22
+
+. (81) A bounded margin loss was used to discourage collapsed fine prototypes: 
+
+sep = 2
+
+𝐾 (𝐾 − 1) 
+
+∑
+
+> 1≤𝑗<𝑘 ≤𝐾
+
+max 
+
+(
+
+0, 𝑚 − ‖‖‖𝐏 𝑗 − 𝐏 𝑘 
+
+‖‖‖2
+
+)2
+
+, (82) where 𝑚 = 1 .0. The complete EcoFuseNet-V2 objective was 
+
+V2 = CE + 𝜆 𝑝 proto + 𝜆 𝑐 coarse + 𝜆 𝑠 sep . (83) Cross-entropy remained the dominant objective, while the prototype terms acted as weak auxiliary regularizers. 
+
+5.3.2. Two-Stage Optimization 
+
+Training proceeded in two stages. First, EcoFuseNet-V2 was optimized using only CE so that the embedding and fine-class decision boundaries could stabilize before prototype constraints were introduced. Fine and coarse prototypes were then initialized from the resulting training embeddings. In the second stage, optimization continued using the complete objective in Eq. (83). AdamW was used for neural optimization Loshchilov and Hutter (2019). The gradient norm was clipped at 1.0: 
+
+‖‖∇𝜽 V2 ‖‖2 ≤ 1.0. (84) Validation macro F1 controlled learning-rate scheduling, checkpoint selection, and early stopping. After training, the checkpoint with the highest validation macro F1 was restored before feature extraction or test inference. The test partition was not used for neural checkpoint selection. For the full EcoFuseNet-V2 model, 
+
+(𝜆 𝑝 , 𝜆 𝑐 , 𝜆 𝑠 ) = (0 .03 , 0.01 , 0.001) , (85) whereas the fold-specific neural models used for out-of-fold feature generation employed weaker regularization: 
+
+(𝜆 𝑝 , 𝜆 𝑐 , 𝜆 𝑠 )OOF = (0 .01 , 0.005 , 0.0005) . (86) 
+
+5.4. Tree Probability Branches and Out-of-Fold Construction 
+
+5.4.1. Tree-Ensemble Branches 
+
+Six tree-based learners were used as probability-generating branches: Random Forest, XGBoost, ExtraTrees, HistGradientBoosting, LightGBM, and CatBoost. These branches represent complementary forms of randomized forests and gradient-boosted decision trees Breiman (2001); Chen and Guestrin (2016); Geurts et al. (2006); Friedman (2001); Ke et al. (2017); Prokhorenkova et al. (2018).   
+
+> First Author et al.: Preprint submitted to Elsevier Page 25 of 48 Short Title of the Article
+
+For branch 𝑚 , the output was 
+
+𝐩 𝑚 (𝐱 𝑖 ) = [𝑝 𝑚 (𝑦 = 1 ∣ 𝐱 𝑖 ), … , 𝑝 𝑚 (𝑦 = 𝐾 ∣ 𝐱 𝑖 )]𝖳 , (87) with 
+
+> 𝐾
+
+∑
+
+> 𝑘 =1
+
+𝑝 𝑚 (𝑦 = 𝑘 ∣ 𝐱 𝑖 ) = 1 . (88) All branch probability arrays were aligned to the same 29-class ordering before fusion. 
+
+5.4.2. Tree and Neural OOF Features 
+
+Stacked generalization requires higher-level models to be trained on predictions produced without fitting the corresponding base model directly on the same observation Wolpert (1992); van der Laan et al. (2007). The outer training set was therefore partitioned into 𝑆 = 5 stratified folds: 
+
+tr =
+
+> 𝑆
+
+⋃
+
+> 𝑠 =1
+
+𝑠 , 𝑆 = 5 . (89) For tree branch 𝑚 and observation 𝑖 ∈ 𝑠 , the OOF probability was 
+
+𝐩 OOF  
+
+> 𝑚,𝑖
+
+= 𝑓 (− 𝑠 ) 
+
+> 𝑚
+
+(𝐱 𝑖 ), (90) where 𝑓 (− 𝑠 ) 
+
+> 𝑚
+
+was fitted using tr ⧵ 𝑠 . After OOF generation, each tree branch was refitted on the complete outer training partition to obtain validation and test probabilities. EcoFuseNet-V2 was processed similarly. A fold-specific neural model was trained without gradient updates from the held-out fold, after which the following held-out features were exported: 
+
+{
+
+𝐩 Eco ,OOF  
+
+> 𝑖
+
+, 𝐞 OOF  
+
+> 𝑖
+
+, 𝐠 OOF  
+
+> 𝑖
+
+, 𝐝 OOF 
+
+> 𝑖
+
+}
+
+. (91) The final EcoFuseNet-V2 model fitted on the complete outer training set generated the corresponding validation and test features. This procedure prevented the meta-classifier from receiving neural outputs generated by a model trained directly on the same observation. However, the outer-training scaler was estimated before the inner folds were formed, and the held-out neural fold also supported checkpoint selection. The neural OOF implementation is therefore described as 
+
+leakage-aware rather than fully nested or strictly leakage-free. 
+
+5.5. Hybrid Meta-Learning and Source Selection 
+
+5.5.1. Hybrid Meta-Feature Matrix 
+
+For each observation, EcoTreeFuseNet-Plus concatenated the original standardized predictors, six tree-probability vectors, EcoFuseNet-V2 probabilities, ecological embedding, gate representation, and prototype distances: 
+
+𝐙 𝑖 = [̂
+
+𝐱 𝑖 ; 𝐩 RF  
+
+> 𝑖
+
+; 𝐩 XGB  
+
+> 𝑖
+
+; 𝐩 ET  
+
+> 𝑖
+
+; 𝐩 HGB  
+
+> 𝑖
+
+; 𝐩 LGBM  
+
+> 𝑖
+
+; 𝐩 CAT  
+
+> 𝑖
+
+; 𝐩 Eco  
+
+> 𝑖
+
+; 𝐞 𝑖 ; 𝐠 𝑖 ; 𝐝 𝑖 
+
+] . (92) With all six tree branches available, the complete dimensionality was 
+
+𝑑 meta = 8 + 6(29) + 29 + 128 + 64 + 29 = 432 . (93)   
+
+> First Author et al.: Preprint submitted to Elsevier Page 26 of 48 Short Title of the Article
+
+The hybrid matrix was standardized using statistics estimated exclusively from the OOF training meta-features: ̂𝑍 𝑖𝑗 = 𝑍 𝑖𝑗 − 𝜇 𝑍 𝑗 
+
+𝜎 𝑍 𝑗 
+
+, (94) and the same transformation was applied to validation and test meta-features. 
+
+5.5.2. Candidate Meta-Classifiers 
+
+Five meta-classifier families were compared: 1. L2-regularized multinomial logistic regression; 2. elastic-net multinomial logistic regression; 3. HistGradientBoosting; 4. ExtraTrees; and 5. Random Forest. Elastic-net regularization permits simultaneous coefficient shrinkage and sparse feature selection Zou and Hastie (2005). Each candidate was fitted on the OOF training meta-features and scored on the predefined validation partition. The selected meta-classifier was 
+
+ℎ∗ = arg max  
+
+> ℎ∈
+
+MacroF1 
+
+[
+
+𝐲 val , arg max  
+
+> 𝑘
+
+ℎ𝑘 
+
+(̂
+
+𝐙 val 
+
+)] 
+
+. (95) 
+
+5.5.3. Validation-Weighted Soft Voting 
+
+In parallel, a weighted soft-voting alternative combined the available tree and neural probability branches: 
+
+𝐩 𝑤 (𝐱 𝑖 ) = 
+
+> 𝑀
+
+∑
+
+> 𝑚 =1
+
+𝑤 𝑚 𝐩 𝑚 (𝐱 𝑖 ), 𝑤 𝑚 ≥ 0,
+
+> 𝑀
+
+∑
+
+> 𝑚 =1
+
+𝑤 𝑚 = 1 . (96) Candidate weights included uniform combinations, one-branch solutions, and randomly generated Dirichlet mixtures. The weight vector was selected using validation macro F1: 
+
+𝐰 ∗ = arg max  
+
+> 𝐰
+
+MacroF1 
+
+(
+
+𝐲 val , arg max  
+
+> 𝑘
+
+𝑝 𝑤,𝑘 
+
+)
+
+. (97) Lower validation ECE was used to distinguish soft-voting candidates with equal macro F1. The raw EcoTreeFuseNet-Plus probability source was then selected between the best meta-classifier and the optimized soft vote: 
+
+𝐩 plus =
+
+{𝐩 meta , MacroF1 val (𝐩 meta ) ≥ MacroF1 val (𝐩 𝑤 ),
+
+𝐩 𝑤 , otherwise . (98) The implemented base-source comparison used validation macro F1 directly; no additional ECE tie-breaking rule was applied at this final meta-versus-soft-vote selection stage. 
+
+5.6. Calibration and Secondary Variants 
+
+5.6.1. Temperature-Scaled Main Model 
+
+After validation-based selection between the best meta-classifier and the optimized soft-voting alternative, the resulting raw EcoTreeFuseNet-Plus probability vector 𝐩 plus was calibrated using a single scalar temperature (Guo et al., 2017). Calibration was performed on probabilities rather than assuming direct access to model logits, because the selected raw probability source could originate from either meta-classification or probability-level soft voting.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 27 of 48 Short Title of the Article
+
+For observation 𝑖 and class 𝑘 , numerically stabilized log-probabilities were defined as 
+
+𝓁 𝑖𝑘 = log [max (𝑝 plus ,𝑖𝑘 , 𝜖 )] , (99) where 𝜖 is a small positive constant introduced to avoid taking the logarithm of zero. The temperature-scaled probabilities were then obtained as 
+
+𝑝 cal ,𝑖𝑘 (𝑇 ) = exp (𝓁 𝑖𝑘 ∕𝑇 )
+
+> 𝐾
+
+∑
+
+> 𝑟 =1
+
+exp (𝓁 𝑖𝑟 ∕𝑇 )
+
+, 𝑇 > 0. (100) Equivalently, the probability transformation can be written compactly as 
+
+𝐩 cal ,𝑖 (𝑇 ) = sof tmax 
+
+( log 𝐩 plus ,𝑖 
+
+𝑇 
+
+)
+
+, (101) with numerical clipping applied before the logarithm as defined in Eq. 99. The temperature was selected exclusively from the validation partition by minimizing negative log-likelihood: 
+
+𝑇 ∗ = arg min  
+
+> 𝑇 ∈𝑇
+
+NLL (𝐲 val , 𝐩 cal (𝑇 )) , (102) where the implemented calibration grid was restricted to 
+
+𝑇 ⊆ [0 .5, 5.0] . (103) Within this prespecified validation grid, the selected value was 𝑇 ∗ = 0 .50 . Because the selected value coincided with the lower boundary of the implemented search interval, it is interpreted as the validation-NLL optimum within the evaluated grid rather than as evidence of an unconstrained global optimum. The resulting 𝐩 cal (𝑇 ∗) defined the principal proposed model, Calibrated EcoTreeFuseNet-Plus. Temperature scaling was applied only after the raw probability source had been fixed from validation data, and the test labels were not involved in temperature selection. 
+
+5.6.2. Bias-Tuned Variant 
+
+A secondary class-bias variant was constructed to investigate whether validation-based class-specific probability adjustment could improve macro-averaged discrimination. Class-specific offsets were introduced into the calibrated log-probabilities: 
+
+𝑝 bias ,𝑖𝑘 = sof tmax 𝑘 
+
+(log 𝑝 cal ,𝑖𝑘 + 𝑏 𝑘 
+
+) , (104) where 𝑏 𝑘 denotes the offset associated with fine class 𝑘 . The bias vector was optimized using validation-only greedy coordinate search: 
+
+𝐛 ∗ = arg max  
+
+> 𝐛
+
+MacroF1 
+
+[
+
+𝐲 val , arg max 
+
+> 𝑘
+
+(log 𝑝 cal ,𝑖𝑘 + 𝑏 𝑘 
+
+)]
+
+, (105) subject to 
+
+−1 .25 ≤ 𝑏 𝑘 ≤ 1.25 , 𝑘 = 1 , … , 𝐾. (106) The bias-tuned model was treated as a secondary minority-class-sensitive variant. It was not used to define the principal proposed model or the main statistical reference.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 28 of 48
+
+Short Title of the Article 
+
+Table 6 
+
+Definitions and reporting roles of the EcoTreeFuseNet-Plus variants. 
+
+Variant Probability output Role in the study 
+
+EcoTreeFuseNet-Plus 𝐩 plus Validation-selected uncalibrated meta-classifier or soft-voting output Calibrated EcoTreeFuseNet-Plus 𝐩 cal (𝑇 ∗) Principal proposed model and main statistical reference Bias-Tuned EcoTreeFuseNet-Plus 𝐩 bias (𝐛 ∗) Validation-tuned secondary variant emphasizing macro F1 Hierarchy-Aware EcoTreeFuseNet-Plus 
+
+𝐩 hier (𝛼 ∗) Secondary variant incorporating fine-to-coarse ecological consistency 
+
+5.6.3. Hierarchy-Aware Variant 
+
+A second secondary variant incorporated consistency between the 29 fine classes and their five broader ecological categories. Let 𝜙 (𝑘 ) denote the coarse ecological category associated with fine class 𝑘 . For observation 𝑖 , the probability mass associated with coarse category 𝑐 was calculated from the bias-tuned fine-class probabilities as 
+
+𝑆 𝑖𝑐 = ∑
+
+> 𝑘 ∶𝜙 (𝑘 )= 𝑐
+
+𝑝 bias ,𝑖𝑘 . (107) The hierarchy-adjusted fine-class probabilities were then defined as 
+
+𝑝 hier ,𝑖𝑘 (𝛼 ) = 
+
+𝑝 bias ,𝑖𝑘 𝑆 𝛼 𝑖,𝜙 (𝑘 )
+
+> 𝐾
+
+∑
+
+> 𝑟 =1
+
+𝑝 bias ,𝑖𝑟 𝑆 𝛼 𝑖,𝜙 (𝑟 )
+
+, (108) where 𝛼 ≥ 0 controls the strength of the coarse-category adjustment. Setting 𝛼 = 0 recovers the bias-tuned fine-class probabilities without an additional hierarchy contribution. The hierarchy strength was selected exclusively on the validation partition: 
+
+𝛼 ∗ = arg max 
+
+> 𝛼 ∈𝛼
+
+MacroF1 
+
+[
+
+𝐲 val , arg max  
+
+> 𝑘
+
+𝑝 hier ,𝑖𝑘 (𝛼 )
+
+]
+
+, (109) using the candidate grid 
+
+𝛼 = {0 , 0.15 , 0.25 , 0.5, 0.75 , 1, 1.5, 2} . (110) When two hierarchy candidates produced identical validation macro F1, the candidate with the lower validation ECE was preferred. The hierarchy-aware model was retained only as a secondary ecological-consistency analysis and did not replace Calibrated EcoTreeFuseNet-Plus as the principal proposed model. Overall, the four reported probability outputs therefore represent distinct roles within the experimental design: 
+
+𝐩 plus is the validation-selected uncalibrated fusion output, 𝐩 cal (𝑇 ∗) defines the principal calibrated model, 𝐩 bias (𝐛 ∗)
+
+represents the class-bias-adjusted secondary variant, and 𝐩 hier (𝛼 ∗) represents the hierarchy-aware secondary variant. All calibration and secondary probability transformations were selected using validation data only before evaluation on the held-out test partition. 
+
+5.7. Model Definitions and Fixed Configuration 
+
+The four reported framework variants are summarized in Table 6. The fixed framework-level constants are reported in Table 7. Estimator-specific settings for the tree and meta-classifier candidates were held fixed within the executable configuration and were applied consistently across all corresponding comparisons. 
+
+First Author et al.: Preprint submitted to Elsevier Page 29 of 48 Short Title of the Article                                                              
+
+> Table 7
+> Fixed architecture, optimization, and fusion constants.
+> Setting Value Purpose
+> Fine classes, 𝐾 29 Primary prediction categories Coarse groups, 𝐶 5Auxiliary ecological hierarchy Branch width, 𝑑 𝑓 64 Terrain, CHM, spectral, and gate dimensions Embedding size, 𝑑 𝑒 128 Ecological latent representation Initial 𝛼 CHM 0.05 Restrained initial canopy contribution Minimum prototype temperature 0.1 Ensures strictly positive temperature Label smoothing, 𝜀 0.03 Smoothed fine-class targets Full 𝜆 𝑝 0.03 Prototype-contrastive weight Full 𝜆 𝑐 0.01 Coarse-consistency weight Full 𝜆 𝑠 0.001 Prototype-separation weight OOF 𝜆 𝑝 0.01 Fold-specific prototype weight OOF 𝜆 𝑐 0.005 Fold-specific coarse weight OOF 𝜆 𝑠 0.0005 Fold-specific separation weight Prototype margin, 𝑚 1.0 Bounded fine-prototype separation Gradient-norm limit 1.0 Neural optimization stability OOF folds, 𝑆 5Tree and neural meta-feature generation Temperature interval [0 .5,5.0] Validation-NLL calibration search Class-bias interval [−1 .25 ,1.25] Validation-only bias search Hierarchy grid
+> {0 ,0.15 ,0.25 ,0.5,
+> 0.75 ,1,1.5,2} Validation-only hierarchy selection
+
+5.8. Complete Training and Inference Algorithm 
+
+The complete procedure is summarized in Algorithm 1. All meta-learning, soft-voting, calibration, bias, and hierarchy decisions were based on the same predefined validation partition. The test labels were accessed only after the complete configuration and probability transformations had been fixed. 
+
+5.9. Computational and Reproducibility Details 
+
+The complete framework was implemented in Python. PyTorch was used for EcoFuseNet-V2 and neural op-timization, while scikit-learn-compatible tools supported preprocessing, conventional ensembles, meta-classifiers, and evaluation (Paszke, Gross, Massa, Lerer, Bradbury, Chanan, Killeen, Lin, Gimelshein, Antiga et al., 2019; Pedregosa, Varoquaux, Gramfort, Michel, Thirion, Grisel, Blondel, Prettenhofer, Weiss, Dubourg et al., 2011). XGBoost, LightGBM, and CatBoost were accessed through their corresponding Python interfaces. AdamW was used for neural optimization. The principal architecture, loss, out-of-fold, calibration, and secondary-variant settings are reported in Table 7. All reported experiments were executed in a CPU environment without GPU acceleration. Random states were propagated, wherever supported, to data partitioning, conventional learners, neural initialization, mini-batch ordering, out-of-fold generation, candidate soft-voting weight generation, and repeated-split evaluation. The repeated-seed protocol itself is defined in Section 4.12. For each run, the implementation retained partition metadata, validation-selected neural checkpoints, refitted branch outputs, out-of-fold probability arrays, EcoFuseNet-V2 representations, meta-feature scalers, selected meta-classifiers, soft-voting weights, selected raw probability sources, calibration parameters, secondary-variant parameters, final test probabilities, predicted labels, and statistical outputs. These saved artifacts allowed the reported metrics, calibration analyses, figures, and paired statistical comparisons to be regenerated from fixed predictions without retraining the complete pipeline.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 30 of 48 Short Title of the Article
+
+Algorithm 1 Training and inference procedure for Calibrated EcoTreeFuseNet-Plus. 
+
+Require: Training, validation, and test partitions; fine labels 𝑦 ; coarse labels 𝑐 ; mapping 𝜙 
+
+Ensure: Calibrated test probabilities and predicted fine classes  
+
+> 1:
+
+Apply the CHM transformation and training-derived standardization  
+
+> 2:
+
+Partition the predictors into terrain, canopy, and spectral groups  
+
+> 3:
+
+Compute class weights from the outer training labels  
+
+> 4:
+
+Train EcoFuseNet-V2 using cross-entropy warm-up  
+
+> 5:
+
+Initialize fine and coarse prototypes from training embeddings  
+
+> 6:
+
+Continue EcoFuseNet-V2 training using weak prototype regularization  
+
+> 7:
+
+Configure the six tree-probability branches  
+
+> 8:
+
+for 𝑠 = 1 , … , 5 do  
+
+> 9:
+
+Generate held-out tree probabilities for fold 𝑠  
+
+> 10:
+
+Train fold-specific EcoFuseNet-V2  
+
+> 11:
+
+Export held-out neural probabilities, embeddings, gates, and distances  
+
+> 12:
+
+end for  
+
+> 13:
+
+Refit branch models on the complete outer training set  
+
+> 14:
+
+Generate aligned validation and test branch outputs  
+
+> 15:
+
+Construct the 432-dimensional training, validation, and test meta-feature matrices  
+
+> 16:
+
+Fit the meta-feature scaler using OOF training features only  
+
+> 17:
+
+Train candidate meta-classifiers and select one using validation macro F1  
+
+> 18:
+
+Optimize validation-weighted soft voting  
+
+> 19:
+
+Select the raw Plus source using validation macro F1  
+
+> 20:
+
+Select 𝑇 ∗ by minimizing validation NLL  
+
+> 21:
+
+Apply 𝑇 ∗ to the corresponding test probabilities  
+
+> 22:
+
+Optionally generate the validation-selected bias-tuned and hierarchy-aware variants  
+
+> 23:
+
+Predict ̂𝑦 𝑖 = arg max 𝑘 𝑝 cal ,𝑖𝑘 (𝑇 ∗)              
+
+> First Author et al.: Preprint submitted to Elsevier Page 31 of 48 Short Title of the Article
+> Table 8
+> Experimental configuration for the primary seed-42 evaluation.
+> Setting Value
+> Total observations 1,833 Training observations 1,273 Validation observations 190 Test observations 370 Fine classes 29 Predictors 8Primary random seed 42 Out-of-fold stacking folds 5Bootstrap resamples 1,000 Execution device CPU Complete seed-42 benchmark runtime 20.56 min
+
+## 6. Experimental Results 
+
+6.1. Experimental Configuration 
+
+The primary evaluation used the spatially informed seed-42 partition described in Section 4. All baseline, ablation, neural, and hybrid models were evaluated using the same training, validation, and test observations. The complete seed-42 benchmark suite, including the baseline, ablation, hybrid, and diagnostic experiments, was executed on a CPU and required 20.56 min. The principal configuration is summarized in Table 8. 
+
+6.2. Overall Predictive Performance 
+
+Table 9 compares the standalone tree ensembles, EcoFuseNet-V2, the legacy hybrid model, and the EcoTreeFuseNet-Plus variants. Calibrated EcoTreeFuseNet-Plus correctly classified 296 of the 370 test observations, yielding an accuracy of 0.8000, a macro F1-score of 0.7768, a balanced accuracy of 0.7903, and an MCC of 0.7903. Its weighted F1-score and Cohen’s kappa were 0.8010 and 0.7900, respectively. ExtraTrees was the strongest standalone baseline, with an accuracy of 0.7865, a macro F1-score of 0.7712, a balanced accuracy of 0.7618, and an MCC of 0.7759. The proposed model therefore exceeded ExtraTrees by 0.0055 in macro F1. Legacy EcoTreeFuseNet obtained a macro F1-score of 0.7549, whereas standalone EcoFuseNet-V2 obtained 0.5639. The raw and calibrated EcoTreeFuseNet-Plus variants produced identical class labels and consequently identical discrimination metrics. The bias-tuned and hierarchy-aware variants slightly reduced ECE to 0.0597 but also reduced accuracy and macro F1. The selected hierarchy coefficient was 𝛼 = 0 , causing the hierarchy-aware and bias-tuned variants to produce identical predictions and metrics.                                                                                              
+
+> First Author et al.: Preprint submitted to Elsevier Page 32 of 48 Short Title of the Article
+> Table 9
+> Test-set discrimination and probability-reliability performance under the primary seed-42 split. Lower values are preferable for ECE, Brier score, and NLL.
+> Model Accuracy Macro F1 Bal. Acc. MCC ECE Brier NLL
+> Random Forest 0.7676 0.7500 0.7349 0.7559 0.2386 0.4098 0.8943 XGBoost 0.7730 0.7448 0.7449 0.7618 0.0808 0.3379 0.7899 ExtraTrees 0.7865 0.7712 0.7618 0.7759 0.2910 0.4187 0.9346 HistGradientBoosting 0.7243 0.7170 0.7126 0.7106 0.0700 0.3780 0.9024 LightGBM 0.7703 0.7407 0.7517 0.7589 0.0823 0.3464 0.8303 CatBoost 0.7486 0.7398 0.7561 0.7373 0.1684 0.3964 0.8685 EcoFuseNet-V2 0.6054 0.5639 0.5720 0.5869 0.0702 0.5302 1.1421 Legacy EcoTreeFuseNet 0.7811 0.7549 0.7687 0.7704 0.1984 0.3766 0.9239 EcoTreeFuseNet-Plus (raw) 0.8000 0.7768 0.7903 0.7903 0.3866 0.4839 1.2926
+> Calibrated EcoTreeFuseNet-Plus 0.8000 0.7768 0.7903 0.7903 0.0651 0.3108 0.8179 Bias-Tuned EcoTreeFuseNet-Plus 0.7811 0.7653 0.7772 0.7708 0.0597 0.3367 0.9072 Hierarchy-Aware EcoTreeFuseNet-Plus 0.7811 0.7653 0.7772 0.7708 0.0597 0.3367 0.9072
+
+6.3. Fusion Selection and Calibration Performance 
+
+All fusion and calibration decisions were based exclusively on validation-set performance. Elastic-net multinomial logistic regression with 𝐶 = 0 .003 achieved the highest validation macro F1-score of 0.7037 and was selected as the meta-classifier. The best validation-weighted soft-voting solution achieved a macro F1-score of 0.6979 and was therefore not selected as the final base-probability source. The optimized soft-voting solution assigned 85.88% of its weight to ExtraTrees and 8.88% to CatBoost. The remaining branches received substantially smaller weights. The displayed weights sum to 99.99% because of rounding. Temperature scaling selected 𝑇 = 0 .50 by minimizing validation NLL. The resulting validation NLL and ECE were 0.8764 and 0.0868, respectively. The complete validation-based selection results are reported in Table 10. Temperature scaling substantially improved probability reliability without altering the predicted labels. ECE decreased from 0.3866 to 0.0651, corresponding to an 83.16% reduction. The Brier score decreased by 35.78%, from 0.4839 to 0.3108, while NLL decreased by 36.72%, from 1.2926 to 0.8179. The discrimination metrics remained unchanged, as summarized in Table 11. Figure 3 compares the raw and calibrated reliability profiles. The raw model was predominantly underconfident, with empirical accuracy exceeding mean confidence in most occupied bins. Following temperature scaling, the confidence levels were substantially closer to the corresponding empirical accuracies.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 33 of 48
+
+Short Title of the Article 
+
+Table 10 
+
+Validation-based selection of the meta-classifier, soft-voting alternative, and calibration temperature. 
+
+Panel A: Candidate meta-classifiers 
+
+Candidate Val. Macro F1 Selected 
+
+L2 logistic, 𝐶 = 0 .001 0.6837 No L2 logistic, 𝐶 = 0 .003 0.6895 No L2 logistic, 𝐶 = 0 .010 0.6745 No L2 logistic, 𝐶 = 0 .030 0.6723 No L2 logistic, 𝐶 = 0 .100 0.6635 No Elastic-net logistic, 𝐶 = 0 .003 0.7037 Yes Elastic-net logistic, 𝐶 = 0 .010 0.6950 No Elastic-net logistic, 𝐶 = 0 .030 0.6580 No HistGradientBoosting 0.6418 No ExtraTrees 0.6586 No Random Forest 0.6559 No 
+
+Panel B: Soft-voting weights and final selection 
+
+Branch Weight Selection quantity Value 
+
+Random Forest 0.49% Soft-vote val. Macro F1 0.6979 XGBoost 1.97% Meta-model val. Macro F1 0.7037 ExtraTrees 85.88% Selected base source Meta-classifier HistGradientBoosting 0.00% Temperature, 𝑇 0.50 LightGBM 1.03% Validation NLL 0.8764 CatBoost 8.88% Validation ECE 0.0868 EcoFuseNet-V2 1.74% 
+
+Table 11 
+
+Effect of temperature scaling on EcoTreeFuseNet-Plus. Predicted class labels were unchanged. 
+
+Metric Raw Plus Calibrated Plus Relative change 
+
+Accuracy 0.8000 0.8000 Unchanged Macro F1 0.7768 0.7768 Unchanged Balanced accuracy 0.7903 0.7903 Unchanged MCC 0.7903 0.7903 Unchanged ECE 0.3866 0.0651 −83 .16 %Brier score 0.4839 0.3108 −35 .78 %NLL 1.2926 0.8179 −36 .72 %First Author et al.: Preprint submitted to Elsevier Page 34 of 48 Short Title of the Article 
+
+Figure 3: Reliability diagrams of EcoTreeFuseNet-Plus before and after temperature scaling. Calibration reduced the expected calibration error from 0.3866 to 0.0651 without altering the predicted class labels. First Author et al.: Preprint submitted to Elsevier Page 35 of 48 Short Title of the Article 
+
+6.4. Statistical Robustness and Ablation Analysis 
+
+Bootstrap resampling produced a 95% confidence interval of [0 .7059 , 0.8152] for macro F1 and [0 .7323 , 0.8379] 
+
+for balanced accuracy. Relative to ExtraTrees, the proposed model obtained a macro-F1 difference of 0.0055, with a paired-bootstrap interval of [−0 .0362 , 0.0499] and 𝑝 = 0 .733 . The balanced-accuracy difference and McNemar comparison against ExtraTrees were also non-significant. For macro F1, statistically supported differences were observed against HistGradientBoosting, LightGBM, and EcoFuseNet-V2, whereas the differences relative to Random Forest, XGBoost, ExtraTrees, CatBoost, and Legacy EcoTreeFuseNet were not significant. Balanced accuracy was significantly higher than that of Random Forest, XGBoost, HistGradientBoosting, LightGBM, and EcoFuseNet-V2. McNemar’s test identified significant differences in paired correctness relative to HistGradientBoosting, LightGBM, CatBoost, and EcoFuseNet-V2. Because the reported probabilities were not adjusted for multiple comparisons, they are interpreted as model-specific evidence rather than simultaneous family-wise tests. The architectural and modality ablations are summarized in Table 13. EcoFuseNet-V2 achieved a macro F1-score of 0.5639. The No-Gate MLP and No-CHM-gate variants achieved macro F1-scores of 0.4412 and 0.4410, respectively. The flat-loss variant achieved 0.5427, while the legacy prototype model achieved 0.4835. The LiDAR-only and spectral-only configurations produced macro F1-scores of 0.1930 and 0.2224, respectively. All neural-only and modality-restricted variants remained below the complete calibrated tree–neural framework.      
+
+> First Author et al.: Preprint submitted to Elsevier Page 36 of 48 Short Title of the Article
+> Table 12
+> Bootstrap uncertainty and paired comparison of Calibrated EcoTreeFuseNet-Plus with the principal competing models. Differences are calculated as proposed model minus comparator. Paired-bootstrap 𝑝 -values are two-sided and unadjusted for multiplicity. Macro F1, observed [95% CI] 0.7768 [0.7059, 0.8152] Balanced accuracy, observed [95% CI] 0.7903 [0.7323, 0.8379]
+
+Comparator ΔMacro F1 [95% CI] 𝑝 ΔBal. Acc. [95% CI] 𝑝 McNemar 𝑝 
+
+Random Forest 0.0268 [ −0 .0164 , 0.0732] 0.230 0.0553 [0.0163, 0.0929] 0.010 0.074 XGBoost 0.0320 [ −0 .0039 , 0.0721] 0.072 0.0454 [0.0135, 0.0785] 0.008 0.052 ExtraTrees 0.0055 [ −0 .0362 , 0.0499] 0.733 0.0285 [ −0 .0116 , 0.0668] 0.156 0.542 HistGradientBoosting 0.0597 [0.0166, 0.1109] 0.006 0.0777 [0.0335, 0.1225] 0.002 < 0.001 
+
+LightGBM 0.0361 [0.0090, 0.0716] 0.014 0.0385 [0.0105, 0.0712] 0.008 0.027 CatBoost 0.0369 [ −0 .0047 , 0.0775] 0.086 0.0341 [ −0 .0072 , 0.0721] 0.110 0.005 EcoFuseNet-V2 0.2129 [0.1434, 0.2790] 0.002 0.2182 [0.1411, 0.2829] 0.002 < 0.001 
+
+Legacy EcoTreeFuseNet 0.0219 [ −0 .0160 , 0.0600] 0.240 0.0216 [ −0 .0130 , 0.0569] 0.240 0.210                                              
+
+> Table 13
+> Architectural and modality ablation results under the common seed-42 protocol.
+> Model Accuracy Macro F1 Bal. Acc. MCC ECE
+> EcoFuseNet-V2 0.6054 0.5639 0.5720 0.5869 0.0702 Legacy prototype model 0.4541 0.4835 0.5242 0.4347 0.3364 No-Gate MLP 0.4514 0.4412 0.4791 0.4337 0.3587 Flat-loss model 0.6081 0.5427 0.5373 0.5885 0.0668 LiDAR-only model 0.2216 0.1930 0.2600 0.1970 0.5016 Spectral-only model 0.2297 0.2224 0.2605 0.2041 0.3097 No-CHM-gate model 0.4676 0.4410 0.4827 0.4479 0.3744 Calibrated EcoTreeFuseNet-Plus 0.8000 0.7768 0.7903 0.7903 0.0651
+
+6.5. Class-Wise and Error Analysis 
+
+Class-wise evaluation revealed substantial variation in performance across the 29 fine ecological classes. Ir-rigLawnPasture achieved the highest F1-score of 0.9863, followed by Water at 0.9630 and Wyethia at 0.9091. GravelRoadTrail, Snow, and WetAlpine each achieved an F1-score of 0.8889. These results indicate that several classes were identified consistently despite the fine-grained and imbalanced nature of the classification problem. The lowest F1-score was observed for DrySubalpTill at 0.5143. SandstoneOutcrop and SandstoneTalus each achieved an F1-score of 0.5714, whereas GraniteTalus and Paved each obtained 0.6154. Performance estimates for low-support classes were interpreted cautiously. For example, BareSoil and Frasera each achieved an F1-score of 0.8571, but both classes contained only four observations in the seed-42 test partition. Consequently, apparently high class-specific scores for such categories should not be interpreted as equally stable as those obtained for better represented classes. The row-normalized confusion matrix is shown in Figure 4. The largest bidirectional confusion occurred between DrySubalpTill and Festuca, with eight combined errors. AlpineSandstone and AlpineShale produced six mutual errors, while Artemisia and DrySubalpTill produced five. Other prominent confusion pairs were Paved and StreamSandGravel, and GraniteOutcrop and SandstoneOutcrop, each with four combined errors. These error patterns indicate that the remaining classification difficulty was concentrated primarily among fine classes with overlapping ecological or surface characteristics rather than being distributed uniformly across the target taxonomy.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 37 of 48
+
+Short Title of the Article 
+
+Figure 4: Row-normalized confusion matrix of Calibrated EcoTreeFuseNet-Plus on the seed-42 test partition ( 𝑁 = 370 ). The model correctly classified 296 observations and misclassified 74 observations. First Author et al.: Preprint submitted to Elsevier Page 38 of 48 Short Title of the Article 
+
+6.6. Meta-Feature and Neural-Branch Diagnostics 
+
+The grouped contribution of the selected elastic-net meta-classifier is shown in Figure 5. Tree-probability features accounted for 93.70% of the normalized absolute coefficient contribution, while EcoFuseNet-V2 class probabilities contributed 6.19% and the original predictors contributed 0.11%. The remaining latent neural feature families— ecological embeddings, gate outputs, and prototype-distance features—received zero coefficient contribution in the selected sparse meta-classifier. Among the eight original predictors, only NDVI was retained, with an absolute elastic-net coefficient magnitude of 0.000656. These results indicate that the final meta-classifier was driven predominantly by tree-derived class probabilities, with a smaller complementary contribution from EcoFuseNet-V2 probabilities. The zero coefficients assigned to the latent neural feature families indicate exclusion under the selected regularization setting and should not be interpreted as evidence that those representations contain no information. The class-level gate analysis did not provide evidence of the predefined ecological relationship with canopy height. The Spearman association between class-level mean CHM and mean gate value was weak and non-significant (𝜌 = 0 .124 , 𝑝 = 0 .521 ). The association between class-level positive-CHM proportion and mean gate value was similarly weak and non-significant ( 𝜌 = 0 .132 , 𝑝 = 0 .496 ). Accordingly, the predefined ecological gate-validity criterion was not satisfied. The prototype diagnostic yielded a macro compactness ratio of 0.6906. The mean within-class distance to the corresponding learned prototype was 6.3266, while the mean nearest inter-prototype distance was 4.3626. These quantities are reported as exploratory diagnostics of the EcoFuseNet-V2 representation geometry. Consistent with the meta-feature analysis, the prototype-distance feature family itself received zero coefficients in the selected elastic-net meta-classifier. Predictive uncertainty was also examined for the standalone EcoFuseNet-V2 branch using MC dropout. Incorrect predictions ( 𝑛 = 146 ) exhibited a higher mean predictive entropy of 1.7940 than correct predictions ( 𝑛 = 224 ), for which the mean entropy was 1.5115. The directional difference was statistically supported by the one-sided Mann– Whitney 𝑈 test ( 𝑝 = 1 .18 × 10 −10 ), with an effect size of Cohen’s 𝑑 = 0 .716 under the implementation defined in Section 4.11.4. These results indicate that higher EcoFuseNet-V2 predictive entropy was associated with incorrect classifications, although the entropy distributions were not completely separated. This uncertainty analysis applies only to EcoFuseNet-V2 and should not be interpreted as an uncertainty estimate for Calibrated EcoTreeFuseNet-Plus. 
+
+6.7. Repeated-Split Stability and Computational Cost 
+
+The complete calibrated pipeline was repeated using seeds 42, 101, 202, 303, and 404. The seed-specific results are reported in Table 14. Across the five runs, accuracy was 0.7892 ± 0 .0072 , macro F1 was 0.7717 ± 0 .0112 , balanced accuracy was 
+
+0.7735 ± 0 .0154 , and MCC was 0.7789 ± 0 .0075 .The probability-reliability metrics were also comparatively stable. Mean ECE was 0.0491 ± 0 .0151 , the Brier score was 0.3146 ± 0 .0090 , and NLL was 0.6987 ± 0 .0732 . All variability estimates use the sample standard deviation. The five repeated runs of the proposed calibrated pipeline required 72.63 min in total, corresponding to 14 .53 ± 3.20 min per run. These timings exclude the complete baseline, ablation, and diagnostic benchmark suite reported for seed 42. Because each seed generated a separate outer split, the results represent repeated-split stability rather than an ensemble of identical test observations.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 39 of 48
+
+Short Title of the Article 
+
+Table 14 
+
+Repeated-seed and split stability of Calibrated EcoTreeFuseNet-Plus. Variability is reported using the sample standard deviation.                                                                  
+
+> Seed Accuracy Macro F1 Bal. Acc. MCC ECE Brier NLL
+> 42 0.8000 0.7768 0.7903 0.7903 0.0651 0.3108 0.8179 101 0.7919 0.7840 0.7894 0.7815 0.0248 0.3029 0.6302 202 0.7865 0.7596 0.7594 0.7756 0.0568 0.3119 0.6499 303 0.7811 0.7781 0.7692 0.7704 0.0469 0.3233 0.6891 404 0.7865 0.7602 0.7593 0.7766 0.0516 0.3239 0.7063 Mean ±sample SD 0.7892 ±0.0072 0.7717 ±0.0112 0.7735 ±0.0154 0.7789 ±0.0075 0.0491 ±0.0151 0.3146 ±0.0090 0.6987 ±0.0732
+
+Figure 5: Normalized absolute coefficient contributions of the meta-feature families retained by the selected elastic-net meta-classifier. Tree-probability features accounted for 93.70% of the total contribution, followed by EcoFuseNet-V2 class probabilities at 6.19% and the original predictors at 0.11%. The embedding, gate, and prototype-distance feature families received zero coefficient contribution. First Author et al.: Preprint submitted to Elsevier Page 40 of 48 Short Title of the Article 
+
+## 7. Discussion 
+
+7.1. Principal Findings 
+
+This study evaluated whether calibrated tree–neural probability fusion could provide reliable fine-grained vegetation-community classification under a limited-sample, multiclass ecological setting. On the primary seed-42 test partition, Calibrated EcoTreeFuseNet-Plus achieved an accuracy of 0.8000, a macro F1-score of 0.7768, a balanced accuracy of 0.7903, and an MCC of 0.7903. Across five repeated splits, the macro F1-score was 0.7717 ± 0 .0112 ,indicating limited sensitivity of the principal finding to the selected random partition. The discrimination improvement over the strongest standalone baseline was modest. ExtraTrees achieved a macro F1-score of 0.7712, producing an observed difference of 0.0055 in favour of the proposed model. However, the paired-bootstrap confidence interval crossed zero, and neither the paired-bootstrap test nor McNemar’s test identified a significant difference from ExtraTrees. The proposed framework should therefore not be interpreted as demonstrating universal predictive superiority over strong tree ensembles. Its principal contribution is instead the combination of competitive discrimination, substantially improved probability calibration, repeated-split stability, and a transparent assessment of the information sources retained by the fusion model. This interpretation is consistent with evidence that tree ensembles remain highly competitive for heterogeneous tabular-learning problems, particularly when sample sizes are limited and the predictor dimension is modest Grinsztajn et al. (2022); Shwartz-Ziv and Armon (2022). The results also support validation-based stacking rather than assuming that the inclusion of additional model components will necessarily improve generalization Wolpert (1992); van der Laan et al. (2007). 
+
+7.2. Discrimination–Calibration Trade-off 
+
+The clearest improvement provided by the proposed framework concerned probability reliability. Temperature scaling reduced ECE from 0.3866 to 0.0651, the Brier score from 0.4839 to 0.3108, and NLL from 1.2926 to 0.8179. Because calibration did not alter the predicted class labels, accuracy, macro F1, balanced accuracy, and MCC remained unchanged. The improvement therefore reflects a correction of model confidence rather than a change in class decisions. The selected temperature was 𝑇 = 0 .50 , indicating that the raw EcoTreeFuseNet-Plus probabilities were predom-inantly underconfident and required sharpening. The reliability diagrams in Figure 3 show that empirical accuracy generally exceeded mean confidence before calibration, whereas the calibrated probabilities were substantially closer to the ideal reliability relationship. The simultaneous reductions in ECE, Brier score, and NLL are important because these measures capture complementary aspects of probabilistic performance. ECE summarizes the agreement between confidence and empirical accuracy within probability bins, whereas the Brier score and NLL assess the complete predictive distribution and penalize inaccurate probability assignments Gneiting and Raftery (2007). Reliable probabilities are particularly important in ecological classification because model confidence may be used to prioritize field verification, identify ambiguous observations, or support subsequent environmental decision-making. A classifier with competitive discrimination but poorly scaled confidence can create an unjustified impression of certainty. Post-hoc calibration provides a comparatively simple mechanism for reducing this risk without retraining the underlying classifier Niculescu-Mizil and Caruana (2005); Guo et al. (2017). In the present study, the calibrated model therefore provided a more favourable discrimination–calibration balance than the raw fusion output. 
+
+7.3. Contribution of the Tree and Neural Branches 
+
+The selected elastic-net meta-classifier provides direct evidence about how the final predictive distribution was formed. Tree-probability features accounted for 93.70% of the normalized absolute coefficient contribution, whereas EcoFuseNet-V2 probabilities accounted for 6.19%. The original predictors contributed 0.11%, while the neural embeddings, gate outputs, and prototype-distance features received zero coefficients. These findings indicate that the final model operated primarily as a probability-level ensemble of tree learners rather than as a representation-level neural fusion model. The neural branch was not entirely excluded because its class-probability outputs supplied a small but retained contribution. However, the learned embeddings, gates, and prototype distances did not provide sufficient additional validation benefit to survive elastic-net regularization. Consequently, the final performance should not be attributed to the latent neural representations. The dominance of tree probabilities is plausible for the present problem. The predictor matrix contained eight tabular variables and 1,833 observations distributed across 29 classes. Under this regime, tree ensembles can represent   
+
+> First Author et al.: Preprint submitted to Elsevier Page 41 of 48 Short Title of the Article
+
+nonlinear thresholds and feature interactions without requiring the larger sample sizes generally needed to stabilize high-dimensional neural representations. The result also demonstrates the value of sparse meta-learning: rather than forcing every candidate feature family into the final model, the validation-selected elastic-net solution suppressed components that did not improve generalization. The contribution percentages shown in Figure 5 represent normalized absolute coefficient magnitudes rather than causal feature importance. Correlated predictors may share or redistribute coefficient magnitude, and a zero coefficient indicates exclusion by the selected sparse model rather than proof that the corresponding representation contains no information Zou and Hastie (2005). The figure should therefore be interpreted as evidence about the fitted fusion mechanism, not as a universal ranking of ecological information content. 
+
+7.4. Architectural Ablation and Multisource Complementarity 
+
+The ablation analysis examined whether simplified neural and modality-restricted configurations could match the complete calibrated hybrid pipeline. Figure 6 presents the change in macro F1 relative to Calibrated EcoTreeFuseNet-Plus. All evaluated variants produced lower macro F1, with reductions ranging from 0.2129 for standalone EcoFuseNet-V2 to 0.5837 for the LiDAR-only configuration. The largest reductions were observed for the LiDAR-only and spectral-only models, with ΔMacro F1 values of 
+
+−0 .5837 and −0 .5544 , respectively. These results indicate that neither information domain was sufficient independently for the 29-class classification task. Terrain and canopy variables characterize topographic setting and vegetation struc-ture, whereas NDVI and NDWI describe spectral responses associated with vegetation greenness and moisture. Their combined use therefore provides complementary information consistent with the broader rationale for multisource ecological remote sensing Kampe et al. (2010); Lefsky et al. (2002); Baltrušaitis et al. (2019); Albanwan et al. (2024). The flat-loss variant reduced macro F1 by 0.2341, while the legacy prototype model reduced it by 0.2933. The No-gate MLP and No-CHM-gate models produced similar reductions of 0.3355 and 0.3358, respectively. These comparisons show that none of the simplified neural or modality-restricted configurations matched the complete calibrated hybrid pipeline. Because each variant differs from the final model in multiple respects, the reported reductions should not be interpreted as isolated causal effects of individual architectural components. The ablation results must also be distinguished from ecological interpretation of the learned gate. The relationships between class-level gate values and CHM statistics were weak and non-significant, and the gate outputs received zero coefficient contribution in the selected elastic-net meta-classifier. Although the gate-based variants performed better than their simplified counterparts, the present results do not establish the mechanism responsible for this difference. The non-significant CHM associations and zero meta-level gate contribution prevent a strong ecological interpretation of the learned gate. 
+
+7.5. Class-Level Behaviour and Error Structure 
+
+The class-wise results demonstrate that predictive performance was not uniform across the 29 categories. IrrigLawnPasture, Water, and Wyethia obtained high F1-scores, whereas DrySubalpTill, SandstoneOutcrop, Sand-stoneTalus, GraniteTalus, and Paved were more difficult to classify. Some low-support classes, including BareSoil and Frasera, achieved high F1-scores, but these estimates were based on only four test observations and should therefore be interpreted cautiously. The confusion matrix in Figure 4 shows that the principal errors were concentrated among ecologically or physically similar categories. DrySubalpTill and Festuca formed the largest bidirectional confusion pair, followed by AlpineSandstone and AlpineShale, and Artemisia and DrySubalpTill. Additional confusion occurred between Paved and StreamSandGravel and between GraniteOutcrop and SandstoneOutcrop. These patterns are consistent with the fine-grained nature of the target taxonomy. Several classes may share similar vegetation cover or spectral responses while differing primarily in substrate, topographic setting, moisture regime, or community composition. Conversely, within-class variation in canopy condition, illumination, and local terrain can broaden the observed predictor distributions. Under such conditions, overall accuracy can obscure weak performance in low-support categories, supporting the joint use of macro F1, balanced accuracy, MCC, and class-wise evaluation Foody (2002); Stehman and Foody (2019). The observed error structure further suggests that future gains may depend more on additional discriminative ecological information than on increased classifier complexity alone. More detailed vegetation structure, seasonal spectral observations, substrate descriptors, or additional reference samples may help separate classes that currently occupy overlapping regions of the eight-variable predictor space.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 42 of 48 Short Title of the Article
+
+7.6. Uncertainty Signal in EcoFuseNet-V2 
+
+MC dropout uses repeated stochastic forward passes to approximate predictive uncertainty in neural networks Gal and Ghahramani (2016). In the present analysis, incorrect EcoFuseNet-V2 predictions had a mean predictive entropy of 1.7940, compared with 1.5115 for correct predictions. The one-sided Mann–Whitney test evaluated the directional hypothesis that incorrect predictions would exhibit higher entropy than correct predictions. The difference was statistically supported ( 𝑝 = 1 .18 × 10 −10 ) and had a standardized effect size of 𝑑 = 0 .716 .The distributions shown in Figure 7 demonstrate a clear shift toward higher entropy for incorrect predictions, although the groups still overlap. Predictive entropy can therefore support the relative identification of difficult neural predictions, but it should not be treated as a deterministic error detector. Some correct predictions remain uncertain, while some incorrect predictions receive comparatively low entropy. This result applies specifically to EcoFuseNet-V2. It does not directly establish uncertainty discrimination for Calibrated EcoTreeFuseNet-Plus because the final framework combines multiple tree and neural probability sources and subsequently applies temperature scaling. A complete uncertainty analysis of the final fusion model would require uncertainty measures calculated from its calibrated predictive distribution, ideally under both in-domain and spatially shifted evaluation conditions. 
+
+7.7. Repeated-Split Stability and Computational Considerations 
+
+The five repeated splits produced comparatively small variation in the principal evaluation metrics. Macro F1 was 
+
+0.7717 ± 0 .0112 , balanced accuracy was 0.7735 ± 0 .0154 , MCC was 0.7789 ± 0 .0075 , and ECE was 0.0491 ± 0 .0151 .The consistency of these values indicates that the principal conclusions were not driven exclusively by the seed-42 partition. The repeated results should not be interpreted as an ensemble because each seed generated a different training, validation, and test partition. They instead quantify sensitivity to repeated data splitting. The observed stability strengthens confidence in the reported discrimination–calibration trade-off, but it does not establish transfer to a different watershed, acquisition year, sensor configuration, or ecological region. The complete seed-42 benchmark suite required 20.56 min on a CPU, whereas the five repeated runs of the proposed calibrated pipeline required 72.63 min in total. This computational requirement is moderate for model development and repeated validation. However, the fusion pipeline is more complex than a standalone ExtraTrees model, while its macro-F1 improvement over ExtraTrees was small and non-significant. The additional complexity is therefore most defensible when calibrated probabilities, multi-model robustness, or uncertainty-aware analysis are required. For applications concerned only with hard class labels, a strong tree ensemble may provide a simpler and competitive alternative.   
+
+> First Author et al.: Preprint submitted to Elsevier Page 43 of 48
+
+Short Title of the Article 
+
+Figure 6: Change in macro F1 relative to Calibrated EcoTreeFuseNet-Plus for the principal architectural and modality ablations. All evaluated variants produced lower macro F1, with the largest reductions observed for the LiDAR-only and spectral-only configurations. First Author et al.: Preprint submitted to Elsevier Page 44 of 48 Short Title of the Article 
+
+Figure 7: Distribution of MC-dropout predictive entropy for correct and incorrect EcoFuseNet-V2 classifications. Incorrect predictions exhibited higher mean entropy than correct predictions (1.7940 versus 1.5115; one-sided Mann–Whitney 
+
+𝑝 = 1 .18 × 10 −10 ; Cohen’s 𝑑 = 0 .716 ). This diagnostic applies to EcoFuseNet-V2 and not to the calibrated final probability-fusion model. First Author et al.: Preprint submitted to Elsevier Page 45 of 48 Short Title of the Article 
+
+## 8. Conclusions 
+
+This study developed Calibrated EcoTreeFuseNet-Plus for fine-grained vegetation-community classification by integrating terrain, canopy-structure, and spectral predictors through a calibrated tree–neural fusion strategy. The framework achieved an accuracy of 0.8000, a macro F1-score of 0.7768, a balanced accuracy of 0.7903, and an MCC of 0.7903, while repeated-split evaluation showed stable overall performance. Its principal advantage was improved probability reliability rather than a large discrimination gain over ExtraTrees, as temperature scaling reduced ECE from 0.3866 to 0.0651, the Brier score from 0.4839 to 0.3108, and NLL from 1.2926 to 0.8179 without changing the predicted classes. The final meta-classifier was driven mainly by tree probabilities, with a smaller complementary contribution from EcoFuseNet-V2 probabilities, and the neural uncertainty analysis showed that incorrect predictions generally had higher predictive entropy than correct predictions. However, the evaluation was limited to one watershed and one airborne survey, several classes had low sample support, the canopy-height variable was highly sparse, and the out-of-fold procedure was leakage-aware but not fully nested. In addition, the reported entropy analysis was restricted to EcoFuseNet-V2 and did not directly quantify uncertainty in the complete calibrated fusion model. Future work should therefore evaluate the framework using independent sites, spatially blocked and fully nested validation, additional temporal observations, and richer vegetation-structure information. It should also extend uncertainty estimation and calibration analysis to the complete fusion model under spatial and temporal distribution shifts. In practical applications, the calibrated predictions could support vegetation-community mapping, ecological inventory, restoration planning, habitat monitoring, and targeted field verification by identifying locations requiring additional observation. Overall, the study demonstrates that carefully calibrated tree–neural fusion can provide a reliable and transparent decision-support framework for fine-grained ecological classification while clearly defining the validation required before broader operational deployment. 
+
+## References 
+
+Albanwan, H., Qin, R., Tang, Y., 2024. Image fusion in remote sensing: An overview and meta analysis. arXiv preprint arXiv:2401.08837 . Arik, S.O., Pfister, T., 2021. TabNet: Attentive interpretable tabular learning. arXiv preprint arXiv:1908.07442 . Ball, J.E., Anderson, D.T., Chan, C.S., 2017. A comprehensive survey of deep learning in remote sensing: Theories, tools, and challenges for the community. arXiv preprint arXiv:1709.00308 . Baltrušaitis, T., Ahuja, C., Morency, L.P., 2019. Multimodal machine learning: A survey and taxonomy. IEEE Transactions on Pattern Analysis and Machine Intelligence 41, 423–443. doi: 10.1109/TPAMI.2018.2798607 .Bannari, A., Morin, D., Bonn, F., Huete, A.R., 1995. A review of vegetation indices. Remote Sensing Reviews 13, 95–120. doi: 10.1080/ 02757259509532298 .Breiman, L., 2001. Random forests. Machine Learning 45, 5–32. doi: 10.1023/A:1010933404324 .Brier, G.W., 1950. Verification of forecasts expressed in terms of probability. Monthly Weather Review 78, 1–3. doi: 10.1175/1520-0493(1950) 078<0001:VOFEIT>2.0.CO;2 .Brodersen, K.H., Ong, C.S., Stephan, K.E., Buhmann, J.M., 2010. The balanced accuracy and its posterior distribution, in: Proceedings of the 20th International Conference on Pattern Recognition, pp. 3121–3124. doi: 10.1109/ICPR.2010.764 .Cavender-Bares, J., Meireles, J.E., Pinto-Ledezma, J., Reich, P.B., Schuman, M.C., Townsend, P.A., Trowbridge, A., 2025. Spectral biology across scales in changing environments. Ecology 106, e70078. doi: 10.1002/ecy.70078 .Cavender-Bares, J., Schneider, F.D., Santos, M.J., Armstrong, A., Carnaval, A., Dahlin, K.M., Figueiredo, F.O.G., Loarie, S., Purvis, A., Schimel, D., Townsend, P.A., Ustin, S.L., Wang, Z., Wilson, B.E., et al., 2022. Integrating remote sensing with ecology and evolution to advance biodiversity conservation. Nature Ecology & Evolution 6, 506–519. doi: 10.1038/s41559-022-01702-5 .Cawley, G.C., Talbot, N.L.C., 2010. On over-fitting in model selection and subsequent selection bias in performance evaluation. Journal of Machine Learning Research 11, 2079–2107. Chen, T., Guestrin, C., 2016. XGBoost: A scalable tree boosting system, in: Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, pp. 785–794. doi: 10.1145/2939672.2939785 .Cohen, J., 1960. A coefficient of agreement for nominal scales. Educational and Psychological Measurement 20, 37–46. doi: 10.1177/ 001316446002000104 .Datta, D., Paul, M., Murshed, M., Teng, S.W., Schmidtke, L., 2023a. Comparative analysis of machine and deep learning models for soil properties prediction from hyperspectral visual band. Environments 10, 77. doi: 10.3390/environments10050077 .Datta, D., Paul, M., Murshed, M., Teng, S.W., Schmidtke, L.M., 2023b. Novel dry soil and vegetation indices to predict soil contents from Landsat 8 satellite data, in: 2023 International Conference on Digital Image Computing: Techniques and Applications (DICTA), IEEE. pp. 152–159. doi: 10.1109/DICTA60407.2023.00029 .Datta, D., Paul, M., Murshed, M., Teng, S.W., Schmidtke, L.M., 2024. Unveiling soil-vegetation interactions: Reflection relationships and an attention-based deep learning approach for carbon estimation, in: 2024 IEEE International Conference on Multimedia and Expo Workshops (ICMEW), IEEE. doi: 10.1109/ICMEW63481.2024.10645460 .Datta, D., Paul, M., Murshed, M., Teng, S.W., Schmidtke, L.M., 2025. Hybrid bayesian attention model for estimating soil organic carbon from Landsat 8 satellite data. Computers and Electronics in Agriculture 237, 110406. doi: 10.1016/j.compag.2025.110406 .
+
+First Author et al.: Preprint submitted to Elsevier Page 46 of 48 Short Title of the Article 
+
+Datta, D., Paul, M., Murshed, M., Teng, S.W., Schmidtke, L.M., 2026. ReflectGAN: Modeling vegetation effects for soil carbon estimation from satellite imagery. IEEE Transactions on Geoscience and Remote Sensing 64, 1–16. doi: 10.1109/TGRS.2026.3676356 .Efron, B., 1979. Bootstrap methods: Another look at the jackknife. The Annals of Statistics 7, 1–26. doi: 10.1214/aos/1176344552 .Falco, N., et al., 2023. Vegetation classification map and covariates associated with NEON AOP survey, east river, CO 2018. ESS-DIVE Data Repository. URL: https://doi.org/10.15485/1602034 , doi: 10.15485/1602034 . dataset. Feng, M., Gao, F., Fang, J., Dong, J., 2021. Hyperspectral and LiDAR data classification based on linear self-attention. arXiv preprint arXiv:2104.02301 . Foody, G.M., 2002. Status of land cover classification accuracy assessment. Remote Sensing of Environment 80, 185–201. doi: 10.1016/ S0034-4257(01)00295-4 .Friedman, J.H., 2001. Greedy function approximation: A gradient boosting machine. The Annals of Statistics 29, 1189–1232. doi: 10.1214/aos/ 1013203451 .Gal, Y., Ghahramani, Z., 2016. Dropout as a bayesian approximation: Representing model uncertainty in deep learning, in: Proceedings of the 33rd International Conference on Machine Learning, pp. 1050–1059. Gao, B.C., 1996. NDWI—a normalized difference water index for remote sensing of vegetation liquid water from space. Remote Sensing of Environment 58, 257–266. doi: 10.1016/S0034-4257(96)00067-3 .GDAL/OGR Contributors, 2026. GDAL Raster Data Model. Geospatial Data Abstraction Library Documentation. URL: https://gdal.org/ en/stable/user/raster_data_model.html .Geurts, P., Ernst, D., Wehenkel, L., 2006. Extremely randomized trees. Machine Learning 63, 3–42. doi: 10.1007/s10994-006-6226-1 .Gillies, S., Contributors, R., 2026. Rasterio Sample Module: Coordinate-Based Raster Sampling. Rasterio Documentation. URL: https: //rasterio.readthedocs.io/en/stable/api/rasterio.sample.html .Gneiting, T., Raftery, A.E., 2007. Strictly proper scoring rules, prediction, and estimation. Journal of the American Statistical Association 102, 359–378. doi: 10.1198/016214506000001437 .Gorishniy, Y., Rubachev, I., Khrulkov, V., Babenko, A., 2021. Revisiting deep learning models for tabular data. arXiv preprint arXiv:2106.11959 . Gorodkin, J., 2004. Comparing two 𝑘 -category assignments by a 𝑘 -category correlation coefficient. Computational Biology and Chemistry 28, 367–374. doi: 10.1016/j.compbiolchem.2004.09.006 .Grinsztajn, L., Oyallon, E., Varoquaux, G., 2022. Why do tree-based models still outperform deep learning on typical tabular data? arXiv preprint arXiv:2207.08815 . Guo, C., Pleiss, G., Sun, Y., Weinberger, K.Q., 2017. On calibration of modern neural networks, in: Proceedings of the 34th International Conference on Machine Learning, pp. 1321–1330. He, H., Garcia, E.A., 2009. Learning from imbalanced data. IEEE Transactions on Knowledge and Data Engineering 21, 1263–1284. doi: 10.1109/TKDE.2008.239 .Huang, X., Khetan, A., Cvitkovic, M., Karnin, Z., 2020. TabTransformer: Tabular data modeling using contextual embeddings. arXiv preprint arXiv:2012.06678 . Hubbard, S.S., Williams, K.H., Agarwal, D., Banfield, J., Beller, H., Bouskill, N., Brodie, E., Carroll, R., Dafflon, B., Dwivedi, D., Falco, N., Faybishenko, B., Maxwell, R., Nico, P., Steefel, C., Steltzer, H., Tokunaga, T., Tran, A., Wainwright, H., Varadharajan, C., 2018. The east river, colorado, watershed: A mountainous community testbed for improving predictive understanding of multiscale hydrological–biogeochemical dynamics. Vadose Zone Journal 17, 180061. doi: 10.2136/vzj2018.03.0061 .IOGP Geomatics Committee, 2022. WGS 84 / UTM Zone 13N: EPSG 32613. EPSG Geodetic Parameter Dataset. URL: https://epsg.io/32613 .coordinate reference system definition, revision date 12 December 2022. Jia, S., Jiang, S., Lin, Z., Li, N., Xu, M., Yu, S., 2021. A survey: Deep learning for hyperspectral image classification with few labeled samples. arXiv preprint arXiv:2112.01800 . Kampe, T.U., Johnson, B.R., Kuester, M.A., Keller, M., 2010. NEON: The first continental-scale ecological observatory with airborne remote sensing of vegetation canopy biochemistry and structure. Journal of Applied Remote Sensing 4, 043510. doi: 10.1117/1.3361375 .Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., Ye, Q., Liu, T.Y., 2017. LightGBM: A highly efficient gradient boosting decision tree, in: Advances in Neural Information Processing Systems. Korkeala, J., Muhojoki, J., Taher, J., Salolahti, K., Hyyppä, M., Kukko, A., Hyyppä, J., 2025. Normalview: sensor-agnostic tree species classification from backpack and aerial lidar data using geometric projections. arXiv preprint arXiv:2512.05610 . van der Laan, M.J., Polley, E.C., Hubbard, A.E., 2007. Super learner. Statistical Applications in Genetics and Molecular Biology 6, Article 25. doi: 10.2202/1544-6115.1309 .Lefsky, M.A., Cohen, W.B., Parker, G.G., Harding, D.J., 2002. Lidar remote sensing for ecosystem studies. BioScience 52, 19–30. doi: 10.1641/ 0006-3568(2002)052[0019:LRSFES]2.0.CO;2 .Li, S., Song, W., Fang, L., Chen, Y., Ghamisi, P., Benediktsson, J.A., 2019. Deep learning for hyperspectral image classification: An overview. arXiv preprint arXiv:1910.12861 . Lin, H., Nazari, M., Zheng, D., 2024. PCTreeS: 3D point cloud tree species classification using airborne LiDAR images. arXiv preprint arXiv:2412.04714 . Loshchilov, I., Hutter, F., 2019. Decoupled weight decay regularization. International Conference on Learning Representations . Mazzia, V., Khaliq, A., Chiaberge, M., 2020. Improvement in land cover and crop classification based on temporal features learning from sentinel-2 data using recurrent-convolutional neural network (R-CNN). arXiv preprint arXiv:2004.12880 . McNemar, Q., 1947. Note on the sampling error of the difference between correlated proportions or percentages. Psychometrika 12, 153–157. doi: 10.1007/BF02295996 .Moore, I.D., Grayson, R.B., Ladson, A.R., 1991. Digital terrain modelling: A review of hydrological, geomorphological, and biological applications. Hydrological Processes 5, 3–30. doi: 10.1002/hyp.3360050103 .
+
+First Author et al.: Preprint submitted to Elsevier Page 47 of 48 Short Title of the Article 
+
+Mouret, F., Morin, D., Planells, M., Vincent-Barbaroux, C., 2024. Tree species classification at the pixel-level using deep learning and multispectral time series in an imbalanced context. arXiv preprint arXiv:2408.08887 . Musinsky, J., Goulden, T., Wirth, G., Leisso, N., Krause, K., Haynes, M., Chapman, C., 2022. Spanning scales: The airborne spatial and temporal sampling design of the national ecological observatory network. Methods in Ecology and Evolution 13, 1866–1884. doi: 10.1111/2041-210X. 13942 .Niculescu-Mizil, A., Caruana, R., 2005. Predicting good probabilities with supervised learning, in: Proceedings of the 22nd International Conference on Machine Learning, pp. 625–632. doi: 10.1145/1102351.1102430 .Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., Killeen, T., Lin, Z., Gimelshein, N., Antiga, L., et al., 2019. Pytorch: An imperative style, high-performance deep learning library, in: Advances in Neural Information Processing Systems. Paul, M., Datta, D., Murshed, M., Teng, S.W., Schmidtke, L.M., 2025. Transformer-guided noise detection and correction in remote sensing data for enhanced soil organic carbon estimation. Remote Sensing 17, 3463. doi: 10.3390/rs17203463 .Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., et al., 2011. Scikit-learn: Machine learning in python. Journal of Machine Learning Research 12, 2825–2830. Ploton, P., Mortier, F., Réjou-Méchain, M., Baraloto, C., Pélissier, R., 2020. Spatial validation reveals poor predictive performance of large-scale ecological mapping models. Nature Communications 11, 4546. Popov, S., Morozov, S., Babenko, A., 2020. Neural oblivious decision ensembles for deep learning on tabular data. arXiv preprint arXiv:1909.06312 .Prokhorenkova, L., Gusev, G., Vorobev, A., Dorogush, A.V., Gulin, A., 2018. CatBoost: unbiased boosting with categorical features, in: Advances in Neural Information Processing Systems. Roberts, D.R., Bahn, V., Ciuti, S., Boyce, M.S., Elith, J., Guillera-Arroita, G., Hauenstein, S., Lahoz-Monfort, J.J., Schröder, B., Thuiller, W., Warton, D.I., Wintle, B.A., Hartig, F., Dormann, C.F., 2017. Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure. Ecography 40, 913–929. doi: 10.1111/ecog.02881 .Rodriguez-Galiano, V.F., Ghimire, B., Rogan, J., Chica-Olmo, M., Rigol-Sanchez, J.P., 2012. An assessment of the effectiveness of a random forest classifier for land-cover classification. ISPRS Journal of Photogrammetry and Remote Sensing 67, 93–104. doi: 10.1016/j.isprsjprs.2011. 11.002 .Rouse, J.W., Haas, R.H., Schell, J.A., Deering, D.W., 1974. Monitoring vegetation systems in the great plains with ERTS, in: Proceedings of the Third Earth Resources Technology Satellite-1 Symposium, NASA. pp. 309–317. Shwartz-Ziv, R., Armon, A., 2022. Tabular data: Deep learning is not all you need. Information Fusion 81, 84–90. doi: 10.1016/j.inffus. 2021.11.011 .Snell, J., Swersky, K., Zemel, R.S., 2017. Prototypical networks for few-shot learning, in: Advances in Neural Information Processing Systems. Sokolova, M., Lapalme, G., 2009. A systematic analysis of performance measures for classification tasks. Information Processing & Management 45, 427–437. doi: 10.1016/j.ipm.2009.03.002 .Stehman, S.V., Foody, G.M., 2019. Key issues in rigorous accuracy assessment of land cover products. Remote Sensing of Environment 231, 111199. doi: 10.1016/j.rse.2019.05.018 .Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., Wojna, Z., 2016. Rethinking the inception architecture for computer vision, in: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition, pp. 2818–2826. doi: 10.1109/CVPR.2016.308 .Talukdar, S., Singha, P., Mahato, S., Shahfahad, Pal, S., Liou, Y.A., Rahman, A., 2020. Land-use land-cover classification by machine learning classifiers for satellite observations—a review. Remote Sensing 12, 1135. doi: 10.3390/rs12071135 .Valavi, R., Elith, J., Lahoz-Monfort, J.J., Guillera-Arroita, G., 2019. blockCV: An R package for generating spatially or environmentally separated folds for k-fold cross-validation of species distribution models. Methods in Ecology and Evolution 10, 225–232. doi: 10.1111/2041-210X. 13107 .Venter, Z.S., Sydenham, M.A.K., 2021. Continental-scale land cover mapping at 10 m resolution over europe (ELC10). arXiv preprint arXiv:2104.10922 . Vermeer, M., Hay, J.A., Völgyes, D., Koma, Z., Breidenbach, J., Fantin, D.S.M., 2023. Lidar-based norwegian tree species detection using deep learning. arXiv preprint arXiv:2311.06066 . Wolpert, D.H., 1992. Stacked generalization. Neural Networks 5, 241–259. doi: 10.1016/S0893-6080(05)80023-1 .Yang, J.X., Wang, J., Li, Z., Sui, C., Long, Z., Zhou, J., 2025. HSLiNets: Evaluating band ordering strategies in hyperspectral and lidar fusion. arXiv preprint arXiv:2503.21072 . Yang, J.X., Zhou, J., Wang, J., Tian, H., Liew, A.W.C., 2024a. LiDAR-guided cross-attention fusion for hyperspectral band selection and image classification. arXiv preprint arXiv:2404.03883 . Yang, J.X., Zhou, J., Wang, J., Tian, H., Liew, A.W.C., 2024b. Unsupervised band selection using fused HSI and LiDAR attention integrating with autoencoder. arXiv preprint arXiv:2404.05258 . Zou, H., Hastie, T., 2005. Regularization and variable selection via the elastic net. Journal of the Royal Statistical Society: Series B 67, 301–320. doi: 10.1111/j.1467-9868.2005.00503.x .
+
+First Author et al.: Preprint submitted to Elsevier Page 48 of 48

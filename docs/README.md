@@ -6,26 +6,37 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-07-27
-- 运行时间：2026-07-27 21:21:00 UTC
+- 最新运行日期：2026-07-28
+- 运行时间：2026-07-28 20:28:16 UTC
 - 运行状态：成功
-- 本次总论文数：1
-- 精读区：1
-- 速读区：0
+- 本次总论文数：5
+- 精读区：2
+- 速读区：3
 
 ### 今日简报（AI）
-今日精读一篇高光谱图像特征提取论文，评分高达9.0/10，方法名为整体多变量分解。  
-核心结论是该方法能同时高效利用空间与光谱信息，突破传统分解的维度瓶颈。  
-普通读者可重点关注该技术如何简化复杂高光谱数据处理，未来或提升遥感与农业监测的实时分析能力。
-- 详情：[/202607/27/README](/202607/27/README)
+今日聚焦高光谱遥感图像处理与多模态融合，精读《HyperImageNet》高分基准及树莓派嵌入式融合方案，速读多模态大模型遥感理解等3篇。  
+最值得关注《HyperImageNet》构建的超高空间分辨率高光谱分类标杆，以及《Optimized Embedded Implementation》实现轻量化实时融合。  
+建议读者从高光谱+多模态大模型交叉方向切入，或探索嵌入式部署的实际应用场景。
+- 详情：[/202607/28/README](/202607/28/README)
 
 ### 精读区论文标签
-1. [Efficient Spatial-Spectral Feature Extraction in Hyperspectral Images via Holistic Multivariance Decomposition](/202607/27/2607.22272v1-efficient-spatial-spectral-feature-extraction-in-hyperspectral-images-via-holistic-multivariance-decomposition)  
-   标签：评分：9.0/10、query:hsi
-   evidence：通过张量分解进行高光谱图像空谱特征提取
+1. [HyperImageNet: A Large-Scale High-Spatial Resolution Hyperspectral Imagery Classification Benchmark](/202607/28/2607.21050v2-hyperimagenet-a-large-scale-high-spatial-resolution-hyperspectral-imagery-classification-benchmark)  
+   标签：评分：10.0/10、query:hsi
+   evidence：大规模高光谱图像分类基准
+2. [Optimized Embedded Implementation of Hyperspectral-Multispectral Image Fusion on Raspberry Pi](/202607/28/2607.23136v1-optimized-embedded-implementation-of-hyperspectral-multispectral-image-fusion-on-raspberry-pi)  
+   标签：评分：8.0/10、query:hsi-lidar
+   evidence：高光谱-多光谱图像融合在嵌入式平台上的实现
 
 ### 速读区论文标签
-- 本次无速读推荐。
+1. [Multimodal Large Language Models for Remote Sensing Image Understanding: Domain-Specific or General-Purpose?](/202607/28/2607.20284v1-multimodal-large-language-models-for-remote-sensing-image-understanding-domain-specific-or-general-purpose)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：多模态遥感图像理解综述
+2. [Calibrated Tree-Neural Fusion for Fine-Grained Vegetation Community Classification](/202607/28/2607.24160v1-calibrated-tree-neural-fusion-for-fine-grained-vegetation-community-classification)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：树-神经网络融合用于植被分类，涉及光谱和地形特征
+3. [Co-Learning for Missing Arbitrary Modalities in Multi-modal Classification](/202607/28/2607.24683v1-co-learning-for-missing-arbitrary-modalities-in-multi-modal-classification)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：缺失模态下的多模态分类
 
 
 <div class="dpr-home-promo-card">

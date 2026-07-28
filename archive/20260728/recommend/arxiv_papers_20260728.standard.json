@@ -1,0 +1,224 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-07-28T20:24:24.267606+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 2,
+    "deep_cap": 7,
+    "deep_selected": 2,
+    "quick_candidates": 3,
+    "quick_skim_target": 12,
+    "quick_selected": 3
+  },
+  "deep_dive": [
+    {
+      "id": "2607.21050v2",
+      "source": "arxiv",
+      "title": "HyperImageNet: A Large-Scale High-Spatial Resolution Hyperspectral Imagery Classification Benchmark",
+      "abstract": "We present HyperImageNet, a large-scale benchmark for fine-grained hyperspectral land-cover understanding. The dataset contains 26,084 airborne hyperspectral image patches with 224 spectral bands and 138 fine-grained land-cover categories. Unlike existing datasets, HyperImageNet provides raw imagery, pixel-level semantic labels, and object-level instance masks, supporting both semantic and instance segmentation. Furthermore, we establish an open-environment benchmark with strict spatial separation to evaluate representative methods and the HyperFree foundation model. Experimental results demonstrate the effectiveness of HyperImageNet for fine-grained hyperspectral understanding and open-environment remote sensing research.",
+      "authors": [
+        "Chuguang Zeng",
+        "Jingtao Li",
+        "Yinhe Liu",
+        "Yanfei Zhong"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-23T08:34:01+00:00",
+      "link": "https://arxiv.org/pdf/2607.21050v2",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "large-scale benchmark for hyperspectral image classification",
+      "llm_evidence_cn": "大规模高光谱图像分类基准",
+      "llm_evidence": "大规模高光谱图像分类基准",
+      "canonical_evidence": "大规模高光谱图像分类基准",
+      "llm_tldr_en": "HyperImageNet provides a large-scale benchmark with 26084 hyperspectral image patches, 138 land-cover categories, supporting semantic and instance segmentation, and evaluates the HyperFree foundation model for fine-grained hyperspectral understanding.",
+      "llm_tldr_cn": "该论文提出了HyperImageNet，一个包含26084个高光谱图像块和138个精细土地覆盖类别的大规模基准，支持语义和实例分割，并建立开放环境基准评估了HyperFree基础模型，证明了其在精细高光谱理解中的有效性。",
+      "llm_tldr": "该论文提出了HyperImageNet，一个包含26084个高光谱图像块和138个精细土地覆盖类别的大规模基准，支持语义和实例分割，并建立开放环境基准评估了HyperFree基础模型，证明了其在精细高光谱理解中的有效性。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2607.23136v1",
+      "source": "arxiv",
+      "title": "Optimized Embedded Implementation of Hyperspectral-Multispectral Image Fusion on Raspberry Pi",
+      "abstract": "Remote sensing optical images have become central to a wide range of applications. In particular, hyperspectral images, with their high spectral resolution, enable the extraction of rich information about the objects and materials present in the observed scene. Nevertheless, processing such data comes at the expense of a high computational load due to its large data volume, making real-time processing very difficult to achieve. Recently, we proposed an approach to investigate the feasibility of processing such data on a Raspberry Pi by implementing a hyperspectral super-resolution technique, namely HSB-SV. However, the implementation resulted in high computational time. To overcome this limitation, we apply computational optimization techniques based on migrating the most intensive operations to PyTorch and edge inference frameworks such as ONNX Runtime and ExecuTorch with the XNNPACK backend. The proposed optimized implementation is deployed on a Raspberry Pi 5 platform. Experimental results demonstrate a significant reduction in computational time, achieving a 1.48x overall speedup on the Raspberry Pi 5, the total execution time decreases significantly, from 527.1 ms to 356.7 ms corresponding to a 32.3% dminution, while fully preserving the fusion quality, making the approach more suitable for embedded and edge computing scenarios, particularly for UAV-based hyperspectral remote sensing applications.",
+      "authors": [
+        "Salah Eddine Brezini",
+        "Okba Bekhelifi",
+        "Oussama Mezouar",
+        "Chams Eddine Choucha",
+        "Sarra Boukhacheba",
+        "Fethi Abdelatif Dali"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.PF"
+      ],
+      "published": "2026-07-25T10:36:14+00:00",
+      "link": "https://arxiv.org/pdf/2607.23136v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "hyperspectral-multispectral image fusion on embedded platform",
+      "llm_evidence_cn": "高光谱-多光谱图像融合在嵌入式平台上的实现",
+      "llm_evidence": "高光谱-多光谱图像融合在嵌入式平台上的实现",
+      "canonical_evidence": "高光谱-多光谱图像融合在嵌入式平台上的实现",
+      "llm_tldr_en": "Optimizes embedded implementation of hyperspectral-multispectral fusion on Raspberry Pi, reducing computational time while preserving fusion quality, enabling real-time HSI processing.",
+      "llm_tldr_cn": "本文针对高光谱-多光谱图像融合在树莓派上计算耗时的问题，应用计算优化技术加速HSB-SV融合算法。优化后的实现显著降低了处理时间，验证了在低功耗嵌入式设备上实时处理高光谱融合数据的可行性，为高光谱遥感在边缘计算中的应用铺平了道路。",
+      "llm_tldr": "本文针对高光谱-多光谱图像融合在树莓派上计算耗时的问题，应用计算优化技术加速HSB-SV融合算法。优化后的实现显著降低了处理时间，验证了在低功耗嵌入式设备上实时处理高光谱融合数据的可行性，为高光谱遥感在边缘计算中的应用铺平了道路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.20284v1",
+      "source": "arxiv",
+      "title": "Multimodal Large Language Models for Remote Sensing Image Understanding: Domain-Specific or General-Purpose?",
+      "abstract": "The rapid development of multimodal large language models (MLLMs) has introduced a flexible paradigm for remote sensing image scene understanding (RSISU), enabling natural-language interaction with remote sensing imagery. However, a systematic understanding of the capability boundaries, cross-task generalization, and task-specific limitations of existing remote sensing MLLMs (RS-MLLMs) is still lacking. This paper presents a systematic survey and diagnostic evaluation of MLLMs for RSISU. We review the technical evolution of RS-MLLMs, focusing on model design, multimodal learning, training data, and downstream capabilities. We further compare RS-MLLMs with general-purpose computer vision MLLMs (CV-MLLMs) across diverse RSISU tasks and benchmarks. RS-MLLMs remain competitive in domain-specific settings, particularly remote sensing visual grounding and high-resolution visual question answering. More notably, general-purpose CV-MLLMs can match or even outperform these specialized models on several RSISU tasks without remote sensing-specific fine-tuning. These findings demonstrate the strong transferability of general-purpose CV-MLLMs and show that current RS-MLLMs do not consistently outperform them across diverse RSISU tasks. Current MLLMs also face limitations in spatial and relational reasoning, fine-grained visual understanding, instruction diversity, and generalization across heterogeneous task formats. Based on these findings, we outline future directions toward reliable evaluation, multimodal and high-resolution reasoning, efficient deployment, and tool-augmented remote sensing agents. This survey provides a systematic reference for developing robust, generalizable, and practical MLLMs for RSISU.",
+      "authors": [
+        "Qiwei Ma",
+        "Chunping Qiu",
+        "Xinjun Cheng",
+        "Xiaoyu Zhang",
+        "Puhong Duan",
+        "Ke Yang",
+        "Xudong Kang",
+        "Shutao Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-22T15:30:08+00:00",
+      "link": "https://arxiv.org/pdf/2607.20284v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multimodal remote sensing image understanding survey",
+      "llm_evidence_cn": "多模态遥感图像理解综述",
+      "llm_evidence": "多模态遥感图像理解综述",
+      "canonical_evidence": "多模态遥感图像理解综述",
+      "llm_tldr_en": "This survey systematically reviews and evaluates multimodal large language models for remote sensing image scene understanding, comparing domain-specific and general-purpose models across diverse tasks.",
+      "llm_tldr_cn": "多模态大语言模型（MLLM）为遥感图像场景理解带来了新范式，但现有模型的能力边界和跨任务泛化能力尚不明确。本文对遥感MLLM进行了系统综述和诊断评估，回顾了模型设计、多模态学习、训练数据等关键技术，并与通用视觉MLLM进行了对比。实验揭示了遥感MLLM在多项任务上的表现和局限，为未来研究提供了指导。",
+      "llm_tldr": "多模态大语言模型（MLLM）为遥感图像场景理解带来了新范式，但现有模型的能力边界和跨任务泛化能力尚不明确。本文对遥感MLLM进行了系统综述和诊断评估，回顾了模型设计、多模态学习、训练数据等关键技术，并与通用视觉MLLM进行了对比。实验揭示了遥感MLLM在多项任务上的表现和局限，为未来研究提供了指导。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24160v1",
+      "source": "arxiv",
+      "title": "Calibrated Tree-Neural Fusion for Fine-Grained Vegetation Community Classification",
+      "abstract": "Accurate vegetation-community classification is essential for ecological monitoring, habitat assessment, and evidence-based environmental management in heterogeneous landscapes. Existing studies often rely on standalone tree ensembles or generic neural networks, although fine-grained ecological classes frequently exhibit overlapping spectral, topographic, and structural characteristics. Many frameworks also provide limited protection against stacking leakage, insufficient probability calibration, weak minority-class evaluation, and little evidence of stability across repeated data splits. To address these limitations, this study proposes Calibrated EcoTreeFuseNet-Plus, a tree-neural probability-fusion framework that combines out-of-fold tree probabilities, EcoFuseNet-V2 outputs, validation-selected meta-learning, and post-hoc temperature scaling. Raster values from six LiDAR-derived terrain and canopy variables and two hyperspectral vegetation indices were extracted at coordinate-based reference locations. Quality control removed 26 samples with missing elevation and one sample with non-finite NDWI, producing 1,833 complete records across 29 vegetation and non-vegetation classes. On the held-out test set, the proposed model achieved an accuracy of 0.8000, a macro F1-score of 0.7768, a balanced accuracy of 0.7903, and an MCC of 0.7903. Calibration reduced the expected calibration error from 0.3866 to 0.0651 without changing class predictions. Five-seed evaluation yielded a macro F1-score of 0.7717 +/- 0.0112, indicating stable performance across repeated splits. The results demonstrate a reliable discrimination-calibration trade-off for small-sample, fine-grained ecological classification.",
+      "authors": [
+        "Dristi Datta",
+        "Md Khalid Hasan Sakib",
+        "Manoranjan Paul"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-27T08:37:49+00:00",
+      "link": "https://arxiv.org/pdf/2607.24160v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "tree-neural fusion for vegetation classification using spectral and topographic features",
+      "llm_evidence_cn": "树-神经网络融合用于植被分类，涉及光谱和地形特征",
+      "llm_evidence": "树-神经网络融合用于植被分类，涉及光谱和地形特征",
+      "canonical_evidence": "树-神经网络融合用于植被分类，涉及光谱和地形特征",
+      "llm_tldr_en": "Proposes Calibrated EcoTreeFuseNet-Plus for fine-grained vegetation community classification, fusing tree ensembles and neural networks with spectral, topographic, and structural features, achieving improved calibration and minority-class performance.",
+      "llm_tldr_cn": "针对精细植被群落分类中光谱、地形和结构特征重叠的问题，该论文提出Calibrated EcoTreeFuseNet-Plus框架，融合树集成模型与神经网络输出概率，通过防止堆叠泄漏和概率校准实现稳定分类。实验表明该方法在少数类评估和重复数据划分下性能提升，为多模态遥感数据融合分类提供了有效方案。",
+      "llm_tldr": "针对精细植被群落分类中光谱、地形和结构特征重叠的问题，该论文提出Calibrated EcoTreeFuseNet-Plus框架，融合树集成模型与神经网络输出概率，通过防止堆叠泄漏和概率校准实现稳定分类。实验表明该方法在少数类评估和重复数据划分下性能提升，为多模态遥感数据融合分类提供了有效方案。",
+      "llm_tags": [
+        "query:hsi-lidar:composite"
+      ],
+      "matched_query_tag": "query:hsi-lidar:composite",
+      "matched_query_text": "Papers central to 请帮我查找高光谱图像与激光雷达图像联合分类或者多模态高光谱图像目标检测或者多模态高光谱图像分类方向的论文, especially work that connects or combines: hyperspectral image classification; LiDAR image classification; joint classification of hyperspectral and LiDAR images; object detection in hyperspectral images; multimodal remote sensing image classification; fusion of hyperspectral and LiDAR data; multimodal hyperspectral image classification with LiDAR data; hyperspectral and LiDAR fusion for target detection; multimodal hyperspectral image classification methods.",
+      "matched_requirement_id": "req-composite-hsi-lidar",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24683v1",
+      "source": "arxiv",
+      "title": "Co-Learning for Missing Arbitrary Modalities in Multi-modal Classification",
+      "abstract": "Multi-modal classification leverages complementary information across diverse data sources to enhance predictive performance. However, real-world scenarios subject to operational constraints, such as sensor failures or privacy restrictions, lead to inconsistent modality availability between training and inference times. To handle missing modalities, prior studies have mainly covered bimodal data setups and focused on designing robust fusion processes. Instead, we adopt a multi-modal co-learning framework that prioritizes inter-modal collaboration rather than multi-modal fusion. Specifically, we consider that any subset of modalities may be absent, without assuming predefined missing-modality patterns, an inference scenario we refer to as missing arbitrary modalities. To address this challenge, we introduce two alternative approaches that leverage information at both feature- and decision-level. Experiments on two multi-modal classification benchmarks demonstrate significant robustness gains in various missing modality conditions. The first method shows more robust behavior under minimal missing conditions, where a single modality is absent, whereas the second performs better under extreme missing conditions, where all-but-one modalities are missing. Our code is available at https://github.com/fmenat/Co4Miss.",
+      "authors": [
+        "Francisco Mena",
+        "Dino Ienco",
+        "Roberto Interdonato",
+        "Cassio F. Dantas",
+        "Simon Besnard"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-07-27T17:23:30+00:00",
+      "link": "https://arxiv.org/pdf/2607.24683v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "multi-modal classification with missing modalities",
+      "llm_evidence_cn": "缺失模态下的多模态分类",
+      "llm_evidence": "缺失模态下的多模态分类",
+      "canonical_evidence": "缺失模态下的多模态分类",
+      "llm_tldr_en": "Proposes a co-learning framework for multi-modal classification that handles arbitrary missing modalities by prioritizing inter-modal collaboration over fusion.",
+      "llm_tldr_cn": "多模态分类中常因传感器故障导致模态缺失，现有方法多假设固定缺失模式。本文提出一种多模态协同学习框架，不依赖预设缺失模式，通过模态间协作而非融合来处理任意子集缺失。在多种缺失场景下的实验表明，该方法在不增加推理负担的情况下显著提升了鲁棒性，适用于多模态遥感分类等实际应用。",
+      "llm_tldr": "多模态分类中常因传感器故障导致模态缺失，现有方法多假设固定缺失模式。本文提出一种多模态协同学习框架，不依赖预设缺失模式，通过模态间协作而非融合来处理任意子集缺失。在多种缺失场景下的实验表明，该方法在不增加推理负担的情况下显著提升了鲁棒性，适用于多模态遥感分类等实际应用。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
