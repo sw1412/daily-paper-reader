@@ -1,0 +1,266 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-01T21:09:50.830095+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 5,
+    "quick_skim_target": 12,
+    "quick_selected": 5
+  },
+  "deep_dive": [
+    {
+      "id": "2607.28277v1",
+      "source": "arxiv",
+      "title": "MSCM-net: A hyperspectral image classiffcation method based on multi-scale convolution and Mamba",
+      "abstract": "Hyperspectral imaging is widely used in remote sensing and engineering. Therefore, research on its classification methods is crucial. While CNN and Transformer-based methods have advanced, they still face locality constraints and high computational complexity. To address these issues, we propose an innovative hyperspectral image classification model, MSCM-net. Specifically, first of all, a model architecture combining multi-scale CNN and Mamba is proposed. It consists of a multi-scale feature extraction module (MCSE) and multiple stacked Mamba blocks, which integrates the local feature extraction capability of multi-scale CNN and the long sequence modeling advantage of Mamba. Secondly, the proposed MCSE module consists of multi-scale convolution and SENet. Convolution kernels of different scales extract local information with different receptive fields, enhancing the fusion of spatial and spectral information. Meanwhile, the SENet enables the model to automatically learn the importance of each channel in the multi-scale features. Furthermore, we also propose a dual-branch feature aggregation module, which further effectively extracts and integrates the spectral information contained in the central pixel and the spatial information in the surrounding pixels. Our model has undergone numerous experiments on three widely used benchmark datasets. The experimental results show that MSCM-net can achieve advanced classification performance while reducing computational complexity.",
+      "authors": [
+        "Jianjun Chen",
+        "Linlin Wang",
+        "Lifang Chang",
+        "Limin Huo",
+        "Shujiang Song",
+        "Yanjia Zhao",
+        "Mingwei Shao"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-30T14:27:59+00:00",
+      "link": "https://arxiv.org/pdf/2607.28277v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "hyperspectral image classification method",
+      "llm_evidence_cn": "高光谱图像分类方法",
+      "llm_evidence": "高光谱图像分类方法",
+      "canonical_evidence": "高光谱图像分类方法",
+      "llm_tldr_en": "This paper proposes MSCM-net, a hyperspectral image classification model combining multi-scale CNN and Mamba blocks, achieving strong accuracy and efficiency by integrating local features with long-sequence modeling.",
+      "llm_tldr_cn": "高光谱图像分类至关重要，但现有CNN与Transformer方法在局部特征与计算效率上存在局限。本文提出MSCM-net，结合多尺度卷积与Mamba体系，利用MCSE模块提取多尺度局部特征，并通过堆叠Mamba块建模长距离依赖。实验表明，MSCM-net在多个高光谱数据集上取得优于主流方法的分类精度，且计算开销更低，为高光谱分类提供了新的高效方案。",
+      "llm_tldr": "高光谱图像分类至关重要，但现有CNN与Transformer方法在局部特征与计算效率上存在局限。本文提出MSCM-net，结合多尺度卷积与Mamba体系，利用MCSE模块提取多尺度局部特征，并通过堆叠Mamba块建模长距离依赖。实验表明，MSCM-net在多个高光谱数据集上取得优于主流方法的分类精度，且计算开销更低，为高光谱分类提供了新的高效方案。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.24074v1",
+      "source": "arxiv",
+      "title": "MiSS: A Logic-Driven Explanation of Minimal Sufficient Coalitions for Point Cloud Classifiers",
+      "abstract": "We present MiSS, a black-box, query-based framework for explaining 3D point cloud classifiers through perturbation-relative sufficiency reasoning. MiSS treats a superpoint partition as an interpretable abstraction layer and asks whether the original prediction can be certified from a minimal coalition of geometric regions under a specified perturbation distribution. Unlike abductive explainers that require Boolean feature spaces or white-box logical encodings of the predictor, MiSS separates candidate proposal from verification: a weighted MaxSAT procedure proposes coalitions using a heuristic adaptive cardinality floor, certified exact-size fallback, a safely tightened upper bound, blocking clauses, and a surrogate acquisition heuristic learned from previous oracle evaluations, while a blackbox statistical oracle decides sufficiency from prediction queries. The system returns a statistically verified sufficient coalition as a binary attribution, with minimum cardinality guaranteed when certified search completes. Experiments on ModelNet40 and ShapeNet with PointNet and PointMLP classifiers show higher precision and coverage than rule-based baselines in most settings, with lower explanation time than exhaustive search.",
+      "authors": [
+        "Mengda Xing",
+        "Jean-Marie Lagniez"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-07-27T07:17:04+00:00",
+      "link": "https://arxiv.org/pdf/2607.24074v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Point cloud classifier explanation relevant to LiDAR data processing",
+      "llm_evidence_cn": "与激光雷达数据处理相关的点云分类器解释",
+      "llm_evidence": "与激光雷达数据处理相关的点云分类器解释",
+      "canonical_evidence": "与激光雷达数据处理相关的点云分类器解释",
+      "llm_tldr_en": "MiSS is a black-box query-based framework for explaining 3D point cloud classifiers via minimal sufficient coalitions of superpoints, useful for interpreting LiDAR-based classification decisions.",
+      "llm_tldr_cn": "3D点云分类在激光雷达数据处理中至关重要，但模型决策难以解释。本文提出MiSS，一种基于查询的黑盒解释框架，利用超点划分作为抽象层，通过加权MaxSAT求取最小充分联盟来认证原始预测，并引入启发式自适应基数下界、精确大小回退及安全上界等机制。该方法不要求布尔特征空间或白盒逻辑编码，适用于多种点云分类器。为激光雷达图像分类提供了可解释性分析工具。",
+      "llm_tldr": "3D点云分类在激光雷达数据处理中至关重要，但模型决策难以解释。本文提出MiSS，一种基于查询的黑盒解释框架，利用超点划分作为抽象层，通过加权MaxSAT求取最小充分联盟来认证原始预测，并引入启发式自适应基数下界、精确大小回退及安全上界等机制。该方法不要求布尔特征空间或白盒逻辑编码，适用于多种点云分类器。为激光雷达图像分类提供了可解释性分析工具。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.22212v1",
+      "source": "arxiv",
+      "title": "Deep Convolutional Large-Margin $\\ell_p$-SVDD for Visual Anomaly Detection",
+      "abstract": "Visual anomaly detection requires adaptive representations and reliable decision boundaries, particularly when anomalous training samples are scarce and class distributions are highly imbalanced. Classical kernel-based methods yield principled geometric decision regions but typically operate on fixed features, while deep detectors learn task-specific representations but often fail to provide an explicit margin-aware kernel boundary. In this study, we propose DLM-SVDD, a deep large-margin novelty-detection framework that jointly learns convolutional features and an explicit kernel-based decision boundary. By drawing on the large-margin $\\ell_p$-Support Vector Data Description ($\\ell_p$-SVDD) approach, the proposed method performs explicit margin maximization and nonlinear slack penalization while adapting the representation to the target task. To train the proposed model, we present an optimization scheme that alternates between a Frank--Wolfe--based update of the convex dual boundary and a CNN update step operating on a smooth margin-violation loss induced by the recovered boundary. To improve scalability, we analyze the efficiency--accuracy trade-offs for different kernel approximation strategies, deriving practical propositions for large-scale anomaly detection.   Extensive experiments on multiple standard benchmarks show consistent performance improvements over the baseline and strong overall performance compared with state-of-the-art methods while illustrating that the proposed joint representation--boundary learning scheme remains effective under severe imbalanced class distributions.",
+      "authors": [
+        "Alireza Dastmalchi Saei",
+        "Shervin Rahimzadeh Arashloo"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-07-24T11:30:03+00:00",
+      "link": "https://arxiv.org/pdf/2607.22212v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Deep anomaly detection framework with margin-aware decision boundary, applicable to hyperspectral anomaly detection",
+      "llm_evidence_cn": "深度大间隔异常检测框架，可用于高光谱异常检测",
+      "llm_evidence": "深度大间隔异常检测框架，可用于高光谱异常检测",
+      "canonical_evidence": "深度大间隔异常检测框架，可用于高光谱异常检测",
+      "llm_tldr_en": "DLM-SVDD jointly learns convolutional features and an explicit margin-aware kernel boundary for visual anomaly detection, offering a transferable deep anomaly detection method for hyperspectral imagery.",
+      "llm_tldr_cn": "针对深度异常检测方法缺乏显式几何决策边界的问题，提出深度大间隔SVDD框架DLM-SVDD。该框架联合学习卷积特征与显式核决策边界，引入大规模ℓp-SVDD实现间隔最大化。在图像异常检测任务上，模型在样本稀少和类别不平衡条件下取得鲁棒表现。该方法作为通用异常检测工具，可迁移到高光谱异常检测场景。",
+      "llm_tldr": "针对深度异常检测方法缺乏显式几何决策边界的问题，提出深度大间隔SVDD框架DLM-SVDD。该框架联合学习卷积特征与显式核决策边界，引入大规模ℓp-SVDD实现间隔最大化。在图像异常检测任务上，模型在样本稀少和类别不平衡条件下取得鲁棒表现。该方法作为通用异常检测工具，可迁移到高光谱异常检测场景。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral anomaly detection techniques",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.22408v1",
+      "source": "arxiv",
+      "title": "LunarFM: A Shared Multimodal Representation of the Moon's Surface",
+      "abstract": "The renewed global focus on lunar exploration, driven by the prospect of in-situ resource utilization and a sustained human presence on the Moon, has created growing demand for accurate, large-scale characterization of the lunar surface. Although vast quantities of orbital remote-sensing data have been collected, scientific analysis and resource mapping remain fragmented by heterogeneous multiinstrument observations, sparse labels, and bespoke task-specific modelling workflows. Here we introduce LunarFM, a multimodal foundation model that learns a general representation of the lunar surface from diverse orbital measurements. LunarFM assimilates observations from six instruments across three lunar missions, mapping 18 input channels to a shared embedding space. We demonstrate that this embedding space supports a diverse range of downstream applications, including similarity search, few-shot resource mapping, mineral abundance regression, and geological unit classification, enabling efficient scientific investigation and resource-oriented analysis. We provide a machine-learning-ready dataset of co-registered multimodal observations spanning latitudes from 70°S to 70°N, a pretrained multimodal masked autoencoder, and a companion embedding dataset providing a joint 768-dimensional representation of lunar surface properties. All code and data are available at https://lunarfm.trillium.tech/",
+      "authors": [
+        "Marc Girona-Mata",
+        "Jakob Gawlikowski",
+        "Sumit Goski",
+        "Gautier Bardi de Fourtou",
+        "Valentin T. Bickel",
+        "Ben Moseley",
+        "Abigail Calzada-Diaz",
+        "Sylvester Kaczmarek",
+        "Raúl Ramos-Pollán"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-07-24T15:25:20+00:00",
+      "link": "https://arxiv.org/pdf/2607.22408v1",
+      "tags": [
+        "keyword:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multimodal fusion of orbital remote sensing data into shared representation",
+      "llm_evidence_cn": "将多源轨道遥感数据融合为共享表示，与高光谱-激光雷达融合目标一致",
+      "llm_evidence": "将多源轨道遥感数据融合为共享表示，与高光谱-激光雷达融合目标一致",
+      "canonical_evidence": "将多源轨道遥感数据融合为共享表示，与高光谱-激光雷达融合目标一致",
+      "llm_tldr_en": "LunarFM is a multimodal foundation model that fuses 18 channels from six instruments across three lunar missions into a shared embedding space, learning a general lunar surface representation to support downstream tasks like resource mapping.",
+      "llm_tldr_cn": "该论文针对月球轨道多仪器观测数据异构、标注稀少且建模碎片化的问题，提出多模态基础模型LunarFM。模型将来自三个月球任务的六种仪器共18个通道的数据映射到共享嵌入空间，学得通用的月球地表表示。实验结果表明该表示能够统一异质遥感观测并支持资源制图等任务，展现了多模态基础模型在行星科学遥感中的应用价值。",
+      "llm_tldr": "该论文针对月球轨道多仪器观测数据异构、标注稀少且建模碎片化的问题，提出多模态基础模型LunarFM。模型将来自三个月球任务的六种仪器共18个通道的数据映射到共享嵌入空间，学得通用的月球地表表示。实验结果表明该表示能够统一异质遥感观测并支持资源制图等任务，展现了多模态基础模型在行星科学遥感中的应用价值。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23924v1",
+      "source": "arxiv",
+      "title": "DuoAD: Leveraging [CLS] Dual Characteristics for Training-Free Few-Shot Anomaly Detection",
+      "abstract": "Vision foundation models have enabled strong training-free anomaly detection (AD). However, most existing approaches rely primarily on independent local patch features, leaving the global contextual information encoded by Vision Transformers (ViTs) underexploited. In this work, we identify the dual characteristics of the ViT [CLS] token: its embedding provides anomaly-invariant global semantic representation, while its attention maps implicitly highlight spatially abnormal regions. Building on this observation, we propose a fully automated AD framework leveraging global context to remove manual tunings. Our framework introduces (1) an automatic augmentation selection strategy driven by [CLS]-level semantic consistency, and (2) an attention-guided feature reweighting mechanism that dynamically adjusts patch contributions according to [CLS] attention saliency. By integrating these components over multi-level features, our method achieves stable anomaly scoring and precise localization without training or parameter tuning. Under the one-shot setting, it achieves Image-AUC scores of 97.7%, 93.2%, and 84.5% on MVTec-AD, VisA, and Real-IAD. Using a single fixed configuration across categories, backbones, and datasets, the method establishes a new state-of-the-art for plug-and-play, training-free anomaly detection while maintaining strong robustness and practical scalability.",
+      "authors": [
+        "Jyun-Ze Tang",
+        "Po-Han Huang",
+        "Ming-Ching Chang",
+        "Chih-Fan Hsu",
+        "Jeng-Lin Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-07-27T01:31:48+00:00",
+      "link": "https://arxiv.org/pdf/2607.23924v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "training-free few-shot anomaly detection with global context, transferable to HSI anomaly detection",
+      "llm_evidence_cn": "利用全局上下文的免训练少样本异常检测方法，可迁移至高光谱异常检测",
+      "llm_evidence": "利用全局上下文的免训练少样本异常检测方法，可迁移至高光谱异常检测",
+      "canonical_evidence": "利用全局上下文的免训练少样本异常检测方法，可迁移至高光谱异常检测",
+      "llm_tldr_en": "DuoAD uses ViT [CLS] token dual characteristics (global semantic embedding and attention map spatial abnormality) to build a fully automated training-free few-shot anomaly detection framework, transferable to hyperspectral anomaly detection.",
+      "llm_tldr_cn": "该工作指出现有异常检测方法大多依赖局部块特征而忽视ViT的全局上下文信息。作者提出DuoAD框架，利用[CLS]标记的双重特性，即其嵌入提供异常不变的全局语义表示、注意力图能突出空间异常区域，并通过自动增强选择实现全自动化免训练少样本异常检测。实验表明该方法无需手动调参即可取得优异性能，验证了全局上下文在异常检测中的通用作用，可为高光谱异常检测技术提供可迁移的思路。",
+      "llm_tldr": "该工作指出现有异常检测方法大多依赖局部块特征而忽视ViT的全局上下文信息。作者提出DuoAD框架，利用[CLS]标记的双重特性，即其嵌入提供异常不变的全局语义表示、注意力图能突出空间异常区域，并通过自动增强选择实现全自动化免训练少样本异常检测。实验表明该方法无需手动调参即可取得优异性能，验证了全局上下文在异常检测中的通用作用，可为高光谱异常检测技术提供可迁移的思路。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral anomaly detection techniques",
+      "matched_requirement_id": "req-12",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23994v2",
+      "source": "arxiv",
+      "title": "Effective Receptive Field Ordering Matters for Infrared Small Target Detection",
+      "abstract": "In this work, we investigate a previously unexplored architectural dimension for infrared small target detection: the organization of effective receptive fields (ERFs) during feature refinement. Unlike existing approaches that primarily improve individual feature operators, we argue that ERF organization constitutes an architectural dimension independent of receptive field design itself, and formulate deep feature transformation as a progressive residual correction process, from which a theoretical framework for ERF scheduling is established. Specifically, we reveal that ERF refinement is governed by two fundamental properties: scale-frequency correspondence, which aligns different ERF scales with distinct residual frequency characteristics, and nonlinear non-commutativity, which makes different ERF orderings produce fundamentally different refinement trajectories. Together, these properties show that ERF organization, rather than ERF scale alone, governs refinement dynamics. Guided by these principles, we propose Receptive Field Ordering Network (RFONet), which realizes hierarchical ERF scheduling through a multigrid-inspired V-cycle strategy using only standard $3\\times3$ convolutions. RFONet achieves state-of-the-art performance on multiple benchmarks with only 1.16M parameters and over 157 FPS inference speed. Beyond empirical performance, our theoretical analysis provides theoretical guarantees for stable residual refinement under perturbations, frequency shifts, and partial occlusions, which are consistently reflected in superior noise robustness and cross-dataset generalization. Finally, our framework reformulates ERF organization as a task-dependent optimization objective, providing a principled foundation for future adaptive receptive field scheduling.",
+      "authors": [
+        "Guoyi Zhang",
+        "Yanjin Du",
+        "Zhengyao Zhao",
+        "Tongsu Zhang",
+        "Guangsheng Xu",
+        "Siyang Chen",
+        "Xiangpeng Xu",
+        "Han Wang",
+        "Xiaohu Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-27T04:40:57+00:00",
+      "link": "https://arxiv.org/pdf/2607.23994v2",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "small target detection via effective receptive field ordering, transferable to hyperspectral target detection",
+      "llm_evidence_cn": "通过有效感受野排序提升小目标检测，方法可迁移至高光谱目标检测",
+      "llm_evidence": "通过有效感受野排序提升小目标检测，方法可迁移至高光谱目标检测",
+      "canonical_evidence": "通过有效感受野排序提升小目标检测，方法可迁移至高光谱目标检测",
+      "llm_tldr_en": "This paper reveals that organizing effective receptive fields (ERFs) during feature refinement is a key architectural dimension for infrared small target detection, proposing a theoretical ERF scheduling framework that improves detection and is transferable to hyperspectral target detection.",
+      "llm_tldr_cn": "该论文发现红外小目标检测中一个被忽视的结构维度，即特征细化阶段有效感受野的组织方式。作者将深度特征变换建模为渐进残差校正过程，建立ERF调度理论框架，并揭示尺度-频率对应等两个基本性质。实验表明，合理的ERF排序能显著提升红外小目标检测性能。该发现为小目标检测的网络设计提供新思路，也可迁移到高光谱图像目标检测等相似任务。",
+      "llm_tldr": "该论文发现红外小目标检测中一个被忽视的结构维度，即特征细化阶段有效感受野的组织方式。作者将深度特征变换建模为渐进残差校正过程，建立ERF调度理论框架，并揭示尺度-频率对应等两个基本性质。实验表明，合理的ERF排序能显著提升红外小目标检测性能。该发现为小目标检测的网络设计提供新思路，也可迁移到高光谱图像目标检测等相似任务。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image target detection",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -1,0 +1,368 @@
+Title: MSCM-net: A hyperspectral image classiffcation method based on multi-scale convolution and Mamba
+
+URL Source: https://arxiv.org/pdf/2607.28277v1
+
+Published Time: Fri, 31 Jul 2026 01:08:36 GMT
+
+Number of Pages: 32
+
+Markdown Content:
+# Highlights 
+
+• Research highlight 1 A HSI classification method combining multi-scale convolution and Mamba is proposed. 
+
+• Research highlight 2 MCSE module composed of multi-scale convolution and SENet is de-signed. 
+
+• Research highlight 3 Mamba’s long sequence modeling capability is utilized. 
+
+• Research highlight 4 The residual connection is added before Mamba to prevent original information loss. 
+
+• Research highlight 5 A dual-branch module is proposed to aggregate the central and global information. arXiv:2607.28277v1 [cs.CV] 30 Jul 2026 MSCM-net: A hyperspectral image classification method based on multi-scale convolution and Mamba 
+
+Jianjun Chen a,b , Linlin Wang a, ∗, Lifang Chang a, Limin Huo a, Shujiang Song a, Yanjia Zhao a, Mingwei Shao a
+
+> aQingdao University of Technology , Qingdao, 266520, China
+> bNanyang Technological University, Singapore, 639798, Singapore
+
+Abstract 
+
+Hyperspectral imaging is widely used in remote sensing and engineering. Therefore, research on its classification methods is crucial. While CNN and Transformer-based methods have advanced, they still face locality constraints and high computational complexity. To address these issues, we propose an innovative hyperspectral image classification model, MSCM-net. Specifically, first of all, a model architecture combining multi-scale CNN and Mamba is proposed. It consists of a multi-scale feature extraction module (MCSE) and multiple stacked Mamba blocks, which integrates the local feature extraction capability of multi-scale CNN and the long sequence modeling advantage of Mamba. Secondly, the proposed MCSE module consists of multi-scale convolution and SENet. Convolution kernels of different scales extract local information with different receptive fields, enhancing the fusion of spatial and spectral information. Meanwhile, the SENet enables the model to automat-ically learn the importance of each channel in the multi-scale features. Fur-thermore, we also propose a dual-branch feature aggregation module, which further effectively extracts and integrates the spectral information contained in the central pixel and the spatial information in the surrounding pixels. Our model has undergone numerous experiments on three widely used bench-mark datasets. The experimental results show that MSCM-net can achieve advanced classification performance while reducing computational complex-ity.    
+
+> ∗Corresponding author
+> Email addresses: chenjianjun@qut.edu.cn (Jianjun Chen),
+> wanglinlin@stu.qut.edu.cn (Linlin Wang)
+
+Keywords: Hyperspectral image classification, Mamba, Deep learning, Selective state space model, Multi-scale convolution 
+
+1. Introduction 
+
+By combining imaging techniques with spectroscopy, hyperspectral imag-ing (HSI) enables the concurrent capture of a target’s spatial distribution and its spectral signature [1–3]. The inherent fusion of spatial-spectral character-istics within hyperspectral datasets provides superior discriminative power for remote sensing classification tasks, particularly in domains such as agri-culture [4], environmental and climate monitoring [5], urban development [6] and military security [7]. However, although the spectral diversity enhances the classification potential, due to the high dimensionality of the data and the need to effectively extract spectral and spatial context information, HSI classification remains a challenging issue. In recent years, various machine learning and deep learning techniques have been proposed to meet these challenges. Traditional machine learn-ing models, such as Support Vector Machine (SVM) [8] and Random Forest (RF) [9] have long been applied to HSI classification. For instance, in 2022, Liu et al.[10] proposed a non-parallel support vector machine model and ap-plied it to hyperspectral image classification. However, these methods have limited effectiveness. The main reason is that they couldn’t fully utilize the spectral space characteristics of the data. In contrast, CNN that has emerged in recent years [11–13] utilizes hierarchical convolution to extract spatial features and has shown promising results, outperforming traditional methods significantly. For instance, Yang et al.[14] proposed four new deep learning models, namely the two-dimensional convolutional neural network (2-D-CNN) the three-dimensional CNN, the recurrent two-dimensional CNN (R-2-D-CNN), and the recurrent three-dimensional CNN (R-3-D-CNN) for hyperspectral image classification. Paul et al.[15] proposed a novel deep learning framework, which efficiently utilized CNN and spatial pyramid pool-ing (SPP) to extract spectral-spatial features for classification. The results obtained demonstrated the superiority of the proposed model in effectively classifying hyperspectral images (HSI). Feng et al.[16] designed an 11-layer CNN model, named R-HybridSN (Residual-Hybrid SN). This model organi-cally integrated 3D-2D-CNN, residual learning and depthwise separable con-volution, and was capable of better learning deep spatial-spectral features 2with extremely limited training data. Lei et al.[17] proposed a graph CNN based on the angular field (GAF-SGCN) in 2025 for hyperspectral image classification, which could more effectively extract and fuse the deep features in the image. However, the above-mentioned CNN-based methods are all re-stricted by the local receptive field, which to some extent limits their ability to capture long-range dependencies in hyperspectral data. To address this issue, researchers have incorporated Transformer model into HSI. Transformer model utilizes the self-attention mechanism to capture distant dependencies, and by enabling the modeling of global relationships across input data, has achieved considerable success in the HSI field. For instance, Hu et al.[18] proposed an unsupervised hyperspectral image classi-fication framework that combined the contrast learning method with Trans-former. This model could effectively extract the features of hyperspectral images in an unsupervised manner. Tan et al.[19] proposed a hyperspectral image classification method based on the Embedded Linear Vision Trans-former (ELViT), which significantly improved the classification performance of the model. Fu et al.[20] proposed a small-sample hyperspectral classifica-tion algorithm based on CTA-net in 2025. By combining CNN and Trans-former, they alleviated the problem of insufficient samples. Fan et al.[21] proposed a fine classification method for rare earth mining areas based on object-oriented thinking and multi-layer attention convolutional neural net-work (OCTC) in 2025. They integrated Transformer and CRAM to enhance the reliability of the model, as well as the feature extraction ability and overall classification accuracy. However, Transformer has a significant draw-back: the computational complexity of its self-attention mechanism increases quadratically with the size of the input. This high computational cost limits the practicality of models based on Transformer, especially for large-scale hyperspectral datasets that require real-time or resource-efficient processing. To address these computational challenges, the state space model (SSM) [22] , as the latest proposed model capable of long sequence modeling, has attracted attention. SSM is commonly used in the analysis of dynamic sys-tems and the modeling of time series. It is adept at mapping sequential data to the state space to capture long-term dependencies. Mamba [23] represents the latest advancement in architecture-based SSM, introducing the selective state space model that achieves more efficient long sequence modeling by selectively retaining or discarding information based on the data context. This innovation has demonstrated state-of-the-art performance in areas such as language modeling, audio processing [24], and image understanding. For 3instance, Wang et al.[25] proposed a dual-branch hybrid architecture named DBMGNet in 2025, which combined Mamba and GCN for hyperspectral im-age classification. Jiang et al.[26] proposed a structurally enhanced spatial-spectral dynamic gating Mamba (SEDGM) method in 2025, which utilized the collaborative design of the spatial and spectral gating Mamba mecha-nisms to extract and utilize the key regional features of hyperspectral data. Li et al.[27] proposed the first image-level HSI classification model based on Mamba in 2025. They extracted HSI image features through a spatial-spectral dual-branch approach. Liang et al.[28] proposed a new dual-branch class Mamba linear attention (DBMLLA) network in 2025, which achieved efficient modeling of global dependencies. In conclusion, compared to Transformers, CNNs offer higher computa-tional efficiency and superior local feature extraction. This study combines Mamba with CNN to leverage Mamba’s long-sequence modeling capability while enhancing local feature extraction without increasing computational complexity. We propose MSCM-net, a hyperspectral image classification framework integrating multi-scale convolution and Mamba. First, multi-scale convolution with different kernel sizes performs multi-branch feature extraction to enhance local information focus. Then, stacked Mamba blocks construct a long-sequence model for deeper feature extraction. Experiments demonstrate that this simple combination achieves satisfactory results in hy-perspectral image classification. The main contributions of this work can be summarized as follows: (1) We propose a HSI classification architecture based on multi-scale con-volution and Mamba (MSCM-net). It utilizes Mamba’s sequence modeling capability to establish the dependency relationship between the central pixel and the large number of neighboring pixels. Furthermore, the multi-scale con-volution enhances the ability to extract spatial local information. Compared with traditional attention models such as Transformer, the computational complexity of the MSCM-net structure is reduced, thereby improving the computational efficiency. (2) The SENet is added to the MCSE module. By learning the importance weights of different scale feature extraction channels, adaptive feature re-calibration is achieved, thereby further enhancing the effect of multi-scale feature fusion. (3) To further enhance the extraction of spectral and spatial informa-tion, we have also proposed a dual-branch feature aggregation module. It achieves in-depth exploration and fusion of the features of the hyperspectral 4image through two parallel feature extraction paths - central feature extrac-tion and global feature extraction. Two paths respectively extract features from the local details and global information dimensions. Feature fusion is achieved through simple element-wise addition, resulting in a final feature representation that is both discriminative and robust. (4) A large number of experiments conducted on three benchmark hyper-spectral datasets (Indian Pines, WHU-Hi-HongHu and Salinas) have demon-strated the superiority of MSCM-net. A large number of ablation experi-ments have also verified the effectiveness of the framework components, fully demonstrating that MSCM-net can achieve advanced classification results while significantly reducing computational costs. 
+
+2. METHODOLOGY 
+
+2.1. Model architecture 
+
+The overall framework of the model proposed in this paper is shown in Figure 1, which mainly consists of three parts: the multi-scale convolutional feature extraction module (MCSE), the Mamba feature extraction module, and the dual-branch feature aggregation module. HSI         
+
+> H
+> C
+> WPCA
+> H
+> WB
+> P
+> PB
+> Conv2d BN ReLU MCSE Mamba Block
+> ×L
+> Center feature
+> extraction
+> Global feature
+> extraction
+> Feature Fusion MLP
+> 1×1 Conv2d
+> 3×3 Depthwise +
+> Pointwise
+> 5×5 Depthwise +
+> Pointwise
+> concat
+> SENet
+> BatchNorm
+> ReLU
+> Linear
+> Conv1D
+> SSM
+> Linear
+> Linear 
+> ×
+> Linear ReLU
+> Global average pooling
+> Feature Aggregation
+
+Figure 1: Overall architecture of the MSCM-net model 
+
+Given a hyperspectral image, denoted as H ∈ RB×H×W , where H and 
+
+W represent the height and width of the image, respectively, and B is the 5number of spectral channels. In the preprocessing stage, principal component analysis (PCA) is applied to the HSI data to obtain X ∈ RC×H×W , where 
+
+C represents the number of spectral dimensions after PCA. After applying PCA, each pixel is taken as the center, and patches of the given size P (in this case, 15) are divided. For the edge pixels, zero padding is applied to maintain the patch size. Therefore, each sample is Z ∈ RC×P ×P , and the goal is to use these patches to classify the corresponding central pixels. After obtaining the training and testing samples, the first stage of the model is spectral feature compression [29], which is a crucial preprocessing step for the model. Through learning and weighted combination, the original multiple redundant bands are compressed into 64 most discriminative feature channels, eliminating the correlations and redundancies among the spectra. Using a 3 × 3 convolution kernel, local spatial context information is initially captured to ensure that the subsequent stages can focus on more complex feature representations. After obtaining 64 basic feature channels, the model performs multi-scale spatial feature extraction through the MCSE module. The MCSE module adopts a three-branch parallel strategy, namely 1×1 convolution, 3×3 depth-wise separable convolution, and 5 × 5 depthwise separable convolution. The 
+
+1 × 1 convolution focuses on the global interaction between channels, the 
+
+3 × 3 depthwise separable convolution captures local texture details, and the 
+
+5×5 depthwise separable convolution extracts larger spatial context informa-tion. The outputs of the three branches are concatenated along the channel dimension, resulting in 192 feature channels. Subsequently, the SENet per-forms adaptive weighting on the features of these three branches. By learning the importance weights of each channel, it highlights the channels that are crucial for the classification task and suppresses irrelevant features. This multi-scale design enables the model to simultaneously perceive spatial and spectral features at different scales, while the attention mechanism ensures the efficiency of feature utilization. The enhanced features need to be converted into a format suitable for sequence processing and then input into the Mamba block for further feature extraction. The model reorganizes the spatial feature maps into a sequen-tial form, expanding the 13 × 13 grid into a sequence of 169 positions, with each position corresponding to a 128-dimensional feature vector. Meanwhile, the 64-dimensional features after the original features compressed are also projected and adjusted to the same dimension. The characteristics of the two paths are fused through the residual connection and additional learnable 6positional encoding is added to form the input of the Mamba module. Four stacked Mamba encoder blocks gradually deepen the feature representation. Each block contains residual connections, layer normalization, and SiLU ac-tivation, ensuring stable training and the effective transmission of feature information. After deep Mamba modeling, the model employs a dual-path feature ag-gregation strategy combining central and global features. Based on the prior knowledge that central pixels contain the most comprehensive category in-formation in hyperspectral classification, the central position features are emphasized. Simultaneously, global average pooling over the entire sequence captures overall image statistics. The fused features are fed into a classifica-tion multi-layer perceptron, where batch normalization, Dropout regulariza-tion, and ReLU activation are applied before projection to the output space corresponding to target categories, generating prediction scores for final hy-perspectral image classification. 
+
+2.2. MCSE Module 
+
+The MCSE module is one of the core architectures of the entire model. MCSE receives the output features from the spectral feature compression layer Xoriginal ∈ RB×64 ×W ×H , where B represents the batch size, W = H = 13 
+
+is the spatial dimension, and 64 represents the number of feature channels. The module performs feature extraction through three independent branches. The first branch uses 1 × 1 convolution kernels for pure channel mixing, without changing the spatial dimensions but recombining the spectral feature channels: 
+
+X1 = W1×1 ∗ Xoriginal + b1×1 (1) Where W1×1 ∈ RN ×64 ×1×1 represents the convolution weights, b1×1 represents the bias term, and N = 64 represents the number of output channels. The second branch employs a 3 × 3 depthwise separable convolution structure to extract local details. Firstly, group convolution is used to extract local spatial features, and then 1 × 1 convolution is applied to achieve channel interaction: 
+
+X(c)2,depth = W (c) 
+
+> dw 3
+
+∗ X(c)
+
+> original
+
+, c = 1 , ..., 64 (2) 
+
+X2 = Re LU (BN 3×3(Wpw 3 ∗ X2,depth + bpw 3)) (3) Where W (c) 
+
+> dw 3
+
+∈ R1×1×3×3 represents the deep convolution kernel, and Wpw 3 ∈
+
+RN ×64 ×1×1 represents the point-wise convolution weights. The third branch is 7structurally similar to the second branch, but uses a larger 5 × 5 convolution kernel to capture broader contextual information: 
+
+X(c)3,depth = W (c) 
+
+> dw 5
+
+∗ X(c)
+
+> original
+
+, c = 1 , ..., 64 (4) 
+
+X3 = Re LU (BN 5×5(Wpw 5 ∗ X3,depth + bpw 5)) (5) Where W (c) 
+
+> dw 5
+
+∈ R1×1×5×5 is a 5 × 5 deep convolution kernel. The features extracted by the three branches are concatenated along the channel dimension to form multi-scale fused features: 
+
+Xcat = concat (X1, X 2, X 3) ∈ RB×3N ×W ×H (6) Where 3N = 192 represents the total number of channels after concatenation. Furthermore, to further enhance the discriminative ability of the features, the MCSE module also introduces the Squeeze-and-Excitation channel at-tention mechanism (SENet) to adaptively weight the concatenated features. The attention mechanism consists of two stages. The first stage is the com-pression stage, where the global average pooling is used to obtain the global statistical features of each channel: 
+
+Zc = 1
+
+W × H
+
+> W
+
+X
+
+> i=1
+> H
+
+X
+
+> j=1
+
+X(c)
+
+> cat
+
+(i, j ), Z ∈ RB×3N ×1×1 (7) The second stage is the incentive stage, where the importance weights of each channel are learned through two fully connected layers: 
+
+S = σ(W2  Re LU (W1  Z + b1) + b2) (8) Where S ∈ RB×3N ×1×1 represents the attention weights for each channel. 
+
+σ is the Sigmoid activation function. W1 and W2 are the weights of the fully connected layer. Then, the learned attention weights are multiplied with the original features channel by channel to highlight important features and suppress irrelevant ones: 
+
+Xatt = Xcat ⊙ S (9) Where ⊙ represents the element-wise multiplication operation, and the attention weight S is expanded to the W spatial dimension through the broadcast mechanism. Finally, the weighted features are subjected to batch normalization and ReLU activation for output. The output of the MCSE module will serve as the input for subsequent serialization processing and Mamba modeling. It is combined with the original Conv2d features through residual connections to form complementary feature representations, provid-ing rich spatial context information for hyperspectral image classification. 82.3. Mamba 
+
+After extracting multi-scale spatial features in the MCSE module, the model converts the spatial feature maps into a sequence form to adapt to the sequence processing of the Mamba module. This process involves the feature processing and fusion of two parallel paths. First, the spatial feature maps of the MCSE module are converted into a sequence form, as shown in Equation 10 : 
+
+X1_seq = rearrange (XM CSE _out ) ∈ RB×L×dim (10) Where L = 169 represents the sequence length. dim = 128 represents the feature dimension, and the "rearrange" operation expands the 13 ×13 spatial grid into 169 position sequences. The original features extracted by the initial Conv2d are also processed in a sequential manner: 
+
+Xorig _seq = rearrange (Xoriginal ) ∈ RB×L×64 (11) 
+
+Xorig _proj = Re LU (Dropout (Wproj Xorig _seq + bproj )) ∈ RB×L×dim (12) Where Wproj ∈ Rdim ×64 represents the projection matrix, and bproj is the bias term. The characteristics of the two paths are fused through residual connec-tions, and are further augmented with learnable positional encodings: 
+
+Xf used = Dropout (Xorig _proj ⊕ XM CSE _seq ) (13) 
+
+Xmamba _in = Xf used ⊕ (Epos  α) ∈ RB×L×dim (14) Where ⊕ represents element-wise addition, Epos is a learnable absolute position encoding matrix, and α is a scaling factor that controls the intensity of position information. This paper employs stacked Mamba encoder blocks for deep sequence modeling. Each Mamba block has a structure that includes a selective state space layer, layer normalization, SiLU activation, and residual connections. Among them, Mamba is based on the selective state space model, and its discretized state space equation can be expressed as: 
+
+ht = ¯Atht−1 + ¯Btxt (15) 
+
+yt = Ctht + Dtxt (16) 9Where ht represents the hidden state at time t, xt is the input, yt is the output and Dt is the state dimension. Unlike traditional SSM, the parame-ters of Mamba ∆t, A, B t, C t are all functions of the input xt, implementing a selective scanning mechanism: 
+
+∆t = sof tplus (W∆xt + b∆) (17) 
+
+Bt = linear B (xt) (18) 
+
+Ct = linear C (xt) (19) Where W∆ represents the weight of the time-step parameterization ma-trix. This enables the parameterization that depends on the input to allow the model to dynamically adjust the state transition based on the current in-put, thereby enhancing its ability to focus on important information in long sequences. Continuous-time parameters are discretized using the zero-order hold (ZOH) method: ¯At = exp(∆ tA) (20) 
+
+¯Bt = ∆ tBt(exp(∆ tA) − I)  A−1 (21) The output of the Mamba module serves as the basis for subsequent fea-ture extraction and classification. Its rich serialized feature representation provides a powerful modeling capability for the hyperspectral image classifi-cation task. 
+
+2.4. Dual-branch feature aggregation module 
+
+This paper adopts a central-global dual-branch feature aggregation method, where the central feature extraction and global feature extraction branches are used to further extract the features obtained from the MCSE and Mamba modules. The central pixel of the image block usually contains the most comprehensive category information. Therefore, a center feature extraction module is designed specifically to extract the feature representation of the central position from the Mamba output sequence. First, determine the cen-tral position. For a sequence of length L, the index of the central position is calculated as follows: 
+
+cidx = L
+
+2 (22) 10 This position corresponds to the central pixel of the original 13 ×13 spatial grid. Extract the feature vector at the cidx th position from the Mamba output sequence: 
+
+Xcenter = Xmamba _out [: , c idx , :] ∈ RB×dim (23) Where Xmamba _out represents the output of the Mamba block, and Xcenter 
+
+is the extracted central feature matrix, which contains the central pixel fea-tures of all samples in the batch. Then, a small feature enhancement network is used to further refine the central features: 
+
+Xcenter _f eat = Re LU (Dropout (Wcenter Xcenter + bcenter )) ∈ RB×dim (24) Where Wcenter ∈ Rdim × dim represents the weight matrix and bcenter represents the bias term. This enhancement layer further exploits the discriminative information of the central features through a nonlinear transformation. Another branch is the global feature extraction path, which obtains sta-tistical feature information from the entire image block. The specific steps are to perform an average operation along the sequence dimension of the Mamba output sequence to obtain the global statistical features of the entire image block: 
+
+Xglobal = 1
+
+L
+
+> L
+
+X
+
+> t=1
+
+Xmamba _out [: , t, :] ∈ RB×dim (25) The features obtained through center feature extraction and global fea-ture extraction are directly added together after passing through the feature fusion module: 
+
+Xcom = Xcenter _f eat ⊕ Xglobal ∈ RB×dim (26) Where ⊕ indicates element-wise addition. This module provides local detail information through the central feature, and global feature information to offer contextual statistical information. The combination of these two achieves information complementarity. The fused feature Xcom will be used as the input for the classification head, and is further mapped to the category space through a multi-layer perceptron [30] to complete the final classification decision. 11 3. Results 
+
+3.1. Datasets introduction 
+
+(1) Indian Pines The Indian Pines dataset was collected using the airborne visible/infrared imaging spectrometer (AVIRIS) sensor over the fields in the northwest of Indiana, USA. This dataset consists of 145 × 145 pixels and contains 220 spectral bands, with the wavelength range spanning from 0.4 to 2.5 μm. After removing the noise and water absorption bands, 200 bands are retained for classification. The ground is divided into 16 land cover types, which represent different types of crops and vegetation. The images and category information of the Indian Pines dataset are shown in (a) of Figure 2, and the distribution of training and test samples is shown in Table 1. 
+
+Table 1: Training and testing distribution of the Indian Pines dataset, the WHU-Hi-HongHu dataset, and the Salinas dataset. 
+
+Indian Pines WHU-Hi-HongHu Salinas Category Train Test Category Train Test Category Train Test Alfalfa 30 16 Red roof 30 13981 Brocoli_green_weeds_1 30 1979 Corn-notill 30 1398 Road 30 3452 Brocoli_green_weeds_2 30 3696 Corn-mintill 30 800 Bare soil 30 21761 Fallow 30 1946 Corn 30 207 Cotton 30 163225 Fallow_rough_plow 30 1364 Grass-pasture 30 453 Cotton firewood 30 6158 Fallow_smooth 30 2648 Grass-trees 30 700 Rape 30 44497 Stubble 30 3929 Grass-pasture-mowed 14 14 Chinese cabbage 30 24043 Celery 30 3549 Hay-windrowed 30 448 Pakchoi 30 3994 Grapes_untrained 30 11241 Oats 10 10 Cabbage 30 10759 Soil_vinyard_develop 30 6173 Soybean-notill 30 942 Tuber mustard 30 12334 Corn_senesced_green_weeds 30 3248 Soybean-mintill 30 2425 Brassica parachinensis 30 10955 Lettuce_romaine_4wk 30 1038 Soybean-clean 30 563 Brassica chinensis 30 8894 Lettuce_romaine_5wk 30 1897 Wheat 30 175 Small brassica chinensis 30 22447 Lettuce_romaine_6wk 30 886 Woods 30 1235 Lactuca sativa 30 7296 Lettuce_romaine_7wk 30 1040 Buildings-Grass-Trees 30 356 Celtuce 30 942 Vinyard_untrained 30 7238 Stone-Steel-Towers 30 63 Film covered lettuce 30 7202 Vinyard_vertical_trellis 30 1777 Romaine lettuce 30 2950 Carrot 30 3157 White radish 30 8652 Garlic sprout 30 3426 Broad bean 30 1268 Tree 30 3980 Total 444 9805 Total 660 386003 Total 480 53649 
+
+(2) WHU-Hi-HongHu The WHU-Hi-HongHu dataset was collected using the WHU hyperspec-tral imager. And the target area is an agricultural zone near Honghu City, China. This dataset consists of 940 ×475 pixels and has 270 spectral bands, capturing complex land cover types such as bare soil, cotton fields, cabbages, and trees, etc. The dataset includes 22 land cover categories, making it the 12 （a）Indian Pines 
+
+> （b）WHU -Hi -HongHu
+> （c）Salinas
+
+Figure 2: Images and category information of the three datasets. (a) Indian Pines. (b)WHU-Hi-HongHu. (c)Salinas 
+
+13 largest and most diverse dataset in this study. The image and category in-formation of the WHU-Hi-HongHu dataset is shown in (b) Figure 2, and the distribution of training and test samples is shown in Table 1. (3) Salinas The Salinas dataset is an airborne hyperspectral remote sensing dataset collected in the Salinas Valley area of California, USA, using the AVIRIS sensor. It consists of 224 spectral bands, with a wavelength range of 400 to 2500 nm. The image size is 512 ×217 pixels and the spatial resolution is 3.7 m/pixel. The dataset contains 54,129 labeled pixels with 16 types of land cover (such as Fallow, Celery, etc.). At the same time, the distribution of the number of local land cover types in this dataset is relatively balanced, and the background is relatively simple. The image and category information of the Salinas dataset are shown in (c) of Figure 2, and the distribution of training and test samples is shown in Table 1. 
+
+3.2. Experimental setup 
+
+In this study, the experiments are implemented and trained using the PyTorch framework. During the training process, the NVIDIA GeForce GTX 4090 GPU (with 24GB of memory) is used for acceleration. The relevant settings for implementation are as follows: an Adam optimizer with a learning rate of 1e-3, a training batch size of 64 for the model, a total of 100 epochs, a Mamba block depth of 4, and a patch size of 15. To verify the effectiveness of the proposed method, this paper evaluates it by using many different HSI classification methods as a comparison. Includ-ing methods based on machine learning, methods based on CNN, methods based on Transformer, and methods based on Mamba, the introduction of the comparison methods is as follows: (1) SVM [31]: This method solved the problem of linearly inseparable data through kernel function mapping, achieving pixel-level land classifica-tion. (2) 3DCNN [32]: This method employed a 3DCNN-based ResNet50 com-bined with PCA for dimensionality reduction. (3) SSRN [33]: The spectral-spatial Residual Network (SSRN) took a three-dimensional cube as input and used spectral and spatial residual blocks for identity mapping and batch normalization to improve the classification accuracy of hyperspectral images. It was an end-to-end network. (4) SSFTT [34]: The Spectral-Spatial Feature Transformer (SSFTT) inte-grated 3D and 2D convolutional layers for low-level feature extraction. Gaus-14 sian weighted markers were used for feature transformation, and transformer encoders were employed to capture deep spectral space and semantic features for hyperspectral image classification. (5) MASSFormer [35]: Memory-enhanced Spectral-Space Transformer (MASSFormer) combined a memory marker to store previous spectral-space features and a memory-enhanced transformer encoder to enhance informa-tion mixing and improve classification accuracy. (6) SQSFormer [36]: This method, while preserving the spectral features, utilized the adaptive query of the central pixel to access relevant spatial information. It combined rotation-invariant positional embedding and the center-focused module to enhance the integration of spectral and spatial in-formation, thereby improving the classification accuracy of hyperspectral im-ages. (7) SSMamba [37]: This method effectively modeled the remote spectral spatial dependencies by using spectral space tokens generation and stacking Mamba blocks, thereby enhancing the classification ability of hyperspectral data. It achieved faster processing speed and lower computational complexity compared to Transformer. 
+
+3.3. Experimental results 
+
+The classification results of the three datasets used in this article by different methods reported in the literature are shown in Tables 2-4. As can be seen from the tables, when the training samples are set to 30, the method proposed in this article achieves the best classification effect in all three datasets. （a） （b） （c） （d） （e） （f） （g） （h）
+
+> Figure 3: Classification results of different methods on the Indian Pines dataset (a)SVM (b)3DCNN (c)SSRN (d)SSFTT (e)MASSFormer (f)SQSFormer (g)SSMamba (h) ours
+
+It can also be seen intuitively from Figures 3-5 that the classification result graphs on the three datasets show that the performance of SVM is the worst, indicating that its classification performance is the poorest. The 15 Table 2: Test results (averages) of data classification on the Indian Pines dataset Class SVM 3DCNN SSRN SSFTT MASSFormer SQSFormer SSMamba Ours 1 98.75 100 100 100 100 98.75 100 100 
+
+2 58.54 86.35 87.18 90.21 86.98 84.18 83.46 90.20 3 67.05 81.50 87.70 91.60 88.92 93.03 91.67 92.13 4 90.05 99.76 99.61 99.13 99.52 96.33 99.42 99.03 5 67.86 91.39 94.75 91.08 92.36 93.16 94.57 96.25 
+
+6 98.49 96.76 98.00 97.06 98.63 99.54 99.43 99.57 
+
+7 75.05 100 100 100 100 100 98.46 100 
+
+8 98.39 100 99.82 99.73 97.95 100 100 100 
+
+9 78.72 100 100 100 100 98.00 100 100 
+
+10 60.83 87.90 90.51 92.27 91.40 92.95 88.68 85.03 11 66.19 83.15 86.32 79.69 87.70 90.01 90.99 90.60 12 40.00 89.28 94.07 89.73 92.75 96.23 94.74 90.59 13 98.74 97.14 98.74 98.63 98.86 99.54 100 100 
+
+14 72.57 95.52 97.20 94.90 97.96 98.62 99.37 99.51 
+
+15 75.67 97.66 98.71 99.16 98.71 99.61 99.38 99.72 
+
+16 99.68 98.68 99.05 98.41 97.78 100 99.05 98.41 OA(%) 69.34 89.26 91.70 90.18 92.06 93.19 91.59 94.35 
+
+AA(%) 68.30 94.07 95.73 82.60 95.60 96.25 95.46 96.31 
+
+K×100 65.36 87.79 90.56 88.84 90.97 92.22 90.42 93.03 （a） （b） （c） （d） （e） （f） （g） （h）
+
+Figure 4: Classification results using different methods on the WHU-Hi-HongHu dataset (a)SVM (b)3DCNN (c)SSRN (d)SSFTT (e)MASSFormer (f)SQSFormer (g)SSMamba (h) ours 
+
+16 Table 3: Test data classification results (averages) on the WHU-Hi-HongHu dataset Class SVM 3DCNN SSRN SSFTT MASSFormer SQSFormer SSMamba Ours 1 55.32 88.12 94.57 92.20 92.26 94.77 96.14 95.70 2 41.55 86.24 82.41 93.69 96.84 96.40 95.76 84.43 3 35.05 86.83 91.46 88.72 86.27 90.62 91.32 92.96 
+
+4 33.42 89.89 96.18 96.30 94.71 97.41 98.01 98.24 
+
+5 50.31 91.62 96.82 93.83 94.52 95.59 99.30 97.75 6 34.78 93.75 94.54 93.64 93.61 93.96 95.04 96.32 
+
+7 20.54 67.57 77.54 87.12 80.45 85.14 85.59 88.68 
+
+8 24.42 86.20 96.84 89.55 90.07 91.29 97.46 94.83 9 67.10 94.74 96.56 95.37 93.78 94.72 96.21 97.91 
+
+10 22.99 71.09 71.19 88.54 89.44 92.06 91.33 92.73 
+
+11 20.52 80.62 78.08 85.38 87.59 88.50 87.92 93.30 
+
+12 20.84 74.36 86.34 82.61 82.86 88.67 89.47 85.44 13 20.64 73.92 74.88 76.48 79.23 84.40 80.07 80.40 14 31.76 87.28 95.43 94.51 95.33 96.67 93.30 87.63 15 69.38 97.37 98.79 99.55 99.57 98.48 99.49 97.63 16 52.98 92.01 94.78 96.69 94.98 96.54 97.09 98.81 
+
+17 53.73 89.22 99.97 96.61 98.66 99.31 99.95 98.22 18 42.45 98.53 98.97 98.15 98.56 99.50 99.20 98.81 19 36.38 89.98 93.58 94.10 96.09 96.11 94.09 93.70 20 24.18 88.79 93.48 93.65 96.45 97.77 99.53 98.96 21 44.71 98.47 99.89 97.69 99.37 99.72 99.83 100 
+
+22 38.00 96.08 97.14 96.43 98.57 97.25 99.70 99.95 
+
+OA(%) 33.84 86.80 91.58 92.59 91.72 94.19 94.56 94.94 
+
+AA(%) 38.23 87.39 91.34 92.31 92.69 94.31 94.82 94.92 
+
+K×100 26.76 83.73 89.46 90.71 89.65 92.70 93.15 93.63 （a） （b） （c） （d） （e） （f） （g） （h）
+
+Figure 5: Classification results of different methods on the Salinas dataset (a)SVM (b)3DCNN (c)SSRN (d)SSFTT (e)MASSFormer (f)SQSFormer (g)SSMamba (h) ours 
+
+17 Table 4: Test data classification results (averages) on the Salinas dataset Class SVM 3DCNN SSRN SSFTT MASSFormer SQSFormer SSMamba Ours 1 92.70 100 96.38 94.02 100 100 97.98 100                                                                                                                                                 
+
+> 298.61 98.53 96.56 99.23 99.90 98.02 97.99 99.95
+> 375.17 97.38 95.55 95.26 100 96.43 97.96 100
+> 496.79 98.12 98.72 98.73 96.87 97.99 97.83 99.63
+> 591.04 97.13 99.59 98.20 99.89 97.86 96.63 98.11 699.87 97.89 98.37 99.68 98.95 94.46 97.99 99.97
+> 794.30 96.64 99.73 96.71 99.89 98.99 100 99.97 865.65 98.32 100 80.18 97.90 92.46 89.43 95.12 995.03 95.95 97.17 98.07 100 100 100 100
+> 10 80.87 100 98.13 86.49 99.76 99.02 97.39 95.01 11 58.82 96.13 98.14 69.47 99.70 98.78 99.78 100
+> 12 86.41 97.35 99.63 97.33 99.92 100 100 100
+> 13 81.66 94.74 97.85 92.40 88.34 99.93 99.76 99.89 14 80.08 97.62 98.54 97.65 93.62 98.46 96.75 99.71
+> 15 48.14 98.33 94.19 66.09 91.59 96.56 94.73 95.99 16 88.65 97.86 95.36 93.31 99.99 98.65 96.88 98.99 OA(%) 80.50 95.14 96.15 87.95 97.92 97.63 95.60 98.35
+> AA(%) 83.36 96.08 97.89 91.43 97.91 97.79 96.97 98.99
+> K×100 78.21 94.03 96.05 86.62 97.68 96.54 95.34 98.16
+
+methods based on CNN and Transformer are better than SVM, but it’s dif-ficult to determine who is better. Among them, the classification effect of SSMamba and our method MSCM-net is the best. The specific results analy-sis reveals that Table 4 presents the classification results on the Indian Pines dataset. It is evident that the method proposed in this study achieves the highest performance in all metrics. OA reaches 94.35%. AA is 96.31%. And the Kappa value is 93.03%. Compared with the suboptimal method, OA and AA increased by 2.29% and 0.58% respectively. On the WHU-Hi-HongHu dataset, as shown in Table 5, the method proposed achieves the highest OA of 94.94% and Kappa value of 93.63%, outperforming all other comparison methods. In Table 6, the method presented demonstrates the best classi-fication performance on the Salinas dataset. Compared with all the other methods listed, the OA, AA, and kappa values are all improved by more than 2 percentage points. Overall, our method achieves the best results in all three datasets as evaluated by the OA, AA and Kappa metrics. For specific categories, it also achieves the majority of the optimal accuracy, which is sufficient to demonstrate that our method has certain competitiveness and performance 18 advantages. 
+
+3.4. Parameter analysis 
+
+In this section, we analyze the influence of several key hyperparameters of the MSCM-net model on the model’s performance, namely learning rate, batch size, and patch size. To facilitate the analysis, we plot line graphs as shown in Figure 6-8 and the heatmap as shown in Figure 9. 
+
+> Figure 6: Line graph showing the impact of learning rate on accuracy on three datasets
+> Figure 7: Line graph showing the impact of batch size on accuracy across three datasets
+
+The results shown in Figure 6 indicate that initially, as the learning rate is gradually increased from a small value of 3e-5, OA of the model also gradually improves. When the learning rate is set to 0.001, the model’s performance reaches its peak. Further increasing the learning rate does not 19 Figure 8: Line graph showing the influence of patch size on accuracy across the three datasets 
+
+help in improving the model’s accuracy. Therefore, the optimal learning rate chosen in this article is 0.001. The results shown in Figure 7 indicate that as the batch size increases, the model initially benefits from richer representations, thereby improving accuracy. However, beyond a certain point, further increasing the batch size leads to a decline in performance. This decline may be due to the model beginning to capture noise rather than useful information, resulting in a decrease in generalization performance. In our model, when the batch size is set to 64, the model accuracy reaches the highest on all three datasets. This value achieves a balance between underfitting and overfitting for the model, providing the best result. The results shown in Figure 8 indicate that, across all three datasets, the impact of patch size on the model performance follows a similar pattern. In Figure 10, initially, as the patch size increases, the performance of the model significantly improves. However, after reaching a certain point, the perfor-mance begins to stagnate or even slightly decline. This indicates that there is an optimal range of patch sizes within which the model can capture suffi-cient contextual information without introducing unnecessary complexity or noise. Through experiments, we finally choose the value 15, which performs the best on all three datasets, as the optimal patch size. Furthermore, to conduct a more comprehensive analysis of the model’s sensitivity to key hyperparameters, we have plotted a 3 × 3 heat map matrix, as shown in Figure 9. Each row of the heat map corresponds to a specific hyperparameter, and each column represents a performance metric. The 20 color intensity of each cell represents the classification performance. Warm colors (green, yellow) indicate higher accuracy, while cool colors (red) indicate lower performance. As shown in Figure 9, there is a clearly defined "optimal range" for performance at a learning rate of 1e-3. An excessively high learning rate (5e-3) leads to unstable training, while an excessively low learning rate (3e-5) results in insufficient convergence. When the batch size is set to 64, the best results are achieved. A smaller batch size (32) introduces higher variance, while a larger batch size (128, 256) reduces the generalization ability of the model. The optimal patch size is 15 × 15 . A smaller patch size (13 × 13 ) captures insufficient contextual information, while a larger patch size ( 17 ×17 , 19 ×19 ) introduces excessive background noise, slightly reducing the classification accuracy. 
+
+> Figure 9: Heatmap showing the impact of hyperparameters on the classification perfor-mance of the three datasets
+
+3.5. Performance and complexity analysis(on the Indian Pines dataset) 
+
+The parameter quantity and model complexity of all methods are ana-lyzed on the Indian Pines dataset, and the analysis results are recorded in Table 5. From the table, it can be seen that compared with all the com-parison methods, the MSCM-net model proposed has the smallest number 21 of parameters, the shortest inference time, and the highest OA. This clearly indicates that our model has achieved a good balance between parameter efficiency and model performance. The MSCM-net has only 200,000 parameters, which is much lighter than other Transformer-based models (such as SQSFormer with 1,045,000 param-eters and CNN-based models such as SSRN with 292,000 parameters). Our method not only has a lower complexity but also achieves the highest OA of 94.35%, outperforming these more complex models. This efficiency high-lights the ability of the model in this paper to capture basic features without relying on a large parameter space. Furthermore, MSCM-net requires only 0.19 GFLOPs. Although it is not the lowest, it is significantly lower than most other models, such as SSMamba (2.844G) and 3DCNN (1.091G). Although SSFTT has the lowest FLOPs, it fails to achieve the accuracy of the model in this study. This indicates that the model in this paper effectively balances the computational cost and performance. Regarding the inference speed, the method based on Mamba has a faster inference speed, such as the method we present and SSMamba. This is because Mamba does not have the problem of quadratic complexity, as its computing speed is faster than that of models based on Transformers. More-over, Mamba also employs a hardware-aware algorithm, fully utilizing the GPU of the computer, which further accelerates the inference speed. In conclusion, MSCM-net demonstrates its ability to achieve high accu-racy through a more streamlined and computationally efficient design. By achieving better performance with fewer parameters and lower computational requirements, MSCM-net is particularly suitable for practical applications with limited computing resources.                                  
+
+> Table 5: Analysis of Model Parameters and Complexity of Different Methods on the Indian Pines Dataset
+> SVM 3DCNN SSRN SSFTT MASSFormer SQSFormer SSMamba Ours Parameters (M) /0.564 0.292 0.915 0.304 1.045 0.407 0.201 FLOPs (G) /1.091 0.246 0.078 0.817 0.233 2.844 0.19 Test time (s) /5.99 6.54 1.48 5.203 12.024 2.11 1.2 OA (%) 69.34 89.26 91.70 90.18 92.06 93.19 91.59 94.35
+
+22 4. Ablation experiments 
+
+In this section, we conduct ablation experiments on the three key mod-ules used in the model of this paper to verify their effectiveness and their contribution to the overall framework. (1) The number of Mambas To investigate the impact of the depth of the Mamba block on the model performance, we conduct ablation experiments on the Mamba module, set-ting the number of Mamba blocks from 0 to 5. Experiments are conducted on three datasets, and the experimental results are plotted as a line graph as shown in Figure 10. As shown in Figure 10, when the number of Mamba blocks ranges from 0 to 1, on all three datasets, the slope of the line is the greatest, showing a clear upward trend. This indicates that the values of OA, AA and kappa in the model without using the Mamba block are significantly lower than those with the Mamba block, suggesting that the Mamba block added to the model in this study has greatly contributed to improving the model’s accuracy. Furthermore, it can be observed that as the number of Mamba blocks increases, the classification accuracy shows a trend of first rising and then falling. When the number of Mamba blocks is 4, it achieves the best performance on all three datasets. However, when the number of Mamba blocks is increased to 5, there is no significant improvement in ac-curacy. Therefore, considering the complexity of the model, it is ultimately decided that the number of Mamba blocks in this model is 4. 
+
+> Figure 10: Line graph showing the ablation experiment results of Mamba block quantity
+
+(2) SeNet 23 To further enhance the feature extraction capability of the main module MCSE in our method, the SeNet is incorporated into the MCSE module. And the effectiveness of SeNet is verified through experiments. Table 6’s ablation experiments demonstrate the classification results on three datasets with and without SeNet in the MCSE module. As can be seen from Table 8, on the Indian Pines dataset, compared with not incorporating SeNet, after adding SeNet, OA, AA and Kappa have increased by 4.29, 2.36 and 4.35 percentage points respectively. On the Salinas dataset, the OA, AA and Kappa metrics increase by 2.51, 0.83 and 2.79 percentage points respectively. This is sufficient to prove the role that the SeNet module plays in the MCSE. 
+
+> Table 6: Ablation Experiments of SENet
+
+Indian Pines Honghu Salinas OA(%) 94.35 94.94 98.35 Yes AA(%) 96.31 94.20 98.99 K×100 93.03 93.63 98.16 OA(%) 90.06 93.73 95.84 No AA(%) 93.95 93.57 98.16 K×100 88.68 92.12 95.37 (3) residual connection To stabilize the input of the Mamba block, residual connections are added to the model, specifically before the input Mamba block. This arrangement ensures that the input of the Mamba block not only contains the features pro-cessed by the MCSE module but also the original features. The purpose is to guarantee that the input contains sufficient information for Mamba to make a choice. To verify the effectiveness of this residual connection, we conducted corresponding ablation experiments for this improvement. The experimental results are shown in Table 7. Analysis of the experimental data reveals that when residual connections were not used, the OA, AA and Kappa values on the three datasets were all lower than the results obtained when residual connections were employed. This indicates that adding residual connections at this position in the model provides the Mamba module with more compre-hensive input features. It not only retains the spectral specificity of hyper-spectral data but also incorporates rich contextual information, laying a solid foundation for the subsequent deep sequential modeling of Mamba, thereby effectively improving the overall classification performance of the model. 24 Table 7: Abandonment Experiment of Residual Connection 
+
+Indian Pines Honghu Salinas OA(%) 94.35 94.94 98.35 Yes AA(%) 96.31 94.20 98.99 K×100 93.03 93.63 98.16 OA(%) 92.18 93.56 97.75 No AA(%) 95.36 92.98 98.52 K×100 92.87 92.64 97.04 (4) Dual-branch Feature Aggregation Module In order to verify the impact of the dual-branch center and global feature aggregation module proposed in the model on the improvement of model ac-curacy, detailed ablation experiments are conducted on this module on three datasets. The specific approach is as follows: separately add only the central feature extraction branch to the model, only the global feature extraction branch to the model, and a dual branch of central feature extraction and global feature extraction. OA on the three datasets is recorded respectively. The experimental results are shown in Table 8. It is clearly observed that the overall accuracy of using both the central extraction and global extraction branches is higher than that of using only one of the branches alone. Among them, the effect of using only the center extraction is the poorest. This is because the center extraction only contains the key information and lacks the completeness of the data. In contrast, the global feature extraction can pay more attention to the global information that can identify the categories, thereby enabling classification. Therefore, the optimal choice is to combine the center extraction and the global extraction, which is also the approach adopted in this paper. 
+
+> Table 8: Abandonment Experiment of the Dual-Branch Feature Aggregation Module
+
+center extraction global extraction Indian Pines HongHu Salinas 
+
+✓ 86.36 85.22 94.65 
+
+✓ 93.42 93.86 97.29 
+
+✓ ✓ 94.35 94.94 98.35 25 5. Conclusions 
+
+We have proposed MSCM-net, a hybrid framework integrating multi-scale convolutional neural networks with selective state-space models for hyperspectral image classification. By combining multi-scale convolution’s spatial feature extraction advantages with Mamba’s capacity to capture re-mote spectral dependencies, MSCM-net effectively processes both local and global information in hyperspectral data. The framework employs multi-scale convolutional modules with different kernel sizes to extract multi-range features, enabling more accurate hyperspectral data representation. Multiple stacked Mamba blocks perform sequence modeling to extract deeper features, while residual connections prevent original information loss. A dual-branch feature aggregation structure with center and global extraction enhances the model’s ability to capture both central pixel and edge information. Extensive experiments on benchmark datasets demonstrate that MSCM-net achieves higher classification accuracy with fewer parameters compared to state-of-the-art methods, balancing powerful feature extraction with computational efficiency. This study validates the potential of combining selective state-space models with multi-scale CNNs for hyperspectral image classification, offering a valuable research direction for future work in this field. 
+
+References 
+
+[1] J. Gao, G. Chen, X. Ji, C. Shen, Reinforced graph aggrega-tion cross-domain few-shot learning for hyperspectral remote sens-ing image classification, SIGNAL PROCESSING 238 (2026). doi:10.1016/j.sigpro.2025.110101. [2] J. Zhao, K. Wu, L. Zhang, W. Huang, C. Ruan, L. Huang, Patch-based hierarchical residual spectral-spatial convolutional network for hyperspectral image classification, SIGNAL PROCESSING 230 (2025). doi:10.1016/j.sigpro.2024.109850. [3] X. Wang, Q. Hu, Y. Cheng, J. Ma, Hyperspectral image super-resolution meets deep learning: A survey and perspective, IEEE-CAA JOURNAL OF AUTOMATICA SINICA 10 (2023) 1668–1691. doi:10.1109/JAS.2023.123681. 26 [4] X. Yang, K. Ma, D. Zhang, S. Song, X. An, Classification of soybean seeds based on rgb reconstruction of hyperspectral images, PLOS ONE 19 (2024). doi:10.1371/journal.pone.0307329. [5] F. Ali, A. Razzaq, W. Tariq, A. Hameed, A. Rehman, K. Razzaq, S. Sarfraz, N. A. Rajput, H. E. M. Zaki, M. S. Shahid, G. On-drasek, Spectral intelligence: Ai-driven hyperspectral imaging for agri-cultural and ecosystem applications, AGRONOMY-BASEL 14 (2024). doi:10.3390/agronomy14102260. [6] J. Wang, G. Chen, J. Ju, T. Lin, R. Wang, Z. Wang, Characteriza-tion and classification of urban weed species in northeast china using terrestrial hyperspectral images, WEED SCIENCE 71 (2023) 353–368. doi:10.1017/wsc.2023.36. [7] S. Ruo-xi, F. Yi-ning, C. Wei, W. Xiang-hai, Advance in hyperspec-tral images change detection, SPECTROSCOPY AND SPECTRAL ANALYSIS 43 (2023) 2354–2362. doi:10.3964/j.issn.1000-0593(2023)08-2354-09. [8] P. Du, K. Tan, X. Xing, A novel binary tree support vector machine for hyperspectral remote sensing image classification, OPTICS COMMU-NICATIONS 285 (2012) 3054–3060. doi:10.1016/j.optcom.2012.02.092. [9] Y. Zhang, G. Cao, X. Li, B. Wang, Cascaded random forest for hyper-spectral image classification, IEEE JOURNAL OF SELECTED TOP-ICS IN APPLIED EARTH OBSERVATIONS AND REMOTE SENS-ING 11 (2018) 1082–1094. doi:10.1109/JSTARS.2018.2809781. [10] G. Liu, L. Wang, D. Liu, L. Fei, J. Yang, Hyperspectral image classifica-tion based on non-parallel support vector machine, REMOTE SENSING 14 (2022). doi:10.3390/rs14102447. [11] D.-X. Zhou, Deep distributed convolutional neural networks: Uni-versality, ANALYSIS AND APPLICATIONS 16 (2018) 895–919. doi:10.1142/S0219530518500124. [12] M. Yasin, M. Sarigul, M. Avci, Logarithmic learning differential convolutional neural network, NEURAL NETWORKS 172 (2024). doi:10.1016/j.neunet.2024.106114. 27 [13] D. J. Atha, M. R. Jahanshahi, Evaluation of deep learning approaches based on convolutional neural networks for corrosion detection, STRUC-TURAL HEALTH MONITORING-AN INTERNATIONAL JOURNAL 17 (2018) 1110–1128. doi:10.1177/1475921717737051. [14] X. Yang, Y. Ye, X. Li, R. Y. K. Lau, X. Zhang, X. Huang, Hyperspectral image classification with deep learning models, IEEE TRANSACTIONS ON GEOSCIENCE AND REMOTE SENSING 56 (2018) 5408–5423. doi:10.1109/TGRS.2018.2815613. [15] A. Paul, S. Bhoumik, N. Chaki, Ssnet: an improved deep hybrid net-work for hyperspectral image classification, NEURAL COMPUTING & APPLICATIONS 33 (2021) 1575–1585. doi:10.1007/s00521-020-05069-1. [16] F. Feng, S. Wang, C. Wang, J. Zhang, Learning deep hierarchical spatial-spectral features for hyperspectral image classification based on residual 3d-2d cnn, SENSORS 19 (2019). doi:10.3390/s19235276. [17] X. Lei, F. Xie, C. Jin, Gram angle field-based siamese graph convolutional neural network for hyperspectral images classification, IEEE GEOSCIENCE AND REMOTE SENSING LETTERS 22 (2025). doi:10.1109/LGRS.2024.3521461. [18] X. Hu, T. Li, T. Zhou, Y. Liu, Y. Peng, Contrastive learning based on transformer for hyperspectral image classification, APPLIED SCIENCES-BASEL 11 (2021). doi:10.3390/app11188670. [19] Y. Tan, M. Li, L. Yuan, C. Shi, Y. Luo, G. Wen, Hyperspectral image classification with embedded linear vision transformer, EARTH SCI-ENCE INFORMATICS 18 (2024). doi:10.1007/s12145-024-01651-6. [20] C. Fu, T. Zhou, T. Guo, Q. Zhu, F. Luo, B. Du, Cnn-transformer and channel-spatial attention based network for hyperspectral image classification with few samples, NEURAL NETWORKS 186 (2025). doi:10.1016/j.neunet.2025.107283. [21] X.-y. Fan, H.-k. Li, K.-m. Liu, X.-l. Wang, Y. Yu, X.-y. Li, A multi-layer attention convolutional neural network model for fine classification of hy-perspectral images in rare earth mining areas, SPECTROSCOPY AND 28 SPECTRAL ANALYSIS 45 (2025) 2666–2675. doi:10.3964/j.issn.1000-0593(2025)09-2666-10. [22] M. Schuessler, Machine learning with nonlinear state space mod-els, AT-AUTOMATISIERUNGSTECHNIK 70 (2022) 1027–1028. doi:10.1515/auto-2022-0089. [23] J. Sun, K. Chen, S. Wang, Y. Zhang, Z. Xu, X. Wu, C. Tang, Dgfe-mamba: Mamba-based 2d image segmentation network, JOURNAL OF BIONIC ENGINEERING 22 (2025) 2135–2150. doi:10.1007/s42235-025-00711-x. [24] C. Zhang, J. Zheng, M. Cao, A music source separation method integrat-ing time-frequency decoupling and mamba-based state space modeling, SCIENTIFIC REPORTS 15 (2025). doi:10.1038/s41598-025-20179-3. [25] H. Wang, P. Zhuang, X. Zhang, J. Li, Dbmgnet: A dual-branch mamba-gcn network for hyperspectral image classification, IEEE TRANS-ACTIONS ON GEOSCIENCE AND REMOTE SENSING 63 (2025). doi:10.1109/TGRS.2025.3564364. [26] Y. Jiang, S. Zhang, C. Wang, G. Zhang, M. Tan, B. Du, X. Shen, Sedgm: A structure-enhanced spatial-spectral dynamic gat-ing mamba for hyperspectral image classification, IEEE TRANS-ACTIONS ON GEOSCIENCE AND REMOTE SENSING 63 (2025). doi:10.1109/TGRS.2025.3626930. [27] Y. Li, Y. Luo, L. Zhang, Z. Wang, B. Du, Mambahsi: Spatial-spectral mamba for hyperspectral image classification, IEEE TRANS-ACTIONS ON GEOSCIENCE AND REMOTE SENSING 62 (2024). doi:10.1109/TGRS.2024.3430985. [28] L. Liang, P. Xie, Y. Zhang, J. Li, Z. Zhang, J. Li, A. Plaza, Dbmlla: Double-branch mamba-like linear attention network for hyperspectral image classification, IEEE TRANSACTIONS ON GEOSCIENCE AND REMOTE SENSING 63 (2025). doi:10.1109/TGRS.2025.3605798. [29] F. Kong, M. Huang, J. Tang, G. Ren, End-to-end feature domain resid-ual coding network for multispectral image compression based on inter-spectral prediction, JOURNAL OF APPLIED REMOTE SENSING 18 (2024). doi:10.1117/1.JRS.18.036508. 29 [30] J.-M. Wu, Multilayer potts perceptrons with levenberg-marquardt learn-ing, IEEE TRANSACTIONS ON NEURAL NETWORKS 19 (2008) 2032–2043. doi:10.1109/TNN.2008.2003271. [31] T. Kun, D. Pei-Jun, Hyperspectral remote sensing image clas-sification based on support vector machine, JOURNAL OF INFRARED AND MILLIMETER WAVES 27 (2008) 123–128. doi:10.3724/SP.J.1010.2008.00123. [32] H. Firat, D. Hanbay, Comparison of 3d cnn based deep learning archi-tectures using hyperspectral images, JOURNAL OF THE FACULTY OF ENGINEERING AND ARCHITECTURE OF GAZI UNIVERSITY 38 (2023) 521–534. doi:10.17341/gazimmfd.977688. [33] Z. Zhong, J. Li, Z. Luo, M. Chapman, Spectral-spatial residual network for hyperspectral image classification: A 3-d deep learning framework, IEEE TRANSACTIONS ON GEOSCIENCE AND REMOTE SENS-ING 56 (2018) 847–858. doi:10.1109/TGRS.2017.2755542. [34] L. Sun, G. Zhao, Y. Zheng, Z. Wu, Spectralspatial feature tokeniza-tion transformer for hyperspectral image classification, IEEE TRANS-ACTIONS ON GEOSCIENCE AND REMOTE SENSING 60 (2022). doi:10.1109/TGRS.2022.3144158. [35] L. Sun, H. Zhang, Y. Zheng, Z. Wu, Z. Ye, H. Zhao, Massformer: Memory-augmented spectral-spatial transformer for hyperspectral im-age classification, IEEE TRANSACTIONS ON GEOSCIENCE AND REMOTE SENSING 62 (2024). doi:10.1109/TGRS.2024.3392264. [36] N. Chen, L. Fang, Y. Xia, S. Xia, H. Liu, J. Yue, Spectral query spa-tial: Revisiting the role of center pixel in transformer for hyperspectral image classification, IEEE TRANSACTIONS ON GEOSCIENCE AND REMOTE SENSING 62 (2024). doi:10.1109/TGRS.2024.3361652. [37] L. Huang, Y. Chen, X. He, Spectral-spatial mamba for hy-perspectral image classification, REMOTE SENSING 16 (2024). doi:10.3390/rs16132449. 30 Declaration of competing interest 
+
+The authors declare that they have no known competing financial inter-ests or personal relationships that could have appeared to influence the work reported in this paper. 
+
+Acknowledgments 
+
+This work was supported by the Natural Science Foundation of Shan-dong Province (ZR2021QF113), the Outstanding Youth Innovation Team in Shandong Higher Education Institutions (2022KJ162). 31
