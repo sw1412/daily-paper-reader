@@ -1,0 +1,348 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-02T19:47:18.573096+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 8,
+    "quick_skim_target": 12,
+    "quick_selected": 8
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2607.23464v1",
+      "source": "arxiv",
+      "title": "Direction-adaptive Mamba: Spatial-Frequency Dual-Domain Collaborative Learning for PolSAR Image Classification",
+      "abstract": "Deep learning dominates polarimetric synthetic aperture radar (PolSAR) image classification, with Mamba architectures serving as favorable backbones due to linear complexity and strong global modeling capacity. However, existing PolSAR Mamba methods have two critical flaws: pure spatial processing discards fine-grained edges and textures, and fixed scanning patterns fail to model direction-variant anisotropic scattering and weak boundaries essential for PolSAR physical analysis. This work proposes DA-Mamba, a direction-adaptive Mamba framework with dual-domain collaborative learning for PolSAR classification. Equipped with an edge-aligned direction-adaptive scanning scheme, DA-Mamba captures long-range spatial dependencies and accurate boundary details. It adopts the Non-Subsampled Contourlet Transform (NSCT) to separate PolSAR data into low-frequency global components and multi-directional high-frequency subbands, extracting anisotropic structural features from high-frequency information while preserving global context via low-frequency branches. A dual-domain collaborative learning module further integrates spatial scattering and frequency-domain representations to strengthen feature discriminability. Evaluated on three real-world PolSAR datasets, DA-Mamba surpasses state-of-the-art methods, verifying the efficacy of the proposed adaptive scanning and dual-domain fusion designs. Code will be publicly available.",
+      "authors": [
+        "Junfei Shi",
+        "Yu Cheng",
+        "Haojia Zhang",
+        "Wenqiang Hua",
+        "Junhuai Li",
+        "Maoguo Gong"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.CV"
+      ],
+      "published": "2026-07-26T05:17:07+00:00",
+      "link": "https://arxiv.org/pdf/2607.23464v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "PolSAR image classification with direction-adaptive Mamba architecture, transferable to hyperspectral classification",
+      "llm_evidence_cn": "使用方向自适应Mamba进行PolSAR图像分类，方法可迁移至高光谱分类",
+      "llm_evidence": "使用方向自适应Mamba进行PolSAR图像分类，方法可迁移至高光谱分类",
+      "canonical_evidence": "使用方向自适应Mamba进行PolSAR图像分类，方法可迁移至高光谱分类",
+      "llm_tldr_en": "Proposes DA-Mamba, a direction-adaptive Mamba framework with spatial-frequency dual-domain learning for remote sensing image classification, demonstrating strong long-range modeling and edge preservation that can transfer to hyperspectral data.",
+      "llm_tldr_cn": "现有PolSAR图像分类的Mamba方法因纯空间处理丢失边缘纹理、固定扫描方向难以适配各向异性散射。本文提出方向自适应Mamba（DA-Mamba），结合边缘对齐的自适应扫描与空间-频率双域协作学习，在捕捉长距离依赖的同时增强弱边界表达。在PolSAR分类实验中验证了该方法相较于现有Mamba基线的优越性。这一双域协作范式对高光谱图像分类同样具有方法迁移价值。",
+      "llm_tldr": "现有PolSAR图像分类的Mamba方法因纯空间处理丢失边缘纹理、固定扫描方向难以适配各向异性散射。本文提出方向自适应Mamba（DA-Mamba），结合边缘对齐的自适应扫描与空间-频率双域协作学习，在捕捉长距离依赖的同时增强弱边界表达。在PolSAR分类实验中验证了该方法相较于现有Mamba基线的优越性。这一双域协作范式对高光谱图像分类同样具有方法迁移价值。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23530v1",
+      "source": "arxiv",
+      "title": "Geometry Meets Semantics: Fractional Gradient Stabilization for Semantic-Driven Bounding Box Optimization in Visual Detection Tasks",
+      "abstract": "Bounding boxes are fundamental for object localization in visual detection tasks. Among them, oriented bounding boxes are widely used in visual detection tasks, which provide a more precise directional representation. Generally, IoU-based losses are widely adopted to optimize box regression. However, we observed that IoU-driven box optimization suffers from two key issues: (1) it relies solely on geometric properties while ignoring semantic cues; (2) orientation optimization suffers from unstable gradients, causing oscillations in orientation convergence. In this paper, we propose a Fractional Semantic IoU loss to achieve unified semantic-geometric learning with gradient stabilization. First, we design a semantic similarity metric to guide IoU optimization, building a Semantic IoU loss (SIoU loss) with an adaptive gradient gating mechanism. Then, we revisit the gradient instability issue in oriented box optimization and extend the SIoU loss to a fractional-order formulation to build the \\textbf{Fr}actional \\textbf{S}emantic \\textbf{IoU} \\textbf{loss} (FrSIoU loss). The FrSIoU loss accumulates historical IoU states to regularize abnormal gradients during bounding box optimization process. Extensive experiments demonstrate that our approach achieves stable performance gains across different bounding box formulations and diverse visual detection tasks. The code will be available on GitHub.",
+      "authors": [
+        "Qi Ming",
+        "Haitian Yang",
+        "Xudong Zhao",
+        "Mingjing Zhao",
+        "Liuqian Wang",
+        "Nanqing Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-26T08:01:22+00:00",
+      "link": "https://arxiv.org/pdf/2607.23530v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Bounding box optimization for visual detection, transferable to object detection in hyperspectral images",
+      "llm_evidence_cn": "视觉检测中的边界框优化方法，可迁移至高光谱图像目标检测",
+      "llm_evidence": "视觉检测中的边界框优化方法，可迁移至高光谱图像目标检测",
+      "canonical_evidence": "视觉检测中的边界框优化方法，可迁移至高光谱图像目标检测",
+      "llm_tldr_en": "Proposes a Fractional Semantic IoU loss that combines geometric and semantic cues with gradient stabilization for oriented bounding box regression in visual detection; applicable to HSI detection.",
+      "llm_tldr_cn": "在视觉检测任务中，尤其是面向对象的定向边界框回归，常用的IoU损失仅依赖几何属性而忽视语义信息，且方向角优化存在梯度振荡导致收敛不稳定。本文提出分数阶语义IoU损失，将语义线索与几何约束统一到同一个损失函数中，并通过分数阶梯度稳定化机制缓解方向收敛的震荡问题。实验结果表明，该方法在多个检测任务上显著提升了边界框的定位精度与收敛鲁棒性。该语义-几何联合优化策略可为高光谱图像中的目标检测及多模态检测任务提供有价值的方法参考。",
+      "llm_tldr": "在视觉检测任务中，尤其是面向对象的定向边界框回归，常用的IoU损失仅依赖几何属性而忽视语义信息，且方向角优化存在梯度振荡导致收敛不稳定。本文提出分数阶语义IoU损失，将语义线索与几何约束统一到同一个损失函数中，并通过分数阶梯度稳定化机制缓解方向收敛的震荡问题。实验结果表明，该方法在多个检测任务上显著提升了边界框的定位精度与收敛鲁棒性。该语义-几何联合优化策略可为高光谱图像中的目标检测及多模态检测任务提供有价值的方法参考。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23638v1",
+      "source": "arxiv",
+      "title": "WGDnet: Wishart-guided Geometric-aware Deep Network for PolSAR Image Classification",
+      "abstract": "Polarimetric Synthetic Aperture Radar (PolSAR) classification underpins all-weather Earth observation. Conventional Wishart methods depend on rigid handcrafted operators with limited adaptability, while mainstream deep networks ignore PolSAR native Wishart scattering statistics. Additionally, fixed convolution windows fail to capture multi-scale, multi-directional terrain patterns, harming boundary detection and small-object characterization. To mitigate these drawbacks, we propose WGDNet, a Wishart-guided geometric-aware deep network. It integrates three core designs: (1) learnable Wishart convolutions with directional kernels for multi-scale statistical edge feature extraction; (2) an orientation-prior aggregation module that estimates dominant local directions and confidences to refine directional Wishart outputs adaptively; (3) GAnet, a scale-direction adaptive geometric-aware convolution that dynamically reshapes sampling grids to model anisotropic terrain and retain fine details. Our contributions lie in learnable Wishart statistical modeling, orientation-prior feature aggregation, and geometry-adaptive convolution. Evaluations across four real PolSAR datasets verify WGDNet surpasses existing state-of-the-art approaches in classification accuracy and boundary fidelity.",
+      "authors": [
+        "Junfei Shi",
+        "Haojia Zhang",
+        "Yu Cheng",
+        "Yuke Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-26T13:04:02+00:00",
+      "link": "https://arxiv.org/pdf/2607.23638v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "deep network for remote sensing image classification using statistical and geometric features, transferable to hyperspectral classification",
+      "llm_evidence_cn": "面向遥感影像分类的深度网络，结合统计与几何特征，可迁移至高光谱分类",
+      "llm_evidence": "面向遥感影像分类的深度网络，结合统计与几何特征，可迁移至高光谱分类",
+      "canonical_evidence": "面向遥感影像分类的深度网络，结合统计与几何特征，可迁移至高光谱分类",
+      "llm_tldr_en": "Proposes WGDNet integrating learnable Wishart convolutions and orientation-prior aggregation for PolSAR image classification, improving boundary detection and small-object characterization.",
+      "llm_tldr_cn": "传统PolSAR分类依赖固定手工算子，主流深度网络又忽略Wishart散射统计且难以捕捉多尺度地形模式。本文提出WGDNet，包含可学习Wishart卷积、方向先验聚合等模块，实现多尺度统计边缘特征提取与方向感知分类，显著改善边界检测和小目标刻画。其统计引导加几何感知的设计思想可迁移至光谱-空间高光谱图像分类。",
+      "llm_tldr": "传统PolSAR分类依赖固定手工算子，主流深度网络又忽略Wishart散射统计且难以捕捉多尺度地形模式。本文提出WGDNet，包含可学习Wishart卷积、方向先验聚合等模块，实现多尺度统计边缘特征提取与方向感知分类，显著改善边界检测和小目标刻画。其统计引导加几何感知的设计思想可迁移至光谱-空间高光谱图像分类。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.23600v1",
+      "source": "arxiv",
+      "title": "ConFusion: Continuous Fusion Space Learning for Fine-Grained Controllable Infrared and Visible Image Fusion",
+      "abstract": "Controllable infrared-visible image fusion aims to integrate complementary thermal and structural information with flexible region-aware modulation, producing fused images that adapt to diverse user requirements and downstream tasks. However, existing methods typically rely on predefined discrete control conditions, leading to a sparse space that fails to support fine-grained modulation demands. To address this, we propose ConFusion, a novel framework that learns the continuous fusion space via Gaussian-conditioned spatial-aware modulation, enabling instance-level fine-grained controllable infrared and visible image fusion. ConFusion employs a dual-branch architecture to disentangle modality-invariant and modality-specific representations under joint reconstruction and text-guided semantic alignment. Gaussian-conditioned instance modulation variables coupled with Grounded SAM-based instance masks guide instance-level fine-grained modulation through the Mask-Guided Specific Feature Modulator, while the Text-Driven Invariant Feature Enhancer improves semantic consistency and enhances fusion. During inference, the multimodal large language model parses user intents into instance-level modulation variables to guide image fusion. Extensive experiments show that ConFusion achieves state-of-the-art performance across multiple metrics in both fusion quality and downstream tasks, while supporting fine-grained controllable image fusion. Our code is available at https://github.com/HeyufeiAnto/Confusion",
+      "authors": [
+        "Guo Yurong",
+        "He Yufei",
+        "Li Yonghao",
+        "Chang Dongliang",
+        "Zhang Ke",
+        "Ma Zhanyu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-26T11:00:10+00:00",
+      "link": "https://arxiv.org/pdf/2607.23600v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multimodal image fusion method for integrating complementary sensor information",
+      "llm_evidence_cn": "面向互补传感器信息融合的多模态图像融合方法",
+      "llm_evidence": "面向互补传感器信息融合的多模态图像融合方法",
+      "canonical_evidence": "面向互补传感器信息融合的多模态图像融合方法",
+      "llm_tldr_en": "Presents ConFusion, a continuous fusion space learning framework for fine-grained controllable infrared-visible image fusion, enabling instance-level modulation of fused outputs.",
+      "llm_tldr_cn": "现有可控红外与可见光图像融合方法依赖预定义的离散控制条件，导致融合空间稀疏，难以支持实例级细粒度调制。为此提出ConFusion框架，通过高斯条件空间感知调制学习连续融合空间，并采用双分支架构解耦模态不变与模态特定信息，实现细粒度可控融合。实验表明该框架能生成适应多样下游任务需求的融合图像，其连续空间学习思想可推广到高光谱与LiDAR等多模态数据融合场景。",
+      "llm_tldr": "现有可控红外与可见光图像融合方法依赖预定义的离散控制条件，导致融合空间稀疏，难以支持实例级细粒度调制。为此提出ConFusion框架，通过高斯条件空间感知调制学习连续融合空间，并采用双分支架构解耦模态不变与模态特定信息，实现细粒度可控融合。实验表明该框架能生成适应多样下游任务需求的融合图像，其连续空间学习思想可推广到高光谱与LiDAR等多模态数据融合场景。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.23994v1",
+      "source": "arxiv",
+      "title": "Effective Receptive Field Ordering Matters for Infrared Small Target Detection",
+      "abstract": "In this work, we investigate a previously unexplored architectural dimension for infrared small target detection: the organization of effective receptive fields (ERFs) during feature refinement. Unlike existing approaches that primarily improve individual feature operators, we argue that ERF organization constitutes an architectural dimension independent of receptive field design itself, and formulate deep feature transformation as a progressive residual correction process, from which a theoretical framework for ERF scheduling is established. Specifically, we reveal that ERF refinement is governed by two fundamental properties: scale-frequency correspondence, which aligns different ERF scales with distinct residual frequency characteristics, and nonlinear non-commutativity, which makes different ERF orderings produce fundamentally different refinement trajectories. Together, these properties show that ERF organization, rather than ERF scale alone, governs refinement dynamics. Guided by these principles, we propose Receptive Field Ordering Network (RFONet), which realizes hierarchical ERF scheduling through a multigrid-inspired V-cycle strategy using only standard $3\\times3$ convolutions. RFONet achieves state-of-the-art performance on multiple benchmarks with only 1.16M parameters and over 157 FPS inference speed. Beyond empirical performance, our theoretical analysis provides theoretical guarantees for stable residual refinement under perturbations, frequency shifts, and partial occlusions, which are consistently reflected in superior noise robustness and cross-dataset generalization. Finally, our framework reformulates ERF organization as a task-dependent optimization objective, providing a principled foundation for future adaptive receptive field scheduling.",
+      "authors": [
+        "Guoyi Zhang",
+        "Yanjin Du",
+        "Zhengyao Zhao",
+        "Tongsu Zhang",
+        "Guangsheng Xu",
+        "Siyang Chen",
+        "Xiangpeng Xu",
+        "Han Wang",
+        "Xiaohu Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-27T04:40:57+00:00",
+      "link": "https://arxiv.org/pdf/2607.23994v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "small target detection method in infrared imagery, transferable to hyperspectral target detection",
+      "llm_evidence_cn": "红外小目标检测方法，可迁移到高光谱图像目标检测",
+      "llm_evidence": "红外小目标检测方法，可迁移到高光谱图像目标检测",
+      "canonical_evidence": "红外小目标检测方法，可迁移到高光谱图像目标检测",
+      "llm_tldr_en": "Proposes a theoretical framework for effective receptive field scheduling in infrared small target detection, showing that progressive residual correction with scale-frequency correspondence improves target detection performance.",
+      "llm_tldr_cn": "现有红外小目标检测研究多聚焦于改进单个特征算子，而忽略特征细化阶段有效感受野（ERF）的组织方式。本文提出ERF组织是独立于感受野设计的架构维度，并将深度特征变换建模为渐进残差校正过程，据此建立ERF调度的理论框架。通过揭示尺度-频率对应等性质，指导特征细化中的ERF安排，从而提升红外小目标检测性能。该思路可推广至高光谱图像目标检测等小目标检测任务。",
+      "llm_tldr": "现有红外小目标检测研究多聚焦于改进单个特征算子，而忽略特征细化阶段有效感受野（ERF）的组织方式。本文提出ERF组织是独立于感受野设计的架构维度，并将深度特征变换建模为渐进残差校正过程，据此建立ERF调度的理论框架。通过揭示尺度-频率对应等性质，指导特征细化中的ERF安排，从而提升红外小目标检测性能。该思路可推广至高光谱图像目标检测等小目标检测任务。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image target detection",
+      "matched_requirement_id": "req-14",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.24184v1",
+      "source": "arxiv",
+      "title": "LCMamNet: A Lightweight Cross-scale Mamba Network for Infrared Small Target Detection",
+      "abstract": "Infrared small target detection (IRSTD) is important for low-altitude perception, unmanned-system warning, and security monitoring. However, weak targets in infrared imagery usually occupy only a few pixels and are easily submerged by cloud clutter, ground edges, and bright noise, making it difficult for lightweight segmentation-based methods to preserve local target structures while suppressing background interference. To address these challenges, we propose LCMamNet, a lightweight cross-scale Mamba network that progressively enhances local target structures, interacts cross-scale context in a latent space, and restores spatial details with background suppression. Specifically, a compact hierarchical encoder with cross-shaped directional bottleneck residual (CDBR) blocks strengthens direction-sensitive target structures under a small computation budget. A latent dense cross-scale fusion (LDCF) module then performs dense all-level interaction through bidirectional Mamba modeling and reorganizes the interacted features into stable hierarchical semantics. Finally, a progressive decoder selectively recovers shallow spatial details while suppressing irrelevant background textures. Extensive experiments on IRSTD-1k, NUAA-SIRST, and NUDT-SIRST show that the proposed network achieves mIoU scores of 71.25\\%, 79.60\\%, and 95.58\\%, respectively, with only 1.175M parameters and 6.91 GFLOPs. It also runs with a mean inference latency of 6.62 ms, and deployment results on an NVIDIA Jetson Orin NX 16G SUPER further demonstrate its practical potential for real-time edge inference. The code and checkpoints are publicly available at https://github.com/Haoyu096/LCMamNet.",
+      "authors": [
+        "Yuhao Fan",
+        "Le Hui",
+        "Yuchao Dai"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-27T09:06:14+00:00",
+      "link": "https://arxiv.org/pdf/2607.24184v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Small target detection algorithm, transferable to hyperspectral target detection",
+      "llm_evidence_cn": "小目标检测算法，可迁移至高光谱目标检测",
+      "llm_evidence": "小目标检测算法，可迁移至高光谱目标检测",
+      "canonical_evidence": "小目标检测算法，可迁移至高光谱目标检测",
+      "llm_tldr_en": "Proposes LCMamNet, a lightweight cross-scale Mamba network for infrared small target detection; enhances local target structures, interacts cross-scale context, and restores spatial details while suppressing background interference.",
+      "llm_tldr_cn": "红外小目标检测面临目标像素少、易被杂乱背景淹没等问题。该文提出LCMamNet轻量级跨尺度Mamba网络，通过紧凑层次编码器增强局部目标结构，并在隐空间中交互跨尺度上下文以恢复空间细节、抑制背景干扰。实验表明该方法能在保持轻量的同时有效保护小目标结构并提升检测性能。其设计思路可迁移至其他弱目标检测任务。",
+      "llm_tldr": "红外小目标检测面临目标像素少、易被杂乱背景淹没等问题。该文提出LCMamNet轻量级跨尺度Mamba网络，通过紧凑层次编码器增强局部目标结构，并在隐空间中交互跨尺度上下文以恢复空间细节、抑制背景干扰。实验表明该方法能在保持轻量的同时有效保护小目标结构并提升检测性能。其设计思路可迁移至其他弱目标检测任务。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral target detection algorithms",
+      "matched_requirement_id": "req-11",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.27843v1",
+      "source": "arxiv",
+      "title": "VCP-DCN: Beyond Visual Concealed Property via Depth Collaborative Network for Camouflaged Object Detection",
+      "abstract": "Camouflaged Object Detection (COD) aims to identify and segment camouflaged objects in complex environments, which are often concealed because their color and texture are similar to the background. Several existing COD methods introduce depth maps to boost detection performance via learning complementary RGB-D features, ignoring modality-specific characteristics of concealed objects in the depth domain. To address this issue, we propose a depth collaborative network, called VCP-DCN, to mine distinguishable multi-modality features beyond visual concealed prototype in depth domain. Specifically, VCP-DCN progressively performs multi-modality alignment, interaction, and fusion for the COD task. In the \\textbf{alignment} stage, we propose a Separable Prototype Embedding (SPE) module to learn modality-consistency and modality-specific RGB/depth prototype tokens through prototype contrastive learning. Furthermore, we develop a Multi-modality Dual Attention (MDA) module to enhance the cross-modal feature representation through local response maps between modality-consistency RGB/depth prototype tokens and visual tokens on the \\textbf{interaction} stage. Finally, we design a Depth Adaptive Injection (DAI) module to adaptively measure contribution of RGB/depth features with a decision-making mechanism, which calculates similarity distance between RGB/depth modality-specific prototype tokens and modality-consistency ones on the \\textbf{fusion} stage. Extensive experiments demonstrate the effectiveness of our VCP-DCN on three authoritative datasets.",
+      "authors": [
+        "Songsong Duan",
+        "Xi Yang",
+        "Nannan Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-30T08:23:53+00:00",
+      "link": "https://arxiv.org/pdf/2607.27843v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "depth collaborative network for multi-modality fusion in object detection",
+      "llm_evidence_cn": "面向目标检测的多模态融合深度协作网络",
+      "llm_evidence": "面向目标检测的多模态融合深度协作网络",
+      "canonical_evidence": "面向目标检测的多模态融合深度协作网络",
+      "llm_tldr_en": "Camouflaged object detection is challenging due to target-background similarity. Existing RGB-D methods ignore depth-specific features; VCP-DCN proposes a depth collaborative network that progressively aligns, interacts, and fuses multi-modality features, boosting detection performance.",
+      "llm_tldr_cn": "伪装目标检测常因目标与背景相似而困难。现有RGB-D方法忽略了深度域中隐藏目标的模态特定特征，该文提出VCP-DCN深度协作网络，通过渐进式多模态对齐、交互与融合挖掘深度特征，在多个数据集上提升了伪装目标检测性能，展示了深度模态的增值价值。",
+      "llm_tldr": "伪装目标检测常因目标与背景相似而困难。现有RGB-D方法忽略了深度域中隐藏目标的模态特定特征，该文提出VCP-DCN深度协作网络，通过渐进式多模态对齐、交互与融合挖掘深度特征，在多个数据集上提升了伪装目标检测性能，展示了深度模态的增值价值。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral and LiDAR fusion for target detection",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2607.28428v1",
+      "source": "arxiv",
+      "title": "Kohn-Sham Spectral Embedding on Sparse Graphs at the Nishimori Temperature for Image Classification",
+      "abstract": "We introduce Kohn--Sham Spectral Embedding (KSSE), a physics-inspired energy-based model replacing dense CNN classifiers with a sparse-graph spectral embedding evaluated at the Nishimori temperature of an associated Random-Bond Ising Model. By mapping pre-trained features onto quasi-cyclic low-density parity-check graphs and constructing a regularized Laplacian acting as a Kohn--Sham Hamiltonian, we solve $D$ independent channel spectral problems in $\\mathcal{O}(N\\log N + k^2_{\\text{mode}} N)$ time via FFT on circulant blocks (leveraging Pontryagin self-duality of $\\mathbb{Z}/p\\mathbb{Z}$) and low-order Rayleigh refinement. Graph topology is optimized using \\emph{star-domain surgery}: rather than destroying information-carrying codewords by removing frustrated cycles, we construct edge shifts creating local convexity around codewords while bounding residual frustration to $ρ(B_γ)\\leq 1+δ$. Multi-scale fractal analysis ($D_2$ spectrum) and fractal learning-rate landscape certifies a landscape transition from rough regimes ($D_2>3$) to star-domain basins ($D_2<1$), enabling Rayleigh refinement with $k_{\\text{mode}}=5$ modes. We prove six theoretical results: a generalized Ihara--Bass identity linking belief propagation to the Laplacian; trapping-set eigenvalue correspondence; additive channel separability with an explicit exchange-correlation bound; a surgery theorem bounding frustration with attractor width $Ω(1/\\sqrt{d_{\\min}})$; a quasi-stationarity perturbation bound; and a fixed-point convergence theorem. In a transductive protocol on ImageNet-1000 with frozen EfficientNet-B4 features ($D=1792$), KSSE achieves \\textbf{88.93\\%} Top-1 accuracy using $\\approx 21.24$M parameters, outperforming Swin-L (197M, 86.4--87.3\\%) and matching ViT-H/14 (632M, 88.0--89.5\\%) under standard inductive setups, while reducing model footprint by $10\\times$ and $30\\times$, respectively.",
+      "authors": [
+        "V. S. Usatyuk",
+        "D. A. Sapozhnikov",
+        "S. I. Egorov"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.CV",
+        "cs.IT"
+      ],
+      "published": "2026-07-30T16:05:51+00:00",
+      "link": "https://arxiv.org/pdf/2607.28428v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "General spectral embedding classifier applicable to hyperspectral image classification",
+      "llm_evidence_cn": "通用谱嵌入分类器，可适用于高光谱图像分类",
+      "llm_evidence": "通用谱嵌入分类器，可适用于高光谱图像分类",
+      "canonical_evidence": "通用谱嵌入分类器，可适用于高光谱图像分类",
+      "llm_tldr_en": "Introduces Kohn-Sham Spectral Embedding, a physics-inspired energy-based model replacing dense CNN classifiers with sparse-graph spectral embedding; efficient via FFT and graph topology optimization for image classification.",
+      "llm_tldr_cn": "针对传统稠密CNN分类器计算开销大的问题，该文提出基于Kohn-Sham谱嵌入的物理启发能基模型。方法将预训练特征映射到准循环LDPC图并构造正则化拉普拉斯作为Kohn-Sham哈密顿量，利用FFT在循环块上实现高效谱求解，并通过星域手术优化图拓扑。实验表明该嵌入在图像分类任务上具有竞争力，同时显著降低了计算复杂度。该思路为高光谱图像分类提供了可迁移的分类器设计。",
+      "llm_tldr": "针对传统稠密CNN分类器计算开销大的问题，该文提出基于Kohn-Sham谱嵌入的物理启发能基模型。方法将预训练特征映射到准循环LDPC图并构造正则化拉普拉斯作为Kohn-Sham哈密顿量，利用FFT在循环块上实现高效谱求解，并通过星域手术优化图拓扑。实验表明该嵌入在图像分类任务上具有竞争力，同时显著降低了计算复杂度。该思路为高光谱图像分类提供了可迁移的分类器设计。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

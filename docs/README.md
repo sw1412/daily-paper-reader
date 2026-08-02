@@ -6,38 +6,47 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-01
-- 运行时间：2026-08-01 21:14:07 UTC
+- 最新运行日期：2026-08-02
+- 运行时间：2026-08-02 19:52:54 UTC
 - 运行状态：成功
-- 本次总论文数：6
-- 精读区：1
-- 速读区：5
+- 本次总论文数：8
+- 精读区：0
+- 速读区：8
 
 ### 今日简报（AI）
-今日精读1篇、速读5篇共6篇论文，聚焦高光谱图像分类、点云可解释性与多模态表示。最值得精读的是满分论文《MSCM-net》，其多尺度卷积与Mamba结合为高光谱分类提供新框架；速读中《MiSS》逻辑驱动的点云最小充分集也有启发。建议普通读者优先关注高光谱与多模态方向，后续可深入对比Mamba与Transformer在遥感任务中的效率。
-- 详情：[/202608/01/README](/202608/01/README)
+今日速读8篇论文，聚焦PolSAR图像分类与红外小目标检测。  
+其中方向自适应Mamba和Wishart引导几何感知网络在PolSAR分类上表现突出（均7.0分）。  
+建议优先精读这两篇，并关注空间-频率双域协同方法。
+- 详情：[/202608/02/README](/202608/02/README)
 
 ### 精读区论文标签
-1. [MSCM-net: A hyperspectral image classiffcation method based on multi-scale convolution and Mamba](/202608/01/2607.28277v1-mscm-net-a-hyperspectral-image-classiffcation-method-based-on-multi-scale-convolution-and-mamba)  
-   标签：评分：10.0/10、query:hsi
-   evidence：高光谱图像分类方法
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [MiSS: A Logic-Driven Explanation of Minimal Sufficient Coalitions for Point Cloud Classifiers](/202608/01/2607.24074v1-miss-a-logic-driven-explanation-of-minimal-sufficient-coalitions-for-point-cloud-classifiers)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：与激光雷达数据处理相关的点云分类器解释
-2. [Deep Convolutional Large-Margin $\ell_p$-SVDD for Visual Anomaly Detection](/202608/01/2607.22212v1-deep-convolutional-large-margin-ellp-svdd-for-visual-anomaly-detection)  
-   标签：评分：6.0/10、query:hsi
-   evidence：深度大间隔异常检测框架，可用于高光谱异常检测
-3. [LunarFM: A Shared Multimodal Representation of the Moon's Surface](/202608/01/2607.22408v1-lunarfm-a-shared-multimodal-representation-of-the-moons-surface)  
+1. [Direction-adaptive Mamba: Spatial-Frequency Dual-Domain Collaborative Learning for PolSAR Image Classification](/202608/02/2607.23464v1-direction-adaptive-mamba-spatial-frequency-dual-domain-collaborative-learning-for-polsar-image-classification)  
+   标签：评分：7.0/10、query:hsi
+   evidence：使用方向自适应Mamba进行PolSAR图像分类，方法可迁移至高光谱分类
+2. [WGDnet: Wishart-guided Geometric-aware Deep Network for PolSAR Image Classification](/202608/02/2607.23638v1-wgdnet-wishart-guided-geometric-aware-deep-network-for-polsar-image-classification)  
+   标签：评分：7.0/10、query:hsi
+   evidence：面向遥感影像分类的深度网络，结合统计与几何特征，可迁移至高光谱分类
+3. [Effective Receptive Field Ordering Matters for Infrared Small Target Detection](/202608/02/2607.23994v1-effective-receptive-field-ordering-matters-for-infrared-small-target-detection)  
+   标签：评分：7.0/10、query:hsi
+   evidence：红外小目标检测方法，可迁移到高光谱图像目标检测
+4. [Geometry Meets Semantics: Fractional Gradient Stabilization for Semantic-Driven Bounding Box Optimization in Visual Detection Tasks](/202608/02/2607.23530v1-geometry-meets-semantics-fractional-gradient-stabilization-for-semantic-driven-bounding-box-optimization-in-visual-detection-tasks)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：将多源轨道遥感数据融合为共享表示，与高光谱-激光雷达融合目标一致
-4. [DuoAD: Leveraging [CLS] Dual Characteristics for Training-Free Few-Shot Anomaly Detection](/202608/01/2607.23924v1-duoad-leveraging-cls-dual-characteristics-for-training-free-few-shot-anomaly-detection)  
+   evidence：视觉检测中的边界框优化方法，可迁移至高光谱图像目标检测
+5. [ConFusion: Continuous Fusion Space Learning for Fine-Grained Controllable Infrared and Visible Image Fusion](/202608/02/2607.23600v1-confusion-continuous-fusion-space-learning-for-fine-grained-controllable-infrared-and-visible-image-fusion)  
+   标签：评分：6.0/10、query:hsi-lidar
+   evidence：面向互补传感器信息融合的多模态图像融合方法
+6. [LCMamNet: A Lightweight Cross-scale Mamba Network for Infrared Small Target Detection](/202608/02/2607.24184v1-lcmamnet-a-lightweight-cross-scale-mamba-network-for-infrared-small-target-detection)  
    标签：评分：6.0/10、query:hsi
-   evidence：利用全局上下文的免训练少样本异常检测方法，可迁移至高光谱异常检测
-5. [Effective Receptive Field Ordering Matters for Infrared Small Target Detection](/202608/01/2607.23994v2-effective-receptive-field-ordering-matters-for-infrared-small-target-detection)  
+   evidence：小目标检测算法，可迁移至高光谱目标检测
+7. [VCP-DCN: Beyond Visual Concealed Property via Depth Collaborative Network for Camouflaged Object Detection](/202608/02/2607.27843v1-vcp-dcn-beyond-visual-concealed-property-via-depth-collaborative-network-for-camouflaged-object-detection)  
+   标签：评分：6.0/10、query:hsi-lidar
+   evidence：面向目标检测的多模态融合深度协作网络
+8. [Kohn-Sham Spectral Embedding on Sparse Graphs at the Nishimori Temperature for Image Classification](/202608/02/2607.28428v1-kohn-sham-spectral-embedding-on-sparse-graphs-at-the-nishimori-temperature-for-image-classification)  
    标签：评分：6.0/10、query:hsi
-   evidence：通过有效感受野排序提升小目标检测，方法可迁移至高光谱目标检测
+   evidence：通用谱嵌入分类器，可适用于高光谱图像分类
 
 
 <div class="dpr-home-promo-card">

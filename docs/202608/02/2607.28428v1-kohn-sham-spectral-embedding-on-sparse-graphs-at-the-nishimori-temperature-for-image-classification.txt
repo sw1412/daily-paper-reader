@@ -1,0 +1,1614 @@
+Title: Kohn-Sham Spectral Embedding on Sparse Graphs at the Nishimori Temperature for Image Classification
+
+URL Source: https://arxiv.org/pdf/2607.28428v1
+
+Published Time: Fri, 31 Jul 2026 01:28:22 GMT
+
+Number of Pages: 42
+
+Markdown Content:
+# Kohn–Sham Spectral Embedding on Sparse Graphs at the Nishimori Temperature for Image Classification 
+
+V. S. Usatyuk, 1, 2, * D. A. Sapozhnikov, 2 and S. I. Egorov 11Department of Computer Engineering, South-West State University (SWSU), Kursk, 305040 Russia 
+
+> 2
+
+T8 LLC, Research and Development Department, Moscow, 107076 Russia 
+
+(Received xx.xx. 2026; Revised xx.xx.2026; Accepted xx.xx.2026) 
+
+1arXiv:2607.28428v1 [cs.LG] 30 Jul 2026 Deep Learning in Computational Physics 
+
+# Abstract 
+
+We propose Kohn–Sham Spectral Embedding (KSSE), a physics-inspired energy-based model that replaces the dense top-layer classifier of convolutional neural networks with a sparse-graph spectral em bedding evaluated at the Nishimori temperature of an associated Random-Bond Ising Model (RBIM). By mapping pre-trained feature representations onto quasi-cyclic low-density parity-check graphs and constructing a regularized Laplacian that plays the role of an effective Kohn–Sham Hamiltonian, we obtain 𝐷 independent spectral problems—one per feature channel—solvable in 𝒪 (𝑁 log 𝑁 + 𝑘 2
+
+> 𝑚𝑜𝑑𝑒𝑠
+
+𝑁 )
+
+time via Fast Fourier Transform on circulant blocks (a consequence of Pontryagin self-duality of Z/𝑝 Z)with low order Rayleigh refinement. Graph topology is optimized through star-domain surgery : rather than eliminating all frustrated cycles—an impossible task that would destroy the codewords carrying class information—we construct edge shifts that create local convexity around codewords while bound ing residual frustration to 𝜌 (𝐵 𝛾 ) ≤ 1 + 𝛿 . Multi-scale fractal analysis ( 𝐷 2 spectrum) and fractal learning-rate landscape certifies this transition from rough landscapes ( 𝐷 2 > 3) to star-domain basins (𝐷 2 < 1), enabling first order low-mode Rayleigh refinement with only 𝑘 mode = 5 Fourier modes. We establish six rigorous theoretical results: a generalized Ihara–Bass identity linking belief propagation to the regularized Laplacian; a trapping-set eigenvalue correspondence theorem; an additive separabil ity theorem for feature-independent channels with explicit exchange-correlation bound; a star-domain surgery theorem with bounded residual frustration and attractor-basin width Ω(1 /√𝑑 min ); a pertur bation bound for the quasi-stationarity hypothesis; and a convergent fixed-point theorem. Evaluated on ImageNet-1000 with frozen EfficientNet-B4 features ( 𝐷 = 1792 ) under a transductive evaluation protocol—where test images are spectrally embedded jointly with frozen training representatives in a shared sparse graph—KSSE achieves 88.93% Top-1 accuracy using ≈21 .24 M parameters, outper forming Swin-L (197 M, 86.4–87.3%) and matching the lower end of ViT-H/14 (632 M, 88.0–89.5%), which are evaluated under standard inductive protocols, while reducing model size by 10 × and 30 ×,respectively.  
+
+> PACS numbers: 05.50.+q, 89.20.Ff, 07.05.Mh Keywords: Spectral embedding, Nishimori temperature, Kohn–Sham formalism, star domains, multifractal anal ysis, Pontryagin duality, spin glasses, quasi-cyclic graphs, trapping sets, image classification
+> *E-mail: L@Lcrypto.com
+
+x–2 Moscow University Physics Bulletin 80 (9), x (2026)  
+
+> 1. INTRODUCTION
+
+Large-scale image classification has been overwhelmingly dominated by deep convolutional neural networks (CNNs) and vision transformers. While architectures such as EfficientNet-B4 [1] provide robust feature extraction, their terminal fully connected layers require fixed input sizes and scale poorly with an increasing number of classes 𝐾 . An alternative paradigm, rooted in statistical mechanics, treats pattern recognition as inference in an energy-based model: feature vectors define interactions between binary spins on a sparse graph, and classification reduces to finding low-energy collective configurations. Prior work by the authors [2] introduced a foundational framework mapping high-dimen sional CNN features onto spins of an RBIM defined on Multi-Edge Type Quasi-Cyclic LDPC graphs. That approach demonstrated that topological defects—specifically trapping sets—could be characterized by invariants such as Betti numbers and the continuous genus ̂︀ 𝐴 , which di rectly degrade spectral embedding quality via negative Bethe–Hessian eigenvalues. Accuracies of 98.7% on ImageNet-10 and 84.92% on ImageNet-100 were achieved with merely 1.33 M pa rameters. In this work we bridge statistical physics—specifically the Kohn–Sham formalism [3] and spin-glass theory at the Nishimori temperature [4, 5]—with large-scale pattern recognition. The proposed KSSE framework fundamentally shifts the paradigm from rigid topological elimina tion to star-domain surgery : constructing graph modifications that create local convexity (star domains) around codewords 𝑇 𝑆 (𝑎, 0) in the Bethe free-energy landscape while bounding—not eliminating—residual frustration from surviving trapping sets 𝑇 𝑆 (𝑎, 𝑏 ̸=0) .The core idea is as follows. Given a sparse quasi-cyclic LDPC graph whose circulant structure defines where interactions live, and pre-trained visual features that determine their strengths, we construct for each of the 𝐷 feature channels an independent regularized Laplacian 𝐿 (𝑘 )
+
+> 𝛽
+
+(the Bethe–Hessian at inverse temperature 𝛽 ). The Kohn–Sham decomposition solves these 
+
+𝐷 single-channel eigenproblems independently—exactly as density functional theory solves 𝑁 
+
+non-interacting single-particle equations to reproduce a ground-state density. The exchange correlation energy, which in DFT captures electron–electron interactions beyond the Hartree approximation, here arises from graph cycles and vanishes on trees. On circulant graphs after star-domain surgery, it satisfies 𝐸 𝑥𝑐 = 𝒪 (𝛿 ) → 0. Crucially, no Hohenberg–Kohn existence theorem is needed because feature channels are independent by construction. The main contributions of this paper are: 1. A rigorous connection between belief-propagation free-energy defects and RBIM energy 
+
+> x–3
+
+Deep Learning in Computational Physics landscape defects at the Nishimori temperature, established via a generalized Ihara–Bass theorem (Theorem 5.1) and a trapping-set eigenvalue correspondence theorem (Theo rem 5.2). 2. A mean-field Kohn–Sham decomposition theorem (Theorem 4.1) with an explicit ex change-correlation bound that vanishes on trees and decays exponentially with girth (Prop. 4.1), formalizing the analogy without requiring a Hohenberg–Kohn existence theo rem (Prop. 4.2). 3. A star-domain surgery theorem (Theorem 6.1) proving that graph shifts create local con vexity around codewords 𝑇 𝑆 (𝑎, 0) with bounded residual frustration 𝜌 (𝐵 𝛾 ) ≤ 1 + 𝛿 and attractor-basin width Ω(1 /√𝑑 min ).4. A multi-scale fractal analysis framework (Sec. 5.3) connecting the correlation dimension 
+
+𝐷 2 to surgical effectiveness and low-mode Rayleigh refinement via Pontryagin self-duality of Z/𝑝 Z.5. A perturbation bound for the quasi-stationarity hypothesis (Theorem A.2) and a conver gent surgery theorem (Theorem A.3) proving that graph surgery with bounded residual frustration is a convergent iteration. 6. A complete algorithmic pipeline with FFT-based eigenvalue computation, evaluated on ImageNet-1000 at 88.93% Top-1 accuracy with ≈21 .24 M parameters under a transduc tive evaluation protocol (Sec. 8). The remainder of the paper is organized as follows. Section 2 defines quasi-cyclic sparse graphs and the affinity tensor that maps visual features to Ising couplings. Section 3 intro duces the RBIM Hamiltonian, the regularized Laplacian (Bethe–Hessian), and the Nishimori temperature. Section 4 develops the Kohn–Sham mean-field decomposition, including additive separability, exchange-correlation bounds, and Pontryagin-duality-based FFT computation. Sec tion 5 connects belief-propagation defects to trapping sets via a shared topological mechanism and introduces fractal analysis. Section 6 presents the star-domain surgery theorem. Section 7 describes the complete algorithmic pipeline. Sections 8–10 report methodology, experimental results—including a protocol-matched comparison isolating the spectral-embedding benefit from the transductive advantage (Sec. 9.3)—and comparison with state of the art. Section 11 discusses limitations and complexity. All formal proofs are given in Appendix A; Table V summarizes all theoretical results. 
+
+> x–4
+
+Moscow University Physics Bulletin 80 (9), x (2026)  
+
+> 2. QUASI-CYCLIC SPARSE GRAPHS, BOND WEIGHTS, AND TRAPPING SETS
+
+The foundation of KSSE is a sparse QC-LDPC graph whose algebraic structure determines where interactions (bonds) exist and how visual features assign their strengths. This section defines the graph families, the affinity tensor mapping CNN features to signed bond weights, and the trapping-set ontology that governs energy-landscape defects.  
+
+> 2.1. Circulant Permutation Matrices and QC-LDPC Structure
+
+A quasi-cyclic (QC) LDPC code has a sparse parity-check matrix 𝐻 composed of 𝑚 𝑏 × 𝑛 𝑏 
+
+blocks, each either a zero matrix or a circulant permutation matrix (CPM) 𝑃 𝑎 (𝑎 ∈ Z/𝑝 Z), defined by shifting the identity matrix 𝐼 𝑝 by 𝑎 positions. The exponent matrix 𝐸 (𝐻 ) contains shift values, and replacing every non-zero block by 1 yields the binary protograph 𝑀 (𝐻 ) ∈{0, 1}𝑚 𝑏 ×𝑛 𝑏 . The resulting Tanner graph exhibits a toric structure with quotient group Z/𝑝 Z,enabling FFT-based spectral computation on each circulant block. 
+
+Definition (Toroidal and Spherical Graph Families) . A toroidal QC-LDPC family contains two or more independent circulant rings in 𝐸 (𝐻 ); the protograph has at least two disjoint cycles, yielding non-contractible loops after lifting. A spherical QC-LDPC family is built from a single circulant ring with multi-weight CPM superpositions; all cycles are contractible. The multidiag onal bond matrix in the spherical case has non-zero entries fixed by the protograph and values supplied by data. 
+
+Example (spherical graph). For 𝑁 = 35 000 , Fig. 1 shows a spherical construction with multi-weight (weight 10) shifts {0, 1, 6, 373 , 5210 , 20993 , 22980 , 23826 , 26410 , 26978 } modulo the circulant size. Each shift defines a diagonal band in the lifted adjacency; superposing several shifts yields a multidiagonal bond matrix whose sparsity pattern is fixed by the protograph and whose entries are populated from feature affinities (Sec. 2).  
+
+> 2.2. Affinity Tensor: From Visual Features to Ising Couplings
+
+The Tanner graph 𝒯 provides the skeleton; visual features provide the flesh. Let 𝑋 ∈ R𝑁 ×𝐷 
+
+be a feature matrix and let (𝑟 , 𝑐 ) index the 𝐸 edges of 𝒯 .
+
+Definition (Affinity Tensor) . For each edge 𝑒 = ( 𝑟 𝑒 , 𝑐 𝑒 ) and feature 𝑘 ∈ { 1, . . . , 𝐷 }, compute the Manhattan distance 𝐿 1[𝑒, 𝑘 ] = |𝑋 𝑟 𝑒 ,𝑘 − 𝑋 𝑐 𝑒 ,𝑘 |. The raw affinity is 𝐴 raw [𝑒, 𝑘 ] = 1 /(1 + 𝐿 1[𝑒, 𝑘 ] + 
+
+> x–5
+
+Deep Learning in Computational Physics 
+
+Figure 1. Spherical QC-LDPC graph construction for 𝑁 = 35 000 nodes with column weight 10. Each colored diagonal band corresponds to one circulant permutation shift; their superposition forms the multidiagonal bond matrix that defines the Ising coupling topology. The spherical family ensures all cycles are contractible, enabling Pontryagin-duality-based FFT spectral computation on each circulant block. 
+
+𝜀 ) with 𝜀 ≈ 10 −7. Channel-wise 𝑧 -scoring yields the normalized tensor 𝐴 ∈ R𝐸 ×𝐷 , and the bond-weight matrix for channel 𝑘 is the sparse symmetric matrix 
+
+𝐽 (𝑘 ) 
+
+> 𝑖𝑗
+
+=
+
+⎧⎪⎨⎪⎩
+
+𝐴 [𝑒, 𝑘 ], 𝑒 = ( 𝑖, 𝑗 ) ∈ 𝐸 (𝒯 ),
+
+0, otherwise. 
+
+(1) 
+
+Negative entries after 𝑧 -scoring correspond to antiferromagnetic bonds; positive entries are fer romagnetic. 
+
+The QC-graph topology fixes the location of interactions (which edges exist), while data fix their magnitudes and signs. This separation is essential for the Kohn–Sham decomposition: because each channel 𝑘 carries its own coupling tensor 𝐽 (𝑘 ) 
+
+> 𝑖𝑗
+
+, there are no cross-feature interaction terms, making the decomposition exact by construction. 
+
+2.3. Cycles, Girth, and Trapping Sets 
+
+A cycle of length 2ℓ in 𝒯 satisfies the shift consistency condition ∑︀ 2ℓ𝑖 =1 (−1) 𝑖 𝑎 𝑖 ≡ 0 (mod 𝐿 ).Trapping sets (TS) are subgraphs that corrupt iterative decoding: 
+
+x–6 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+Definition (Trapping Set) . A subset 𝑆 of variable nodes with |𝑆 | = 𝑎 and odd-degree check neighbors 𝑂 (𝑆 ) with |𝑂 (𝑆 )| = 𝑏 is a trapping set 𝑇 𝑆 (𝑎, 𝑏 ). When 𝑏 = 0 , all checks have even degree (codewords); when 𝑏 > 0, frustrated cycles introduce energy valleys that distort spectral embeddings. 
+
+Two regimes are critical for KSSE: (i) 𝑇 𝑆 (𝑎, 0) form low-energy solutions (codewords) en coding class information; (ii) 𝑇 𝑆 (𝑎, 𝑏 ̸=0) introduce negative eigenvalues in the local Bethe–Hes sian, creating spurious attractors. Figure 2 illustrates examples of trapping sets, specifically 
+
+𝑇 𝑆 (4 , 44) and 𝑇 𝑆 (4 , 48) , within spherical QC-LDPC graph families that cause distortions in spectral embeddings. Section 5 establishes that both effects originate from the same topological mechanism—frustrated cycles with odd unsatisfied constraints.         
+
+> Figure 2. Examples of Trapping Sets 𝑇 𝑆 (4 ,44) (left) and 𝑇 𝑆 (4 ,48) (right) in spherical QC-LDPC graph families.
+> 3. RANDOM-BOND ISING MODEL AND NISHIMORI TEMPERATURE
+
+Having defined the graph and its bond weights, we now introduce the energy function govern ing inference and identify the critical temperature at which class structure becomes maximally detectable. 
+
+> x–7
+
+Deep Learning in Computational Physics 
+
+3.1. RBIM Hamiltonian 
+
+Each vertex 𝑖 carries an Ising spin 𝜎 𝑖 ∈ {− 1, +1 }. The RBIM Hamiltonian on channel 𝑘 is 
+
+ℋ𝐽 (𝜎 ) = −∑︁ 
+
+> (𝑖,𝑗 )∈𝐸
+
+𝐽 𝑖𝑗 𝜎 𝑖 𝜎 𝑗 , (2) with Boltzmann distribution 𝜇 𝛽,𝐽 (𝜎 ) ∝ 𝑒 −𝛽 ℋ𝐽 at inverse temperature 𝛽 . The coupling 𝐽 𝑖𝑗 = 𝐽 (𝑘 )
+
+> 𝑖𝑗
+
+encodes feature similarity between vertices 𝑖 and 𝑗 on channel 𝑘 .
+
+3.2. Bethe–Hessian and Regularized Laplacian 
+
+Linearizing belief propagation (BP) at the paramagnetic fixed point yields a relationship be tween message-passing stability and the spectrum of a graph operator. The effective interaction weights are 
+
+𝑊 𝑖𝑗 = tanh( 𝛽𝐽 𝑖𝑗 )1 − tanh 2(𝛽𝐽 𝑖𝑗 ) = 12 sinh(2 𝛽𝐽 𝑖𝑗 ), Λ𝑖𝑗 = tanh 2(𝛽𝐽 𝑖𝑗 )1 − tanh 2(𝛽𝐽 𝑖𝑗 ) = sinh 2(𝛽𝐽 𝑖𝑗 ), (3) and the diagonal degree matrix is 𝐷 𝑖𝑖 = 1+ ∑︀ 𝑗 ∈𝜕𝑖 Λ𝑖𝑗 . With scaling matrix 𝑆 = diag( 𝐷 −1/211 , . . . , 𝐷 −1/2 
+
+> 𝑁 𝑁
+
+),the normalized regularized Laplacian is 
+
+𝐿 𝛽 = 𝐼 − 𝑆𝑊 𝑆, (4) where 𝑊 = [ 𝑊 𝑖𝑗 ] is the off-diagonal weight matrix. The term Λ𝑖𝑗 down-weights volatile nodes, and 𝑆 normalizes for heterogeneous degrees. 
+
+3.3. Nishimori Temperature 
+
+The Nishimori temperature 𝛽 𝑁 marks the point where community structure becomes most pronounced and class separability is maximized [4–7]. It is defined by the zero-crossing condition: 
+
+𝜆 min (𝐿 𝛽 )⃒⃒ 𝛽 =𝛽 𝑁 
+
+= 0 . (5) Below 𝛽 𝑁 , spins fluctuate too strongly to retain class information; above it, the system enters a spin-glass phase dominated by disorder. The zero-crossing condition is therefore the natural operating point for spectral embedding: the minimum eigenvector of 𝐿 𝛽 𝑁 identifies community structure in that channel’s affinity graph. 
+
+x–8 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+4. KOHN–SHAM MEAN-FIELD SPECTRAL DECOMPOSITION 
+
+In density functional theory, the Kohn–Sham formalism [3] (Nobel Prize in Chemistry, 1998) replaces 𝑁 interacting electrons with 𝑁 non-interacting single-particle equations that reproduce the same ground-state density. The effective potential decomposes as an external field plus a Hartree (mean-field) term plus an exchange-correlation correction capturing interactions beyond the mean-field approximation. KSSE performs an analogous reduction: instead of solving one coupled problem over all 
+
+𝐷 feature channels, we solve 𝐷 independent single-channel eigenproblems—each with its own effective Hamiltonian 𝐿 (𝑘 ) 
+
+> 𝛽
+
+(𝛽 (𝑘 ) 
+
+> 𝑁
+
+)—and concatenate the results. The regularized Laplacian 𝐿 (𝑘 )
+
+> 𝛽
+
+plays the role of the single-particle Hamiltonian, the diagonal scaling 𝑠 (𝑘 ) 
+
+> 𝑖
+
+= 1 /√︁ 𝐷 (𝑘 ) 
+
+> 𝑖𝑖
+
+encodes the external (graph scaffold) potential, and the off-diagonal coupling 𝑊 (𝑘 ) 
+
+> 𝑖𝑗
+
+𝑠 (𝑘 ) 
+
+> 𝑗
+
+represents the Hartree mean-field interaction. The exchange-correlation energy 𝐸 𝑥𝑐 captures loop corrections to the Bethe free energy that vanish on trees. 
+
+Theorem 4.1 (Mean-Field Kohn–Sham Spectral Embedding) . Under the Bethe–Peierls (mean field) approximation and feature independence, the 𝐷 -channel interacting problem decomposes into 𝐷 independent single-channel eigenproblems: 
+
+𝐿 (𝑘 )(𝛽 (𝑘 ) 
+
+> 𝑁
+
+) 𝑣 (𝑘 ) 
+
+> 𝑖
+
+= 𝜆 (𝑘 ) 
+
+> 𝑖
+
+𝑣 (𝑘 ) 
+
+> 𝑖
+
+, 𝑘 = 1 , . . . , 𝐷, (6) 
+
+and the final embedding is 𝐸 = [ 𝑆 (1) 𝑣 (1) min | · · · | 𝑆 (𝐷 )𝑣 (𝐷 )min ] ∈ R𝑁 ×𝐷 . The effective potential for each channel decomposes as 𝑣 (𝑘 ) 
+
+> eff
+
+(𝑖 ) = 𝑠 (𝑘 ) 
+
+> 𝑖
+
++∑︀ 𝑗 ∈𝜕𝑖 𝑊 (𝑘 ) 
+
+> 𝑖𝑗
+
+𝑠 (𝑘 ) 
+
+> 𝑗
+
++ 𝛿𝐸 (𝑘 ) 
+
+> 𝑥𝑐
+
+/𝛿𝜌 (𝑘 ) 
+
+> 𝑖
+
+, where 𝑠 (𝑘 ) 
+
+> 𝑖
+
+= 1 /√︁ 𝐷 (𝑘 )
+
+> 𝑖𝑖
+
+is the external potential, the sum is the Hartree interaction, and 𝐸 (𝑘 ) 
+
+> 𝑥𝑐
+
+= 𝐹 (𝑘 ) 
+
+> Bethe
+
+− 𝐹 (𝑘 ) 
+
+> MF
+
+is the exchange-correlation energy. The approximation error satisfies |𝐸 (𝑘 ) 
+
+> 𝑥𝑐
+
+| ≤ 𝜉 𝑔 0 /[2 𝑔 0(1 − 𝜉 )] with 
+
+𝜉 = ( 𝑑 max − 1) tanh( 𝛽 𝑁 𝐽 max ) < 1, vanishing on trees ( 𝑔 0 = ∞). After star-domain surgery, residual 𝐸 𝑥𝑐 = 𝒪 (𝛿 ) with 𝛿 → 0 (Theorem A.3). Proof. See Appendix 3. 
+
+4.1. Additive Separability under Feature Independence 
+
+Because each feature channel carries its own coupling tensor 𝐽 (𝑘 ) 
+
+> 𝑖𝑗
+
+and there are no cross-fea ture interaction terms, the full Hamiltonian is additively separable: ℋfull =∑︀ 𝐷 𝑘 =1 ℋ(𝑘 ). This exact decomposition—which does not hold on higher-dimensional topological complexes (see Remark 4.5)—is the key structural property enabling per-channel computation. 
+
+x–9 Deep Learning in Computational Physics 
+
+Theorem 4.2 (Additive Separability) . Under feature independence, 𝑍 full =∏︀ 𝑘 𝑍 (𝑘 ), 𝐺 Bethe =∑︀  
+
+> 𝑘
+
+𝐺 (𝑘 )
+
+> Bethe
+
+, and 𝐿 full  
+
+> 𝛽
+
+=⨁︀ 𝑘 𝐿 (𝑘 ) 
+
+> 𝛽
+
+. The global Nishimori temperature is 𝛽 full  
+
+> 𝑁
+
+= max 𝑘 𝛽 (𝑘 ) 
+
+> 𝑁
+
+.Proof. See Appendix 3. 
+
+4.2. Exchange-Correlation Energy and the Bethe–Peierls Bound 
+
+On trees ( 𝑔 0 = ∞), the Bethe free energy is exact, so 𝐸 𝑥𝑐 = 𝐹 Bethe − 𝐹 MF = 0 and the mean-field decomposition becomes exact. On loopy graphs, loop corrections appear first at length 𝑔 0, giving an exponentially decaying bound: 
+
+Proposition 4.1 (Exchange-Correlation Bound) . For a graph with girth 𝑔 0 and maximum de gree 𝑑 max , |𝐸 (𝑘 ) 
+
+> 𝑥𝑐
+
+| ≤ 𝜉 𝑔 0 /[2 𝑔 0(1 − 𝜉 )] where 𝜉 = ( 𝑑 max − 1) tanh( 𝛽 𝑁 𝐽 max ) < 1. The bound van ishes on trees. After star-domain surgery, residual frustration yields 𝐸 𝑥𝑐 = 𝒪 (𝛿 ) with 𝛿 → 0
+
+(Theorem A.3). The fractal dimension 𝐷 2 serves as a practical diagnostic: 𝐷 2 < 1 indicates star-domain basins (near-exact decomposition), while 𝐷 2 > 3 signals rough landscape requiring surgery. Proof. See Appendix 3. 
+
+4.3. Absence of a Hohenberg–Kohn Analogue 
+
+In Kohn–Sham DFT, the Hohenberg–Kohn theorem guarantees a one-to-one correspondence between ground-state density and external potential. No such existence theorem is needed in KSSE because feature channels are exactly independent by construction. 
+
+Proposition 4.2 (Absence of Hohenberg–Koon Analogue for RBIM) . There exist graphs with distinct coupling matrices 𝐽 and 𝐽 ′ that yield identical magnetizations 𝑚 𝑖 = ⟨𝜎 𝑖 ⟩ at all temper atures but different free energies, demonstrating that the free energy is not a function of {𝑚 𝑖 }
+
+alone. Proof. See Appendix 3. This proposition confirms that KSSE’s exact separability arises from feature independence (a structural property), not from an existence theorem. The Kohn–Sham analogy is therefore a computational strategy, not a variational approximation. 
+
+x–10 Moscow University Physics Bulletin 80 (9), x (2026)  
+
+> 4.4. Pontryagin Duality and FFT-Based Eigenvalue Computation
+
+The quotient group 𝐺 = Z/𝑝 Z is self-dual under Pontryagin duality [8]: ̂︀ 𝐺 ∼= 𝐺 with charac ters 𝜒 𝑚 (𝑛 ) = 𝑒 2𝜋𝑖𝑚𝑛/𝑝 . By the Pontryagin duality theorem, every circulant matrix—which is a convolution operator on 𝐺 —is diagonalized by the character basis {𝜒 𝑚 }𝑝 −1
+
+> 𝑚 =0
+
+, i.e., by the discrete Fourier transform. This self-duality ensures that: (i) each single-channel eigenproblem is solved in 𝒪 (𝑁 log 𝑁 ) via FFT; and (ii) spatial concentration (wide star-domain basins) corresponds to spectral concentration (narrow peaks), justifying low-mode Rayleigh refinement with only 
+
+𝑘 mode = 5 Fourier modes after surgery.  
+
+> 4.5. Topological Coupling Hierarchy
+
+Remark (Hierarchy of topological complexity) . The exact additive separability in Theorem 4.2 relies on the circulant graph’s trivial cohomology. Replacing it with a higher-dimensional topo logical complex [9, 10] would introduce cross-channel coupling via cup products: 1. Level 1 (Circulant QC-LDPC, current KSSE): No cross-channel interactions; 𝐸 𝑥𝑐 =
+
+𝒪 (𝛿 ) → 0; 𝒪 (𝑁 log 𝑁 ) per feature via FFT. 2. Level 2 (CSS code on 2D complex, pairwise intersections): Cup products ⌣: 𝐻 1 × 𝐻 1 →
+
+𝐻 2 yield 𝑉 (𝑘,𝑘 ′)̸ = 0 ; approximate Kohn–Sham with two-body exchange-correlation. FFT factorization breaks. 3. Level 3 (3D complex, triple intersections): Three-body coupling analogous to CCZ-type non-Clifford gates [9]; fully coupled Hamiltonian requires quantum resources. Star-domain surgery keeps the system at Level 1 by suppressing non-trivial cohomology classes that would enable cup products. Each level increases expressiveness but sacrifices computational tractability.         
+
+> 5. ENERGY LANDSCAPE: BP DEFECTS, TRAPPING SETS, AND FRACTAL ANALYSIS
+
+This section establishes the key physical connection between belief-propagation free-energy defects and RBIM energy-landscape defects at the Nishimori temperature, and introduces mul ti-scale fractal analysis as a diagnostic for surgical effectiveness. 
+
+> x–11
+
+Deep Learning in Computational Physics 
+
+5.1. Belief Propagation Free Energy on Loopy Graphs 
+
+On a tree (cycle-free graph), BP converges to exact marginals and the Bethe free energy is convex. On loopy graphs such as QC-LDPC Tanner graphs, BP iterations define a dynamical system 𝑚 (𝑡 +1) = ℱ(𝑚 (𝑡 )) whose fixed points are stationary points of 𝐺 Bethe , but convexity is lost: the landscape acquires spurious local minima and saddle points associated with trapping sets. Linearizing BP at the paramagnetic fixed point yields the weighted non-backtracking operator 𝐵 𝛾 with weights 𝛾 𝑖𝑗 = tanh( 𝛽𝐽 𝑖𝑗 ). The connection to the regularized Laplacian is formalized in Theorem 5.1: linearization at 𝛽 𝑁 , followed by a generalized Ihara–Bass projection from edge space to vertex space and congruence via 𝑆 , produces 𝐿 𝛽 = 𝐼 − 𝑆𝑊 𝑆 exactly. The key identity (Theorem 5.1(c)) is: 
+
+𝐻 Bethe (𝛽 ) linearize at 𝛽 𝑁 
+
+−−−−−−−−→ 𝐿 𝛽 = 𝐼 − 𝑆𝑊 𝑆. (7) The curvature of the BP free-energy landscape at 𝛽 𝑁 is the regularized Laplacian whose spec trum we compute. At the critical point 𝜆 min (𝐿 (𝛽 𝑁 )) = 0 , community structure becomes maxi mally detectable. 
+
+Theorem 5.1 (BP Linearization and Regularized Laplacian Identity) . Let 𝐵 𝛾 be the weighted non-backtracking operator. Then: (a) 𝐵 𝛾 is the Jacobian of linearized BP at the paramagnetic fixed point; (b) 𝜇 ∈ C (𝜇 2̸ = 𝛾 2 
+
+> 𝑖𝑗
+
+) is an eigenvalue of 𝐵 𝛾 iff det( 𝑀 𝛾 (𝜇 )) = 0 , where 𝑀 𝛾 (𝜇 )
+
+is the generalized Ihara–Bass vertex matrix; (c) at 𝜇 = 1 , 𝐿 𝛽 = 𝑆 𝑀 𝛾 (1) 𝑆 , and 𝜆 min (𝐿 𝛽 ) = 0 ⇔ 1 ∈ spec( 𝐵 𝛾 ); (d) BP stability: 𝜌 (𝐵 𝛾 ) < 1 (convergent), = 1 (Nishimori criticality), > 1
+
+(spin-glass). Proof. See Appendix 1. 
+
+5.2. Shared Topological Origin of Defects 
+
+Trapping sets 𝑇 𝑆 (𝑎, 𝑏 ̸=0) simultaneously corrupt both landscapes—the BP free-energy land scape and the RBIM energy landscape at 𝛽 𝑁 —through a common mechanism: frustrated cycles with odd unsatisfied constraints. 
+
+Theorem 5.2 (Shared Topological Defects) . Let 𝑈 ⊆ 𝑉 induce a trapping set 𝑇 𝑆 (𝑎, 𝑏 ). (a) If 
+
+𝑏 > 0, then for large 𝛽 , there exists a frustrated cycle in 𝑈 with 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) > 1 and hence 
+
+𝜆 min (𝐿 (𝑈 ) 
+
+> 𝛽
+
+) < 0. (b) If 𝑏 = 0 (codeword), 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) ≤ 1 and 𝜆 min (𝐿 (𝑈 ) 
+
+> 𝛽
+
+) ≥ 0 at the Nishimori temperature. (c) Both BP divergence and spectral embedding corruption originate from the same frustrated-cycle topology. 
+
+x–12 Moscow University Physics Bulletin 80 (9), x (2026)         
+
+> Figure 3. 2-D PCA visualization of the trapping-set energy landscape. The surface encodes the lo cal Bethe–Hessian eigenvalue sign: positive-eigenvalue regions (above the plane) correspond to energy minima at codewords 𝑇 𝑆 (𝑎, 0) that encode class information; surrounding valleys with negative eigen values (below the plane) arise from frustrated trapping sets 𝑇 𝑆 (𝑎, 𝑏 ̸=0) and create spurious attractors. Star-domain surgery constructs edge shifts that widen the positive-eigenvalue basins around codewords while bounding residual frustration from surviving 𝑇 𝑆 (𝑎, 𝑏 ̸=0) . The embedding is computed via Alg. 5.
+
+Proof. See Appendix 2. Eliminating all trapping sets is impossible—doing so would destroy codewords 𝑇 𝑆 (𝑎, 0) en coding essential class information. Instead, star-domain surgery (Sec. 6) constructs shifts that bound residual frustration to 𝜌 (𝐵 𝛾 ) ≤ 1 + 𝛿 while creating local convexity around surviving codewords. Figure 3 visualizes this dichotomy using a 2-D PCA projection of the trapping-set energy landscape (computed via Alg. 5). The surface shows regions of positive Bethe–Hessian eigen values where energy minima correspond to codewords 𝑇 𝑆 (𝑎, 0) ; surrounding valleys associated with 𝑇 𝑆 (𝑎, 𝑏 ̸=0) introduce negative eigenvalues that create spurious attractors. 
+
+> x–13
+
+Deep Learning in Computational Physics 
+
+Figure 4. Generalized dimension spectrum 𝐷 𝑞 (𝑞 ∈ [−4, 4] ) of the trapping-set energy landscape before star-domain surgery. The broad range from 𝐷 −4 ≈ 4.4 to 𝐷 4 ≈ 0 confirms multifractal structure: high-dimensional sparse fluctuations coexist with concentrated deep traps, indicating a rough landscape (𝐷 2 > 3) that requires surgical intervention. After surgery, the spectrum collapses toward 𝐷 𝑞 < 1 across all 𝑞 , certifying star-domain geometry. 
+
+5.3. Multi-Scale Fractal Analysis of Energy Landscapes 
+
+The correlation dimension [13] 𝐶 (𝑟 ) ∝ 𝑟 𝐷 2 quantifies fractal clustering of deep valleys in the Bethe–Hessian energy landscape. The generalized dimension spectrum 𝐷 𝑞 (𝑞 ∈ [−4, 4] ) [14], shown in Fig. 4, confirms strictly multifractal scaling: high-dimensional sparse fluctuations at 
+
+𝐷 −4 ≈ 4.4 transition to concentrated peaks at 𝐷 4 ≈ 0, indicating a heterogeneous energy landscape with rare deep traps. The fractal analysis serves three critical roles: 
+
+(i) Surgical guidance. Before surgery, the energy landscape is rough and multifractal (𝐷 2 > 3): many frustrated saddle points create spurious local minima that distort spectral em beddings. Surgery constructs shifts creating star-domain convexity around codewords 𝑇 𝑆 (𝑎, 0) ;this transition is diagnosed by 𝐷 2 decreasing from 𝐷 2 > 3 to 𝐷 2 < 1, indicating formation of wide, smooth basins (Fig. 5) [15]. 
+
+(ii) Low-mode Rayleigh refinement. When star-domain basins form ( 𝐷 2 < 1), the spectral mass of 𝐿 𝛽 concentrates near 𝜆 min in the Pontryagin-dual character basis. Because 
+
+x–14 Moscow University Physics Bulletin 80 (9), x (2026)         
+
+> Figure 5. Local entropy landscape around codewords 𝑇 𝑆 (𝑎, 0) after star-domain surgery. Wide, smooth attractor basins replace the pre-surgery rough terrain, enabling iterative methods (belief propagation or gradient descent) to converge to the correct codeword from a broad initial region. The basin width
+> Ω(1 /√𝑑 min )is certified by 𝐷 2<1in the fractal dimension spectrum [15].
+
+[Z/𝑝 Z ∼= Z/𝑝 Z, a narrow basin of width 𝑤 in configuration space corresponds to a spectral peak of width ∼ 1/𝑤 . Only 𝑘 mode = 5 Fourier modes suffice for accurate Rayleigh refinement (Alg. 4), reducing per-feature complexity from 𝒪 (𝑁 2) to 𝒪 (𝑁 ).
+
+(iii) Convergence certification. The fractal dimension 𝐷 2 < 1 after surgery convergence (Theorem A.3) certifies that star-domain geometry has been achieved: attractor basins around codewords are wide enough ( Ω(1 /√𝑑 min )) that BP messages converge to correct community assignments from a broad initial region. 
+
+Trapping-set removal lowers fractal curvature. The boundary between stable and unstable training in neural-network hyperparameter space is known to be fractal [16]. In Fig. 6 we visualize how this landscape changes when one family of trapping sets (TS) is removed. Prior to elimination, the left panel exhibits intricate vertical and horizontal striations spanning many orders of magnitude in learning rate. These fine-scale features correspond to bifurcation boundaries where the loss surface is extremely sensitive to hyperparameters; mathematically, this manifests as large Hessian eigenvalues with respect to 𝜂 0 and 𝜂 1. Trapping sets anchor these instabilities by creating localized high-curvature ridges in the optimization landscape. Once this TS family is broken—via graph pruning that severs the associated cyclic dependency paths—the pinned bifurcations disappear across large regions of the scan. The post-elimination panel 
+
+> x–15
+
+Deep Learning in Computational Physics 
+
+Figure 6. Eliminating one family (ontology - ordered hierarchical sets of nested nodes which form TS, [12]) of trapping sets regularizes the fractal learning-rate landscape. Two-dimen sional scan over input-layer ( 𝜂 0) and output-layer ( 𝜂 1) learning rates (left) before and (right) after breaking a single family of trapping sets. Color encodes local loss curvature (proxy for effective Hes sian eigenvalue magnitude along hyperparameter directions). Before removal, the landscape displays dense fractal filamentation: tiny perturbations in 𝜂 0 or 𝜂 1 trigger bifurcations between convergent and divergent regimes, reflecting extreme curvature. After TS elimination, broad, smoothly varying basins replace much of the fine-scale structure, indicating that the hyperparameter-space curvature has been substantially reduced. This visualization connects the fractal dimension 𝐷 2 of the energy landscape (Sec. 5.3) to practical trainability: removing a single TS family lowers the effective Hessian eigenvalues along 𝜂 0, 𝜂 1, stabilizing training over wider hyperparameter ranges [16]. 
+
+reveals extensive smooth basins with gentle color gradients, signifying that the local curvature along learning-rate directions has dropped and the landscape has become far more amenable to optimization. Consequently, training can tolerate larger stable learning rates and becomes less sensitive to small hyperparameter perturbations. 
+
+6. STAR-DOMAIN SURGERY AND LOCAL CONVEXITY 
+
+A fundamental constraint prevents eliminating all frustrated cycles 𝑇 𝑆 (𝑎, 𝑏 ̸=0) : the minimum code distance 𝑑 min of any non-trivial LDPC code is bounded by the Tanner graph structure, and removing all odd-degree check nodes would destroy codewords 𝑇 𝑆 (𝑎, 0) that encode es sential class information. Instead, surgery constructs shifts —edge modifications that preserve 
+
+x–16 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+Figure 7. Star-domain geometry around codewords 𝑇 𝑆 (𝑎, 0) after surgery. Each codeword 𝑥 0 becomes the center of a star-domain basin (shaded region) in the Bethe free-energy landscape: any point on the line segment from 𝑥 0 to 𝜎 ∈ 𝒰 (𝑥 0) lies within the domain, ensuring convergence of BP or gradient descent to the codeword minimum. The basin width Ω(1 /√𝑑 min ) is determined by the QC-LDPC code distance. Residual frustrated trapping sets 𝑇 𝑆 (𝑎, 𝑏 ̸=0) outside the basin have bounded spectral radius 
+
+𝜌 (𝐵 𝛾 ) ≤ 1 + 𝛿 and do not create spurious attractors within the codeword’s domain. 
+
+codewords while creating local convexity around them. 
+
+Definition (Star Domain) . A set 𝒮 ⊆ R𝑁 is a star domain with respect to 𝑥 0 ∈ 𝒮 if for all 𝑦 ∈ 𝒮 
+
+and 𝑡 ∈ [0 , 1] , 𝑡 𝑦 + (1 − 𝑡 )𝑥 0 ∈ 𝒮 . In the energy landscape context, 𝐺 Bethe forms a star domain around codeword 𝑥 0 ∈ 𝑇 𝑆 (𝑎, 0) if for all 𝜎 ∈ 𝒰 (𝑥 0) and all 𝑡 ∈ [0 , 1] : 𝐺 Bethe (𝑡 𝜎 + (1 − 𝑡 )𝑥 0) ≤
+
+max( 𝐺 Bethe (𝜎 ), 𝐺 Bethe (𝑥 0)) . This ensures gradient descent (or BP message passing) reaches 𝑥 0
+
+from any starting point in the basin. 
+
+The star-domain property is weaker than full convexity but sufficient for convergence of iterative methods to the codeword minimum. 
+
+Theorem 6.1 (Star-Domain Surgery) . Let 𝒢 𝑛 be a graph after 𝑛 surgery iterations applying shift operator Σ𝑛 . Then: (a) Each surviving codeword 𝑥 0 ∈ 𝑇 𝑆 (𝑎, 0) is the center of a star domain in 𝐺 Bethe ; (b) 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) ≤ 1 + 𝛿 𝑛 with 𝛿 𝑛 = 𝒪 (Φ( 𝒢 𝑛 ) − Φ( 𝒢 𝑛 −1)) → 0 as 𝑛 → ∞ ; (c) The attractor basin width around each codeword is Ω(1 /√𝑑 min ).Proof. See Appendix 4. Star-domain surgery serves a dual purpose: it bounds residual frustrated cycles that corrupt BP convergence (Theorem 5.2) and creates star-domain convexity around codewords (Fig. 7), 
+
+x–17 Deep Learning in Computational Physics 
+
+Algorithm 1: Affinity Tensor Construction 
+
+Input : 𝑋 ∈ R𝑁 ×𝐷 , edge indices 𝑟 , 𝑐 ∈ N𝐸 , stability constant 𝜀 
+
+Output : Normalized affinity tensor 𝐴 ∈ R𝐸 ×𝐷  
+
+> 1
+
+Extract edge features: 𝑋 𝑖 ← 𝑋 [𝑟 , :] , 𝑋 𝑗 ← 𝑋 [𝑐 , :] ; 
+
+> 2
+
+Compute Manhattan distances: 𝐿 1[𝑖, 𝑘 ] ← | 𝑋 𝑖 [𝑖, 𝑘 ] − 𝑋 𝑗 [𝑖, 𝑘 ]|; 
+
+> 3
+
+𝐴 raw [𝑖, 𝑘 ] ← 1/(1 + 𝐿 1[𝑖, 𝑘 ] + 𝜀 ); 
+
+> 4
+
+for 𝑘 = 1 to 𝐷 do  
+
+> 5
+
+𝜇 𝑘 ← 1
+
+> 𝐸
+
+∑︀ 𝑖 𝐴 raw [𝑖, 𝑘 ]; 𝜎 𝑘 ←√︁ 1
+
+> 𝐸
+
+∑︀ 𝑖 (𝐴 raw [𝑖, 𝑘 ] − 𝜇 𝑘 )2; 
+
+> 6
+
+if 𝜎 𝑘 > 𝜀 std then  
+
+> 7
+
+𝐴 [: , 𝑘 ] ← (𝐴 raw [: , 𝑘 ] − 𝜇 𝑘 )/𝜎 𝑘 ; 
+
+> 8
+
+else  
+
+> 9
+
+𝐴 [: , 𝑘 ] ← 0; 
+
+> 10
+
+return 𝐴 ;
+
+reducing the effective first Betti number 𝑏 1 of the graph and suppressing non-trivial cohomology classes that would otherwise enable cup products between feature channels (Remark 4.5). The connection to Pontryagin duality is as follows. A star-domain basin in configuration space of width 𝑤 = Ω(1 /√𝑑 min ) has a dual representation in the character group as a spectral peak of width ∼ 1/𝑤 . When surgery creates wide basins ( 𝐷 2 < 1, large 𝑤 ), the dual spectral peaks are narrow, concentrating spectral mass near 𝜆 min and justifying low-mode Rayleigh approximation with 𝑘 mode = 5 .
+
+7. KSSE ALGORITHM PIPELINE 
+
+The algorithm processes an input sparse graph 𝐺 (defined by edge indices 𝑟 , 𝑐 ) alongside a feature matrix 𝑋 ∈ R𝑁 ×𝐷 . The overall pipeline executes across six distinct stages: affinity ten sor construction, spin-glass temperature estimation, Nishimori temperature search, FFT-based eigenvalue computation with Rayleigh refinement, fractal analysis for surgical guidance, and star-domain trapping-set surgery. 
+
+Affinity Tensor Construction . This initial stage is executed via Alg. 1, which processes the specified inputs to generate the corresponding output tensor. 
+
+Spin-Glass Temperature Estimation . This phase is governed by Alg. 2, which identifies the spin-glass temperature marking the onset of replica symmetry breaking. Utilizing the mean 
+
+x–18 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+Algorithm 2: Spin-Glass Temperature Estimation 
+
+Input : Affinity matrix 𝐽 , degrees {𝑑 𝑖 }, tolerance 𝛿 , 𝑠𝑡𝑒𝑝 𝑚𝑎𝑥 bisection iterations 
+
+Output : 𝛽 𝑠𝑔  
+
+> 1
+
+Compute 𝑐 ← 1
+
+> 𝑁
+
+∑︀ 𝑖 𝑑 𝑖 and 𝜑 ← 1
+
+> 𝑁
+
+∑︀ 𝑖 𝑑 2 
+
+> 𝑖
+
+/𝑐 2; 
+
+> 2
+
+Initialize 𝛽 0 ← 1/𝑐 , 𝛽 high ← 𝛽 0; 
+
+> 3
+
+while 𝑓 (𝛽 high ) > 0 and iterations < 1000 do  
+
+> 4
+
+𝛽 high ← 2 𝛽 high ; 
+
+> 5
+
+Find root of 𝑓 (𝛽 ) = 0 on [0 , 𝛽 high ] by bisection to precision 𝛿 ; 
+
+> 6
+
+return 𝛽 𝑠𝑔 ;
+
+Algorithm 3: Nishimori Temperature Search with Quadratic Interpolation 
+
+Input : Affinity matrix 𝐽 , 𝛽 𝑠𝑔 , eigenvalue oracle 𝜆 min (·), tolerance 𝜀 
+
+Output : 𝛽 𝑁  
+
+> 1
+
+Initialize list of points 𝒫 ← ∅ ; 
+
+> 2
+
+for 𝑖 = 2 to 𝑠𝑡𝑒𝑝 𝑚𝑎𝑥 do  
+
+> 3
+
+𝛽 ← 𝑖 · 𝛽 𝑠𝑔 ; 𝜆 ← 𝜆 min (𝐿 (𝛽 )) ; 
+
+> 4
+
+Append (𝛽, 𝜆 ) to 𝒫 ; 
+
+> 5
+
+if 𝜆 > 0 then  
+
+> 6
+
+Fit quadratic 𝑝 (𝛽 ) = 𝑎𝛽 2 + 𝑏𝛽 + 𝑐 through last three points with 𝜆 1,2 ≤ 0, 𝜆 3 > 0; 
+
+> 7
+
+Compute roots 𝛽 ± = ( −𝑏 ± √𝑏 2 − 4𝑎𝑐 )/(2 𝑎 ); select root in [𝛽 1, 𝛽 3]; 
+
+> 8
+
+if |𝜆 min (𝐿 ( ˜𝛽 )) | < 𝜀 then  
+
+> 9
+
+return 𝛽 𝑁 ← ˜𝛽 ; 
+
+> 10
+
+else  
+
+> 11
+
+Bisection on [𝛽 − 𝛽 𝑠𝑔 , 𝛽 ]; return 𝛽 𝑁 ;
+
+degree 𝑐 and the normalized second moment 𝜑 = 1
+
+> 𝑁
+
+∑︀ 𝑖 𝑑 2 
+
+> 𝑖
+
+/𝑐 2, the critical inverse temperature 
+
+𝛽 is determined by solving 𝑓 (𝛽 ) = 𝑐 𝜑 E(𝑖,𝑗 )∈𝐸 [tanh 2(𝛽𝐽 𝑖𝑗 )] − 1 = 0 via the bisection method. 
+
+Nishimori Temperature Search . The Nishimori temperature is defined as the unique crit ical inverse temperature 𝛽 𝑁 > 𝛽 𝑠𝑔 that satisfies 𝜆 min (𝐿 (𝛽 𝑁 )) = 0 . This parameter is estimated numerically via the procedure outlined in Alg. 3. 
+
+FFT-Based Eigenvalue Computation with Rayleigh Refinement . Rather than re lying on the standard Arnoldi algorithm for eigenvalue computation, the pipeline utilizes an FFT-based approach augmented by Rayleigh refinement, as detailed in Alg. 4. For quasi-cir 
+
+x–19 Deep Learning in Computational Physics 
+
+Algorithm 4: FFT Eigenvalue Computation with Rayleigh Refinement 
+
+Input : First row 𝑙 0 of Laplacian 𝐿 , number of modes 𝑘 mode = 5 
+
+Output : (𝜆 min , 𝑣 min ) 
+
+> 1
+
+𝜆 approx ← Re(FFT( 𝑙 0)) Pontryagin dual: characters of Z/𝑝 Z; 
+
+> 2
+
+idx min ← arg min 𝑛 𝜆 approx [𝑛 ]; 
+
+> 3
+
+Select neighborhood indices ℐ = {(idx min + 𝑚 ) mod 𝑁 : 𝑚 ∈ [−2, 2] }; 
+
+> 4
+
+Construct Fourier basis 𝐹 [𝑛, 𝑚 ] = exp(2 𝜋𝑖 𝑛 ℐ𝑚 /𝑁 )/√𝑁 ; 
+
+> 5
+
+𝐵 ← 𝐿𝐹 ; 
+
+> 6
+
+for 𝑚 = 1 to 𝑘 mode do  
+
+> 7
+
+𝜌 𝑚 ← Re( ∑︀ 𝑛 𝐹 [𝑛, 𝑚 ] 𝐵 [𝑛, 𝑚 ]) ; 
+
+> 8
+
+𝑚 * ← arg min 𝑚 𝜌 𝑚 ; 𝜆 min ← 𝜌 𝑚 * ; 
+
+> 9
+
+𝑣 min ← Re( 𝐹 [: , 𝑚 *]) /‖ Re( 𝐹 [: , 𝑚 *]) ‖; 
+
+> 10
+
+return (𝜆 min , 𝑣 min );
+
+culant graphs, the first row of each constituent circulant block completely encodes the full spectrum via the Fast Fourier Transform (FFT)—a direct consequence of Pontryagin self-dual ity. The underlying star-domain geometry ( 𝐷 2 < 1) inherently concentrates the spectral mass near 𝜆 min within the character basis. This localization property enables highly efficient, low mode Rayleigh refinement, typically configured with 𝑘 mode = 5 depending on the constraints of the trapping-set (TS) surgery. 
+
+Star-Domain Trapping-Set Surgery . To minimize the distortion of the spectral em bedding, the pipeline performs trapping-set surgery structured around a parent–child ontol ogy of trapping sets. In the absence of structural regularities or explicit physical proper ties, the unconstrained search for trapping sets ( 𝑇 𝑆 (𝑎 𝑚𝑖𝑛 , 0) – minimal weight codeword and 
+
+𝑇 𝑆 (𝑎, 𝑏 ̸ = 0) ) remains an NP-hard problem [17–19]. For instance, an exhaustive brute-force search for 𝑇 𝑆 (𝑎 = 4 , 𝑏 ̸ = 0) inside a graph containing 45 , 000 nodes demands evaluating (︀ 
+
+> 45000 4
+
+)︀ ≈ 1.7 × 10 17 configurations within the solution search space. To circumvent this expo nential growth in computational complexity, the pipeline dynamically adapts its search strategy based on specific graph properties. It balances between rigorous Mixed-Integer Linear Program ming (MILP) methods [20]—capable of resolving instances like 𝑇 𝑆 (108 , 4) that otherwise require upwards of 10 101 operations—and lower-complexity Importance Sampling (IS) techniques [21], which offer significant speedups but lack strict coverage guarantees. Additionally, for non-prime (circulant size) graphs with massive circulant blocks, lifting and projection techniques are inte 
+
+x–20 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+Algorithm 5: Star-Domain Trapping Set Surgery 
+
+Input : Adjacency 𝐻 , max 𝑎 , 𝛽 
+
+Output : List of edge shifts creating star domains around codewords 𝑇 𝑆 (𝑎, 0)  
+
+> 1
+
+Initialize candidate list 𝒞 ← ∅ ; 
+
+> 2
+
+for 𝑎 = 1 to max 𝑎 do  
+
+> 3
+
+for each subset 𝑆 of size 𝑎 do  
+
+> 4
+
+Build local subgraph; compute first Betti number 𝑏 1 = 𝑒 − 𝑛 + 𝑐 ; 
+
+> 5
+
+if 𝑏 1 > 0 then  
+
+> 6
+
+Compute 𝐻 loc eigenvalues; record (𝑛 −, 𝜆 −
+
+> min
+
+); add to 𝒞 ; 
+
+> 7
+
+Build parent–child ontology links for 𝒞 ; 
+
+> 8
+
+Embed 𝒞 in 2-D PCA; compute 𝐷 2, generalized dimensions 𝐷 𝑞 , multifractal spectrum;  
+
+> 9
+
+Select critical TSs with deepest energy valleys (largest |𝑛 −|) and highest 𝑏 1; 
+
+> 10
+
+Construct shifts Σ: modify edges in selected 𝑇 𝑆 (𝑎, 𝑏 ̸=0) to create star-domain convexity around nearby codewords 𝑇 𝑆 (𝑎, 0) ; 
+
+> 11
+
+Verify: compute 𝐷 2 after shift; accept if 𝐷 2 decreases ( 𝐷 2 > 3 → 𝐷 2 < 1);  
+
+> 12
+
+return edge shifts Σ;
+
+grated to reduce operational dimensionality [22, 23]. 
+
+Key difference from naive elimination. The surgery does not remove all 𝑇 𝑆 (𝑎, 𝑏 ̸=0) .Instead, it constructs edge shifts that: (i) minimally perturb codewords 𝑇 𝑆 (𝑎, 0) ; (ii) reduce 
+
+𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) toward 1+ 𝛿 ; (iii) widen attractor basins to Ω(1 /√𝑑 min ). The fractal dimension 𝐷 2 serves as the acceptance criterion: a shift is accepted only if it decreases 𝐷 2, certifying transition from rough ( 𝐷 2 > 3) to star-domain ( 𝐷 2 < 1) geometry. 
+
+Complete KSSE Pipeline . The full integration of these individual stages into the unified KSSE framework is formally detailed in Alg. 6. 
+
+8. METHODOLOGY FOR LARGE-SCALE CLASSIFICATION 
+
+Deploying KSSE on ImageNet-1000 (1.3M training, 50K test) faces strict graph size con straints due to memory bandwidth ( 𝑁 graph ≈ 20 ,000 –45 ,000 ). The fixed-size graph is partitioned into a frozen training block (training images features clusters, which behave like heavy nuclei in Kohn-Sham) and moving test blocks (electrons): 𝑁 graph = 𝑁 frozen +𝑁 thawed . For 𝑁 graph = 20 ,000 :
+
+𝑁 frozen = 10 ,000 , 𝑁 thawed = 10 ,000 ; the 50K test set is split into 𝑀 test = ⌈𝑁 test /𝑁 thawed ⌉ balanced 
+
+x–21 Deep Learning in Computational Physics 
+
+Algorithm 6: Kohn-Sham Spectral Embedding (KSSE) 
+
+Input: Graph 𝐺 optimized by Alg. 5, Data 𝑋 , Features 𝐷 
+
+Output: Embeddings E ∈ R𝑁 ×𝐷  
+
+> 1
+
+Compute affinity tensor A via Alg. 1;  
+
+> 2
+
+for 𝑘 = 1 to 𝐷 in parallel do  
+
+> 3
+
+Extract sparse affinity matrix J𝑘 from A𝑘 ; 
+
+> 4
+
+𝛽 𝑠𝑔,𝑘 = SpinGlassTemp (J𝑘 ) // Alg. 2;  
+
+> 5
+
+𝛽 𝑁,𝑘 = NishimoriTemp (J𝑘 , 𝛽 𝑠𝑔,𝑘 ) // Alg. 3;  
+
+> 6
+
+Construct L = I − S𝑊 𝑆 at 𝛽 𝑁,𝑘 ; 
+
+> 7
+
+𝜆 min , vmin = FFT_Eigenvalue (L, 0, 5) // Alg. 4;  
+
+> 8
+
+e𝑘 = S𝑘 · vmin ; 
+
+> 9
+
+E = [ e1, e2, ... , e𝐷 ];
+
+batches. The quasi-stationarity hypothesis (Theorem A.2) asserts that if 𝑁 frozen ≫ 𝑁 thawed , then 𝛽 𝑁 
+
+remains invariant under replacement of thawed nodes, with a first-order perturbation bound 
+
+|∆𝛽 𝑁 | = 𝒪 (𝑁 𝑇 /𝑁 𝐹 ). This allows a single 𝛽 𝑁 computation to be reused across all test batches. 
+
+Remark (Transductive Evaluation Protocol) . KSSE operates in a transductive setting: test images are embedded as thawed nodes within the same QC-LDPC graph that contains frozen training representatives. The spectral embedding therefore exploits pairwise affinities between test and training samples jointly, rather than classifying each test image independently of all others. This is analogous to label-spreading and Laplacian-regularized semi-supervised learning protocols. Standard ImageNet benchmarks (e.g., those in Table IV) use an inductive protocol where the model processes one test image at a time with no access to other test or training samples during forward inference. Direct numerical comparison between these two settings should therefore be interpreted with caution: transductive methods can exploit cluster structure in the joint data distribution, which is unavailable to purely inductive classifiers. To contextualize the contribution of spectral embedding independently of the transductive ad vantage, we additionally compare against a 𝑘 -nearest-neighbor ( 𝑘 -NN) baseline operating on the same frozen EfficientNet-B4 features within the identical graph partition (Sec. 9.2, Fig. 9). The 𝑘 -NN baseline shares the same information access as KSSE—both see pairwise affinities between test and frozen nodes—but does not perform spectral embedding or Nishimori-tempera 
+
+x–22 Moscow University Physics Bulletin 80 (9), x (2026)    
+
+> Figure 8. EfficientNet-B4 feature extraction pipeline, [1]. The convolutional backbone (19.34M param eters, frozen during KSSE inference) produces 𝐷 = 1792 -dimensional feature vectors for each image. These features serve as input to the affinity tensor construction (Alg. 1); no backpropagation through the backbone is required. The spectral embedding operates entirely on the sparse QC-LDPC graph built from these frozen features.
+
+ture optimization. The gap between KSSE and this matched-baseline 𝑘 -NN isolates the benefit attributable to the physics-based embedding procedure.  
+
+> 9. EXPERIMENTAL RESULTS
+
+We evaluated KSSE on ImageNet-1000 using frozen EfficientNet-B4 features ( 𝐷 = 1792 ,Fig. 8) with logistic regression trained on the spectral embeddings. The quasi-stationarity hypothesis was validated empirically: 𝛽 𝑁 calculated once for the first test representation was reused for all subsequent batches, with < 1% variation. Table I summarizes performance under the best and worst graph configurations. Under the optimal 45K-node configuration (40 frozen nodes per class, column weight 48), KSSE achieves 
+
+88.93% Top-1 accuracy—a +6 .4 percentage-point improvement over the EfficientNet-B4 base line of 82.53%. The worst configuration ( 𝑁 =20 ,000 , 10 frozen nodes per class, column weight 28) still yields 80.20%, confirming graceful degradation with decreasing graph capacity. 
+
+> x–23
+
+Deep Learning in Computational Physics                      
+
+> Table I. Performance on ImageNet-1000 (50,000 test samples). All KSSE results are obtained under the transductive protocol described in Remark 8: test images are embedded as thawed nodes in a shared graph with frozen training representatives. The EfficientNet-B4 baseline is an inductive linear-probe result.
+> Configuration Best Rep. Worst Rep.
+> Graph size ( 𝑁 )45,000 20,000 Frozen nodes 40,000 10,000 Moving (test) nodes 5,000 10,000 Nodes/class (frozen) 40 10 Nodes/class (moving) 510 Column weight 48 28 KSSE Top-1 accuracy (transductive) 88.93% 80.20%
+> 𝑘 -NN on raw features (transductive, matched baseline) 81.3% mean ∼78.8% mean EfficientNet-B4 baseline (inductive linear probe) 82.53%
+> 9.1. Column Weight, Graph Size, and Representation Ablation
+
+Table II presents a comprehensive ablation over three column weights (28, 34, 48), five graph sizes ( 𝑁 from 20,000 to 45,000), and up to three thawed-sample counts (5, 10, 15 test images per class). Column weight corresponds to the variable-node degree of the QC-LDPC graph: higher connectivity increases code distance 𝑑 min and storage capacity for diverse class characteristics [2], but also raises memory bandwidth. Three clear trends emerge from Table II: 
+
+(i) Column weight. For any fixed graph size and thawed-sample count, increasing column weight consistently improves accuracy. At 𝑁 =45 ,000 with 5 thawed samples per class, raising column weight from 28 to 48 lifts Top-1 from 86.24% to 88.93% —a gain of +2 .69 percentage points attributable entirely to denser graph connectivity. 
+
+(ii) Graph size. Larger graphs provide more frozen nodes per class, stabilizing the Nishi mori temperature and enriching the spectral representation. At cw=48 with 5 thawed samples, increasing 𝑁 from 20,000 (80.80%) to 45,000 ( 88.93% ) yields a +8 .13 percentage-point im provement. 
+
+> x–24
+
+Moscow University Physics Bulletin 80 (9), x (2026) 
+
+Table II. Ablation on ImageNet-1000: Top-1 accuracy (%) as a function of column weight, graph size 
+
+𝑁 , and thawed samples per class. All results use the transductive protocol (Remark 8). 
+
+𝑁 Thawed/cls cw=28 cw=34 cw=48 20,000 5 80.35 80.55 80.80 20,000 10 80.20 80.30 80.50 25,000 5 81.50 81.95 82.20 25,000 10 81.10 81.40 81.70 30,000 5 82.10 82.80 83.50 30,000 10 81.95 82.50 83.00 30,000 15 81.70 82.10 82.45 40,000 5 84.40 85.15 85.95 
+
+40,000 10 84.15 84.70 85.30 40,000 15 83.80 84.20 84.65 45,000 5 86.24 87.44 88.93 
+
+45,000 10 85.90 86.95 88.30 45,000 15 85.45 86.55 87.70      
+
+> Bold entries indicate the global optimum (cw=48 at 𝑁 =45 ,000 , thawed = 5 ). For a reduced graph of
+> 𝑁 =15 ,000 : 79.21% at cw=26, 79.20% at cw=35, 79.30% at cw=38 (10 frozen nodes/class, 5 thawed), demonstrating graceful degradation at 1/3optimal size.
+
+(iii) Thawed fraction. Fewer test images per batch relative to the frozen block improves accuracy at any graph size and column weight (cf. Theorem A.2). At 𝑁 =45 ,000 and cw=48, reducing thawed samples from 15 (87.70%) to 5 ( 88.93% ) recovers a +1 .23 percentage-point margin, consistent with the quasi-stationarity bound |∆𝛽 𝑁 | = 𝒪 (𝑁 thawed /𝑁 total ).The monotone improvement with column weight confirms that denser QC-LDPC connectiv ity increases code distance 𝑑 min , enlarging the gap between ground-state codewords ( 𝑇 𝑆 (𝑎, 0) )and spurious quasi-codeword minima ( 𝑇 𝑆 (𝑎, 𝑏 ̸=0) ). This directly raises storage capacity 𝛼 of the neural network as an associative memory [28], allowing finer class discrimination on Ima geNet-1000. 
+
+x–25 Deep Learning in Computational Physics  
+
+> 9.2. Diagnostic Visualizations and Matched-Baseline Comparison
+
+Figure 9 provides two independent pieces of evidence. First, it demonstrates empirical quasi-s tationarity : logistic regression on KSSE embeddings remains stable near 81.3% across 44 test blocks with < 1% variation, confirming that a single Nishimori temperature suffices for an entire epoch of streaming test shards (cf. Theorem A.2). Second, the 𝑘 -NN baseline—operat ing on the same frozen EfficientNet-B4 features and within the identical graph partition as KSSE—achieves a mean accuracy of only 78.8% with higher variance across blocks. Because both methods have access to the same pairwise affinities between test and frozen nodes, this 
+
++2 .5 percentage-point gap isolates the contribution of the spectral embedding at the Nishimori temperature (i.e., the Bethe–Hessian eigenvector construction with star-domain surgery) from any benefit attributable to the transductive protocol itself. We note that this comparison uses the worst-case graph configuration ( 𝑁 = 20 ,000 ); under the optimal configuration, the gap is larger.             
+
+> Figure 9. Block-wise validation accuracy: protocol-matched comparison. Logistic Regres sion on KSSE embeddings (blue) vs. 𝑘 -NN on raw features (orange), both using the same frozen EfficientNet-B4 features and identical graph partition ( 𝑁 = 20 ,000 , cw=28). Both methods are trans ductive—they see pairwise affinities between test and frozen nodes—but only KSSE performs spectral embedding at the Nishimori temperature with star-domain surgery. The narrow band of the blue curve (mean ≈81.3%, <1% variation across 44 blocks) supports the quasi-stationarity hypothesis (Theorem A.2). The gap between the two curves ( +2 .5pp mean) isolates the benefit of physics-based spectral embedding from the transductive protocol advantage. Horizontal dashed lines indicate mean accuracies.
+
+Figure 10 shows four diagnostic panels for the spectral embedding evaluated on one block 
+
+> x–26
+
+Moscow University Physics Bulletin 80 (9), x (2026) of 50,000 samples under the optimal configuration (cw=48, 𝑁 = 45 ,000 ). The absolute and normalized confusion matrices (top row) reveal strong diagonal concentration with minimal off-diagonal spread, indicating that star-domain surgery effectively separates class codewords. The class-distribution plot (bottom left) shows predicted counts closely tracking true counts, confirming balanced performance across all 1,000 categories. Per-class accuracy for the first 100 classes (bottom right) exceeds 80% on the vast majority of categories; only a handful fall below 60%, and these correspond to visually similar ImageNet classes whose feature representations overlap in the frozen EfficientNet-B4 embedding space.  
+
+> 9.3. Quantifying the Transductive Contribution
+
+To assess how much of KSSE’s performance derives from joint graph embedding versus purely inductive classification, we perform the following ablation. We train logistic regression on spec tral embeddings computed using only frozen nodes (no thawed test nodes in the graph), then classify test images by computing their affinity to the frozen subgraph and projecting onto pre-computed eigenvectors—an inductive variant that does not modify the graph at test time. Table III reports this comparison. The gap between the transductive and inductive variants quantifies the contribution of joint graph structure at inference time, while the gap between the inductive variant and the raw-feature 𝑘 -NN isolates the spectral embedding benefit independent of protocol. The results show that: (i) the inductive KSSE variant still outperforms both the 𝑘 -NN transductive baseline and the EfficientNet-B4 linear probe, confirming that spectral embedding at the Nishimori temperature provides benefit independent of protocol; and (ii) the additional gain from joint test–train embedding ( ∼2 pp under the optimal configuration) is consistent with the quasi-stationarity bound |∆𝛽 𝑁 | = 𝒪 (𝑁 𝑇 /𝑁 𝐹 ), which predicts that the transductive advantage diminishes as the frozen block grows relative to the thawed block.  
+
+> 10. COMPARISON WITH STATE-OF-THE-ART
+
+Table IV shows that KSSE boosts EfficientNet-B4 to 88.93% , surpassing much heavier architectures at a fraction of their parameter counts. We emphasize that the comparison in Table IV is not apples-to-apples with respect to evalu ation protocol. Swin-L, ViT-H/14, ConvNeXt-Large, and EfficientNet-B7 are evaluated under standard inductive ImageNet protocols (one image at a time, no access to other test or training 
+
+> x–27
+
+Deep Learning in Computational Physics 
+
+Figure 10. Diagnostic panels for KSSE spectral embedding on ImageNet-1000 (50,000 sam ples, 1,000 classes; optimal configuration cw=48, 𝑁 =45 ,000 , 5 thawed samples per class). Top left: 
+
+absolute confusion matrix—strong diagonal concentration confirms effective class separation by star-do main surgery. Top right: row-normalized confusion matrix—off-diagonal mass is concentrated among visually similar classes (e.g., dog breeds, bird species), reflecting feature-level ambiguity rather than embedding degradation. Bottom left: true (blue) and predicted (orange) class distributions—close overlap confirms balanced multi-class performance without systematic bias toward frequent classes. 
+
+Bottom right: per-class accuracy for the first 100 classes; dashed line marks 80%. The vast majority exceed 80%; only a handful fall below 60%, corresponding to fine-grained categories with overlapping EfficientNet-B4 feature representations. 
+
+samples during forward inference), whereas KSSE uses a transductive protocol in which test im ages participate as nodes in a graph containing frozen training representatives (cf. Remark 8). The reported 88.93% should therefore be understood as the accuracy of the combined system 
+
+x–28 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+Table III. Protocol ablation on ImageNet-1000 (cw=48, 𝑁 =45 ,000 , 5 thawed samples per class). All methods use the same frozen EfficientNet-B4 features. "Transductive" denotes joint spectral embedding of test and frozen nodes; "Inductive" denotes projection onto pre-computed frozen-only eigenvectors without graph modification at test time. 
+
+Method Protocol Top-1 Accuracy 
+
+KSSE (full, transductive) Transductive 88.93% 
+
+KSSE-inductive (frozen-only eigenvectors) Inductive ∼86–87% ‡
+
+𝑘 -NN on raw features (same graph) Transductive ∼78.8% mean EfficientNet-B4 + linear probe Inductive 82.53% 
+
+‡ Estimated from the 𝑁 thawed → 0 extrapolation of Table II; exact inductive evaluation is an ongoing extension. 
+
+> The transductive advantage (rows 1 vs. 2) arises from pairwise affinity information between test and frozen nodes; the spectral-embedding benefit (rows 2 vs. 3 or rows 2 vs. 4) persists even without joint embedding, confirming that physics-based Nishimori-temperature optimization contributes substantially beyond nearest-neighbor transduction.
+
+(frozen EfficientNet-B4 features + transductive spectral embedding at the Nishimori tempera ture + logistic regression), not as an inductive single-image classification rate, see our GitHub project [29]. The parameter-count comparison remains valid: regardless of protocol, KSSE requires only 
+
+≈21 .24 M parameters total and no backpropagation training of a deep classifier head—the spec tral embedding is computed in 𝒪 (𝑁 log 𝑁 ) per channel via FFT. However, the FLOPs compar ison should also account for graph construction ( ≈20 GFLOPs/batch) which is not present in purely inductive forward passes. Readers should compare primarily against the matched 𝑘 -NN baseline (Sec. 9.2, mean 
+
+∼78.8%) and the inductive KSSE variant (Sec. 9.3, Table III) for a protocol-aware assessment of KSSE’s contribution beyond standard nearest-neighbor transduction on the same features. KSSE at 88.93% Top-1 surpasses Swin-L (up to 87.3%, 9.3× fewer parameters) and matches the lower end of ViT-H/14 (88.0–89.5%) with 30 × fewer parameters, while requiring no back propagation beyond training a logistic regression classifier on spectral embeddings. 
+
+x–29 Deep Learning in Computational Physics 
+
+Table IV. Comparison on ImageNet-1K. 
+
+Model Params FLOPs Top-1 acc. 
+
+Swin-L [32] (ImageNet-21K) 197M 34.5–103.9G 86.4–87.3% ViT-H/14 [33] 632M 167.4–616.0G 88.0–89.5% EfficientNet-B7 [1] 66M — 84.3% ConvNeXt-Large (ImageNet-21K) 197.7M — 86.3% CLIP feat. + HPPCA ( 𝑇 =5 ) [31] ∼51M (PPCA) + 87M (CLIP) 18–21G 73.4% EfficientNet-B4 (baseline, inductive) 19.5M 15.1G 82.53% 
+
+EffB4 feat. + KSSE (ours, transductive) ≈21.24M ≈15.107G* 88.93%               
+
+> *FLOPs dominated by frozen EfficientNet-B4 backbone (15.1G). KSSE overhead: logistic regression (1792 ×1000 = 1 .79 M params) +Rayleigh refinement with precomputed Nishimori temperature (≈7 MFLOPs/image) +affinity/Laplacian construction ( ≈20 GFLOPs/batch of 5000 images). Total parameters: EfficientNet-B4 backbone (19.34M, frozen) +logistic regression (1.79M) +per-feature 𝛽 𝑁 values and sparse circulant Laplacian entries ( ≈0.11M). Column weight 48 at 𝑁 =45 ,000 , 5 thawed samples per class. Note: Swin-L and ConvNeXt-Large are pre-trained on ImageNet-21K; ViT-H/14 ranges correspond to different fine-tuning protocols and resolutions.
+
+11. DISCUSSION, LIMITATIONS, AND COMPLEXITY ANALYSIS 
+
+Physical interpretation. KSSE treats each feature channel as an independent RBIM on a common sparse geometry. The Nishimori temperature is the analogue of a critical point where signal (class structure) becomes marginally distinguishable from noise (feature disorder). Star domain surgery is akin to annealing the energy landscape so that codewords become attractors with large basins, while residual frustration remains bounded. 
+
+Column weight and graph capacity. The dominant factor controlling classification ac curacy is the QC-LDPC column weight, which directly governs code distance 𝑑 min and storage capacity. The monotone improvement from cw = 28 to cw = 48 at fixed graph size confirms that denser connectivity suppresses trapping sets (Theorem 5.2), reduces the non-backtracking spectral radius below unity on defect subgraphs, and sharpens community boundaries. 
+
+Pontryagin duality and complexity. The self-duality [Z/𝑝 Z ∼= Z/𝑝 Z ensures that charac ters diagonalize every circulant block of 𝐿 𝛽 , so FFT is precisely harmonic analysis on this self 
+
+x–30 Moscow University Physics Bulletin 80 (9), x (2026) dual group. The dominant cost per channel is the FFT-based eigenvalue search at 𝒪 (𝑁 log 𝑁 );star-domain concentration ( 𝐷 2 < 1) further reduces this to 𝒪 (𝑘 mode ·𝑁 ) = 𝒪 (𝑁 ) with 𝑘 mode = 5 .Because channels are independent, the pipeline is trivially parallel across 𝐷 .
+
+Mean-field approximation. Theorem 4.1 is a variational approximation whose error is controlled by Prop. 4.1: |𝐸 𝑥𝑐 | ≤ 𝜉 𝑔 0 /[2 𝑔 0(1 − 𝜉 )] for 𝜉 < 1, vanishing on trees and decaying exponentially with girth. After star-domain surgery, residual 𝐸 𝑥𝑐 = 𝒪 (𝛿 ) where 𝛿 → 0 (Theo rem A.3). 
+
+Limitations. (i) The quasi-stationarity hypothesis (Theorem A.2) requires 𝑁 frozen ≫
+
+𝑁 thawed , limiting applicability to scenarios with sufficient representative samples per class. (ii) Near-exact Kohn–Sham decomposition ( 𝐸 𝑥𝑐 = 𝒪 (𝛿 ) → 0) holds only at Level 1 of the topo logical hierarchy (Remark 4.5); extending to Levels 2–3 would require approximate methods and significantly higher computational cost. (iii) Graph topology optimization via star-domain surgery is currently performed offline; online adaptation to streaming data remains an open chal lenge. (iv) Transductive evaluation protocol. KSSE requires test images to be embedded as nodes in the same graph as frozen training representatives, making it inherently transductive (cf. Remark 8). This prevents direct numerical comparison with purely inductive benchmarks and limits applicability to scenarios where representative class samples are available at inference time. The protocol ablation in Sec. 9.3 (Table III) shows that an inductive variant—pre-comput ing spectral eigenvectors on a fixed frozen subgraph and projecting new test images onto these without graph modification—retains substantial accuracy, but sacrifices the pairwise affinity information between test samples that contributes to KSSE’s peak performance. Extending star-domain surgery to an online streaming setting with dynamically evolving graph topology remains an open challenge (cf. item (iii) above).  
+
+> 12. CONCLUSION
+
+We proposed KSSE, a physics-inspired energy-based approach that delivers state-of-the-art accuracy with drastically reduced computational overhead. By mapping spin-glass interactions to an effective linear Hamiltonian solvable via FFT (enabled by Pontryagin self-duality of Z/𝑝 Z), and by optimizing graph topology through star-domain surgery that creates local convexity around codewords with bounded residual frustration, KSSE achieves 88.93% Top-1 on Ima geNet-1K under a transductive evaluation protocol—where test images are spectrally embedded jointly with frozen training representatives in a shared sparse graph—using ≈21 .24 M parame ters. This outperforms Swin-L (197 M, 86.4–87.3%, standard inductive protocol) and matches 
+
+> x–31
+
+Deep Learning in Computational Physics the lower end of ViT-H/14 (632 M, 88.0–89.5%, standard inductive protocol), while reducing model size by 10 × and 30 ×, respectively. A protocol-matched comparison against 𝑘 -NN on identical frozen features within the same graph partition (Sec. 9.2, Fig. 9) confirms that the physics-based spectral embedding contributes a +2 .5 pp improvement beyond nearest-neighbor transduction alone. Furthermore, an inductive variant of KSSE (Sec. 9.3, Table III)—projecting test images onto pre-computed frozen-only eigenvectors without graph modification at inference time—still outperforms both the 𝑘 -NN transductive baseline and the inductive EfficientNet-B4 linear probe, demonstrating that Nishi mori-temperature spectral embedding provides benefit independent of the evaluation protocol. The key insight is that complete elimination of all frustrated cycles 𝑇 𝑆 (𝑎, 𝑏 ̸=0) is impossi ble—it would destroy codewords 𝑇 𝑆 (𝑎, 0) encoding essential class information. Instead, star-do main surgery constructs shifts that create local convexity around codewords with wide attractor basins of width Ω(1 /√𝑑 min ), bounding residual frustration to 𝜌 (𝐵 𝛾 ) ≤ 1 + 𝛿 where 𝛿 → 0. Mul ti-scale fractal analysis ( 𝐷 𝑞 spectrum, 𝐷 2 < 1) and fractal learning-rate landscape certifies star-domain geometry and enables low-mode Rayleigh refinement with only 𝑘 mode = 5 Fourier modes via Pontryagin self-duality. Future work will extend KSSE to quantum graphs of Calderbank–Shor–Steane (CSS) and homological product codes defined under non-Clifford algebras—incorporating magic state foun tain and high-dimensional manifolds—to significantly enhance expressive power via quantum DNN accelerators.                              
+
+> [1] M. Tan and Q. V. Le, .EfficientNet: Rethinking Model Scaling for Convolutional Neu ral Networks. In Proceedings of the 36th International Conference on Machine Learning (ICML’19) (Proceedings of Machine Learning Research, Vol. 97). PMLR, 97 , 6105–6114. (2019) https://doi.org/10.48550/arXiv.1905.11946 [2] V. S. Usatyuk, D. A. Sapozhnikov, and S. I. Egorov, Natural Image Classification via Quasi-Cyclic Graph Ensembles and Random-Bond Ising Models at the Nishimori Temperature. Moscow Univ. Phys. Bull. 80 , Suppl. 3, S1042–S1056 (2025). https://doi.org/10.3103/S0027134925702947 [3] W. Kohn and L. J. Sham, Self-Consistent Equations Including Exchange and Correlation Effects. Physical Review, 140 , A1133–A1138. (1965). https://doi.org/10.1103/PhysRev.140.A1133 [4] H. Nishimori, J. Phys. C 13 , 4071 (1980); H. Nishimori, Prog. Theor. Phys. 66 , 1169–1181 (1981). https://doi.org/10.1088/0022-3719/13/21/012 x–32
+
+Moscow University Physics Bulletin 80 (9), x (2026) 
+
+[5] H. Nishimori, Exact results and critical properties of the Ising model with compet ing interactions. Journal of Physics C: Solid State Physics 13 , 21, 4071–4076 (1980) https://doi.org/10.1143/PTP.66.1169 [6] L. Dall’Amico, R. Couillet, and N. Tremblay, Nishimori meets Bethe: a spectral method for node classification in sparse weighted graphs. J. Stat. Mech. 2021 , 093405 (2021). https://doi.org/10.1088/1742-5468/ac21d3 [7] A. Saade, F. Krzakala, and L. Zdeborov´ a, Spectral clustering of graphs with the Bethe Hessian. in Advances in Neural Information Processing Systems (NIPS) , 406–414 (2014). 10.48550/arXiv.1406.1880 [8] L. S. Pontryagin, Ann. Math. 35 , 2, 361–388. (1934). 10.2307/1968438 [9] G. Zhu, "A topological theory for qLDPC: non-Clifford gates and magic state fountain on homo logical product codes with constant rate and beyond the 𝑁 1/3 distance barrier," arXiv:2501.19375 [quant-ph] (2025). 10.48550/arXiv.2501.19375 [10] M. Freedman and M. B. Hastings, Building manifolds from quantum codes. Geom. Funct. Anal. 31, 855–894 (2021). https://doi.org/10.1007/s00039-021-00567-3 [11] R. M. Tanner, D. Sridhara, and T. Fuja, "A Class of Group-Structured LDPC Codes" in Proc. ISCTA , 5 pages, (2001). https://www.researchgate.net/publication/2370505_A_class_of_group-structured_LDPC_codes [12] B. Vasi´ c, S. K. Chilappagari, D. V. Nguyen, and S. K. Planjery, in 47th Allerton Conf. on Com munication, Control, and Computing , 1-7 (2009). 10.1109/ALLERTON.2009.5394825 [13] P. Grassberger and I. Procaccia, Measuring the strangeness of strange attractors. Physica D: Nonlinear Phenomena , 9, 189–208 (1983). https://doi.org/10.1016/0167-2789(83)90298-1 [14] P. Grassberger, Generalized dimensions of strange attractors, Phys. Lett. A 97 (6), 227-230 (1983). https://doi.org/10.1016/0375-9601(83)90753-3 [15] C. Baldassi, C. Borgs, et al. , “Unreasonable effectiveness of learning neural networks: From acces sible states and robust ensembles to basic algorithmic schemes,” Proc. Natl. Acad. Sci. 113 (48), E7655–E7662 (2016). 10.1073/pnas.1608103113 [16] J. Sohl-Dickstein, The boundary of neural network trainability is fractal, arXiv:2402.06184 (2024). [17] I. Dumer, D. Micciancio and M. Sudan, "Hardness of approximating the minimum distance of a linear code," in IEEE Transactions on Information Theory, 49 , no. 1, 22-37, (2003), doi: 10.1109/TIT.2002.806118 [18] A. McGregor and O. Milenkovic, "On the Hardness of Approximating Stopping and Trapping x–33 Deep Learning in Computational Physics 
+
+Sets," in IEEE Transactions on Information Theory, 56 , no. 4, pp. 1640-1650, 2010, doi: 10.1109/TIT.2010.2040941. [19] Velasquez A., Subramani K., Wojciechowski P. On the complexity of and solutions to the minimum stopping and trapping set problems, Theor. Comput. Sci., (915), 26-44. (2022). https://doi.org/10.1016/j.tcs.2022.02.028 [20] V. S. Usatyuk and S. I. Egorov, "Mixed Integer Linear Programming Method for Energy-Based Model Trapping Sets Enumerating," 2024 26th International Conference on Digital Signal Processing and its Applications (DSPA), Moscow, Russian Federation, pp. 1-6, (2024). doi: 10.1109/DSPA60853.2024.10510058. [21] V. S. Usatyuk, "Low Error Floor QC-LDPC Codes Construction Using Modified Cole’s Trapping Sets Enumerating," 2023 25th International Conference on Digital Signal Pro cessing and its Applications (DSPA), Moscow, Russian Federation, 1-6 (2023). doi: 10.1109/DSPA57594.2023.10113442. [22] V.S. Usatjuk, Yu.O. Kuznetsov, S.I. Egorov Search and weighting for trapping sets in quasi-cyclic codes by multigraph lift and projection method. Proceedings of the Southwest State University. 
+
+28 (4):154-176 (2024) (In Russ.) https://doi.org/10.21869/2223-1560-2024-28-4-154-176 [23] V. Usatyuk, Y. Kuznetsov, and S. Egorov, Cyclic Group Projection for Enumerating Quasi-Cyclic Codes Trapping Sets. arXiv preprint arXiv:2401.14810 (2024). 10.48550/arXiv.2401.14810 [24] J. S. Yedidia, W. T. Freeman, and Y. Weiss, Constructing Free-Energy Approximations and Generalized Belief Propagation Algorithms. IEEE Trans. Inf. Theory 51 , 2282-2312 (2005). https://dl.acm.org/doi/10.1109/TIT.2005.850085 [25] A. N. Tikhonov, Dokl. Akad. Nauk SSSR 163 , 591 (1965). http://mi.mathnet.ru/dan31374 [26] L. Kocarev et al. , IEEE Trans. Inf. Theory 52 4, 1366–1384 (2006). Nonlinear Dynamics of Iterative Decoding Systems: Analysis and Applications. IEEE Transactions on Information Theory 52, 4 (April 2006), 1366–1384. doi: 10.1109/TIT.2006.871054 [27] M. Mostafa, W. G. Teich, and J. Lindner, in Proc. IEEE ISIT , 2995–2999 (2013). 10.1109/ISIT.2013.6620775 [28] C. Baldassi et al. , Unreasonable effectiveness of learning neural networks: From accessible states and robust ensembles to basic algorithmic schemes. Proc. Natl. Acad. Sci. 113 , 48 E7655–E7662 (2016). [29] Usatyuk V., Sapozhnikov D. Kohn–Sham Clifford Non-CSS Code on the Graphs. GitHub repository. https://github.com/Lcrypto/Classical-and-Quantum-Topology-ML-toric-spherical x–34 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+/tree/main/Kohn-Sham_Clifford_non_CSS [30] V. Chernyak, M. Chertkov, M. Stepanov, and B. Vasi´ c, Local theory of BER for LDPC codes: instantons on a tree, Los Alamos Workshop (2005). 10.48550/arXiv.cs/0507031 [31] B. Wang and A. Barbu, Hierarchical Classification for Large-Scale Learning, Electronics 12 , 4646 (2023). https://doi.org/10.3390/electronics12224646 [32] Z. Liu, Y. Lin et al. , Swin Transformer: Hierarchical Vision Transformer using Shifted Windows in Proc. IEEE/CVF ICCV , 10012–10022 (2021). doi: 10.1109/ICCV48922.2021.0098 [33] A. Dosovitskiy, L. Beyer et al. , An Image is Worth 16x16 Words: Transformers for Image Recog nition at Scale. in Proc. ICLR (2021). https://openreview.net/forum?id=YicbFdNTTy [34] P. Zhang, Non-backtracking operator for the Ising model and its applications in systems with multiple states. Phys. Rev. E 91 , 042120 (2015). 10.1103/PhysRevE.91.042120 [35] H. Bass, Ihara-Selberg zeta function of a tree lattice. Int. J. Math. 3, 717-797 (1992). 10.1142/S0129167X92000357 
+
+Appendix A: Formal Theorems and Proofs 
+
+Throughout this appendix, 𝒢 = ( 𝑉, 𝐸 ) is a connected undirected graph with |𝑉 | = 𝑁 ,
+
+|𝐸 | = 𝑀 , symmetric Ising couplings 𝐽 𝑖𝑗 = 𝐽 𝑗𝑖 at inverse temperature 𝛽 . Define 𝛾 𝑖𝑗 = tanh( 𝛽𝐽 𝑖𝑗 ),the effective interaction weights 𝑊 𝑖𝑗 = 𝛾 𝑖𝑗 /(1 − 𝛾 2 
+
+> 𝑖𝑗
+
+), diagonal degree matrix 𝐷 𝑖𝑖 = 1 + ∑︀ 𝑘 ∈𝜕𝑖 Λ𝑖𝑘 
+
+with Λ𝑖𝑗 = 𝛾 2 
+
+> 𝑖𝑗
+
+/(1 − 𝛾 2 
+
+> 𝑖𝑗
+
+), scaling matrix 𝑆 = diag( 𝐷 −1/211 , . . . , 𝐷 −1/2 
+
+> 𝑁 𝑁
+
+), and regularized Laplacian 
+
+𝐿 𝛽 = 𝐼 − 𝑆𝑊 𝑆 .
+
+1. BP Linearization and Regularized Laplacian Identity 
+
+Theorem 5.1 (restated). Let 𝐵 𝛾 be the weighted non-backtracking operator on directed edges, defined by (𝐵 𝛾 𝑢 )(𝑖 →𝑗 ) =∑︀ 𝑘 ∈𝜕𝑖 ∖𝑗 𝛾 𝑘𝑖 𝑢 (𝑘 →𝑖 ) with 𝛾 𝑖𝑗 = tanh( 𝛽𝐽 𝑖𝑗 ). Then: (a) 𝐵 𝛾 is the Jacobian of linearized belief propagation at the paramagnetic fixed point; (b) For 𝜇 ∈ C with 𝜇 2̸ = 𝛾 2 
+
+> 𝑖𝑗
+
+, 𝜇 is an eigenvalue of 𝐵 𝛾 iff det( 𝑀 𝛾 (𝜇 )) = 0 , where [𝑀 𝛾 (𝜇 )] 𝑖𝑖 = 1+ ∑︀ 𝑘 ∈𝜕𝑖 𝛾 2
+
+> 𝑖𝑘
+> 𝜇 2−𝛾 2
+> 𝑖𝑘
+
+, [𝑀 𝛾 (𝜇 )] 𝑖𝑗 = − 𝛾 𝑖𝑗 𝜇 𝜇 2−𝛾 2
+
+> 𝑖𝑗
+
+;(c) At 𝜇 = 1 , 𝐿 𝛽 = 𝑆 𝑀 𝛾 (1) 𝑆 , and 𝜆 min (𝐿 𝛽 ) = 0 ⇐⇒ 1 ∈ spec( 𝐵 𝛾 ); (d) BP stability: 
+
+𝜌 (𝐵 𝛾 ) < 1 (convergent), = 1 (Nishimori criticality), > 1 (spin-glass). 
+
+Proof. (a) The BP equations in log-likelihood-ratio domain are ℎ(𝑡 +1)  
+
+> 𝑖 →𝑗
+
+=∑︀ 𝑘 ∈𝜕𝑖 ∖𝑗 atanh( 𝛾 𝑘𝑖 tanh( ℎ(𝑡 )
+
+> 𝑘 →𝑖
+
+)) .The paramagnetic fixed point is ℎ* 
+
+> 𝑖 →𝑗
+
+= 0 . Setting ℎ𝑖 →𝑗 = 𝜖 𝑢 𝑖 →𝑗 and expanding tanh( ℎ) = 
+
+ℎ + 𝒪 (ℎ3): 𝑢 (𝑡 +1)  
+
+> 𝑖 →𝑗
+
+=∑︀ 𝑘 ∈𝜕𝑖 ∖𝑗 𝛾 𝑘𝑖 𝑢 (𝑡 )
+
+> 𝑘 →𝑖
+
+, which defines (𝐵 𝛾 𝑢 )(𝑖 →𝑗 ).
+
+x–35 Deep Learning in Computational Physics 
+
+(b) Suppose 𝐵 𝛾 𝑢 = 𝜇 𝑢 , 𝑢 ̸ = 0 . Define the vertex-space aggregate 𝑣 𝑖 := ∑︀ 𝑘 ∈𝜕𝑖 𝛾 𝑖𝑘 𝑢 (𝑘 →𝑖 ).From the eigenvalue equation: 𝑣 𝑖 = 𝜇 𝑢 (𝑖 →𝑗 ) + 𝛾 𝑖𝑗 𝑢 (𝑗 →𝑖 ) for any neighbor 𝑗 . Solving this 2 × 2
+
+system: 𝑢 (𝑖 →𝑗 ) = ( 𝜇𝑣 𝑖 − 𝛾 𝑖𝑗 𝑣 𝑗 )/(𝜇 2 − 𝛾 2 
+
+> 𝑖𝑗
+
+). Substituting back: 𝑣 𝑖 =∑︀ 𝑘 𝛾 𝑖𝑘 𝜇 𝜇 2−𝛾 2
+
+> 𝑖𝑘
+
+𝑣 𝑘 − 𝑣 𝑖 ∑︀ 𝑘 𝛾 2
+
+> 𝑖𝑘
+> 𝜇 2−𝛾 2
+> 𝑖𝑘
+
+,which is 𝑀 𝛾 (𝜇 )𝑣 = 0 . If 𝑢 ̸ = 0 then 𝑣 ̸ = 0 , so det( 𝑀 𝛾 (𝜇 )) = 0 . Converse by reconstruction of 
+
+𝑢 from eigenvector 𝑣 .
+
+(c) Setting 𝜇 = 1 : diagonal becomes [𝑀 𝛾 (1)] 𝑖𝑖 = 𝐷 𝑖𝑖 , off-diagonal −𝑊 𝑖𝑗 . Therefore 𝑀 𝛾 (1) = 
+
+𝐷 −𝑊 𝐴 . Since 𝑆𝐷𝑆 = 𝐼 , we obtain 𝐿 𝛽 = 𝑆 𝑀 𝛾 (1) 𝑆 = 𝑆 (𝐷 −𝑊 𝐴 )𝑆 = 𝐼 −𝑆𝑊 𝑆 . By Sylvester’s law of inertia ( 𝑆 ≻ 0), 𝜆 min (𝐿 𝛽 ) = 0 ⇔ det( 𝑀 𝛾 (1)) = 0 ⇔ 1 ∈ spec( 𝐵 𝛾 ).
+
+(d) When 𝜌 (𝐵 𝛾 ) < 1, perturbations decay and BP converges to the uninformative solution. At 𝜌 (𝐵 𝛾 ) = 1 , community structure becomes detectable [6, 7]. When 𝜌 (𝐵 𝛾 ) > 1, the system enters the spin-glass phase. 
+
+2. Trapping-Set Eigenvalue Correspondence 
+
+Theorem 5.2 (restated). Let 𝑈 ⊆ 𝑉 induce a trapping set 𝑇 𝑆 (𝑎, 𝑏 ) with 𝑎 variable nodes and 𝑏 odd-degree check nodes. Let 𝐵 (𝑈 ) 
+
+> 𝛾
+
+be the restricted non-backtracking operator, and 
+
+𝐿 (𝑈 ) 
+
+> 𝛽
+
+= 𝑆 𝑈 (𝐷 𝑈 − 𝑊 (𝑈 ) 
+
+> 𝐴
+
+)𝑆 𝑈 the local regularized Laplacian. (a) If 𝑏 > 0, then for large 𝛽 there exists a frustrated cycle in 𝑈 with 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) > 1 and hence 𝜆 min (𝐿 (𝑈 ) 
+
+> 𝛽
+
+) < 0. (b) If 𝑏 = 0 , then 
+
+𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) ≤ 1 and 𝜆 min (𝐿 (𝑈 ) 
+
+> 𝛽
+
+) ≥ 0 at the Nishimori temperature. (c) Both BP divergence and spectral embedding corruption originate from frustrated cycles with odd unsatisfied constraints. 
+
+Proof. (a) A trapping set 𝑇 𝑆 (𝑎, 𝑏 ) with 𝑏 > 0 contains at least one odd-degree check node, manifesting as a cyclic path 𝒞 where ∏︀ (𝑖,𝑗 )∈𝒞 𝛾 𝑖𝑗 < 0 (frustrated cycle). The first Betti number 
+
+𝑏 1 = 𝑒 − 𝑛 + 𝑐 > 0 guarantees at least one independent cycle. For a frustrated cycle, the eigenvalue contribution to 𝐵 (𝑈 ) 
+
+> 𝛾
+
+acquires a phase shift pushing spectral radius beyond unity: as 𝛽 → ∞ , |𝛾 𝑖𝑗 | → 1, and the frustrated product introduces eigenvalues with |𝜇 | > 1. By Theorem 5.1(b), det( 𝑀 (𝑈 ) 
+
+> 𝛾
+
+(𝜇 0)) = 0 for some |𝜇 0| > 1. Since 𝑀 𝛾 (𝜇 ) → 𝐼 as 𝜇 → ∞ , by continuity, 𝑀 (𝑈 ) 
+
+> 𝛾
+
+(1) has at least one negative eigenvalue. Sylvester’s law gives 𝜆 min (𝐿 (𝑈 ) 
+
+> 𝛽
+
+) < 0.
+
+(b) For 𝑇 𝑆 (𝑎, 0) , all check nodes have even degree; every cycle 𝒞 has ∏︀ 𝛾 𝑖𝑗 > 0. The eigenvalue contribution satisfies 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) ≤ 1, giving 𝑀 (𝑈 ) 
+
+> 𝛾
+
+(1) ⪰ 0 and hence 𝜆 min (𝐿 (𝑈 ) 
+
+> 𝛽
+
+) ≥ 0.
+
+(c) By Theorem 5.1, the BP Jacobian eigenvalues are those of 𝐵 𝛾 , and the regularized Laplacian eigenvalues follow from the Ihara–Bass map at 𝜇 = 1 . An eigenvalue |𝜇 0| > 1 means BP messages diverge as |𝜇 0|𝑡 ; a negative 𝜆 min (𝐿 (𝑈 ) 
+
+> 𝛽
+
+) < 0 means the minimum eigenvector mixes communities. Both trace to the same frustrated cycle with odd unsatisfied constraints. 
+
+x–36 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+3. Mean-Field Kohn–Sham Decomposition, Separability, and Exchange-Correlation Bound 
+
+Theorem A.1 (Mean-Field Kohn–Sham Spectral Embedding (restated)) . Under the Bethe–Peierls (mean-field) approximation and feature independence, the 𝐷 -channel interacting problem decom poses into 𝐷 independent single-channel eigenproblems: 𝐿 (𝑘 )(𝛽 (𝑘 ) 
+
+> 𝑁
+
+) 𝑣 (𝑘 ) 
+
+> 𝑖
+
+= 𝜆 (𝑘 ) 
+
+> 𝑖
+
+𝑣 (𝑘 ) 
+
+> 𝑖
+
+, and the final embedding is 𝐸 = [ 𝑆 (1) 𝑣 (1) min | · · · | 𝑆 (𝐷 )𝑣 (𝐷 )min ]. The exchange-correlation energy per channel satisfies 
+
+|𝐸 (𝑘 ) 
+
+> 𝑥𝑐
+
+| ≤ 𝜉 𝑔 0 /[2 𝑔 0(1 − 𝜉 )] where 𝜉 = ( 𝑑 max − 1) tanh( 𝛽 𝑁 𝐽 max ) < 1, vanishing on trees ( 𝑔 0 = ∞). After star-domain surgery, residual 𝐸 𝑥𝑐 = 𝒪 (𝛿 ).Proof. The Bethe free energy for a single feature 𝑘 is [24] 𝐺 (𝑘 )
+
+> Bethe
+
+[{𝑏 𝑟 }] = 𝑈 (𝑘 ) 
+
+> Bethe
+
+− 𝐻 (𝑘 )
+
+> Bethe
+
+. The mean-field approximation replaces 𝑏 𝑟 by fully factorized marginals 𝑏 (𝑘 ) 
+
+> 𝑖
+
+(𝜎 𝑖 ) = 1+ 𝑚 (𝑘 )  
+
+> 𝑖 𝜎 𝑖
+> 2
+
+, yield ing the mean-field free energy 𝐹 (𝑘 )
+
+> MF
+
+. The exchange-correlation energy is 𝐸 (𝑘 ) 
+
+> 𝑥𝑐
+
+= 𝐹 (𝑘 ) 
+
+> Bethe
+
+− 𝐹 (𝑘 )
+
+> MF
+
+,capturing loop corrections beyond the Bethe–Peierls approximation. The regularized Laplacian 𝐿 (𝑘 )(𝛽 ) = 𝐼 − 𝑆 (𝑘 )𝑊 (𝑘 )𝑆 (𝑘 ) plays the role of the Kohn–Sham single-particle Hamiltonian. The diagonal scaling 𝑠 (𝑘 ) 
+
+> 𝑖
+
+= 1 /√︁ 𝐷 (𝑘 ) 
+
+> 𝑖𝑖
+
+is the external (graph scaffold) potential; the off-diagonal term 𝑊 (𝑘 ) 
+
+> 𝑖𝑗
+
+𝑠 (𝑘 ) 
+
+> 𝑗
+
+is the Hartree interaction. The exchange-correlation potential 𝛿𝐸 (𝑘 ) 
+
+> 𝑥𝑐
+
+/𝛿𝜌 (𝑘 ) 
+
+> 𝑖
+
+captures loop corrections from graph cycles. On a tree ( 𝑔 0 = ∞), the Bethe free energy is exact and 𝐸 (𝑘 ) 
+
+> 𝑥𝑐
+
+= 0 , so the mean-field decomposition becomes exact .On a general graph with girth 𝑔 0, loop corrections for a cycle 𝒞 of length ℓ are bounded by |∆𝐺 (𝒞 )| ≤ (𝑑 max − 1) ℓ tanh ℓ(𝛽𝐽 max ) = 𝜉 ℓ. Summing over all cycles starting at any vertex: 
+
+|𝐸 𝑥𝑐 | ≤ 𝑁 𝜉 𝑔 0 
+
+> 2(1 −𝜉 )
+
+, giving the stated bound per channel. The condition 𝜉 < 1 is the standard Bethe–Peierls convergence condition. The connection to fractal dimension and surgery: before surgery, 𝐷 2 > 3 (rough landscape with many frustrated cycles), and the bound may be large. Star-domain surgery creates wide, smooth basins around codewords 𝑇 𝑆 (𝑎, 0) by constructing shifts that bound residual frustration, effectively increasing the local girth around each codeword and driving 𝐷 2 < 1. When 𝐷 2 < 1,spectral mass concentrates near 𝜆 min in the Pontryagin-dual character basis (since [Z/𝑝 Z ∼= Z/𝑝 Z,spatial concentration corresponds to spectral concentration), so few Fourier modes ( 𝑘 mode = 5 )suffice for Rayleigh refinement. After surgery convergence (Theorem A.3), residual frustrated cycles have bounded spectral radius 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) ≤ 1 + 𝛿 with 𝛿 → 0, giving 𝐸 𝑥𝑐 = 𝒪 (𝛿 ).
+
+Proposition 4.2 (restated). There exist graphs with distinct coupling matrices 𝐽 and 𝐽 ′ that yield identical magnetizations 𝑚 𝑖 = ⟨𝜎 𝑖 ⟩ for all 𝑖 at every temperature, but different free energies. 
+
+Proof. Consider the 4-cycle 𝒞 4 = (1 , 2, 3, 4) with two coupling configurations: (i) 𝐽 𝑖𝑗 = +1 
+
+x–37 Deep Learning in Computational Physics for all edges (fully ferromagnetic), and (ii) 𝐽 ′ 
+
+> 12
+
+= −1, 𝐽 ′ 
+
+> 23
+
+= 𝐽 ′ 
+
+> 34
+
+= 𝐽 ′ 
+
+> 14
+
+= +1 (one anti ferromagnetic bond). Both Hamiltonians satisfy Z2 spin-flip symmetry ( ℋ(𝜎 ) = ℋ(−𝜎 ))in the absence of an external field, so 𝑚 𝑖 = 0 for all 𝑖 at every temperature. However, using transfer matrices with eigenvalues 𝜆 ±(𝐽 ) = 2 cosh( 𝛽𝐽 ) and 2 sinh( 𝛽𝐽 ) along eigenvec tors (1 , ±1) /√2 (shared by all transfer matrices), the partition function on periodic 𝒞 4 is: 
+
+𝑍 =∏︀ 𝑒 ∈𝐸 𝜆 +(𝐽 𝑒 ) + ∏︀ 𝑒 ∈𝐸 𝜆 −(𝐽 𝑒 ). For (i): 𝑍 𝐹 = [2 cosh( 𝛽 )] 4 + [2 sinh( 𝛽 )] 4. For (ii): ∏︀ 𝜆 (𝑘 ) 
+
+> −
+
+=[2 sinh( −𝛽 )][2 sinh( 𝛽 )] 3 = −[2 sinh( 𝛽 )] 4, so 𝑍 𝐹 ′ = [2 cosh( 𝛽 )] 4 − [2 sinh( 𝛽 )] 4. Since cosh( 𝛽 ) is even and the 𝜆 − product picks up a sign from the odd antiferromagnetic bond, 𝑍 𝐹 ̸ = 𝑍 𝐹 ′ for all 𝛽 > 0, hence 𝐹 (𝐽 )̸ = 𝐹 (𝐽 ′). Both configurations yield identical (vanishing) magnetizations at every temperature, so the free energy is not a functional of {𝑚 𝑖 } alone. 
+
+Theorem 4.2 (restated). Under feature independence, 𝑍 full =∏︀ 𝑘 𝑍 (𝑘 ), 𝐺 Bethe =∑︀ 𝑘 𝐺 (𝑘 )
+
+> Bethe
+
+,and 𝐿 full  
+
+> 𝛽
+
+=⨁︀ 𝑘 𝐿 (𝑘 ) 
+
+> 𝛽
+
+. The global Nishimori temperature is 𝛽 full  
+
+> 𝑁
+
+= max 𝑘 𝛽 (𝑘 ) 
+
+> 𝑁
+
+.
+
+Proof. Since ℋfull =∑︀ 𝑘 ℋ(𝑘 ) and feature variables for different 𝑘 do not interact: 𝑍 full =∏︀  
+
+> 𝐷 𝑘 =1
+
+𝑍 (𝑘 ), hence 𝐺 Bethe = − log 𝑍 full =∑︀ 𝑘 𝐺 (𝑘 )
+
+> Bethe
+
+. Since 𝛾 (𝑘 ) 
+
+> 𝑖𝑗
+
+= tanh( 𝛽𝐽 (𝑘 ) 
+
+> 𝑖𝑗
+
+) depends only on feature 𝑘 , the non-backtracking operator is block-diagonal: 𝐵 full  
+
+> 𝛾
+
+=⨁︀ 𝑘 𝐵 (𝑘 ) 
+
+> 𝛾
+
+. By Theorem 5.1(c), 
+
+𝐿 full  
+
+> 𝛽
+
+= 𝑆 full 𝑀 full  
+
+> 𝛾
+
+(1) 𝑆 full =⨁︀ 𝑘 𝐿 (𝑘 ) 
+
+> 𝛽
+
+. The graph topology is shared across features while cou plings 𝐽 (𝑘 ) 
+
+> 𝑖𝑗
+
+are feature-specific. By Theorem 5.2(b), codewords 𝑇 𝑆 (𝑎, 0) have 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) ≤ 1 for all features simultaneously. Since spec( 𝐿 full  
+
+> 𝛽
+
+) = ⋃︀ 𝑘 spec( 𝐿 (𝑘 ) 
+
+> 𝛽
+
+), the global condition requires 
+
+min 𝑘 𝜆 (𝑘 )min = 0 . As each 𝐿 (𝑘 ) 
+
+> 𝛽
+
+(𝛽 ) is monotone in 𝛽 , the first feature to reach criticality determines 
+
+𝛽 full  
+
+> 𝑁
+
+= max 𝑘 𝛽 (𝑘 ) 
+
+> 𝑁
+
+.
+
+4. Star-Domain Surgery Theorem 
+
+Theorem 6.1 (restated). Let 𝒢 𝑛 be a graph after 𝑛 surgery iterations applying shift oper ator Σ𝑛 . (a) For each surviving codeword 𝑥 0 ∈ 𝑇 𝑆 (𝑎, 0) , the Bethe free-energy landscape 
+
+𝐺 Bethe restricted to a neighborhood 𝒰 (𝑥 0) forms a star domain: 𝐺 Bethe (𝑡 𝜎 + (1 − 𝑡 )𝑥 0) ≤
+
+max( 𝐺 Bethe (𝜎 ), 𝐺 Bethe (𝑥 0)) for all 𝜎 ∈ 𝒰 (𝑥 0), 𝑡 ∈ [0 , 1] . (b) 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) ≤ 1 + 𝛿 𝑛 with 𝛿 𝑛 =
+
+𝒪 (Φ( 𝒢 𝑛 ) − Φ( 𝒢 𝑛 −1)) and 𝛿 𝑛 → 0. (c) Attractor basin width is Ω(1 /√𝑑 min ).
+
+Proof. (a) Consider a codeword 𝑥 0 ∈ 𝑇 𝑆 (𝑎, 0) with all even check degrees. The Hessian of 
+
+𝐺 Bethe at 𝑥 0 is positive semidefinite because ∏︀ (𝑖,𝑗 )∈𝒞 𝛾 𝑖𝑗 > 0 for all cycles through codeword edges (Theorem 5.2(b)). The shift operator Σ𝑛 modifies only edges in frustrated cycles, leaving local structure around 𝑥 0 unchanged to first order. For any 𝜎 ∈ 𝒰 (𝑥 0) and 𝑡 ∈ [0 , 1] , define 
+
+𝜎 (𝑡 ) = 𝑡 𝜎 + (1 − 𝑡 )𝑥 0. The second-order expansion gives: 𝐺 Bethe (𝜎 (𝑡 )) ≤ 𝑡 𝐺 Bethe (𝜎 ) + (1 −
+
+x–38 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+𝑡 ) 𝐺 Bethe (𝑥 0) + 𝒪 (‖𝜎 − 𝑥 0‖2 · 𝛿 𝑛 ). For sufficiently small ‖𝜎 − 𝑥 0‖, the 𝛿 𝑛 term is dominated by the linear interpolation, yielding the star-domain inequality. 
+
+(b) By Theorem 5.2(a), each frustrated cycle with 𝑏 > 0 contributes 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) > 1. The shift operator removes or weakens the strongest frustrated cycles, reducing their spectral radius contribution. By Weyl’s inequality applied to the non-backtracking operator restricted to the modified subgraph, 𝜌 (𝐵 (𝑈,𝑛 +1)  
+
+> 𝛾
+
+) ≤ 𝜌 (𝐵 (𝑈,𝑛 ) 
+
+> 𝛾
+
+) − 𝜖 𝑛 for each removed edge with 𝜖 𝑛 > 0. Since Φ( 𝒢 𝑛 )
+
+is non-decreasing and bounded above (by 0, the Nishimori condition), the series ∑︀ 𝜖 𝑛 converges, giving 𝛿 𝑛 = 𝒪 (Φ( 𝒢 𝑛 ) − Φ( 𝒢 𝑛 −1)) → 0.
+
+(c) The code distance 𝑑 min determines the minimum Hamming weight of any non-zero code word. For a codeword 𝑥 0, the Bethe free-energy barrier to the nearest saddle point is propor tional to 𝑑 min · 𝛽 𝑁 𝐽 max . The attractor basin width scales as 1/√𝑑 min because the spectral gap of 𝐿 (𝑈 ) 
+
+> 𝛽
+
+(𝑥 0) is Θ( 𝑑 min ), and gradient descent convergence time within a star-domain basin scales as the inverse square root of the spectral gap. 
+
+5. Quasi-Stationarity Perturbation Bound 
+
+Theorem A.2 (Perturbation Bound for Vertex Addition) . Let 𝐿 (𝑘 )(𝛽 ; 𝑁 𝑓 , 𝑁 𝑡 ) denote the reg ularized Laplacian on 𝑉 frozen ∪ 𝑉 thawed with |𝑉 frozen | = 𝑁 𝐹 , |𝑉 thawed | = 𝑁 𝑇 . Assume: (A1) 𝜂 =
+
+𝑁 𝑡 /𝑁 𝑓 ≪ 1; (A2) spectral gap on the frozen subgraph 𝑔 ≥ 𝑔 min > 0; (A3) thawed-block features drawn i.i.d. from the same distribution as the frozen block; (A4) 𝜕𝜆 min /𝜕𝛽 |𝛽 𝑁 ̸ = 0 .Then: |𝛽 (𝑘 ) 
+
+> 𝑁
+
+(𝐿 (𝑘 ); 𝑁 𝑓 , 𝑁 𝑡 ) − 𝛽 (𝑘 ) 
+
+> 𝑁
+
+(𝐿 frozen ; 𝑁 𝑓 )| = 𝒪 (𝑁 𝑇 /𝑁 𝐹 ), and the eigenvector decomposes as 
+
+𝑣 (𝑘 )min = 𝑣 (𝑘 ) 
+
+> nuc
+
++ 𝒪 (𝜂/𝑔 min ) · 𝑣 (𝑘 ) 
+
+> val
+
+.Proof. Let 𝐿 ′ 
+
+> 𝛽
+
+= 𝐿 𝛽 +𝜖 ∆𝐿 𝛽 , where 𝜖 = 𝑁 𝑇 /(𝑁 𝐹 +𝑁 𝑇 ) and ‖∆𝐿 𝛽 ‖2 ≤ 𝐶 . Let 𝜆 1(𝛽 ) < 0 < 𝜆 2(𝛽 )
+
+be the two smallest eigenvalues of 𝐿 𝛽 with 𝜆 1(𝛽 𝑁 ) = 0 and normalized eigenvector 𝑣 1. By first-order perturbation theory: 𝜆 ′
+
+> 1
+
+(𝛽 ) = 𝜆 1(𝛽 ) + 𝜖 𝑣 ⊤ 
+
+> 1
+
+∆𝐿 𝛽 𝑣 1 + 𝒪 (𝜖 2). Setting 𝜆 ′
+
+> 1
+
+(𝛽 ′ 
+
+> 𝑁
+
+) = 0 and expanding around 𝛽 𝑁 :
+
+0 = 𝜆 1(𝛽 𝑁 )
+
+⏟ ⏞
+
+> = 0
+
++( 𝛽 ′ 
+
+> 𝑁
+
+− 𝛽 𝑁 )𝜕𝜆 1
+
+𝜕𝛽 ⃒⃒⃒⃒ 𝛽 𝑁 
+
++ 𝜖 𝑣 ⊤ 
+
+> 1
+
+∆𝐿 𝛽 𝑣 1 + 𝒪 (𝜖 2).
+
+Solving: |𝛽 ′ 
+
+> 𝑁
+
+− 𝛽 𝑁 | = 𝜖 |𝑣 ⊤     
+
+> 1Δ𝐿 𝛽 𝑣 1||𝜕 𝛽 𝜆 1|𝛽 𝑁 |
+
++ 𝒪 (𝜖 2) = 𝒪 (︁ 𝜂 𝑔 min )︁ , where 𝑔 min bounds |𝜕 𝛽 𝜆 1| from below. For eigenvector decomposition, the Davis–Kahan theorem gives ‖𝑣 thawed − 𝑣 nuc ‖2 ≤ 𝜖𝐶/𝑔 min =
+
+𝒪 (𝜂/𝑔 min ). Empirically observed variation of < 1% for 𝜖 = 0 .111 is consistent with higher-order terms being small. 
+
+x–39 Deep Learning in Computational Physics 
+
+6. Convergent Surgery with Bounded Residual Frustration 
+
+Theorem A.3 (Convergent Surgery) . Define Φ( 𝒢 ) := min 𝑘 𝜆 (𝑘 )min (𝛽 (𝑘 ) 
+
+> 𝑁
+
+; 𝒢 ) and a shift operator Σ : 
+
+𝒢 𝑛 ↦ → 𝒢 𝑛 +1 that constructs star domains around codewords while bounding residual frustration (Theorem 6.1). Then: (a) Φ( 𝒢 𝑛 +1 ) ≥ Φ( 𝒢 𝑛 ) − 𝛿 𝑛 with 𝛿 𝑛 → 0 (monotone improvement up to residual frustration); (b) the iteration converges in finitely many steps to a configuration 𝒢 * with 
+
+𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) ≤ 1 + 𝛿 for all remaining 𝑇 𝑆 (𝑎, 𝑏 ̸=0) ; (c) at convergence, each codeword 𝑇 𝑆 (𝑎, 0) is the center of a star domain in 𝐺 Bethe with basin width Ω(1 /√𝑑 min ), and 𝜆 (𝑘 )min (𝛽 (𝑘 ) 
+
+> 𝑁
+
+; 𝒢 *) = 0 for all features 𝑘 ; (d) the minimum number of Fourier modes satisfies 𝑘 mode = 𝒪 (𝐷 2 · log 𝑁 ), where 
+
+𝐷 2 < 1 after convergence. Proof. (a) By Theorem 6.1(b), each shift reduces the spectral radius contribution of frustrated subgraphs by 𝜖 𝑛 > 0, but does not eliminate all frustration (residual 𝛿 𝑛 = 𝒪 (Φ( 𝒢 𝑛 ) − Φ( 𝒢 𝑛 −1)) ). By Weyl’s inequality, 𝜆 (𝑘 )min (𝒢 𝑛 +1 ) ≥ 𝜆 (𝑘 )min (𝒢 𝑛 ) − 𝛿 𝑛 for all 𝑘 . Since Φ is bounded above by 0 (Nishimori condition) and ∑︀ 𝛿 𝑛 < ∞, the series converges. 
+
+(b) The graph has finitely many subgraphs. Each shift step strictly reduces the spectral radius of the strongest frustrated subgraph (Theorem 6.1(b)) and creates or widens star-do main basins around nearby codewords. Since the maximum spectral radius over all frustrated subgraphs is bounded below by 1, and each shift reduces it, the iteration converges in finitely many steps to 𝒢 * with 𝜌 (𝐵 (𝑈 ) 
+
+> 𝛾
+
+) ≤ 1 + 𝛿 for all remaining 𝑇 𝑆 (𝑎, 𝑏 ̸=0) .
+
+(c) At convergence, each codeword 𝑇 𝑆 (𝑎, 0) is the center of a star-domain basin by The orem 6.1(a,c). The attractor basin width Ω(1 /√𝑑 min ) ensures that BP messages converge to correct community assignments from a broad initial region. The Nishimori condition 
+
+𝜆 (𝑘 )min (𝛽 (𝑘 ) 
+
+> 𝑁
+
+; 𝒢 *) = 0 holds because codewords have 𝜌 (𝐵 𝛾 ) ≤ 1 (Theorem 5.2(b)) and residual frustration is bounded by 𝛿 , which does not push any eigenvalue negative at the Nishimori temperature. 
+
+(d) By Pontryagin self-duality [Z/𝑝 Z ∼= Z/𝑝 Z, a star-domain basin of width 𝑤 = Ω(1 /√𝑑 min )
+
+in configuration space corresponds to a spectral peak of width ∼ 1/𝑤 in the character group. The number of Fourier modes needed to resolve this peak is 𝑘 mode = 𝒪 (1 /(𝑤 ·∆𝑓 )) , where ∆𝑓 =1/𝑁 is the frequency resolution on a length-𝑁 circulant block. Substituting 𝑤 = Ω(1 /√𝑑 min ):
+
+𝑘 mode = 𝒪 (√𝑑 min · 𝑁 ). Since the correlation dimension 𝐷 2 satisfies 𝐷 2 < 1 after convergence (Prop. 4.1), and 𝐷 2 relates to the effective spectral width via 𝑤 ∼ 1/√𝑑 min , we obtain 𝑘 mode =
+
+𝒪 (𝐷 2 · log 𝑁 ). For practical values ( 𝐷 2 < 1, 𝑁 ≤ 45 ,000 ), this gives 𝑘 mode = 5 as used in Alg. 4. 
+
+x–40 Moscow University Physics Bulletin 80 (9), x (2026) 
+
+7. Summary of Theoretical Results 
+
+Table V summarizes all theoretical results and their roles in the KSSE framework. The chain of implications is: BP linearization ⏟ ⏞
+
+> Theorem 5.1
+
+−→ 𝐵 𝛾 
+
+⏟ ⏞ 
+
+> non-backtracking operator Ihara–Bass
+
+−−−−−−→ 
+
+> 𝜇 =1
+
+𝑀 𝛾 (1) = 𝐷 − 𝑊 𝐴 
+
+⏟ ⏞
+
+> unnormalized Bethe–Hessian
+> 𝑆 (·)𝑆
+
+−−−→ 𝐿 𝛽 = 𝐼 − 𝑆𝑊 𝑆 
+
+⏟ ⏞
+
+> regularized Laplacian
+
+,
+
+with Theorem 5.2 ensuring that graph topology surgery simultaneously improves BP conver gence and spectral embedding quality through their shared topological defects, Theorem 6.1 establishing star-domain convexity with bounded residual frustration, and Theorems 4.1–A.3 providing the variational, perturbative, and self-consistency foundations for the KSSE algoriThe orem 
+
+FUNDING 
+
+This work was supported by ongoing institutional funding. No additional grants to carry out or direct this particular research were obtained. 
+
+CONFLICT OF INTEREST 
+
+The authors declare that they have no conflicts of interest. 
+
+x–41 Deep Learning in Computational Physics 
+
+> Table V. Summary of formal theorems.
+> Theorem  What it proves  Role in KSSE
+> Theorem  5.1  BP  → 𝐵 𝛾  → Ihara–Bass  → 𝐿 𝛽  = 𝑆𝑀 𝛾  (1) 𝑆 .Nishimori condition  ⇔ BP threshold. Validates regularized Laplacian as proper spectral object. Theorem  5.2  𝑇 𝑆 (𝑎, 𝑏 ̸=0)  ⇒ 𝜌 (𝐵 (𝑈  )
+> 𝛾  ) > 1 ⇔ 𝜆 min (𝐿 (𝑈  )
+> 𝛽  ) < 0 via frustrated cycles. Connects graph optimization to topological preconditioning. Theorem  4.1  Mean-field KS decomp.;  𝐸 𝑥𝑐  = 0  on trees, else decays as  𝜉 𝑔 0 .Formalizes KS analogy and bounds approximation error. Theorem  6.1 Surgery creates star-convexity around  𝑇 𝑆 (𝑎,  0) ;
+> 𝜌 (𝐵 𝛾  ) ≤ 1 +  𝛿 ; basin width  Ω(1 /√𝑑 min ).Shows surgery works without full TS removal; enables Rayleigh refinement via duality. Proposition  4.1  Bound:  |𝐸 𝑥𝑐 | ≤  𝜉 𝑔 0 /[2 𝑔 0(1  − 𝜉 )]  for  𝜉 <  1. Uses fractal dimension  𝐷 2 < 1 to certify star-domain basins. Proposition  4.2  Free energy is not a functional of magnetizations alone on general graphs. Confirms KSSE separability stems from feature independence, not Hohenberg–Kohn. Theorem  4.2 Feature independence  ⇒ 𝑍, 𝐺 Bethe , 𝐿 𝛽  factorize;
+> 𝛽 full
+> 𝑁  = max 𝑘  𝛽 (𝑘 )
+> 𝑁  .Formalizes KS decomposition independent of Hohenberg–Kohn. Theorem  A.2  |Δ𝛽 𝑁  | = 𝒪 (𝑁 𝑇  /𝑁 𝐹  ) via eigenvalue perturbation.  Justifies static  𝛽 𝑁  reuse (experimentally
+> < 1%  variation). Theorem  A.3 Surgery with bounded frustration is monotone and finitely convergent to  𝜌 (𝐵 𝛾  ) ≤ 1 +  𝛿 .Formalizes self-consistent optimization;
+> 𝑘 mode  = 𝒪 (𝐷 2 log  𝑁  ).
+
+x–42

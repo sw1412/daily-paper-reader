@@ -1,0 +1,356 @@
+Title: Direction-adaptive Mamba: Spatial-Frequency Dual-Domain Collaborative Learning for PolSAR Image Classification
+
+URL Source: https://arxiv.org/pdf/2607.23464v1
+
+Published Time: Tue, 28 Jul 2026 01:08:31 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# Direction-adaptive Mamba: Spatial-Frequency Dual-Domain Collaborative Learning for PolSAR Image Classification 
+
+## Junfei Shi, Yu Cheng, Haojia Zhang, Wenqiang Hua, Junhuai Li, Maoguo Gong 
+
+Abstract 
+
+Deep learning dominates polarimetric synthetic aperture radar (PolSAR) image classification, with Mamba architectures serving as favorable backbones due to linear complexity and strong global modeling capacity. However, existing PolSAR Mamba methods have two critical flaws: pure spatial pro-cessing discards fine-grained edges and textures, and fixed scanning patterns fail to model direction-variant anisotropic scattering and weak boundaries essential for PolSAR phys-ical analysis. This work proposes DA-Mamba, a direction-adaptive Mamba framework with dual-domain collaborative learning for PolSAR classification. Equipped with an edge-aligned direction-adaptive scanning scheme, DA-Mamba cap-tures long-range spatial dependencies and accurate bound-ary details. It adopts the Non-Subsampled Contourlet Trans-form (NSCT) to separate PolSAR data into low-frequency global components and multi-directional high-frequency sub-bands, extracting anisotropic structural features from high-frequency information while preserving global context via low-frequency branches. A dual-domain collaborative learn-ing module further integrates spatial scattering and frequency-domain representations to strengthen feature discriminability. Evaluated on three real-world PolSAR datasets, DA-Mamba surpasses state-of-the-art methods, verifying the efficacy of the proposed adaptive scanning and dual-domain fusion de-signs. Code will be publicly available. 
+
+## Introduction 
+
+Polarimetric Synthetic Aperture Radar (PolSAR) image clas-sification plays a critical role in diverse Earth observation and remote sensing applications, including land cover mapping(Ji et al. 2018), agricultural monitoring(Xiang et al. 2016), urban planning and disaster assessment(Antropov et al. 2013). Ben-efiting from abundant scattering matrix measurements, Pol-SAR data enables more comprehensive physical characteri-zation of ground targets than single-polarization SAR. Tra-ditional PolSAR classification methods rely on handcrafted features derived from scattering mechanisms(Freeman and Durden 1998a) and statistical distributions(Lee, Grunes, and Kwok 1994a), which fail to capture the complex, hierarchical scattering patterns prevalent in heterogeneous terrain scenar-ios. 
+
+Copyright © 2027, Association for the Advancement of Artificial Intelligence (www.aaai.org). All rights reserved. 
+
+Recently, deep learning has emerged as the dominant paradigm for PolSAR image interpretation, yielding state-of-the-art performance in terrain classification and target de-tection. Convolutional Neural Networks (CNNs)(Zhou et al. 2016a; Yu et al. 2015) are widely prevalent in this field for their exceptional local feature extraction ability, yet they are inherently constrained by fixed local receptive fields and fail to model long-range global context. By contrast, Vi-sion Transformers (ViTs)(Wang et al. 2022; Dong, Zhang, and Zou 2021a) attain full global receptive fields via self-attention mechanisms. However, ViTs incur input-dependent quadratic computational complexity, which severely hinders their deployment on high-resolution PolSAR imagery. To address the aforementioned limitations, the Mamba state-space architecture has emerged as a promising alter-native, enabling linear-complexity global context modeling with favorable tradeoffs between performance and com-putational overhead(Gu and Dao 2023; Smith, Warring-ton, and Linderman 2022). Nonetheless, existing PolSAR Mamba variants(Kuang et al. 2025) focus solely on spatial-domain feature learning. This spatial-only design neglects fine-grained edges and heterogeneous structural cues criti-cal for differentiating PolSAR scattering mechanisms, fre-quently causing boundary blurring and edge misclassifica-tion. While frequency-domain methods can remedy this de-fect by extracting discontinuity-emphasized detail features, naive frequency-domain 2D Mamba deployment ignores di-rectional priors. This deficiency prevents capturing the inher-ent anisotropy of PolSAR edges, leading to inaccurate and inconsistent edge delineation. Fig. 1 illustrates the architectures of spatial 2D-Mamba, frequency-domain Mamba, and our proposed dual-domain direction-adaptive Mamba (DA-Mamba). Compared with the two baseline Mamba variants, our method excels at extracting fine structural features in the frequency domain while cap-turing long-range global context in the spatial domain. This dual-domain collaborative learning paradigm yields more discriminative feature embeddings and boosts final classifi-cation performance. Experiments on the Xi’an dataset further verify the efficacy of our DA-Mamba module and the overall framework. Consequently, existing Mamba methods still face two fun-damental limitations: (1) they neglect critical edge details during feature learning, leading to pronounced edge confu-arXiv:2607.23464v1 [eess.IV] 26 Jul 2026 Figure 1: Comparison of conventional and proposed meth-ods. sion and misclassification at object boundaries; and (2) they rely solely on either the spatial or frequency domain in iso-lation, thus failing to holistically integrate local structural details with global contextual cues, resulting in suboptimal feature representations. To tackle the above drawbacks, we propose DA-Mamba-DDCL, a dual-domain collaborative learning framework in-tegrated with a direction-adaptive Mamba tailored for Pol-SAR feature extraction across spatial and frequency do-mains. Distinct from standard fixed-scanning Mamba, our edge-aligned adaptive scanning captures long-range struc-tural dependencies and precisely outlines object boundaries. We first adopt the Non-Subsampled Contourlet Transform (NSCT) to split PolSAR images into low-frequency global components and multi-orientation high-frequency subbands. The proposed direction-adaptive Mamba(DA-Mamba) pro-cesses high-frequency subbands along orientation-aware tra-jectories to model anisotropic edges, while low-frequency branches retain holistic scene context. Additionally, our dual-domain architecture leverages a spatial 2D-Mamba to extract scattering signatures from raw PolSAR data. Features from the two domains are fused to support classification. The core contributions of this paper are outlined below: 1) We propose a novel direction-adaptive Mamba that dy-namically scans along edge orientations, effectively captur-ing direction-sensitive structural information and alleviating edge confusion in PolSAR classification. 2) We design a dual-domain spatial-frequency collabora-tive learning framework that holistically integrates spatial scattering context with structural features of the frequency-domain, achieving more discriminative and robust represen-tations. 3) Extensive experiments demonstrate that our DA-Mamba-DDCL framework achieves superior classification performance compared to state-of-the-art methods, validat-ing the effectiveness of both the direction-adaptive scanning strategy and the dual-domain collaboration. 
+
+## Related Work 
+
+Deep Learning-Based Methods 
+
+Driven by the rapid advancement of deep learning, PolSAR image classification has evolved from handcrafted feature engineering(Lee, Grunes, and Kwok 1994b; Lee et al. 1999; Freeman and Durden 1998b) to end-to-end data-driven fea-ture learning. Early mainstream studies adopted Convolu-tional Neural Networks (CNNs) to extract discriminative spatial and polarimetric PolSAR features(Zhou et al. 2016b; Cui et al. 2021; Ding et al. 2021). For instance, Zhou et al. first deployed CNNs for six-dimensional PolSAR data pro-cessing(Zhou et al. 2016b); Shang et al. developed a dual-branch CNN to boost feature representation capability(Cui et al. 2021); Zhang et al. further exploited 3D convolution to jointly model polarimetric properties and local spatial cor-relations(Dong, Zhang, and Zou 2020). Nevertheless, CNNs suffer from limited local receptive fields and fail to capture long-range spatial dependencies and global context. Atten-tion and Transformer architectures have been adopted for PolSAR classification to remedy this issue(Alkhatib 2024; Dong, Zhang, and Zou 2021b), yet they incur heavy computa-tion and memory overhead, particularly for high-dimensional multi-channel PolSAR data. 
+
+Frequency-Domain Methods 
+
+Frequency-domain multi-scale decomposition enriches Pol-SAR feature representations by isolating low-frequency se-mantics from high-frequency textures while suppressing speckle noise. Notable methods include LC-PSENet (Qin, Fu, and Lang 2020), which fuses low-frequency and con-tour subbands; Complex Contourlet-CNN (Li et al. 2020), combining multi-scale contourlet features with complex con-volutions; and C2N2 (Liu et al. 2024), which enhances contourlet-domain modeling via complex-valued learning. Wavelet-based approaches have also proven effective, such as using 3D discrete wavelet transforms (Bi et al. 2020) and combining wavelet convolutions with hierarchical spa-tial transformers (Wang et al. 2025b). However, these meth-ods overlook directional correlations across high-frequency subbands, failing to fully capture the anisotropic scattering and directional textures intrinsic to PolSAR data. 
+
+State Space Model 
+
+State Space Models (SSMs) have recently emerged as an effective framework for long-range sequence modeling. S4 (Gu, Goel, and Ré 2021) first introduced structured state space representations to efficiently capture long-range depen-dencies while maintaining linear complexity. Building upon S4, S5 (Smith, Warrington, and Linderman 2022) further simplified the state-space formulation and improved compu-tational efficiency through a multi-input multi-output design. More recently, Mamba (Gu and Dao 2023) incorporated se-lective state update mechanisms and hardware-aware opti-mization strategies into the SSM framework, significantly enhancing modeling capability and scalability. Owing to these advantages, Mamba has demonstrated promising per-formance across a variety of remote sensing tasks, including hyperspectral image classification (Wang et al. 2025a; He et al. 2024; Cui and Zhang 2025), remote sensing scene clas-sification (An et al. 2026; Chen et al. 2024), and semantic segmentation (Ding et al. 2024; Zheng et al. 2025). Moti-vated by these successes, we investigate the application of Mamba to PolSAR image classification. 
+
+## Proposed method 
+
+Network Overview 
+
+PolSAR image classification suffers from bottlenecks in joint modeling of polarimetric scattering semantics, global spatial structures, and fine-grained directional textures. To address this issue, this work proposes DA-Mamba-DDCL, a novel direction-adaptive Mamba-based spatial-frequency dual-domain collaborative learning framework (Fig. 2). Un-like existing single-branch spatial learning methods, our framework builds a dual-domain modeling paradigm to ex-ploit complementary spatial and frequency-domain cues: dis-criminative polarimetric scattering features, low-frequency global structural components, and high-frequency directional texture features. Moreover, a customized Direction-Adaptive Mamba (DA-Mamba) module is designed to capture diverse directional structural characteristics of PolSAR data. In our pipeline, the Non-Subsampled Contourlet Trans-form (NSCT) first decomposes input PolSAR images into one low-frequency component and multi-directional high-frequency subbands. For high-frequency subbands, the DA-Mamba module models multi-orientation structural features to boost edge detection and directional texture representation. The low-frequency component is processed to extract sta-ble global layouts, improving cross-region semantic consis-tency and mitigating local speckle noise. Beyond frequency-domain feature modeling, raw spatial polarimetric features are preserved to retain inherent scattering mechanisms and capture long-range spatial dependencies. Finally, a cross-branch adaptive fusion module integrates complementary dual-domain features, and the fused discriminative repre-sentations are fed into the classifier to yield final PolSAR classification results. 
+
+DA-Mamba for Frequency Domain 
+
+To explicitly separate structural information and muti-directional detail information in PolSAR images, we intro-duce the non-subsampled contourlet transform (NSCT) to decompose the original polarimetric data into low-frequency and high-frequency components. The NSCT owns shift-invariant properties and maintains full spatial resolution for all decomposed subbands. Given the original polarimetric input Xori ∈ RCori ×H×W , the NSCT decomposition can be formulated as 
+
+TN SCT (Xori ) = 
+
+n
+
+Xlf , X (1)  
+
+> hf
+
+, X (2)  
+
+> hf
+
+, . . . , X (K)
+
+> hf
+
+o
+
+where TN SCT (·) denotes the NSCT decomposition opera-tion, Xlf represents the low-frequency component, and X(k)
+
+> hf
+
+denotes the high-frequency component corresponding to the 
+
+k-th directional subband. In this work, K = 8 directional high-frequency subbands are used. For convenience, the di-rectional high-frequency components are stacked as 
+
+Xhf =
+
+h
+
+X(1)  
+
+> hf
+
+, X (2)  
+
+> hf
+
+, . . . , X (K)
+
+> hf
+
+i
+
+∈ RK×Chf ×H×W .
+
+where Chf , H and W denote the channel number, height and width of the feature map, respectively. 
+
+1) Direction-adaptive Mamba for HF subbands 
+
+(1) Edge-guided feature Enhancement 
+
+The high-frequency(HL) components can capture fine-grained textures and boundary information of ground objects. To enhance the edge details, we propose an edge-guided HL enhancement module for preserving detailed frontier information. Given the original polarimetric image Xori ∈
+
+RCori ×H×W , we extract directional edge cues through ro-tated Sobel filters, which can enhance directional structures and fine-grained details. The enhancement process can be formulated as 
+
+X′ 
+
+> hf
+
+= Xhf + α · tanh  S(Xori ),
+
+where S(·) denotes the edge enhancement operation im-plemented by rotated Sobel filters. The rotation angles are aligned with the directional decomposition angles of NSCT. 
+
+α is a learnable parameter that controls the contribution of the original polarimetric information to the high-frequency features, and tanh( ·) is adopted to constrain the value range of the enhancement term. 
+
+(2) Direction-adaptive Mamba 
+
+Conventional fixed-scanning 2D Mamba neglects inter-subband directional discrepancies, limiting full utilization of NSCT’s multi-directional decomposition merits. To this end, we propose a Direction-adaptive Mamba module to implement direction-aligned sequential modeling for ori-ented subbands, enhancing directional texture and fine struc-tural feature learning. It comprises two core steps: direction-aware serialization and direction-consistent state-space mod-eling. The former reorganizes high-frequency subbands into orientation-matched sequences, which compute the scanning sequences along the given direction. The latter models long-range dependencies on these sequences via a shared state-space model. 
+
+Direction-aware serialization. As illustrated in Fig. 3, each directional subband is first projected onto its correspond-ing orientation axis and sorted according to the projection values to generate a direction-aware serialization order. Let 
+
+X(k) 
+
+> hf
+
+∈ Rd×H×W represent the enhanced high-frequency feature of the k-th directional subband, where K = 8 is the total number of orientations and d is the feature dimension. To align serialization with each subband’s principal direc-tion θk, we define a directional ordering score for spatial coordinate (i, j ):
+
+ζk(i, j ) = i cos θk + j sin θk.
+
+Sorting pixels by ascending ζk(i, j ),yields the permutation index πk for direction k. We flatten and reorder the feature 
+
+X(k) 
+
+> hf
+
+into an orientation-aware sequence: 
+
+Sk = Π k
+
+
+
+X(k)
+
+> hf
+
+
+
+∈ RL×d,Figure 2: Framework of the proposed method. 
+
+Figure 3: Illustration of the proposed direction-aware serial-ization in Direction-adaptive Mamba. with Πk(·) standing for the permutation-based serialization operation guided by πk. This arrangement strengthens direc-tional spatial adjacency within Sk, enabling the state-space model to transfer context more efficiently along the main structural orientation. 
+
+Direction-consistent state-space modeling. The direc-tional sequence Sk is input into a shared state-space model for long-range dependency modeling. Aligned with each sub-band’s principal orientation, the model propagates context along inherent structural directions with cross-branch pa-rameter sharing. The formal formulation of this sequence modeling process is: 
+
+Yk = M(Sk),
+
+where M(·) denotes the shared Mamba state-space model. Finally, the output sequence is restored to the original 2D spatial layout using the inverse permutation: 
+
+F (k) 
+
+> hf
+
+= Π −1 
+
+> k
+
+(Yk) ∈ Rd×H×W ,
+
+where Π−1 
+
+> k
+
+(·) denotes the inverse operation corresponding to 
+
+Πk(·). Through the above workflow, our Direction-adaptive Mamba aligns sequence modeling with the inherent orienta-tion of NSCT high-frequency subbands, boosting the repre-sentation of directional textures, anisotropic structures and long-range contextual dependencies. 
+
+(3) Multi-directional subbands fusion 
+
+The Spatial Selective Fusion module(SSF) aims to boost the discriminability of fused high-frequency features via di-rectional feature weighting, to better characterize directional discrepancies among diverse land covers. To extract the adap-tive fused features, the SSF module can be expressed as 
+
+F f used hf =
+
+> K
+
+X
+
+> k=1
+
+C(F (k) 
+
+> hf
+
+) ⊙ F (k) 
+
+> hf
+
+,
+
+where C(·) denotes the convolution operation for generating directional weight maps, and Softmax( ·)performs weight normalization. ⊙ represents element-wise multiplication. 
+
+2) Global feature learning in LF subband 
+
+The NSCT-derived low-frequency component Xlf ∈
+
+RC×H×W retains coarse global scene structures, providing complementary semantic cues for PolSAR classification. For LF subband, a lightweight convolutional module is adopted to extract structural features with low computa-tional overhead. As shown in Fig. 2, the input feature is first downsampled via strided convolution. It is then pro-cessed by stacked lightweight refinement blocks consisting of depthwise convolution, pointwise convolution, batch nor-malization and GELU activation. Finally, the refined feature is upsampled and fused with skip-connected input features to yield the ultimate low-frequency representation, noted by 
+
+Flow = ϕ (Up ( D(φs(Xlow ))) + ψ(Xlow )) ,
+
+where φs(·) denotes the strided projection, D(·) repre-sents the lightweight refinement module, Up( ·) denotes up-sampling, ψ(·) is the skip projection, and ϕ(·) denotes the output transformation. Scattering-based 2D Mamba for Spatial Domain 
+
+Raw polarimetric data preserves full scattering characteris-tics and inter-channel correlations, delivering complemen-tary spatial information to frequency-domain features for PolSAR scene understanding. Accordingly, we deploy a 2D Mamba module in the spatial domain to capture global scat-tering contextual patterns. Given the original polarization input Xori ∈ RC×H×W ,a shallow projection layer generates the initial feature: 
+
+X0 = P(Xori ),
+
+where P(·) denotes feature embedding projection. Following the 2D selective scanning paradigm, X0 is se-rialized along four complementary directions: forward/back-ward row and column axes. Each sequence is fed into a Mamba block for efficient long-range dependency modeling. The outputs are remapped to spatial space and aggregated to yield the final spatial feature: 
+
+Fori = X0 + 14
+
+> 4
+
+X
+
+> k=1
+
+S−1
+
+> k
+
+ Mamba( Sk(X0)) ,
+
+where Sk(·) and S−1 
+
+> k
+
+(·) represent scanning and inverse scanning operations, respectively. By combining four-directional selective scanning with state-space modeling, the original polarization branch ef-fectively captures global contextual information while pre-serving intrinsic scattering characteristics, providing a strong semantic representation for subsequent feature fusion. 
+
+Dual-domain Feature Fusion and Classification 
+
+To fully capture the synergistic relationships among the three feature types, we first concatenate them along the channel dimension to obtain the joint feature: 
+
+Fjoint = [ Fori , F low , F high ],
+
+where Fori , Flow , and Fhigh represent the original polar-ization, low-frequency, and high-frequency feature streams, respectively. We then adopt a gating mechanism to produce spatial weight maps for the three feature types. After normalization, the fusion weights of the three features are calculated as: 
+
+Wf usion = Softmax ( G(Fjoint )) ,
+
+where G(·) is the gating function used to generate the spatial weight maps, and Softmax( ·) ensures that the weights are normalized across the three feature streams. Thus, the weighted fusion of the three types of features can be expressed as: 
+
+Ff used =
+
+> 3
+
+X
+
+> k=1
+
+Wk ⊙ Fk,
+
+where Wk represents the fusion weight of the k-th feature stream, Fk denotes the corresponding feature stream, and ⊙
+
+denotes element-wise multiplication, which is broadcasted across all channels. This design enables the network to adaptively adjust the contribution of the three information streams for different spatial regions, thus avoiding the information imbalance caused by fixed fusion strategies. The fused feature map is then passed into the classification head for the final decision. We adopt supervised cross-entropy loss for end-to-end training of the dual-domain collaborative network. Targeting patch-level multi-class classification, this loss aligns model predictions with ground-truth labels. The loss function is formulated as: 
+
+L = − 1
+
+N
+
+> N
+
+X
+
+> i=1
+> C
+
+X
+
+> c=1
+
+yi,c log(ˆ yi,c ),
+
+where N is the number of samples, C is the number of classes, yi,c is the ground truth label for the i-th sample and 
+
+c-th class, and ˆyi,c is the predicted probability for the i-th sample and c-th class. 
+
+## Experiments 
+
+Experimental Setup 
+
+We evaluate the proposed method on four widely used Pol-SAR benchmark datasets, namely Xi’an, San Francisco, Flevoland, and Oberpfaffenhofen. Detailed descriptions of the datasets, preprocessing procedure, and visualization ex-amples are provided in the supplementary material. The proposed model is implemented in PyTorch and trained using the AdamW optimizer with an initial learn-ing rate of 1 × 10 −4 and a weight decay of 1 × 10 −3. The batch size is set to 128, the patch size is 64, and all mod-els are trained for 300 epochs. Following common PolSAR classification protocols, 5% of labeled samples are randomly selected for training and 1% for validation. During evalua-tion, Overall Accuracy (OA), Average Accuracy (AA), and the Kappa coefficient are adopted as quantitative metrics. We compare our method with six representative state-of-the-art methods, including DFGCN (Liu et al. 2020), HybridCVNet (Alkhatib 2024), CV-MsAtViT (Alkhatib 2025), SpectralNet (Chakraborty and Trehan 2021), S2Mamba (Wang et al. 2025a), and NGDiffSM (Shi et al. 2025). Detailed descriptions of the comparison methods and implementation settings are provided in the supplementary material. 
+
+Results 
+
+Xi’an Dataset: The quantitative and qualitative results on the Xi’an dataset are shown in Table 1 and Fig. 4, respec-tively. The proposed method achieves the best overall per-formance with an OA of 97.17%, an AA of 96.64%, and a Kappa coefficient of 95.32%, outperforming all compet-ing approaches. Compared with the strongest diffusion-based baseline NGDiffSM, our method further improves OA by 0.18%. In addition, the proposed framework achieves supe-rior performance on the water category while maintaining competitive accuracies for grass and building. As illustrated in Fig. 4, our method produces cleaner classification maps with fewer isolated noisy pixels and more accurate object Table 1: Classification accuracy of different methods on the Xi’an dataset (%).                                                  
+
+> Class DFGCN HybridCVNet CVMsAtViT SpectralNet NGDiffSM S2Mamba Ours Water 84.64 92.01 93.74 92.82 92.02 88.89 94.48
+> Grass 91.79 93.99 96.90 93.05 97.43 91.50 97.27 Building 87.21 96.72 90.60 92.96 98.47 92.71 98.16 OA 89.10 93.50 94.20 92.98 96.99 91.53 97.17
+> AA 87.88 91.70 93.74 92.94 95.98 91.03 96.64
+> Kappa 81.84 89.24 90.38 88.42 95.02 86.01 95.32
+
+Table 2: Classification accuracy (%) on the Oberpfaffenhofen dataset.                                                                
+
+> Class DFGCN HybridCVNet CVMsAtViT SpectralNet NGDiffSM S2Mamba Ours Bare ground 90.51 94.08 88.21 93.33 95.20 91.30 95.71
+> Forest 85.08 91.22 85.27 92.78 96.66 93.25 96.87
+> Building 87.30 89.00 81.62 93.74 96.83 77.64 95.72 Farmland 77.57 90.15 74.41 80.82 94.34 40.39 96.28
+> Road 66.10 77.69 68.44 82.44 90.74 8.06 91.97
+> OA 85.46 90.65 83.50 91.25 95.14 74.91 95.52
+> AA 81.31 88.43 79.59 88.62 94.75 60.13 95.31
+> Kappa 78.66 86.24 75.83 87.24 92.94 61.09 93.49
+
+boundaries, demonstrating the effectiveness of contourlet-guided directional feature modeling. 
+
+Oberpfaffenhofen Dataset: The quantitative and qualita-tive comparisons on the Oberpfaffenhofen dataset are pre-sented in Table 2 and Fig. 5. The proposed method obtains the highest OA, AA, and Kappa values of 95.52%, 95.31%, and 93.49%, respectively, exceeding the strongest baseline NGDiffSM by 0.38% in OA. Notably, substantial improve-ments are achieved for farmland and road, which exhibit complex scattering characteristics and fragmented spatial distributions. The qualitative comparison further confirms that the proposed method better preserves homogeneous re-gions and object boundaries while suppressing misclassified pixels. These results demonstrate the advantage of the pro-posed spatial-frequency collaborative framework in model-ing complex PolSAR scenes. Detailed quantitative analyses and qualitative comparisons on the San Francisco and Flevoland datasets are provided in the supplementary material. 
+
+Ablation Analysis 
+
+Ablation Study As shown in Table 3, using only the original polarization branch leads to limited performance, while introducing either the high-frequency or low-frequency branch improves the results in most cases. This indicates that directional texture details and low-frequency structural infor-mation provide complementary cues to the original PolSAR features. The variant without Ori-Guided Enhancement shows per-formance degradation on most datasets, demonstrating that the original polarization features are beneficial for refining high-frequency representations and suppressing ambiguous directional responses. Moreover, replacing the proposed Di-rectional Mamba with conventional 2D Mamba in the high-frequency branch leads to lower performance on Xi’an and Flevoland, suggesting that direction-aware scanning is more suitable for modeling NSCT high-frequency subbands. Overall, the complete model achieves the best results on Xi’an and Flevoland and remains competitive on San Fran-
+
+Figure 4: Qualitative comparison on the Xi’an dataset. (a) Ground Truth; (b) DFGCN; (c) HybridCVNet; (d) CVM-sAtViT; (e) SpectralNet; (f) NGDiffSM; (g) S2Mamba; (h) Ours. 
+
+Figure 5: Qualitative comparison on the Oberpfaffenhofen dataset. (a) Ground Truth; (b) DFGCN; (c) HybridCVNet; (d) CVMsAtViT; (e) SpectralNet; (f) NGDiffSM; (g) S2Mamba; (h) Ours. cisco and Oberpfaffenhofen, verifying the effectiveness of the proposed multi-branch modeling, original-feature-guided enhancement, and direction-aware high-frequency represen-tation. 
+
+Effect of the number of decomposition directions To analyze how decomposition direction count impacts perfor-mance, we test our method with 4, 8, and 16 directional subbands. Table 4 shows the classification performance is sensitive to the directional settings. On the Xi’an dataset, OA rises from 95.26% (4 directions) to 97.17% (8 directions) be-fore dropping to 95.48% (16 directions). This implies too few directions fail to capture intricate scattering textures, while excessive directions yield redundant high-frequency signals and hinder feature fusion. The Flevoland dataset exhibits the same pattern: 8 directions yield the optimal 99.97% OA, ver-sus 99.95% (4) and 99.91% (16). The San Francisco dataset is an exception, where 4 directions deliver marginally higher OA (99.60%) than 8 (99.55%), with negligible performance disparity. Balancing classification accuracy and feature ro-bustness, we fix the decomposition direction count to 8 for our model. Table 3: Ablation study of key modules on different data sets (%).                                                                                                           
+
+> Module Configuration Xi’an San Francisco Oberpfaffenhofen Flevoland Ori. Low. High. Ori-Guid. Dir-Mamba OA AA Kappa OA AA Kappa OA AA Kappa OA AA Kappa
+> ✓93.58 90.49 89.26 99.59 97.67 99.36 94.59 93.43 92.12 99.94 99.94 99.92
+> ✓✓✓✓96.39 95.99 94.05 99.66 98.22 99.47 95.83 95.82 93.96 99.94 99.95 99.92
+> ✓✓95.45 94.42 92.47 99.70 98.65 99.53 95.29 94.76 93.14 99.96 99.97 99.95
+> ✓✓✓✓96.15 95.86 93.65 99.66 98.65 99.46 95.62 95.51 93.64 99.92 99.93 99.89
+> ✓✓✓✓95.73 94.76 92.93 99.68 98.79 99.50 95.44 95.30 93.38 99.93 99.94 99.90
+> ✓✓✓✓✓97.17 96.64 95.32 99.55 98.31 99.29 95.52 95.31 93.49 99.97 99.97 99.95
+
+Table 4: Effect of the number of decomposition directions on classification performance (%). Dataset Directions OA AA Kappa Xi’an 4 95.26 94.35 92.16 Xi’an 8 97.17 96.64 95.32 
+
+Xi’an 16 95.48 94.08 92.52 San Francisco 4 99.60 98.06 99.37 
+
+San Francisco 8 99.55 98.31 99.29 San Francisco 16 99.37 98.48 99.02 Flevoland 4 99.95 99.96 99.93 Flevoland 8 99.97 99.97 99.95 
+
+Flevoland 16 99.91 99.92 99.88 
+
+Figure 6: Effect of the Mamba state dimension on classifica-tion performance. 
+
+Effect of the Mamba State Dimension We evaluate the influence of the Mamba state dimension dstate using four candidate values: 8, 16, 32, and 64. As shown in Fig. 6(b), a moderate state dimension generally leads to more stable performance. On the Xi’an dataset, the OA improves from 96.39% to 97.17% as dstate increases from 8 to 32, but drops to 96.02% with a state dimension of 64. This indicates that an appropriate state dimension helps improve long-range de-pendency modeling, whereas an excessively large state space may introduce redundant parameters and reduce generaliza-tion. Since the performance differences on San Francisco and Flevoland are relatively small, a state dimension of 32 is selected as the default setting by considering both accuracy and complexity. 
+
+Figure 7: Effect of the training sample ratio on classification performance. 
+
+Effect of Training Ratio We ablate training label ratios (1%, 3%, 5%, 7%, 10%) to study how limited labeled data affects our model. Figure 7 shows classification accuracy grows with more training labels. On the Xi’an dataset, OA jumps sharply from 88.92% (1%) to 97.17% (5%), proving extra annotations strengthen discriminative power over com-plex terrain. Raising the ratio further to 10% only marginally lifts OA to 97.23%, yielding negligible gains. San Francisco and Flevoland follow identical saturation trends, with per-formance plateauing under abundant labeled samples. We adopt a 5% training split for all primary experiments: this setup enables fair comparisons against prior arts and strikes a favorable trade-off between prediction accuracy and label-ing overhead. 
+
+## CONCLUSION 
+
+This work proposes a dual-domain collaborative DA-Mamba-DDCL network for PolSAR land cover classifica-tion. Tailored for NSCT multi-directional decomposition, the proposed direction-adaptive Mamba module strength-ens anisotropic texture learning for high-frequency subbands, and the gated dual-domain fusion adaptively aggregates raw polarimetric spatial features and frequency-domain struc-tural cues. Experimental results verify that our approach out-performs state-of-the-art baselines in classification accuracy, speckle noise robustness and computational efficiency. How-ever, the model suffers from limited generalization under few-sample scenarios. Future work will focus on developing semi-supervised paradigms to promote its practical general-ization capability. References 
+
+Alkhatib, M. Q. 2024. PolSAR image classification using a hybrid complex-valued network (HybridCVNet). IEEE Geoscience and Remote Sensing Letters , 21: 1–5. Alkhatib, M. Q. 2025. PolSAR image classification using complex-valued multiscale attention vision transformer (CV-MsAtViT). International Journal of Applied Earth Obser-vation and Geoinformation , 137: 104412. An, W.; Deng, W.; Yao, Y.; Zong, H.; and Jiang, D. 2026. CVTM-NET: Remote sensing scene classification and seg-mentation using cross-layer vision transformer Mamba net-work. Digital Signal Processing , 106129. Antropov, O.; Rauste, Y.; Astola, H.; Praks, J.; Häme, T.; and Hallikainen, M. T. 2013. Land cover and soil type mapping from spaceborne PolSAR data at L-band with probabilis-tic neural network. IEEE Transactions on Geoscience and Remote Sensing , 52(9): 5256–5270. Bi, H.; Xu, L.; Cao, X.; Xue, Y.; and Xu, Z. 2020. Polari-metric SAR image semantic segmentation with 3D discrete wavelet transform and Markov random field. IEEE transac-tions on image processing , 29: 6601–6614. Chakraborty, T.; and Trehan, U. 2021. Spectralnet: Exploring spatial-spectral waveletcnn for hyperspectral image classifi-cation. arXiv preprint arXiv:2104.00341 .Chen, K.; Chen, B.; Liu, C.; Li, W.; Zou, Z.; and Shi, Z. 2024. Rsmamba: Remote sensing image classification with state space model. IEEE Geoscience and Remote Sensing Letters , 21: 1–5. Cui, X.; and Zhang, L. 2025. Mamba-DCAU: state space dual attention center-sampling U-Net for hyperspectral im-age classification. International Journal of Remote Sensing ,46(15): 5523–5547. Cui, Y.; Liu, F.; Jiao, L.; Guo, Y.; Liang, X.; Li, L.; Yang, S.; and Qian, X. 2021. Polarimetric multipath convolutional neural network for PolSAR image classification. IEEE Trans-actions on Geoscience and Remote Sensing , 60: 1–18. Ding, H.; Xia, B.; Liu, W.; Zhang, Z.; Zhang, J.; Wang, X.; and Xu, S. 2024. A novel mamba architecture with a semantic transformer for efficient real-time remote sensing semantic segmentation. Remote Sensing , 16(14): 2620. Ding, L.; Zheng, K.; Lin, D.; Chen, Y.; Liu, B.; Li, J.; and Bruzzone, L. 2021. MP-ResNet: Multipath residual network for the semantic segmentation of high-resolution PolSAR images. IEEE Geoscience and Remote Sensing Letters , 19: 1–5. Dong, H.; Zhang, L.; and Zou, B. 2020. PolSAR image classification with lightweight 3D convolutional networks. 
+
+Remote Sensing , 12(3): 396. Dong, H.; Zhang, L.; and Zou, B. 2021a. Exploring vi-sion transformers for polarimetric SAR image classification. 
+
+IEEE Transactions on Geoscience and Remote Sensing , 60: 1–15. Dong, H.; Zhang, L.; and Zou, B. 2021b. Exploring vi-sion transformers for polarimetric SAR image classification. 
+
+IEEE Transactions on Geoscience and Remote Sensing , 60: 1–15. Freeman, A.; and Durden, S. L. 1998a. A three-component scattering model for polarimetric SAR data. IEEE transac-tions on geoscience and remote sensing , 36(3): 963–973. Freeman, A.; and Durden, S. L. 1998b. A three-component scattering model for polarimetric SAR data. IEEE transac-tions on geoscience and remote sensing , 36(3): 963–973. Gu, A.; and Dao, T. 2023. Mamba: Linear-time se-quence modeling with selective state spaces. arXiv preprint arXiv:2312.00752 .Gu, A.; Goel, K.; and Ré, C. 2021. Efficiently modeling long sequences with structured state spaces. arXiv preprint arXiv:2111.00396 .He, Y.; Tu, B.; Liu, B.; Li, J.; and Plaza, A. 2024. 3DSS-Mamba: 3D-spectral-spatial mamba for hyperspectral image classification. IEEE Transactions on Geoscience and Remote Sensing , 62: 1–16. Ji, Y.; Sri Sumantyo, J. T.; Chua, M. Y.; and Waqar, M. M. 2018. Earthquake/tsunami damage assessment for urban ar-eas using post-event PolSAR data. Remote Sensing , 10(7): 1088. Kuang, Z.; Bi, H.; Li, F.; and Xu, C. 2025. Ecp-mamba: An efficient multi-scale self-supervised contrastive learning method with state space model for polsar image classifica-tion. IEEE Transactions on Geoscience and Remote Sensing .Lee, J.-S.; Grunes, M. R.; Ainsworth, T. L.; Du, L.-J.; Schuler, D. L.; and Cloude, S. R. 1999. Unsupervised classi-fication using polarimetric decomposition and the complex Wishart classifier. IEEE Transactions on Geoscience and Remote Sensing , 37(5): 2249–2258. Lee, J.-S.; Grunes, M. R.; and Kwok, R. 1994a. Classification of multi-look polarimetric SAR imagery based on complex Wishart distribution. International Journal of Remote Sens-ing , 15(11): 2299–2311. Lee, J.-S.; Grunes, M. R.; and Kwok, R. 1994b. Classi-fication of multi-look polarimetric SAR imagery based on complex Wishart distribution. International Journal of Re-mote Sensing , 15(11): 2299–2311. Li, L.; Ma, L.; Jiao, L.; Liu, F.; Sun, Q.; and Zhao, J. 2020. Complex contourlet-CNN for polarimetric SAR image clas-sification. Pattern Recognition , 100: 107110. Liu, H.; Zhu, T.; Shang, F.; Liu, Y.; Lv, D.; and Yang, S. 2020. Deep fuzzy graph convolutional networks for PolSAR imagery pixelwise classification. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing ,14: 504–514. Liu, M.; Jiao, L.; Liu, X.; Li, L.; Liu, F.; Yang, S.; Guo, Y.; and Chen, P. 2024. C2N 2: Complex-Valued Contourlet Neural Network. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , 17: 4478–4491. Qin, R.; Fu, X.; and Lang, P. 2020. PolSAR image classifi-cation based on low-frequency and contour subbands-driven polarimetric SENet. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , 13: 4760– 4773. Shi, J.; Shen, K.; Jin, H.; Zhang, Y.; Hua, W.; Lv, Z.; Gong, M.; and Lin, W. 2025. Scattering Mechanism Inspired Non-Gaussian Diffusion Model for Polarimetric SAR Image Clas-sification. IEEE Transactions on Geoscience and Remote Sensing .Smith, J. T.; Warrington, A.; and Linderman, S. W. 2022. Simplified state space layers for sequence modeling. arXiv preprint arXiv:2208.04933 .Wang, G.; Zhang, X.; Peng, Z.; Zhang, T.; and Jiao, L. 2025a. S 2 Mamba: A spatial–spectral state space model for hyper-spectral image classification. IEEE Transactions on Geo-science and Remote Sensing , 63: 1–13. Wang, H.; Xing, C.; Yin, J.; and Yang, J. 2022. Land cover classification for polarimetric SAR images based on vision transformer. Remote Sensing , 14(18): 4656. Wang, L.; Zhu, S.; Hong, H.; Shi, Y.; Zhu, Y.; and Ma, L. 2025b. WTC-HST: Wavelet transform convolutions and hierarchical spatial transformers for polarimetric SAR image classification. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing .Xiang, D.; Tang, T.; Hu, C.; Fan, Q.; and Su, Y. 2016. Built-up area extraction from PolSAR imagery with model-based decomposition and polarimetric coherence. Remote Sensing ,8(8): 685. Yu, W.; Yang, K.; Bai, Y.; Yao, H.; and Rui, Y. 2015. Learning cross space mapping via DNN using large scale click-through logs. IEEE Transactions on Multimedia , 17(11): 2000–2007. Zheng, K.; Yu, M.; Liu, Z.; Bao, S.; Pan, Z.; Song, Y.; Zhu, L.; and Xie, Z. 2025. Frequency and prompt learning coop-eration enhanced mamba for remote sensing semantic seg-mentation. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing .Zhou, Y.; Wang, H.; Xu, F.; and Jin, Y.-Q. 2016a. Polari-metric SAR image classification using deep convolutional neural networks. IEEE Geoscience and Remote Sensing Let-ters , 13(12): 1935–1939. Zhou, Y.; Wang, H.; Xu, F.; and Jin, Y.-Q. 2016b. Polari-metric SAR image classification using deep convolutional neural networks. IEEE Geoscience and Remote Sensing Let-ters , 13(12): 1935–1939.

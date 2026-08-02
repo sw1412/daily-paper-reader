@@ -1,0 +1,317 @@
+Title: WGDnet: Wishart-guided Geometric-aware Deep Network for PolSAR Image Classification
+
+URL Source: https://arxiv.org/pdf/2607.23638v1
+
+Published Time: Tue, 28 Jul 2026 01:06:31 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# WGDnet: Wishart-guided Geometric-aware Deep Network for PolSAR Image Classification 
+
+# Junfei Shi, Haojia Zhang, Yu Cheng, Yuke Li 
+
+Abstract 
+
+Polarimetric Synthetic Aperture Radar (PolSAR) classifica-tion underpins all-weather Earth observation. Conventional Wishart methods depend on rigid handcrafted operators with limited adaptability, while mainstream deep networks ignore PolSAR’s native Wishart scattering statistics. Additionally, fixed convolution windows fail to capture multi-scale, multi-directional terrain patterns, harming boundary detection and small-object characterization. To mitigate these drawbacks, we propose WGDNet, a Wishart-guided geometric-aware deep network. It integrates three core designs: (1) learnable Wishart convolutions with directional kernels for multi-scale statistical edge feature extraction; (2) an orientation-prior ag-gregation module that estimates dominant local directions and confidences to refine directional Wishart outputs adap-tively; (3) GAnet, a scale-direction adaptive geometric-aware convolution that dynamically reshapes sampling grids to model anisotropic terrain and retain fine details. Our contribu-tions lie in learnable Wishart statistical modeling, orientation-prior feature aggregation, and geometry-adaptive convolu-tion. Evaluations across four real PolSAR datasets verify WGDNet surpasses existing state-of-the-art approaches in classification accuracy and boundary fidelity. Keywords: PolSAR classification; learned Wishart convolu-tion; directional prior; geometric-aware convolution; Scale-direction adaptive 
+
+# Introduction 
+
+Polarimetric Synthetic Aperture Radar (PolSAR) provides full-polarization backscattering measurements that char-acterize the intrinsic scattering properties of ground tar-gets(Cloude and Pottier 1997). Pixel-level PolSAR image classification is therefore fundamental to a wide range of Earth observation applications, including land-cover map-ping, crop monitoring, disaster assessment(Zhou et al. 2016), and urban planning. Unlike optical remote sensing, PolSAR can operate under all-day and all-weather condi-tions, enabling reliable terrain interpretation in challenging environments. Consequently, (Fang et al. 2024)developing accurate and robust PolSAR classification methods remains an important topic in remote sensing and artificial intelli-gence(Hou et al. 2018). 
+
+Copyright © 2026, Association for the Advancement of Artificial Intelligence (www.aaai.org). All rights reserved. 
+
+Traditional PolSAR classification methods are mainly based on physically motivated statistical models(Yan 2025). Representative approaches include Wishart maximum-likelihood classification, Wishart edge detection(Lee and Grunes 1992), polarimetric decomposition methods such as Pauli, Freeman–Durden(Jin et al. 2023), and Yamaguchi de-compositions(Yamaguchi et al. 2005), and statistical clus-tering algorithms combining K-means with Wishart like-lihood metrics. These methods exploit the statistical char-acteristics of PolSAR covariance or coherency matrices and provide physically interpretable scattering represen-tations. However, they generally rely on handcrafted op-erators, fixed-size sliding windows, and designed classi-fier(Carvalho, Sant’Anna Bins, and Siqueira Sant’Anna 2019). Such designs lack sufficient adaptability to heteroge-neous scenes and cannot be optimized jointly with the final classification objective, limiting their ability to characterize multi-scale and arbitrarily oriented terrain structures(Han and Shao 2010). With the rapid development of deep learning, data-driven neural networks have been widely applied to PolSAR image classification(Li et al. 2023). Convolutional neural networks, Vision Transformers(Dong, Zhang, and Zou 2022), and hy-brid architectures(Wang et al. 2024) can automatically learn high-level semantic representations from PolSAR data and have achieved substantial performance improvements. Nev-ertheless, existing deep PolSAR classification models still face two major limitations. 1) Conventional deep learning pipelines flatten PolSAR matrices into 9D input vectors, discarding the covariance matrix’s scattering statistics and intrinsic geometric proper-ties(Shi et al. 2024)(Zhao et al. 2019). The resulting features suffer severe speckle interference and weak physical con-sistency, hurting generalization across sensors, scenes, and land-cover categories(He et al. 2020). 2) Standard convolutions adopt fixed square kernels with symmetric horizontal and vertical receptive fields(Yu et al. 2024). Yet PolSAR imagery contains anisotropic, arbitrar-ily shaped targets (small vegetation, elongated corridors, large farmlands, irregular terrain edges). Fixed-shape con-volutions fail to capture these structures,(Yua 2026) and re-current downsampling erases fine details to yield blurry clas-sification boundaries(Xie, Jiao, and Hua 2022). To jointly exploit polarimetric scattering statistics and arXiv:2607.23638v1 [cs.CV] 26 Jul 2026 adaptive geometric information(Xie et al. 2017)(Chen and Tao 2018), we propose a Wishart-guided Geometric-aware Deep Network , termed WGDNet , for PolSAR im-age classification. WGDNet integrates Wishart statistical modeling, orientation-prior-guided response aggregation, and scale–direction adaptive geometric feature extraction into a unified end-to-end framework. Specifically, our framework comprises three core com-ponents. First, a learnable Wishart convolution branch embeds Wishart likelihood-ratio statistics into the net-work. Trainable soft-split local kernels estimate multi-scale, multi-orientation statistical disparities to produce PolSAR-statistics-compliant task-specific edge features. Second, the proposed OriPriorNet predicts each pixel’s dominant lo-cal orientation and confidence. It generates orientation prior scores via periodic angular distances between pre-dicted orientations and preset directional candidates to adap-tively aggregate multi-directional Wishart outputs, amplify-ing terrain-aligned edge responses and suppressing noisy di-rectional signals. Third, we present GAnet, a scale-direction adaptive geometric-aware convolution module. It dynami-cally predicts per-pixel sampling dimensions and rotation to build rotated rectangular sampling grids for anisotropic ter-rain modeling, boosting feature representation for elongated targets, irregular zones, and fine-grained objects. The main contributions of this work are summarized as follows: • We propose a learnable Wishart statistical modeling branch that incorporates the physical distribution prior of PolSAR data into deep networks through trainable soft-split kernels. The resulting multi-scale and multi-orientation statistical responses can be optimized jointly with the classification objective. • We develop an orientation-prior-guided aggregation strategy. OriPriorNet estimates pixel-wise dominant ori-entations and confidence values, while a periodic angu-lar distance metric is used to generate directional prior weights for adaptive fusion of Wishart responses. • We design a scale–direction adaptive GAnet that predicts pixel-wise geometric parameters and constructs rotated rectangular sampling grids. This module improves the modeling of anisotropic terrain structures and alleviates the loss of small-target and boundary information. • Extensive experiments on four real PolSAR datasets demonstrate that WGDNet consistently outperforms rep-resentative physically driven and deep learning-based methods, achieving higher classification accuracy and more complete boundary preservation. 
+
+# Relate Work 
+
+Deep Learning-based Classification 
+
+Traditional PolSAR classification relies on target decom-position (Freeman and Durden 1998) and statistical mod-els (Deng, Chen, and L´ opez–Mart´ ınez 2018) (e.g., complex Wishart distribution (Schou et al. 2003)) to analyze covari-ance matrices and characterize polarimetric scattering prop-erties (Qin, Fu, and Lang 2020). Though physically inter-pretable, these handcrafted methods suffer from limited gen-eralization in complex scenarios. Recent deep learning ad-vances, including CNNs, complex-valued networks, atten-tion mechanisms, and Transformers, have substantially im-proved PolSAR feature representation (Zhang et al. 2024). For instance, Zhang et al. proposed a complex-valued con-volutional neural network (Zhang et al. 2017) to preserve the phase and amplitude information of polarimetric scat-tering parameters. Nevertheless, most existing deep learning approaches flatten PolSAR inputs into feature vectors and ignore the intrinsic statistical characteristics of covariance matrices (Cui et al. 2022), failing to fully preserve physical scattering priors during optimization. This motivates the de-velopment of learnable frameworks that synergize physical scattering constraints with data-driven feature learning for robust PolSAR classification. 
+
+Scale-adaptive Learning Methods 
+
+Standard CNN(Zhang and Ma 2021) adopt fixed sampling grids, limiting their ability to model objects with variable scales, orientations, and irregular geometric structures . To alleviate this limitation, scale-adaptive networks have been extensively explored. Multi-scale and large-kernel architec-tures expand receptive fields to aggregate multi-range con-textual cues but are restricted by predefined kernel configu-rations and static sampling layouts(Chen et al. 2017),(Ding et al. 2022). Deformable convolutions(Dai et al. 2017) im-prove spatial modeling flexibility via learnable sampling off-sets but fail to explicitly encode object scale and orienta-tion priors . Rotation-equivariant and oriented convolutions boost directional feature extraction yet remain constrained by fixed orientation templates and scale-invariant receptive fields(Zhou et al. 2017; Han et al. 2021). Recently, AR-Conv(Wang et al. 2025) enables dynamic kernel dimension adjustment to accommodate objects with diverse scales and aspect ratios . Nevertheless, it lacks explicit local orienta-tion estimation and cannot fully excavate the inherent direc-tional scattering signatures of PolSAR data. In essence, cur-rent approaches struggle with the joint adaptive modeling of sampling scale and orientation, resulting in insufficient characterization of anisotropic terrain structures and blurry boundary discrimination in PolSAR classification tasks. 
+
+# Proposed Method 
+
+This section presents a Wishart-guided Geometric-aware Deep Network (WGDNet) for PolSAR image classifica-tion, whose framework is illustrated in Fig. 1. The proposed method integrates learnable Wishart statistical edge mod-eling, direction-prior-guided multi-orientation aggregation, and direction-aware feature representation. Specifically, we design learnable Wishart edge convolution operators to cap-ture multi-scale and multi-directional features. We then in-troduce a primary direction-guided multi-orientation aggre-gation module to adaptively fuse multi-directional features. Furthermore, scale-direction aware convolution kernels are developed to adaptively model diverse terrain characteris-tics, in which a scale-direction adaptive convolution window is designed in place of the fixed-square window used in stan-dard convolutions. Figure 1: Framework of the proposed wishart-guided geometric-aware deep network for PolSAR image classification. 
+
+Learnable Wishart Edge Modeling 
+
+Given a PolSAR image, its input feature is denoted by X ∈
+
+RH×W ×9. For each pixel position p, the nine-dimensional polarimetric feature is reorganized into a 3 × 3 Hermitian coherency matrix Tp:
+
+Tp =
+
+ |Shh |2 ⟨Shh S∗ 
+
+> hv
+
+⟩ ⟨Shh S∗ 
+
+> vv
+
+⟩⟨Shv S∗
+
+> hh
+
+⟩ |Shv |2 ⟨Shv S∗ 
+
+> vv
+
+⟩⟨Svv S∗
+
+> hh
+
+⟩ ⟨Svv S∗ 
+
+> hv
+
+⟩ |Svv |2
+
+ . (1) where Shh denotes the complex scattering echo with hori-zontal transmitting and horizontal receiving mode. The su-perscript ∗ denotes complex conjugation, and ⟨·⟩ represents ensemble averaging. Conventional deep learning approaches flatten PolSAR covariance matrices into an input vector, which ignores both the PolSAR data’s statistical characteristics and geometric structure of complex matrices. Since PolSAR covariance matrices obey the Wishart distribution, we define learnable Wishart convolution kernels to capture multi-scale, multi-orientation PolSAR scattering signatures. Specifically, for each scale s ∈ S and orientation θ ∈ Θ, a local statistical kernel is softly divided into two complemen-tary regions, denoted by a and b. For each region r ∈ { a, b },the locally weighted mean coherency matrix is calculated as 
+
+Tr (p) = 1
+
+Zr (p)
+
+X 
+
+> pi∈R r(p)
+
+w(s,θ,r ) 
+
+> pi
+
+Tpi , (2) where Rr (p) denotes the pixels belonging to region r within the local window centered at p, w(s,θ,r ) 
+
+> pi
+
+is the corresponding learnable kernel weight, and 
+
+Zr (p) = X 
+
+> pi∈R r(p)
+
+w(s,θ,r ) 
+
+> pi
+
+(3) is the normalization term. These kernel weights are opti-mized end-to-end using the final classification objective. Based on the weighted mean coherency matrices Ta(p)
+
+and Tb(p), the Wishart likelihood ratio at scale s and orien-tation θ is defined as 
+
+Qs,θ (p) = 
+
+" Ta(p) Na(p) Tb(p) Nb(p)
+
+> Na(p)Ta(p)+ Nb(p)Tb(p)
+> Na(p)+ Nb(p)
+> Na(p)+ Nb(p)
+
+#L
+
+. (4) The corresponding statistical response is defined as 
+
+Ds,θ (p) = −2ρ log Qs,θ (p), (5) where L denotes the number of equivalent looks and ρ is the correction coefficient. Repeating this procedure over all scales and orienta-tions yields the multi-scale and multi-orientation Wishart re-sponse set: 
+
+D(p) = {Ds,θ (p) | s ∈ S , θ ∈ Θ} . (6) Different scales capture statistical variations over differ-ent spatial ranges, while different orientations characterize boundary structures along different directions. These re-sponses are subsequently organized as Wishart statistical edge features and passed to the following feature aggrega-tion module. 
+
+Orientation-Prior Aggregation Network 
+
+Wishart statistical responses encode multi-scale and multi-orientation cues, yet distinct orientations exert unequal im-pacts on pixel discrimination. For areas with prominent di-rectional terrain structures, responses consistent with local dominant orientations carry more discriminative edge infor-mation. To adaptively aggregate multi-orientation Wishart features, we incorporate orientation priors to weight mean-ingful directional responses. In this paper, an orientation-prior network, termed OriPri-orNet, is designed to estimate the dominant orientation and its confidence from the input PolSAR features: 
+
+(ϕp, c p) = OriPriorNet( X)p, (7) where ϕp denotes the estimated dominant orientation around pixel p, and cp ∈ [0 , 1] represents the confidence of the ori-entation estimation. Since boundary orientations exhibit π-periodicity, i.e., ϕ and ϕ + π describe the same structural direction, the orientation is restricted to ϕp ∈ [0 , π ).Let the discrete orientation set be Θ = {θ1, θ 2, . . . , θ K }.The periodic angular distance between the predicted orien-tation ϕp and the k-th candidate orientation θk is defined as 
+
+δk(p) = min ( |ϕp − θk| , π − | ϕp − θk|) . (8) This formulation avoids treating orientations close to 0 and 
+
+π as distant directions. Based on the angular distance, the corresponding orientation-prior score is calculated as 
+
+αk(p) = exp 
+
+
+
+− δ2
+
+> k
+
+(p)2σ2
+
+
+
+, (9) where σ controls the smoothness of the orientation prior. A smaller angular distance produces a larger prior score. To reduce the influence of inaccurate orientation estimates in structurally ambiguous regions, the prior score is further modulated by the confidence map: 
+
+eαk(p) = cpαk(p) + (1 − cp) 1
+
+K . (10) When the local orientation is reliable, responses aligned with the predicted direction are emphasized. Otherwise, the prior approaches a uniform distribution, allowing the aggregation to rely mainly on data-driven responses. For the response at scale s and orientation θk, a data-driven attention score As,k (p) is first generated from the Wishart response Ds,θ k (p). The orientation prior is then in-corporated as 
+
+Es,k (p) = As,k (p) + λeαk(p), (11) where λ controls the contribution of the orientation prior. The normalized orientation attention weight is obtained by 
+
+βs,k (p) = exp ( Es,k (p)) 
+
+> K
+
+X
+
+> k′=1
+
+exp ( Es,k ′ (p)) 
+
+. (12) Finally, the orientation-aggregated Wishart response at scale s is formulated as 
+
+Ds(p) = 
+
+> K
+
+X
+
+> k=1
+
+βs,k (p)Ds,θ k (p). (13) Unlike average pooling or max pooling over the orientation dimension, the proposed aggregation adaptively emphasizes statistically informative responses according to the local structural orientation. The resulting multi-scale responses are subsequently used as direction-aware statistical priors for deep feature extraction. 
+
+Figure 2: Structure of the proposed CV-Trans module. 
+
+Geometric-Aware Convolution Network 
+
+After obtaining the orientation-guided multi-scale Wishart responses {Ds(p)}, they are fused with the original PolSAR features and passed to the pixel-wise classification back-bone. The input feature of the l-th layer can be expressed as 
+
+Fl = Fusion ( X, {Ds}s∈S ) . (14) A conventional convolution uses a fixed square sampling grid and can be written as 
+
+Fl+1 = σ (W ∗ Fl + b) , (15) where ∗ denotes convolution, W and b are the convolution weights and bias, respectively, and σ(·) denotes the nonlin-ear activation function. However, fixed-square convolution kernel structures are insufficient for modeling elongated targets, oblique bound-aries, and irregular terrain regions. To address this limitation, the GAnet module design a geometric-aware convolution kernel, which predicts a height map h(p), a width map w(p),and an orientation map θ(p) for each spatial position. These geometric parameters enable the convolution kernel to adapt its scale and orientation to local structures. The height and width maps determine the sampling region, while the orien-tation map controls kernel rotation, transforming the fixed grid into a scale- and direction-adaptive sampling pattern, as illustrated in Fig. 2 
+
+GA convolution kernel: For the (i, j )-th point of a rect-angular sampling kernel, the scale-adaptive offset is defined as 
+
+ri,j (p) = 
+
+ i h (p)
+
+j w (p)
+
+
+
+. (16) The offset is then rotated according to the predicted local orientation: 
+
+qi,j (p) = p +
+
+cos θ(p) − sin θ(p)sin θ(p) cos θ(p)
+
+
+
+ri,j (p), (17) where p denotes the coordinate of the central pixel, and 
+
+qi,j (p) is the transformed sampling position. The indices 
+
+i and j correspond to the vertical and horizontal sampling positions of the rectangular kernel, respectively. Since the transformed coordinates are generally non-integer, bilinear interpolation is employed to obtain feature values from the four neighboring grid points. In this way, the original fixed sampling grid is converted into a scale-and orientation-adaptive rectangular structure. With the GA convolution kernel, the output of the GAnet module is formulated as 
+
+Fl+1 = CHk ,W k (S (Fl; h, w, θ )) ⊙ M (Fl) + B(Fl), (18) where S(·) denotes adaptive scale–direction sampling, 
+
+CHk ,W k (·) represents rectangular convolution aggregation with Hk × Wk sampling points, and M(·) and B(·) denote the modulation and bias branches, respectively. The symbol 
+
+⊙ denotes element-wise multiplication. This adaptive mechanism enables GAnet to dynamically adjust its receptive-field shape and orientation according to local terrain geometry. Standard convolutions are employed in shallow stages to preserve local details, whereas GAnet is introduced in deeper stages to capture direction-aware con-textual information. Multi-level features are progressively fused to generate the final pixel-wise representation F.
+
+Prediction and Optimization Objective 
+
+Given the final fused feature F, a lightweight classification head Ψ( ·) maps each pixel feature into the semantic class space. For pixel p, the class probability vector is defined as 
+
+byp = Ψ( Fp) = Softmax ( WcFp + bc) , (19) where Fp denotes the feature representation of pixel p, Wc
+
+and bc are the parameters of the classification head, and 
+
+byp,c ∈ [0 , 1] represents the predicted probability that pixel 
+
+p belongs to class c.The final classification result is determined by 
+
+bcp = arg max 
+
+> c∈{ 1,...,C }
+
+byp,c , (20) where C denotes the number of land-cover classes. During training, only labeled foreground pixels are used for supervision. Let Plab denote the set of labeled training pixels and yp,c denote the corresponding one-hot label. The class-weighted cross-entropy loss is defined as 
+
+Lcls = − 1
+
+|P lab |
+
+X
+
+> p∈P lab
+> C
+
+X
+
+> c=1
+
+ωcyp,c log ( byp,c ) , (21) where ωc denotes the weight assigned to class c to alleviate class imbalance. The entire network is trained end-to-end by minimizing 
+
+Lcls . Therefore, the learnable Wishart statistical modeling, orientation-prior estimation, multi-orientation response ag-gregation, and GAnet feature extraction modules are jointly optimized under the final pixel-wise classification objective. 
+
+# Experiments 
+
+Experimental Data and Settings 
+
+We evaluate the proposed WGDNet on three widely used PolSAR benchmark datasets, namely Xi’an, San Francisco, Flevoland1 and Flevoland2. Detailed descriptions of the 
+
+Figure 3: Classification maps of the Xi’an data set. (a) Ground truth; (b) PolMPCNN; (c) HybridCVNet; (d) Spec-tralDiff; (e) NGDiff-SM; (f) SDNet; (g) F-Conv; (h) Pro-posed. Table 1: Classification results (%) of different methods on the Xi’an dataset. Class PMC HCV SPD NGD SDN FC Ours Water 95.52 92.01 89.70 92.01 92.02 91.75 96.57                                    
+
+> Grass 90.95 94.99 97.09 97.43 95.13 89.39 97.86
+> Building 97.68 95.05 97.74 98.43 98.16 88.46 98.79
+> OA 94.01 94.56 96.21 96.99 95.98 89.38 97.94
+> AA 94.71 94.02 94.85 95.98 95.65 88.16 97.73
+> Kappa 90.25 91.02 93.73 82.75 93.40 82.37 96.61
+
+datasets, preprocessing procedures, and visualization exam-ples are provided in the supplementary material. The proposed model is implemented in PyTorch and trained using the Adam optimizer with an initial learning rate of ( 1 × 10 −3) for 300 epochs. Following common Pol-SAR classification protocols, (5%) of the labeled pixels from each class are randomly selected for training, (1%) for validation, and the remainder for testing. Overall Ac-curacy (OA), Average Accuracy (AA), and the Kappa co-efficient are adopted as quantitative metrics.We compare WGDNet with six representative methods, including PolM-PCNN (PMC), HybridCVNet (HCV), SpectralDiff (SDiff), NGDiff-SM (NGDiff), SDNet (SD), and F-Conv (FConv). Detailed descriptions and implementation settings are pro-vided in the supplementary material. 
+
+Experimental Result and Analysis 
+
+Xi’an data set As shown in Figs. 3(b)–(h), the compared methods generally recover the main land-cover regions, but still exhibit scattered errors, fragmented predictions, de-tail loss, boundary confusion, or speckle noise. In contrast, WGDNet produces more homogeneous intra-class regions and clearer class boundaries by jointly exploiting Wishart statistical cues and adaptive geometric modeling. As re-ported in Table 1, WGDNet achieves the best OA, AA, and Kappa values of (97.94%), (97.73%), and (96.61%), respec-tively, while also obtaining the highest accuracy for all three classes, demonstrating more balanced and reliable classifi-cation performance. Figure 4: Classification maps on the San Francisco dataset. (a) Ground truth; (b) PolMPCNN; (c) HybridCVNet; (d) SpectralDiff; (e) NGDiff-SM; (f) SDNet; (g) F-Conv; and (h) Proposed. Table 2: Classification results (%) of different methods on the San Francisco dataset. Class PMC HCV SPD NGD SDN FC Ours Bare soil 73.21 52.19 76.06 90.33 90.37 82.23 95.97                                                  
+
+> Mountain 94.42 99.30 98.05 99.35 99.31 96.91 99.29 Ocean 99.53 99.58 99.09 99.61 99.77 99.43 99.87
+> Urban 99.73 99.67 98.45 99.85 99.81 98.17 99.85
+> Vegetation 97.24 91.24 90.60 97.92 97.95 78.19 99.00
+> OA 97.93 98.31 97.49 99.42 99.47 96.98 99.69
+> AA 93.64 88.62 91.72 97.41 97.44 90.98 98.80
+> Kappa 98.64 97.33 96.04 99.09 99.17 95.26 99.51
+
+San Francisco data set As shown in Figs. 5(b)–(h), the compared methods exhibit different levels of spatial con-sistency and boundary preservation. PolMPCNN, Hybrid-CVNet, NGDiff-SM, and SDNet generally recover the main land-cover regions, but still suffer from class leakage, over-smoothing, or loss of fine structures. SpectralDiff produces noticeable speckled errors, while F-Conv shows fragmented predictions in heterogeneous areas. In contrast, WGDNet generates cleaner homogeneous regions and more accurate boundaries. It achieves the best OA, AA, and Kappa values of (99.69%), (98.80%), and (99.51%), respectively, and ob-tains the highest accuracies on four of the five classes while tying for the best result on Urban , demonstrating superior and balanced classification performance. 
+
+Flevoland data set The comparison methods show clear differences on the Flevoland dataset. PolMPCNN, Hybrid-CVNet, SpectralDiff, NGDiff-SM, SDNet, and F-Conv gen-erally preserve the main land-cover regions, but still suf-fer from class confusion, missed small structures, inaccu-rate boundaries, or scattered errors. In contrast, the pro-posed method produces more complete farmland parcels, cleaner forest and water regions, and more accurate urban boundaries. As reported in Table 3, it achieves the best OA and Kappa of (99.82%) and (99.80%), respectively, together with the second-best AA of (99.43%). It also obtains the best or tied-best results on eight classes, demonstrating superior overall accuracy, spatial consistency, and balanced discrimi-nation across land-cover categories. 
+
+Figure 5: Classification maps on the San Francisco dataset. (a) Ground truth; (b) PolMPCNN; (c) HybridCVNet; (d) SpectralDiff; (e) NGDiff-SM; (f) SDNet; (g) F-Conv; and (h) Proposed. Table 3: Classification results (%) of different methods on the Flevoland dataset.                                                                                                                                      
+
+> Class PMC HCV SPD NGD SDN FC Ours Stem beans 99.78 99.52 99.69 99.69 99.80 99.87 99.67 Peas 99.98 99.26 100.00 100.00 99.65 99.30 100.00
+> Forest 99.96 99.89 99.95 99.95 100.00 97.09 100.00
+> Lucerne 98.44 99.92 96.20 96.20 99.89 97.61 99.96
+> Wheat 98.01 99.51 99.94 99.94 99.94 97.88 99.93 Beets 95.51 100.00 99.20 99.20 99.08 99.22 99.99 Potatoes 98.76 97.10 99.94 99.94 99.76 98.40 99.81 Bare soil 95.70 97.86 100.00 100.00 100.00 99.06 98.93 Grasses 99.83 99.84 98.42 98.42 99.27 95.35 100.00
+> Rapeseed 93.55 88.54 100.00 100.00 99.79 94.17 99.32 Barley 95.96 92.76 99.75 99.75 100.00 97.01 100.00
+> Wheat2 40.24 99.28 100.00 100.00 99.47 93.05 100.00
+> Wheat3 93.88 99.19 99.92 99.92 99.97 98.76 99.98
+> Water 96.01 99.84 99.97 99.97 100.00 99.95 100.00
+> Buildings 91.27 91.81 82.56 82.56 98.95 95.11 93.76 OA 93.82 98.98 99.73 99.73 99.69 97.63 99.82
+> AA 93.06 98.35 98.57 98.57 99.64 97.45 99.43 Kappa 93.26 98.88 99.71 99.71 99.66 97.41 99.80
+
+Ablation Study 
+
+The proposed WGDNet consists of the learnable Wishart convolution module and the GAnet module. To evaluate their contributions, four variants are compared: CNN, Fixed-Wishart-CNN(denoted by”FWC”), Learnable-Wishart-CNN(denoted by”LWC”) and the proposed WGDNet. The OA, AA, Kappa, MIoU, and F-Score are used for evaluation. Table 6 presents ablation results in the Xi’an, San Fran-cisco, and Flevoland datasets. The CNN baseline yields poorer performance without scattering information. The fixed Wishart-based FWC outperforms CNN, although still lower than others. Further performance gains from LWC demonstrate its superiority with learned Wishart convolu-tion. Our WGDNet, which integrates the learnable Wishart module with the GAnet, achieves optimal performance with OA values of 97.94%, 99.69%, and 99.82% on the three Figure 6: The effect of different parameters on classification accuracies. (a) Effect of the number of directions. (b) Effect of prior strength. (c) Effect of the anisotropy ratio. Table 4: ABLATION EXPERIMENT RESULTS ON Xi’an Dataset ( %)Method OA AA Kappa F1-score MIoU CNN 93.98 70.48 90.17 94.04 65.13 FWC 95.18 71.02 92.08 95.19 67.02 LWC 96.52 96.28 94.27 96.54 92.06 WGDNet 97.94 97.73 96.51 95.43 93.53 Table 5: ABLATION EXPERIMENT RESULTS ON San Francisco Dataset ( %)Method OA AA Kappa F1-score MIoU CNN 91.10 93.08 86.65 92.04 72.00 FWC 97.89 97.62 96.27 95.93 92.28 LWC 98.92 98.40 98.32 98.95 93.39 WGDNet 99.69 98.80 99.51 99.69 97.80 datasets. It surpasses LWC by 1.42%, 0.77%, and 1.36% in OA, verifying the benefit of adaptive geometric feature ex-traction. These results demonstrate the synergistic effect of the Wishart module and GAnet, which allows WGDNet to deliver an accurate and robust PolSAR classification. 
+
+Effect of the Number of Directions Figs. 6(a) illustrates that increasing the number of directions improves the direc-tional representation capability of the model. When D in-creases from 6 to 12 and 18, the OA improves from 92.52% to 96.07% and 97.94%, respectively, demonstrating that suf-ficient directional sampling is beneficial for capturing irreg-ular structures and complex boundaries. Although D = 24 
+
+achieves a slightly higher OA of 98.08%, it provides only a 0.14% improvement over D = 18 while requiring con-siderably more computation and processing time. Therefore, 
+
+D = 18 is selected with a compared performance and less computational efficiency. 
+
+Effect of Prior Strength The prior strength controls the influence of the predicted orientation prior on directional feature aggregation. From Figs. 6(b), it can be seen that When the prior strength increases from 0 to 1 and 2, the OA improves from 94.35% to 96.57% and 97.79%, re-spectively. This demonstrates that appropriate orientation-prior guidance helps the model emphasize directionally con-sistent Wishart responses and better characterize irregular structures and object boundaries. However, when the prior Table 6: ABLATION EXPERIMENT RESULTS ON Flevoland Dataset ( %)Method OA AA Kappa F1-score MIoU CNN 92.90 92.66 92.25 92.84 87.56 FWC 97.27 96.35 95.95 95.15 93.12 LWC 98.46 97.90 97.28 97.15 96.45 WGDNet 99.82 99.43 99.80 99.82 99.22 strength increases to 3, the OA decreases to 95.96%. This may be because an excessively strong prior suppresses the data-driven directional responses and reduces the adaptabil-ity of the aggregation process. Therefore, the prior strength is set to 2. 
+
+Effect of the Anisotropy Ratio The anisotropy ratio con-trols the aspect ratio of the directional Wishart kernels and directly affects their sensitivity to oriented structures. Figs. 6(c) shows that When the anisotropy ratio increases from 1 to 2 and 3, the OA improves from 95.05% to 96.55% and 97.79%, respectively. This indicates that an appropriate anisotropic configuration enables the kernels to better cap-ture elongated structures, directional boundaries, and local spatial variations. However, when the ratio increases further to 4, the OA decreases markedly to 93.51%. An excessively large ratio produces overly elongated kernels, which may weaken local contextual modeling and reduce robustness to complex structures. Therefore, the anisotropy ratio is set to 3. 
+
+Running Time Analysis 
+
+Table 7 summarizes the training and testing efficiency of competing methods on the Xi’an dataset. The proposed method achieves a well-balanced tradeoff between perfor-mance and efficiency, with a training time of 383.14 s and a low inference latency of 2.43 s. It substantially reduces training overhead compared with PMC and SDN while re-taining superior classification accuracy. Although HCV and FC train faster, their performance is constrained by limited modeling of polarimetric scattering characteristics. The in-troduced learnable Wishart statistical modeling and adap-tive geometric feature extraction inevitably increase training complexity, yet the overhead remains tolerable. Meanwhile, the competitive testing time further validates the practical applicability of our method for PolSAR classification. Table 7: Training and testing time of different methods on Xi’an dataset (s) Method PMC HCV SPD NGD SDN FC Prop. Train 21201.26 99.84 731.89 71.73 4236.15 99.84 383.14 Test 1.96 9.19 5.16 8.26 2.45 4.29 2.43 
+
+# References 
+
+2025. Dual Information Purification for Lightweight SAR Object Detection. 2026. Strip R-CNN: Large Strip Convolution for Remote Sensing Object Detection. 40: 12259–12267. Carvalho, N. C. R. L.; Sant’Anna Bins, L.; and Siqueira Sant’Anna, S. J. 2019. Analysis of Stochastic Dis-tances and Wishart Mixture Models Applied on PolSAR Im-ages. Remote Sensing , 11(24). Chen, L.-C.; Papandreou, G.; Schroff, F.; and Adam, H. 2017. Rethinking Atrous Convolution for Semantic Image Segmentation. Chen, S.-W.; and Tao, C.-S. 2018. PolSAR Image Classifica-tion Using Polarimetric-Feature-Driven Deep Convolutional Neural Network. IEEE Geoscience and Remote Sensing Let-ters , 15(4): 627–631. Cloude, S.; and Pottier, E. 1997. An entropy based classi-fication scheme for land applications of polarimetric SAR. 
+
+IEEE Transactions on Geoscience and Remote Sensing ,35(1): 68–78. Cui, Y.; Liu, F.; Jiao, L.; Guo, Y.; Liang, X.; Li, L.; Yang, S.; and Qian, X. 2022. Polarimetric Multipath Convolutional Neural Network for PolSAR Image Classification. IEEE Transactions on Geoscience and Remote Sensing , 60: 1–18. Dai, J.; Qi, H.; Xiong, Y.; Li, Y.; Zhang, G.; Hu, H.; and Wei, Y. 2017. Deformable Convolutional Networks. In 2017 IEEE International Conference on Computer Vision (ICCV) ,764–773. Deng, X.; Chen, J.; and L´ opez–Mart´ ınez, C. 2018. A Com-parison of Statistical Models for Polarimetric Sar Data. In 
+
+IGARSS 2018 - 2018 IEEE International Geoscience and Remote Sensing Symposium , 617–620. Ding, X.; Zhang, X.; Han, J.; and Ding, G. 2022. Scaling Up Your Kernels to 31×31: Revisiting Large Kernel Design in CNNs. In 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 11953–11965. Dong, H.; Zhang, L.; and Zou, B. 2022. Exploring Vi-sion Transformers for Polarimetric SAR Image Classifica-tion. IEEE Transactions on Geoscience and Remote Sens-ing , 60: 1–15. Fang, X.; He, C.; Zhang, Q.; and Tong, M. 2024. Pol-SAR Image Classification Framework With POA Align and Cyclic Channel Attention. IEEE Journal of Selected Top-ics in Applied Earth Observations and Remote Sensing , 17: 10203–10220. Freeman, A.; and Durden, S. 1998. A three-component scat-tering model for polarimetric SAR data. IEEE Transactions on Geoscience and Remote Sensing , 36(3): 963–973. Han, J.; Ding, J.; Xue, N.; and Xia, G.-S. 2021. ReDet: A Rotation-equivariant Detector for Aerial Object Detection. arXiv:2103.07733. Han, Y.; and Shao, Y. 2010. Full polarimetric SAR classifi-cation based on Yamaguchi decomposition model and scat-tering parameters. In 2010 IEEE International Conference on Progress in Informatics and Computing , volume 2, 1104– 1108. He, C.; Tu, M.; Xiong, D.; and Liao, M. 2020. Nonlinear Manifold Learning Integrated with Fully Convolutional Net-works for PolSAR Image Classification. Remote Sensing ,12(4). Hou, B.; Guo, X.; Hou, W.; Wang, S.; Zhang, X.; and Jiao, L. 2018. PolSAR Image Classification Based on DBN and Tensor Dimensionality Reduction. In IGARSS 2018 - 2018 IEEE International Geoscience and Remote Sensing Sympo-sium , 8448–8450. Jin, H.; He, T.; Shi, J.; and Ji, S. 2023. Combine Superpixel-Wise GCN and Pixel-Wise CNN for Polsar Image Classi-fication. In IGARSS 2023 - 2023 IEEE International Geo-science and Remote Sensing Symposium , 8014–8017. Lee, J.; and Grunes, M. 1992. Classification of multi-look polarimetric SAR data based on complex Wishart distribu-tion. In [Proceedings] NTC-92: National Telesystems Con-ference , 7/21–7/24. Li, M.; Li, W.; Liu, Y.; Huang, Y.; and Yang, G. 2023. Adaptive Mask Sampling and Manifold to Euclidean Sub-space Learning With Distance Covariance Representation for Hyperspectral Image Classification. IEEE Transactions on Geoscience and Remote Sensing , 61: 1–18. Qin, R.; Fu, X.; and Lang, P. 2020. PolSAR Image Clas-sification Based on Low-Frequency and Contour Subbands-Driven Polarimetric SENet. IEEE Journal of Selected Top-ics in Applied Earth Observations and Remote Sensing , 13: 4760–4773. Schou, J.; Skriver, H.; Nielsen, A.; and Conradsen, K. 2003. CFAR edge detector for polarimetric SAR images. IEEE Transactions on Geoscience and Remote Sensing , 41(1): 20– 32. Shi, J.; Wang, W.; Jin, H.; Nie, M.; and Ji, S. 2024. ALightweight Riemannian Covariance Matrix Convolutional Network for PolSAR Image Classification. IEEE Transac-tions on Geoscience and Remote Sensing , 62: 1–17. Wang, W.; Wang, J.; Quan, D.; Yang, M.; Sun, J.; and Lu, B. 2024. PolSAR Image Classification Via a Multigranularity Hybrid CNN-ViT Model With External Tokens and Cross-Attention. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , 17: 8003–8019. Wang, X.; Zheng, Z.; Shao, J.; Duan, Y.; and Deng, L.-J. 2025. Adaptive Rectangular Convolution for Remote Sensing Pansharpening. In 2025 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) , 17872– 17881. Xie, W.; Jiao, L.; Hou, B.; Ma, W.; Zhao, J.; Zhang, S.; and Liu, F. 2017. POLSAR Image Classification via Wishart-AE Model or Wishart-CAE Model. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing ,10(8): 3604–3615. Xie, W.; Jiao, L.; and Hua, W. 2022. Complex-Valued Multi-Scale Fully Convolutional Network with Stacked-Dilated Convolution for PolSAR Image Classification. Remote Sens-ing , 14(15). Yamaguchi, Y.; Moriyama, T.; Ishido, M.; and Yamada, H. 2005. Four-component scattering model for polarimetric SAR image decomposition. IEEE Transactions on Geo-science and Remote Sensing , 43(8): 1699–1706. Yu, H.; Tian, Y.; Ye, Q.; and Liu, Y. 2024. Spatial transform decoupling for oriented object detection. AAAI Press. ISBN 978-1-57735-887-9. Zhang, H.; and Ma, J. 2021. SDNet: A Versatile Squeeze-and-Decomposition Network for Real-Time Image Fusion. 129(10): 2761–2785. Zhang, S.; Cui, L.; Dong, Z.; and An, W. 2024. A Deep Learning Classification Scheme for PolSAR Image Based on Polarimetric Features. Remote Sensing , 16(10). Zhang, Z.; Wang, H.; Xu, F.; and Jin, Y.-Q. 2017. Complex-Valued Convolutional Neural Network and Its Application in Polarimetric SAR Image Classification. IEEE Transactions on Geoscience and Remote Sensing , 55(12): 7177–7188. Zhao, J.; Datcu, M.; Zhang, Z.; Xiong, H.; and Yu, W. 2019. Contrastive-Regulated CNN in the Complex Domain: A Method to Learn Physical Scattering Signatures From Flexible PolSAR Images. IEEE Transactions on Geoscience and Remote Sensing , 57(12): 10116–10135. Zhou, Y.; Wang, H.; Xu, F.; and Jin, Y.-Q. 2016. Polarimetric SAR Image Classification Using Deep Convolutional Neural Networks. IEEE Geoscience and Remote Sensing Letters ,13(12): 1935–1939. Zhou, Y.; Ye, Q.; Qiu, Q.; and Jiao, J. 2017. Oriented Re-sponse Networks. In 2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR) , 4961–4970.

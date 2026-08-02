@@ -1,0 +1,397 @@
+Title: LCMamNet: A Lightweight Cross-scale Mamba Network for Infrared Small Target Detection
+
+URL Source: https://arxiv.org/pdf/2607.24184v1
+
+Published Time: Tue, 28 Jul 2026 02:11:23 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+> 1
+
+# LCMamNet: A Lightweight Cross-scale Mamba Network for Infrared Small Target Detection 
+
+Yuhao Fan, Le Hui, and Yuchao Dai 
+
+Abstract —Infrared small target detection (IRSTD) is impor-tant for low-altitude perception, unmanned-system warning, and security monitoring. However, weak targets in infrared imagery usually occupy only a few pixels and are easily submerged by cloud clutter, ground edges, and bright noise, making it difficult for lightweight segmentation-based methods to preserve local target structures while suppressing background interference. To address these challenges, we propose LCMamNet, a lightweight cross-scale Mamba network that progressively enhances local tar-get structures, interacts cross-scale context in a latent space, and restores spatial details with background suppression. Specifically, a compact hierarchical encoder with cross-shaped directional bottleneck residual (CDBR) blocks strengthens direction-sensitive target structures under a small computation budget. A latent dense cross-scale fusion (LDCF) module then performs dense all-level interaction through bidirectional Mamba modeling and reorganizes the interacted features into stable hierarchical seman-tics. Finally, a progressive decoder selectively recovers shallow spatial details while suppressing irrelevant background textures. Extensive experiments on IRSTD-1k, NUAA-SIRST, and NUDT-SIRST show that the proposed network achieves mIoU scores of 71.25%, 79.60%, and 95.58%, respectively, with only 1.175M parameters and 6.91 GFLOPs. It also runs with a mean inference latency of 6.62 ms, and deployment results on an NVIDIA Jetson Orin NX 16G SUPER further demonstrate its practical potential for real-time edge inference. The code and checkpoints are publicly available at https://github.com/Haoyu096/LCMamNet. 
+
+Index Terms —infrared small target detection, lightweight net-work, Mamba, cross-scale fusion, edge deployment 
+
+I. I NTRODUCTION 
+
+# INFRARED small target detection (IRSTD) aims to seg-ment tiny targets from infrared images and plays an important role in low-altitude perception, unmanned-system warning, security monitoring, and target reconnaissance [1]– [3]. Unlike common objects in natural images, infrared small targets usually occupy only a handful of pixels and exhibit weak responses, low contrast, blurred boundaries, and scarce texture. Meanwhile, cloud structures, ground textures, strong edges, and bright noise can easily overwhelm target responses and lead to false alarms. Therefore, practical IRSTD requires a detector that can preserve weak target structures, distinguish them from cluttered backgrounds, and remain efficient enough for resource-constrained deployment. With the development of deep learning, segmentation-based methods have become the dominant solution for single-frame IRSTD. CNN-based U-shaped models [4] reduce target loss during downsampling through local contrast enhancement, 
+
+(Corresponding authors: Le Hui; Yuchao Dai.) Yuhao Fan, Le Hui, and Yuchao Dai are with the School of Elec-tronics and Information, Northwestern Polytechnical University, Xi’an 710072, China (e-mail: fanyuhao@mail.nwpu.edu.cn; huile@nwpu.edu.cn; daiyuchao@nwpu.edu.cn). 
+
+Fig. 1. Accuracy–efficiency trade-off among representative deep infrared small target detection models on IRSTD-1k. The horizontal axis denotes parameter count in reversed order, the vertical axis denotes mIoU, and the area of each circle is proportional to GFLOPs. Therefore, a point closer to the upper-right corner indicates higher mIoU with fewer parameters. The red arrow marks the shift from SCTransNet to our method, which achieves higher mIoU together with lower parameters and GFLOPs. 
+
+multi-scale aggregation, and cross-level feature reuse [5]– [8]. However, their local receptive fields still limit contextual discrimination under complex backgrounds. Attention-based methods strengthen semantic discrimination through cross-level interaction [9], [10], while existing Mamba-based IRSTD methods mainly embed state-space modeling into backbone or block-level feature extraction for efficient long-range de-pendency representation [11], [12]. These designs improve semantic discrimination, but they often increase architectural complexity and may disturb scale-specific semantic organi-zation after repeated multi-level interaction. As illustrated in Fig. 1, a favorable balance between segmentation accuracy and model complexity remains difficult to achieve. For segmentation-based IRSTD, the above trade-off is closely related to three coupled requirements. First, weak targets must be protected in early encoding stages, since attenuated local structures and directional cues are difficult to recover by later context modeling alone. Second, cross-scale interaction should enrich contextual dependency with-out blurring the scale attribution and semantic organization of different feature levels. Third, shallow details should be restored selectively, because skip features contain useful target boundaries as well as substantial background texture. These re-quirements suggest that lightweight IRSTD should coordinate local structure enhancement, cross-scale contextual modeling, and selective detail restoration, instead of relying on a single arXiv:2607.24184v1 [cs.CV] 27 Jul 2026 2
+
+stronger interaction module. To address these issues, we propose LCMamNet, alightweight infrared small target detection network with a coordinated encoder-fusion-decoder design. First, a hierar-chical encoder built with cross-shaped directional bottleneck residual (CDBR) blocks enhances direction-sensitive local target structures under a compact computation budget. Second, a latent dense cross-scale fusion (LDCF) module formulates deeper multi-level feature fusion as latent-space interaction, where bidirectional Mamba modeling [13]–[15] establishes dense cross-scale association and hierarchy-aware semantic reorganization restores stable multi-level semantics. Finally, a progressive decoder selectively restores shallow spatial details while suppressing background texture leakage. Through this flow, the proposed network keeps the benefits of cross-scale context modeling while maintaining lightweight local repre-sentation and controlled detail restoration. Experimental results on three public infrared small target detection benchmarks show that LCMamNet achieves strong region-level segmentation performance with low complexity. It reaches mIoU scores of 71.25%, 79.60%, and 95.58% on IRSTD-1k [16], NUAA-SIRST [5], and NUDT-SIRST [6], respectively, with only 1.175M parameters and 6.91 GFLOPs. Deployment experiments on a Jetson Orin NX 16G SUPER further verify its potential for real-time edge inference. The main contributions are summarized as follows: 1) We propose LCMamNet, a lightweight infrared small target detection network that coordinates local structure encoding, latent cross-scale fusion, and selective detail restoration. Experiments on public benchmarks and an edge deployment platform verify its favorable balance among accuracy, complexity, and inference efficiency. 2) We design a CDBR-based hierarchical encoder that com-bines cross-shaped directional convolution with bottle-neck residual learning to strengthen direction-sensitive weak-target structures at low complexity. 3) We design LDCF as a latent cross-scale interaction path that integrates bidirectional Mamba modeling with hierarchy-aware semantic reorganization for deeper en-coder features, while selective progressive decoding restores shallow details and suppresses background in-terference. II. R ELATED WORK 
+
+This section reviews representative IRSTD methods from three aspects: CNN-based architectures, context and cross-scale interaction, and Mamba-based modeling. The discussion focuses on a common issue behind these directions: how to en-hance weak-target representation while preserving stable scale-specific semantics under a compact computational budget. 
+
+A. CNN-Based IRSTD Methods 
+
+Early IRSTD methods mainly relied on handcrafted target-background priors, including directional filtering, local con-trast measurement, low-rank sparse decomposition, and tensor-based modeling. Representative methods include the edge directional LMS filter [17], IPI [18], LCM [19], MPCM [20], low-rank sparse representation [21], and later extensions based on entropy weighting, random walks, and tensor priors [22]– [26]. Although these methods offer interpretable assumptions about small-target saliency, they are often sensitive to clutter, low signal-to-noise ratios, and scene-dependent parameter settings. With deep learning, segmentation-based CNN models have become the mainstream solution for single-frame IRSTD. MDvsFA [27], ACM [5], ALCNet [7], AGPCNet [28], and ISNet [16] improve target-background discrimination through task-specific feature learning, attention, and asymmetric con-text modeling. Later U-shaped networks further strengthen weak-target preservation with dense interaction, nested decod-ing, and multi-scale supervision, as shown in DNANet [6], ISTDU-Net [29], UIU-Net [8], MSHNet [30], and ILNet [31]. Recent studies also explore task-specific local operators for weak infrared targets. For example, pinwheel-shaped convo-lution (PConv) uses multi-directional asymmetric branches to better fit dim small-target distributions with limited parameter overhead [32]. FLINet [33] introduces fuzzy logic to enhance and fuse infrared small-target features, while MSSLNet [34] adopts multiscale sparse large-kernel modeling to enlarge effective local context. These CNN-based methods provide effective local representation and recovery paths, but their con-volutional operators still have limited ability to capture long-range contextual dependencies and global semantic relations in complex infrared scenes. 
+
+B. Context Modeling and Cross-Scale Interaction for IRSTD 
+
+Recent IRSTD studies have therefore introduced stronger context modeling and cross-scale interaction mechanisms. These designs often revise skip connections, inter-level fusion paths, or global aggregation modules to improve information exchange among encoder and decoder stages. SCTransNet [9] embeds spatial-channel cross Transformer blocks into long skip connections to promote full-level semantic interaction. DATransNet [10] uses dynamic attention to adaptively enhance weak-target responses, while HSTNet [35] introduces sparse spatial-channel Transformer modeling to separate targets from cluttered backgrounds. HDNet [36] further combines spatial-domain CNN features with frequency-domain enhancement to suppress background interference. More recent works con-tinue to refine feature interaction from different perspectives: PQGNet [37] uses perceptual-query guidance, MPCNet [38] designs multiscale perception and cross-attention feature fu-sion, and FGARNet [39] introduces frequency guidance with aliasing rectification for small-target enhancement. Cross-scale interaction is crucial for IRSTD because small targets require both shallow detail cues and deeper contextual discrimination. MSHNet [30] and MDS-DWGANet [40] fur-ther explore hierarchical similarity modeling, direction-aware convolution, and dynamic attention for multi-level feature ex-change. However, stronger interaction is not always equivalent to better semantic organization. Repeated multi-level mixing may blur scale attribution or disturb spatial detail, especially when weak targets occupy only a few pixels. This motivates a fusion strategy that can build sufficient contextual dependency 3     
+
+> Fig. 2. Overall architecture of LCMamNet. Given an input infrared image, the stem layer first extracts the shallow feature x0, while the Cross-shaped Directional Bottleneck Residual (CDBR)-based hierarchical encoder produces deeper multi-level features x1to x4. These deeper features are then projected into a unified latent space and fused by the Latent Dense Cross-scale Fusion (LDCF) module. Finally, the progressive decoder combines the decoded features with the preserved shallow skip through a lightweight Synergistic Bottleneck Attention (SBA) unit to generate the final prediction mask.
+
+while explicitly reorganizing scale-aware semantics before decoding. 
+
+C. Mamba-Based Modeling for IRSTD 
+
+Mamba, derived from selective state space models, pro-vides an efficient way to model long-range dependencies with input-dependent state transitions and linear-time computation [13]. In vision tasks, Vision Mamba [14] and VMamba [15] show that state-space modeling can serve as an alternative to attention-based global modeling. Subsequent studies extend this idea through local scanning, multi-scale hierarchies, hy-brid backbones, and segmentation-oriented designs, including LocalMamba [41], Multi-Scale VMamba [42], MambaVi-sion [43], and U-Mamba [44]. For IRSTD, MiM-ISTD [11] introduces nested Mamba modeling to capture both global and local information, and HMCNet [12] combines Mamba with CNN-based encoder-decoder structures for weak-target segmentation. These works indicate that state-space modeling is promising for efficient long-range dependency representation. Nevertheless, IRSTD is highly sensitive to local target structure and scale-specific semantic consistency. Long-range modeling alone cannot guar-antee that tiny targets are preserved after downsampling and cross-scale fusion. Therefore, a Mamba-based IRSTD frame-work still needs to coordinate efficient latent-space interaction with local structure encoding and hierarchy-aware semantic restoration. Guided by this consideration, this work places bidirectional state-space modeling in a later latent cross-scale fusion stage, where deeper multi-level features are projected into a unified sequence for cross-scale association, while local structure encoding and hierarchy-aware semantic reorganiza-tion are preserved as separate functions. III. M ETHOD 
+
+This section first presents the overall architecture of the proposed network and then details the two main technical components: the hierarchical encoder for local structure preser-vation and the latent fusion module for cross-scale context interaction. The final decoding process is described in the overall pipeline as a lightweight restoration path for regulated shallow-detail recovery. 
+
+A. Overall Architecture 1) Forward Pipeline: To simultaneously preserve weak-target local structures, model cross-scale context, and suppress shallow noise under a lightweight budget, LCMamNet follows an encoder-fusion-decoder pipeline, as shown in Fig. 2. Given an input infrared image, the stem layer first extracts the shallow feature x0, and a cross-shaped directional bottleneck residual (CDBR)-based hierarchical encoder then produces deeper multi-level features. These deeper features are projected into a unified latent space by a latent dense cross-scale fusion (LDCF) module, where cross-scale interaction and hierarchy-aware semantic reorganization are performed before decoding. Finally, a progressive decoder restores spatial details, and a lightweight synergistic bottleneck attention (SBA) unit regu-lates the preserved shallow skip before prediction. Given an input infrared image I ∈ R1×H×W , the network first extracts an initial shallow feature x0 through a stem layer, and then generates four deeper-scale features along the hierarchical encoding path: 
+
+{xi}4
+
+> i=1
+
+. (1) Unlike conventional residual encoders [45], [46], the hierar-chical encoder is built to maintain weak-target local geometry and direction-sensitive responses during progressive downsam-pling. The resulting deeper features serve as the semantic input to the subsequent fusion stage, while the shallowest feature is intentionally kept outside the latent interaction path. 
+
+2) Shallow Feature Routing: The shallowest feature x0
+
+is excluded from latent cross-scale fusion and is instead preserved as a shallow-detail anchor for the final restoration 4 
+
+> Fig. 3. Illustration of the proposed Cross-shaped Directional Convolution (CDConv) and its feature responses. (a) Process of CDConv, where a cross-shaped directional representation is built through directional padding, branch-specific spatial convolutions (BSCs), concatenation (Cat), and Channel Fuse. (b) Visualization of feature responses inside the Cross-shaped Directional Bottleneck Residual (CDBR) block. The locally enlarged maps include the block input, ground truth (GT), the outputs of the four BSC branches, the concatenated branch output, and the channel-fused output.
+
+stage. This routing choice follows two practical considerations. First, x0 has the highest spatial resolution, and projecting it into latent tokens would substantially lengthen the unified sequence and weaken the lightweight objective. Second, this feature mainly contains edges, local contrast, and fine-grained spatial responses, which are useful for boundary recovery but may also carry high-frequency background textures. Directly mixing it with deeper semantic features may therefore intro-duce shallow clutter into the latent interaction process. Therefore, only x1–x4 are used for latent cross-scale fusion, while x0 is reserved as a shallow skip. After the deeper features are fused and reorganized, the decoder introduces this shallow-detail anchor only near the final restoration stage, where the attention unit regulates skip information before prediction. In this way, the network separates latent contextual interaction from shallow-detail recovery, allowing cross-scale semantics to be formed before high-resolution local details are selectively restored. This design follows the general logic of preserving high-resolution detail branches in encoder-decoder frameworks [4], [47]. As illustrated by the enlarged SBA UpBlock in Fig. 2, SBA is used as a lightweight skip-regulation unit in the decoder. Given the preserved skip feature fk and the upsampled de-coder feature dk+1 , SBA first extracts channel descriptors from both branches through global average pooling and two lightweight 1 × 1 transformations. The two branch responses are summed and passed through a sigmoid function to generate a channel-wise gate, which recalibrates the skip feature before concatenation with the decoder feature. Different from direct skip concatenation, this design allows decoder semantics to regulate high-resolution shallow details, reducing the transfer of background textures while keeping useful boundary cues for final mask recovery. 
+
+B. CDBR-Based Hierarchical Encoder 
+
+For infrared small target detection (IRSTD), the goal of the encoding stage is not merely to extract deeper semantic features, but, more importantly, to preserve weak-target local structures and directional cues throughout repeated down-sampling. Because infrared small targets occupy very few pixels, their local responses are easily submerged by cloud textures, ground edges, and bright background noise. Once shallow structural information is weakened at early stages, even stronger contextual modeling later on can hardly recover the lost target representation. We therefore introduce a cross-shaped directional bottleneck residual (CDBR) block into the hierarchical encoder to enhance the network’s sensitivity to weak-target local structures under lightweight constraints and to maintain more stable feature extraction. 
+
+1) Cross-Shaped Directional Convolution: The core local operator in this block is cross-shaped directional convolution (CDConv), which decomposes local spatial modeling into four orthogonal directional branches. Given an input feature 
+
+X ∈ RC×H×W , the block first compresses the channels into a lower-dimensional intermediate space through a 1 × 1
+
+convolution: 
+
+U = Fred (X), U ∈ RCb×H×W (2) where Cb denotes the bottleneck channel dimension. CDConv is then applied in this compressed space for direction-sensitive local enhancement. For a kernel size of k = 3 , the asymmetric padding operators for the four directions are defined as 
+
+Pl = (2 , 0, 0, 0) , Pr = (0 , 2, 0, 0) 
+
+Pt = (0 , 0, 2, 0) , Pb = (0 , 0, 0, 2) (3) where each quadruple denotes the zero-padding widths on the left, right, top, and bottom sides, respectively. Based on these definitions, the responses of the four directional branches can be written as 
+
+Bl = Conv 1×3l
+
+ Pl(U), Br = Conv 1×3r
+
+ Pr(U)
+
+Bt = Conv 3×1t
+
+ Pt(U), Bb = Conv 3×1b
+
+ Pb(U) (4) where Bl, Br, Bt, and Bb denote the outputs of the four directional branches, respectively. In Fig. 3, these operations correspond to branch-specific spatial convolutions (BSCs), each of which applies an asymmetric spatial convolution to a single directional branch. The output channels of the four branches are approximately evenly split and satisfy 
+
+Cl + Cr + Ct + Cb = Cb (5) The responses of the four directional branches are then con-catenated along the channel dimension: 
+
+˜U = Cat  Bl, Br, Bt, Bb
+
+ (6) 5Conv �x�            
+
+> SiLu
+> Conv �x�
+> Cat
+> TP
+> TP
+> TP
+> TP
+> 11,LD
+> 21,LD
+> 31,LD
+> 41,LD
+> 1,LD
+> 1x
+> 3x
+> 4x
+> 2x
+> Fwd State Bwd State Bi-Mamba Mixer
+> LCR LCR LCR Higher-level semantic refinement
+> LCR
+> LCR
+> LCR
+> LCR
+> Cat
+> Split
+> DW-Conv �x�
+> DW-Conv �x�
+
++ Local Context Restorer      
+
+> LP LP
+> Fwd Conv�d
+> Bwd Conv�d
+> Fwd SSM Bwd SSM
+> ××
+> SiLu
+> +
+> LP
+> +
+> LN
+> fwd hbwd h
+> Bi-directional Mamba Mixer
+> Fig. 4. Detailed illustration of the proposed Latent Dense Cross-scale Fusion (LDCF) module. Multi-level features are projected into a unified latent space for Bi-Mamba-based dense cross-scale association, followed by hierarchy-aware semantic reorganization and local context restoration.
+
+where Cat( ·) denotes channel-wise concatenation. The con-catenated feature is first normalized and activated, and then aggregated by a lightweight channel fusion operation: 
+
+¯U = ϕ BN( ˜U) (7) 
+
+Ucd = ϕ BN(Conv 1×1( ¯U))  (8) Note that Eq. (8) corresponds to the Channel Fuse operation in Fig. 3. This process re-aggregates the responses of the four directional branches along the channel dimension to form a unified cross-shaped directional representation. 
+
+2) Bottleneck Residual Design: After direction-sensitive local enhancement, the block maps the feature back to the target channel dimension through another 1 × 1 convolution and fuses it with the shortcut branch via residual addition, yielding the final output: 
+
+Y = ϕ
+
+
+
+Fexp (Ucd ) + S(X)
+
+
+
+(9) where Fexp (·) denotes channel expansion, S(·) denotes either the identity mapping or a 1 × 1 shortcut, and ϕ(·) is the nonlinear activation function. From a structural perspective, the version that keeps CD-Conv and residual connection but does not use channel com-pression and expansion is denoted as the cross-shaped direc-tional residual block (CDResBlock). By further introducing bottleneck-style channel reduction and expansion, we obtain the proposed CDBR block. Compared with the non-bottleneck variant, this design confines direction-sensitive local enhance-ment to a controlled intermediate representation space, thereby reducing redundant feature expression while preserving local structure modeling ability. This principle is also consistent with residual bottlenecks and lightweight inverted residual structures in general vision, namely maintaining backbone expressiveness while controlling intermediate cost [45], [46]. This design is especially important for IRSTD. First, the four-direction local modeling of CDConv better matches the local response distribution of weak tiny targets under complex backgrounds, thereby enhancing target preservation in shallow and middle-level features. Second, bottleneck compression constrains local enhancement to a more compact intermediate space, encouraging the network to allocate its limited rep-resentation capacity to discriminative structures relevant to target detection rather than redundant background textures. For scenes with extremely weak targets and heavy background interference, this combination of direction-sensitive local mod-eling and compact representation constraint is more conducive to forming stable weak-target representations. 
+
+3) Hierarchical Encoder Construction: Based on the pro-posed block, we construct a hierarchical encoder. The input image first passes through a shallow stem to establish initial local responses, and then multi-scale feature representations are progressively extracted through four stages of these blocks. As the feature hierarchy deepens, the network gains a larger receptive field while preserving and reinforcing weak-target local structure cues. The resulting multi-level features provide not only more robust inputs for subsequent latent cross-scale fusion, but also a stronger basis for detail restoration in the final decoding stage. 
+
+C. Latent Dense Cross-scale Fusion 
+
+Adequate cross-scale contextual dependency is indispens-able for infrared small target detection, because weak tiny targets often require both local responses and surrounding context to be separated from cluttered backgrounds. However, continuously mixing multi-level features in a unified latent space may weaken their original scale attribution and make the subsequent decoder less stable. To address this issue, we propose a latent dense cross-scale fusion (LDCF) module, which establishes full-level contextual interaction while ex-plicitly restoring hierarchy-aware multi-level semantics. The structure of this module is summarized in Fig. 4 and consists of three successive steps. It first projects the deeper encoder features into a unified latent space and performs dense association with bidirectional Mamba modeling. It then reorganizes the interacted latent representation back into scale-specific feature maps, so that each branch keeps explicit hier-archical attribution after cross-scale interaction. Finally, high-level semantic branches are refined again to strengthen target-background discrimination before decoding. In this design, 6
+
+Mamba serves as a dedicated latent sequence mixer for higher-level cross-scale fusion rather than a backbone-wide context block. 
+
+1) Latent Dense Association: Let the multi-level features produced by the hierarchical encoder be 
+
+{xi}4
+
+> i=1
+
+, xi ∈ RCi×Hi×Wi (10) Following the shallow-feature routing strategy described above, the fusion module operates on the four deeper features, while x0 is preserved for final shallow restoration. To establish cross-scale relations in a unified representation space, we first use a lightweight projection function Pi(·) to map features at different levels into a shared latent space. In our implementation, Token Projection consists of a point-wise mapping branch and a depth-wise convolution branch, and is formulated as 
+
+zi = ϕ
+
+
+
+BN  PW i(xi) + DW i
+
+ PW i(xi) 
+
+(11) where PW i(·) denotes a 1 × 1 point-wise projection, DW i(·)
+
+denotes a 3 × 3 depth-wise convolution, and ϕ(·) denotes the SiLU activation. This yields 
+
+zi ∈ RD1×Hi×Wi (12) where D1 is the shared latent dimension. Next, the latent feature at each level is flattened and rearranged into a token sequence 
+
+ti ∈ RLi×D1 , Li = HiWi (13) Since different feature levels have different spatial resolutions, the corresponding token sequence lengths Li also differ, while all sequences share the same latent dimension D1. The token sequences are then concatenated along the length dimension to form a unified latent sequence 
+
+T = Cat( t1, t2, t3, t4) ∈ RLΣ×D1 , LΣ =
+
+> 4
+
+X
+
+> i=1
+
+Li (14) To efficiently model long-range cross-scale dependencies in this unified latent space, we use a pre-normalized bidirectional Bi-Mamba mixer. This design is directly inspired by selective state-space modeling and its visual extensions [13]–[15]. We first apply LayerNorm to the input sequence: 
+
+˜T = LN( T) (15) We then perform state-space modeling in the forward and reverse directions, yielding the forward and backward hidden states 
+
+hfwd = Mfwd ( ˜T), hbwd = Rev 
+
+
+
+Mbwd 
+
+  Rev( ˜T)
+
+(16) where Mfwd (·) and Mbwd (·) denote the forward and back-ward Mamba transforms, respectively, and Rev( ·) denotes sequence reversal. The two state responses are averaged and incorporated with a scaled residual update to obtain the fused latent representation: 
+
+ˆT = T + γ · hfwd + hbwd 
+
+2 (17) where γ is a learnable scaling parameter. The key point of this process is that features from all scales are not modeled independently. Instead, they jointly participate in bidirectional state propagation within a shared latent sequence. As a result, cross-scale associations are not constructed through explicit dense links, but are implicitly established by forward and backward state updates in the unified latent space. In this way, shallow local responses and deep semantic context can interact within the same latent space, forming a more stable cross-scale discriminative rep-resentation. 
+
+2) Hierarchy-Aware Semantic Reorganization: After dense association in the unified latent space, the fused sequence representation is first split back into scale-specific latent se-quences according to the original sequence length of each level: 
+
+{ˆti}4 
+
+> i=1
+
+= Split( ˆT) (18) These sequences are then reshaped into 2D latent feature maps according to the original spatial size of each level: 
+
+ˆzi ∈ RD1×Hi×Wi (19) On top of this, we further perform hierarchy-aware semantic reorganization and local restoration. This step is necessary because the preceding unified latent sequence strengthens cross-scale dependency but no longer explicitly preserves each branch as an independent feature level. Specifically, the fused latent representation is first restored to the corresponding 2D feature map of each level, then refined by a lightweight Local Context Restorer (LCR), and finally projected back to the original channel space with a residual link to the input branch: 
+
+yi = Oi
+
+ L(ˆ zi) + xi (20) where L(·) denotes the LCR operation and Oi(·) denotes the output projection. Here, LCR is used to recover local contextual consistency within each level, so that the reor-ganized features can preserve cross-scale associations while maintaining more stable local structural expression. 
+
+3) High-Level Semantic Refinement: Besides applying the above reorganization to all feature levels, we further perform grouped semantic refinement on higher-level latent represen-tations. Specifically, after obtaining the initial reorganized features {yi}4
+
+> i=1
+
+, we retain only the higher-level semantic branches {yi}4 
+
+> i=2
+
+and project them again into a new shared latent space: 
+
+z′ 
+
+> i
+
+= P′ 
+
+> i
+
+(yi), i = 2 , 3, 4 (21) 
+
+T′ = Cat( t′
+
+> 2
+
+, t′
+
+> 3
+
+, t′
+
+> 4
+
+) ∈ RL′ 
+
+> Σ×D2
+
+(22) where D2 denotes the latent dimension used in the high-level semantic refinement stage. The features are then modeled and reorganized again by a bidirectional Bi-Mamba mixer, yielding more stable high-level semantic representations. Therefore, the module does not stop at a single round of full-level interaction; instead, while preserving the shallowest local anchor, it further refines the higher-level semantic branches. Overall, the multi-level outputs exhibit two desirable prop-erties at the same time: they have already acquired sufficient cross-scale contextual dependency through the unified latent space, and they still preserve clear scale attribution and spatial 7                                                                                                                                                                                                                           
+
+> TABLE I QUANTITATIVE COMPARISON WITH REPRESENTATIVE DEEP IRSTD METHODS ON IRSTD-1 K, NUAA-SIRST, AND NUDT-SIRST. T HE DATASET -LEVEL METRIC UNITS ARE M IOU (%), P D(%), AND FA(10 −6). B OLD ,UNDERLINE ,AND “–” INDICATE THE BEST RESULT ,THE SECOND -BEST RESULT ,AND UNAVAILABLE RESULTS ,RESPECTIVELY .Method Pub. Type Params(M) ↓FLOPs(G) ↓Latency(ms) ↓IRSTD-1k NUAA-SIRST NUDT-SIRST mIoU ↑Pd ↑Fa ↓mIoU ↑Pd ↑Fa ↓mIoU ↑Pd ↑Fa ↓
+> ISNet [16] CVPR’22 CNN 1.09 122.55 –61.85 90.24 31.56 70.49 95.06 67.98 81.24 97.78 6.34 DNANet [6] TIP’22 CNN 4.70 28.52 17.53 65.71 91.84 17.61 77.76 96.33 2.31 79.98 96.93 12.78 ISTDU-Net [29] GRSL’22 CNN 2.75 15.89 7.89 65.01 93.94 26.44 75.93 96.20 38.90 91.76 98.52 3.77 UIU-Net [8] TIP’23 CNN 50.54 108.85 10.13 68.69 91.25 13.48 77.53 92.40 9.33 75.91 96.83 18.61 MSHNet [30] CVPR’24 CNN 4.07 12.21 7.57 67.16 93.88 15.03 73.50 97.25 31.05 80.55 97.99 11.77 SCTransNet [9] TGRS’24 CNN-T 11.19 20.24 17.51 68.03 93.27 10.74 77.50 96.95 13.92 94.09 98.62 4.29 DATransNet [10] GRSL’25 CNN-T 4.04 10.90 8.57 68.56 93.60 24.96 –––94.93 99.04 2.00
+> HDNet [36] TGRS’25 CNN-D 3.67 11.36 8.98 70.26 94.56 4.33 79.17 100.00 0.53 85.17 98.52 2.78 HSTNet [35] TGRS’25 CNN-T –––69.79 91.16 10.70 78.14 100.00 14.72 –––FGARNet [39] TGRS’26 CNN-D 8.40 23.59 21.66 69.31 92.18 4.75 79.76 100.00 1.66 86.01 98.83 7.94 PQGNet [37] TGRS’26 CNN-T 1.19 19.78 9.43 67.51 91.50 28.70 76.60 99.08 5.68 95.27 98.31 2.60 FLINet [33] TGRS’26 CNN 8.57 47.76 12.01 66.69 91.58 15.26 76.08 98.17 18.77 95.52 99.15 4.23 LCMamNet (Ours) –CNN-M 1.18 6.91 6.62 71.25 93.20 11.31 79.60 100.00 0.71 95.58 99.47 3.38
+> Note: CNN, CNN-T (Transformer), CNN-D (domain transform), and CNN-M (Mamba/SSM) denote different model types. Comparison results are obtained from public prediction maps, official implementations, or original reports when available. For remeasured complexity, the input size is 256 ×256 , and FLOPs are counted as twice the number of multiply-accumulate operations (MACs). Latency denotes mean model forward inference latency measured with 50 warm-up runs and 200 timed runs.
+
+structure. The core value of the fusion module therefore does not lie in merely adding one more cross-scale interaction stage. Rather, it lies in unifying dense association propagation in a shared latent space, hierarchy-aware semantic reorganization, and high-level semantic refinement, so that the fused features retain global associations while providing stable inputs for subsequent decoding and restoration. IV. E XPERIMENTS 
+
+A. Experimental Settings 1) Datasets: We conduct experiments on three widely used public IRSTD datasets, namely IRSTD-1k [16], NUAA-SIRST [5], and NUDT-SIRST [6]. These datasets contain 1001, 427, and 1327 infrared images, respectively. Following the common protocol used in recent studies [6], [30], [35], [36], IRSTD-1k is split into training and test sets with a ratio of 4:1, resulting in 800 training images and 201 test images. NUAA-SIRST uses the same split, with 341 training images and 86 test images, while NUDT-SIRST is evenly divided into training and test sets. 
+
+2) Implementation Details: The proposed method is imple-mented in PyTorch and trained/tested under Ubuntu 22.04 on a single NVIDIA RTX 4090 24GB GPU. All input images are resized to 256 × 256 . During training, we apply random flipping and rotation for data augmentation. The model is trained for 800 epochs with an early-stopping patience of 240 epochs. Both the training and test batch sizes are set to 12. We use AdamW as the optimizer, with an initial learning rate of 1 × 10 −3, a minimum learning rate of 1 × 10 −5, and a weight decay coefficient of 5 × 10 −2. A warmup plus cosine annealing schedule is adopted, where the warmup period lasts 5 epochs. The loss function is a weighted combination of BCE and Soft-IoU, with weights of 0.3 and 0.7, respectively. 
+
+3) Evaluation Metrics: We adopt mIoU, Pd, and Fa as the main quantitative metrics, and further analyze threshold-dependent detection behavior using ROC curves. Specifically, mIoU measures the pixel-level overlap between predictions and ground truth, Pd evaluates target-level detection ability, and Fa reflects the false-alarm level. Higher mIoU, Pd, and TPR, together with lower Fa and FPR, indicate better detection performance. For ROC analysis, TPR reflects target preser-vation and FPR reflects background leakage under varying decision thresholds, which are defined as 
+
+TPR( τ ) = 
+
+PNn=1 TP (τ )
+
+> n
+
+PNn=1 
+
+
+
+TP (τ ) 
+
+> n
+
++ FN (τ )
+
+> n
+
+ (23) 
+
+FPR( τ ) = 
+
+PNn=1 FP (τ )
+
+> n
+
+PNn=1 
+
+
+
+TN (τ ) 
+
+> n
+
++ FP (τ )
+
+> n
+
+ (24) By traversing different thresholds τ , we obtain ROC curves to compare the trade-off between target preservation and background suppression across methods. In addition to accuracy metrics, we evaluate model ef-ficiency and deployment potential using parameter count, GFLOPs, model forward inference latency, and inference speed on an edge platform. 
+
+B. Comparison With State-of-the-Art Methods 1) Quantitative Results: We first compare our method with representative deep IRSTD methods on IRSTD-1k, NUAA-SIRST, and NUDT-SIRST, as summarized in Table I. The compared methods include CNN-based, Transformer-based, and domain-transform IRSTD models, as well as recent meth-ods such as FGARNet [39], PQGNet [37], and FLINet [33]. Overall, our method remains among the strongest performers 8
+
+across the three datasets and achieves the most favorable accuracy-efficiency balance among the compared methods. From the perspective of method categories, CNN-based models provide strong local representation and recovery paths, but their performance is still limited when small targets are dim or scale-varying. Transformer-based and hybrid methods further enhance global context modeling, yet they often intro-duce higher parameter counts, computation costs, or latency. By contrast, our method combines local structure encoding with latent cross-scale interaction, leading to stronger segmen-tation quality under a compact model budget. A closer look at the three benchmarks further clarifies this trend. The advantage is most evident on IRSTD-1k, where weak targets and complex background interference make both missed detections and background leakage more likely. On this challenging dataset, our method achieves 71.25% mIoU and outperforms strong baselines such as HDNet [36], HST-Net [35], FGARNet [39], PQGNet [37], and FLINet [33]. Although HDNet obtains a slightly higher Pd and lower Fa, our method achieves a higher mIoU, showing better region-level segmentation quality. The remaining two benchmarks show that the improvement is not limited to one difficult case. NUAA-SIRST already yields very high Pd values for several advanced methods, making target-level detection close to saturation; under this condition, our method obtains a competitive mIoU of 79.60% with the second-lowest Fa. NUDT-SIRST further validates the stability of target preservation on a larger benchmark, where our method obtains the best mIoU of 95.58% and the best Pd of 99.47%. Although a few methods report slightly lower Fa, the overall mIoU and Pd results show a more favorable balance between target completeness and background suppression. Our method also maintains a favorable accuracy-efficiency balance. Compared with strong baselines such as SC-TransNet [9], HDNet [36], FGARNet [39], PQGNet [37], and FLINet [33], it uses fewer parameters or lower computation while maintaining highly competitive segmentation accuracy. Specifically, the model requires only 1.18M parameters and 6.91 GFLOPs, corresponding to the second-smallest parameter count and the lowest reported FLOPs among methods with available complexity results. It also runs with the lowest measured mean model forward inference latency of 6.62 ms among the benchmarked methods. These results suggest that the performance gain is not obtained by simply enlarging the network, but by coordinating local structure encoding, latent cross-scale fusion, and selective shallow restoration within a compact framework. 
+
+2) Visual Results and ROC Analysis: Representative visual comparisons on IRSTD-1k are shown in Fig. 5. The selected examples include cloud clutter, hazy background interference, and extremely dark scenes, where infrared small targets are easily confused with local bright noise or submerged by low-contrast backgrounds. These cases help reveal whether a method can preserve weak target responses without introduc-ing excessive false alarms. Compared with recent advanced methods, our method tends to preserve dim and small targets more completely and produce cleaner masks under complex backgrounds. In the examples                                            
+
+> TABLE II DEPLOYMENT PERFORMANCE OF OUR METHOD ON NVIDIA J ETSON
+> ORIN NX 16G SUPER. MIOUIS MEASURED ON IRSTD-1 K.
+> Backend Precision Input mIoU ↑Latency(ms) ↓FPS ↑
+> PyTorch FP32 1×1×256 ×256 71.27 49.86 20.06 PyTorch FP16 1×1×256 ×256 71.18 47.05 21.25 TensorRT FP16 1×1×256 ×256 65.96 9.75 102.60
+
+with cloud interference, several competing methods tend to miss weak targets or generate incomplete responses, whereas our method keeps more continuous target regions. In the hazy and dark-background cases, it suppresses scattered background responses more effectively. These visual observations are consistent with the quantitative results, especially the higher mIoU on IRSTD-1k. The threshold-dependent detection behavior is further com-pared on the three datasets in Fig. 6. Overall, our method shows competitive ROC curves and maintains a favorable bal-ance between target preservation and background suppression, especially in the low-FPR region. This behavior indicates that the model does not rely on an overly aggressive foreground response to improve segmentation scores. Instead, it keeps a relatively stable trade-off under different thresholds, which is important for practical IRSTD applications where false alarms must be controlled. 
+
+3) Efficiency and Edge Deployment: Efficiency is another important factor for IRSTD models, especially for edge per-ception scenarios. In the comparison in Table I, our method uses only 1.18M parameters and 6.91 GFLOPs, while achiev-ing a mean model forward inference latency of 6.62 ms. To-gether with the lowest reported FLOPs, this latency advantage indicates that the lightweight design is effective not only in theoretical complexity but also in actual model execution. We further evaluate practical inference speed on an NVIDIA Jetson Orin NX 16G SUPER under the MAXN power mode, with 50 model warm-up iterations followed by 200 measured iterations. The input shape follows batch size × channel ×
+
+height × width. The deployment results in Table II show that the PyTorch FP32 and FP16 implementations achieve compa-rable mIoU scores of 71.27% and 71.18%, respectively. After TensorRT FP16 deployment, the latency decreases to 9.75 ms, corresponding to 102.60 FPS, while the mIoU decreases to 65.96%. This result indicates that TensorRT FP16 provides substantial acceleration but introduces a measurable accuracy drop, which may be related to reduced-precision inference and operator conversion for the CDBR encoder and Mamba-based latent fusion. These deployment results demonstrate the practical potential of our method for real-time edge inference, while also showing that accuracy-preserving TensorRT optimization remains an important direction for resource-constrained IRSTD deploy-ment. 
+
+C. Ablation Studies 
+
+We conduct ablation studies on IRSTD-1k to verify the effectiveness of the main design choices. This dataset contains weak targets and complex background interference, making it 9Image GT MSHNet SCTransNet DATransNet HDNet LCMamNet (Ours)      
+
+> Target Missed False Alarm Magnified Area
+> Fig. 5. Qualitative comparison on IRSTD-1k. From left to right: Image, MSHNet [30], SCTransNet [9], DATransNet [10], HDNet [36], LCMamNet (Ours), and GT.
+> Fig. 6. ROC curves on IRSTD-1k, NUAA-SIRST, and NUDT-SIRST.
+
+suitable for analyzing how different components affect target preservation and background suppression. The ablation studies are organized into four groups: encoder replacement, latent cross-scale fusion with semantic reorganization, token mixer replacement in LDCF, and full-framework synergy. These experiments are designed to isolate different levels of contribution. The first group studies whether the proposed directional bottleneck encoder provides a better accuracy-efficiency basis. The second group examines whether latent dense association and hierarchy-aware reorganization are both necessary for effective cross-scale fusion. The third group further compares representative token mixers inside the same LDCF outer structure. The fourth group evaluates whether the final gain comes from the coordinated framework rather than a single isolated component. 
+
+1) Effect of Encoder Replacement: To isolate the effect of encoder design, Table IV compares three encoder units under the setting without latent cross-scale fusion and selective shal-low restoration. ResBlock denotes a standard residual block, CDRes denotes a non-bottleneck residual block equipped with cross-shaped directional convolution, and CDBR denotes the final bottleneck version adopted in our model. Since the fusion module and the selective decoder are removed in this experiment, the comparison mainly reflects the standalone 10                                               
+
+> TABLE III ABLATION ON LATENT CROSS -SCALE FUSION AND SEMANTIC REORGANIZATION ON IRSTD-1 K.
+> Encoder Assoc. Bridge Decoder mIoU ↑Params(M) ↓FLOPs(G) ↓
+> CDBR ––U-Net 65.61 1.45 10.40
+> CDBR Yes –U-Net 67.36 1.65 12.03 CDBR Yes Direct U-Net 67.70 1.59 11.84 CDBR Yes Reorg. U-Net 68.59 1.73 12.26
+> TABLE IV ABLATION ON ENCODER REPLACEMENT ON IRSTD-1 K. LDCF AND SBA
+> ARE REMOVED TO ISOLATE THE ENCODER EFFECT .
+> Encoder mIoU ↑Params(M) ↓FLOPs(G) ↓
+> ResBlock 66.01 3.39 15.86 CDRes 66.20 2.14 12.21 CDBR 65.61 1.45 10.40
+
+representation and complexity of different encoder units. Compared with ResBlock, CDRes improves the mIoU from 66.01% to 66.20% while reducing the parameter count and GFLOPs to 2.14M and 12.21G, respectively. This result shows that directional local modeling is useful for preserving weak-target structures. The bottleneck version obtains a slightly lower isolated mIoU of 65.61%, but further compresses the model to 1.45M parameters and 10.40G GFLOPs. Therefore, this table does not suggest that the bottleneck encoder is the strongest standalone block; rather, it shows that the block provides a compact and direction-aware encoder basis for the complete framework, where subsequent fusion and decoding can compensate for the mild compression cost. 
+
+2) Effect of Latent Cross-scale Fusion and Semantic Re-organization: The fusion module is evaluated under a fixed encoder and standard U-Net decoder in Table III. Here, Assoc. denotes latent dense association, which performs bidi-rectional Mamba-based cross-scale interaction in the unified latent space. Direct denotes directly mapping the interacted latent features back to decoder features, while Reorg. denotes hierarchy-aware semantic reorganization before decoding. Without latent cross-scale fusion, the model obtains an mIoU of 65.61%. Introducing latent dense association raises the mIoU to 67.36%, indicating that cross-scale context helps separate weak targets from complex backgrounds. Passing the interacted features through a direct bridge further improves the mIoU to 67.70%, which shows that the interacted latent rep-resentation can already provide useful contextual information for decoding. However, direct bridging does not explicitly recover the semantic hierarchy among different feature levels after la-tent interaction. Replacing it with semantic reorganization increases the mIoU to 68.59%, confirming that cross-scale association alone is not sufficient. The fused representation also needs to be reorganized into scale-aware hierarchical features before being sent to the decoder. This progressive gain supports the design of combining latent interaction with hierarchy-aware reorganization. 
+
+3) Effect of Token Mixer in LDCF: The token mixer in LDCF needs to associate a long multi-resolution latent sequence while keeping the fusion module compact. Under                                              
+
+> TABLE V ABLATION ON TOKEN MIXERS IN LDCF ON IRSTD-1 K.
+> Mixer Type mIoU ↑Params(M) ↓FLOPs(G) ↓
+> Efficient Self-Attn Channel self-attn. 69.47 1.09 7.88 Bi-GRU Bi. recurrent 70.47 1.15 9.92 Bi-Mamba Bi. SSM 71.25 1.18 6.91
+> TABLE VI ABLATION ON FULL -FRAMEWORK SYNERGY ON IRSTD-1 K. SBA
+> DENOTES SYNERGISTIC BOTTLENECK ATTENTION .
+> Encoder Bridge Decoder mIoU ↑Params(M) ↓FLOPs(G) ↓
+> CDBR Reorg. U-Net 68.59 1.73 12.26 CDRes Reorg. SBA 70.13 1.86 8.72 CDBR Direct SBA 68.71 0.93 6.48
+> CDBR Reorg. SBA 71.25 1.18 6.91
+
+the same LDCF outer structure and training protocol, Ta-ble V compares representative mixer choices for this sequence association step. Efficient Self-Attn denotes a channel self-attention mixer that forms attention along the channel dimen-sion to avoid full token-token attention over the concatenated latent sequence, and Bi-GRU replaces state-space modeling with a standard bidirectional GRU mixer [48]. Bi-Mamba achieves the highest mIoU of 71.25% with 1.18M parameters and 6.91 GFLOPs. Efficient Self-Attn has fewer parameters, but its mIoU is lower and its FLOPs are higher than Bi-Mamba. Bi-GRU obtains a closer mIoU of 70.47%, but it increases the computation to 9.92 GFLOPs. This gap is consistent with the sequence property of LDCF: bidirectional Mamba models the long latent sequence through linear state-space scanning, whereas gated recurrent units pro-cess the flattened sequence with heavier step-wise recurrence. These results support the use of Bi-Mamba as the token mixer in LDCF, since it provides the best accuracy-complexity trade-off among the compared alternatives. 
+
+4) Synergy Analysis in the Full Framework: The previous groups isolate encoder, fusion, and mixer behavior under controlled settings. To further verify whether these designs remain effective in the final network, we perform a controlled comparison under the full framework in Table VI. In this table, the row with CDBR, Reorg., and U-Net removes the selective decoder, the row with CDRes tests whether the non-bottleneck encoder is still preferable in the full framework, and the row with Direct replaces semantic reorganization with direct bridging. The full model achieves 71.25% mIoU with 1.18M parame-ters and 6.91 GFLOPs. Replacing the bottleneck encoder with the non-bottleneck CDRes block reduces the mIoU to 70.13% and increases the parameter count to 1.86M, showing that the compact encoder is more suitable once latent fusion and selective decoding are introduced. This result also explains why the isolated encoder comparison in Table IV should be interpreted from an accuracy-efficiency perspective rather than by standalone mIoU alone. The remaining variants further validate the two down-stream designs. Replacing semantic reorganization with adirect bridge decreases the mIoU to 68.71%, confirming that 11 
+
+restoring hierarchical semantics is still important in the full framework. Replacing the selective decoder with a standard U-Net decoder reduces the mIoU to 68.59%, indicating that the proposed shallow-feature routing and skip regulation are necessary for restoring useful details without introducing ex-cessive background clutter. Overall, these results verify that the final advantage comes from the synergy among local structure encoding, latent cross-scale fusion, and selective decoding. V. C ONCLUSION 
+
+This article proposes LCMamNet, a lightweight network for infrared small target detection that aims to improve weak-target preservation, cross-scale context modeling, and back-ground suppression under an efficient inference budget. Instead of relying on a single stronger module, the method coordi-nates direction-aware local structure encoding, latent cross-scale interaction, and selective shallow feature restoration in a unified encoder-fusion-decoder framework. Experiments on IRSTD-1k, NUAA-SIRST, and NUDT-SIRST show that our method achieves highly competitive segmentation performance while maintaining low parameters, computation, and measured inference latency. The ablation studies further verify that the final performance gain comes from the complementary effects of the compact encoder, the latent fusion module, and the selective decoding path. Deployment results on an NVIDIA Jetson Orin NX 16G SUPER also demonstrate its practical potential for real-time edge inference. Despite these results, the current training and evaluation mainly follow segmentation-oriented objectives and metrics. For very small targets with blurred edges, the predicted mask may still not perfectly match the detailed shape of the original infrared target. Future work will explore shape-aware metrics and architecture designs to improve contour fidelity for such tiny targets. REFERENCES [1] M. Zhao, W. Li, L. Li, J. Hu, P. Ma, and R. Tao, “Single-frame infrared small-target detection: A survey,” IEEE Geosci. Remote Sens. Mag. ,vol. 10, no. 2, pp. 87–119, 2022. [2] Y. Lu, Y. Li, X. Guo, S. Yuan, Y. Shi, and L. Lin, “Rethinking generalizable infrared small target detection: A real-scene benchmark and cross-view representation learning,” IEEE Trans. Geosci. Remote Sens. , vol. 63, pp. 1–10, 2025. [3] Y. Pang, X. Zhao, L. Zhang, H. Lu, G. El Fakhri, X. Liu, and S. Lu, “Rethinking evaluation of infrared small target detection,” in Adv. Neural Inf. Process. Syst. , vol. 38, 2025. [4] O. Ronneberger, P. Fischer, and T. Brox, “U-Net: Convolutional net-works for biomedical image segmentation,” in Proc. Int. Conf. Med. Image Comput. Comput.-Assist. Intervent. (MICCAI) , 2015, pp. 234– 241. [5] Y. Dai, Y. Wu, F. Zhou, and K. Barnard, “Asymmetric contextual modulation for infrared small target detection,” in Proc. IEEE Winter Conf. Appl. Comput. Vis. (WACV) , 2021, pp. 949–958. [6] B. Li, C. Xiao, L. Wang, Y. Wang, Z. Lin, M. Li, W. An, and Y. Guo, “Dense nested attention network for infrared small target detection,” 
+
+IEEE Trans. Image Process. , vol. 32, pp. 1745–1758, 2023. [7] Y. Dai, Y. Wu, F. Zhou, and K. Barnard, “Attentional local contrast networks for infrared small target detection,” IEEE Trans. Geosci. Remote Sens. , vol. 59, no. 11, pp. 9813–9824, 2021. [8] X. Wu, D. Hong, and J. Chanussot, “UIU-Net: U-Net in U-Net for infrared small object detection,” IEEE Trans. Image Process. , vol. 32, pp. 364–376, 2023. [9] S. Yuan, H. Qin, X. Yan, N. Akhtar, and A. Mian, “SCTransNet: Spatial-channel cross transformer network for infrared small target detection,” 
+
+IEEE Trans. Geosci. Remote Sens. , vol. 62, pp. 1–15, 2024. [10] C. Hu, Y. Huang, K. Li, L. Zhang, C. Long, Y. Zhu, T. Pu, and Z. Peng, “DATransNet: Dynamic attention transformer network for infrared small target detection,” IEEE Geosci. Remote Sens. Lett. , vol. 22, pp. 1–5, 2025. [11] T. Chen, Z. Ye, Z. Tan, T. Gong, Y. Wu, Q. Chu, B. Liu, N. Yu, and J. Ye, “MiM-ISTD: Mamba-in-Mamba for efficient infrared small-target detection,” IEEE Trans. Geosci. Remote Sens. , vol. 62, pp. 1–13, 2024. [12] B. Li, P. Rao, Y. Su, and X. Chen, “HMCNet: A hybrid Mamba-CNN UNet for infrared small target detection,” Remote Sens. , vol. 17, no. 3, p. 452, 2025. [13] A. Gu and T. Dao, “Mamba: Linear-time sequence modeling with selective state spaces,” 2024, arXiv:2312.00752. [14] L. Zhu, B. Liao, Q. Zhang, X. Wang, W. Liu, and X. Wang, “Vision Mamba: Efficient visual representation learning with bidirectional state space model,” in Proc. Int. Conf. Mach. Learn. (ICML) , 2024, pp. 62 429–62 442. [15] Y. Liu, Y. Tian, Y. Zhao, H. Yu, L. Xie, Y. Wang, Q. Ye, J. Jiao, and Y. Liu, “VMamba: Visual state space model,” in Adv. Neural Inf. Process. Syst. , vol. 37, 2024, pp. 103 031–103 063. [16] M. Zhang, R. Zhang, Y. Yang, H. Bai, J. Zhang, and J. Guo, “ISNet: Shape matters for infrared small target detection,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , 2022, pp. 867–876. [17] T.-W. Bae, F. Zhang, and I.-S. Kweon, “Edge directional 2D LMS filter for infrared small target detection,” Infrared Phys. Technol. , vol. 55, no. 1, pp. 137–145, 2012. [18] C. Gao, D. Meng, Y. Yang, Y. Wang, X. Zhou, and A. G. Hauptmann, “Infrared patch-image model for small target detection in a single image,” IEEE Trans. Image Process. , vol. 22, no. 12, pp. 4996–5009, 2013. [19] C. L. P. Chen, H. Li, Y. Wei, T. Xia, and Y. Y. Tang, “A local contrast method for small infrared target detection,” IEEE Trans. Geosci. Remote Sens. , vol. 52, no. 1, pp. 574–581, 2014. [20] Y. Wei, X. You, and H. Li, “Multiscale patch-based contrast measure for small infrared target detection,” Pattern Recognit. , vol. 58, pp. 216–226, 2016. [21] Y. He, M. Li, J. Zhang, and Q. An, “Small infrared target detection based on low-rank and sparse representation,” Infrared Phys. Technol. ,vol. 68, pp. 98–109, 2015. [22] H. Deng, X. Sun, M. Liu, C. Ye, and X. Zhou, “Infrared small-target detection using multiscale gray difference weighted image entropy,” 
+
+IEEE Trans. Aerosp. Electron. Syst. , vol. 52, no. 1, pp. 60–72, 2016. [23] Y. Dai and Y. Wu, “Reweighted infrared patch-tensor model with both nonlocal and local priors for single-frame small target detection,” IEEE J. Sel. Topics Appl. Earth Observ. Remote Sens. , vol. 10, no. 8, pp. 3752–3767, 2017. [24] X. Wang, Z. Peng, P. Zhang, and Y. He, “Infrared small target detection via nonnegativity-constrained variational mode decomposition,” IEEE Geosci. Remote Sens. Lett. , vol. 14, no. 10, pp. 1700–1704, 2017. [25] Y. Qin, L. Bruzzone, C. Gao, and B. Li, “Infrared small target detection based on facet kernel and random walker,” IEEE Trans. Geosci. Remote Sens. , vol. 57, no. 9, pp. 7104–7118, 2019. [26] L. Zhang and Z. Peng, “Infrared small target detection based on partial sum of the tensor nuclear norm,” Remote Sens. , vol. 11, no. 4, p. 382, 2019. [27] H. Wang, L. Zhou, and L. Wang, “Miss detection vs. false alarm: Adversarial learning for small object segmentation in infrared images,” in Proc. IEEE/CVF Int. Conf. Comput. Vis. (ICCV) , 2019, pp. 8508– 8517. [28] T. Zhang, L. Li, S. Cao, T. Pu, and Z. Peng, “Attention-guided pyramid context networks for detecting infrared small target under complex background,” IEEE Trans. Aerosp. Electron. Syst. , vol. 59, no. 4, pp. 4250–4261, 2023. [29] Q. Hou, L. Zhang, F. Tan, Y. Xi, H. Zheng, and N. Li, “ISTDU-Net: Infrared small-target detection U-Net,” IEEE Geosci. Remote Sens. Lett. ,vol. 19, pp. 1–5, 2022. [30] Q. Liu, R. Liu, B. Zheng, H. Wang, and Y. Fu, “Infrared small target detection with scale and location sensitivity,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , 2024, pp. 17 490–17 499. [31] H. Li, J. Yang, R. Wang, and Y. Xu, “ILNet: Low-level matters for salient infrared small target detection,” IEEE Trans. Aerosp. Electron. Syst. , vol. 61, no. 4, pp. 8306–8318, 2025. [32] J. Yang, S. Liu, J. Wu, X. Su, N. Hai, and X. Huang, “Pinwheel-shaped convolution and scale-based dynamic loss for infrared small target detection,” in Proc. AAAI Conf. Artif. Intell. , vol. 39, no. 9, 2025, pp. 9202–9210. 12 
+
+[33] Y. Zhang, M. Qi, K. Li, X. Li, and S. Zhuang, “FLINet: Fuzzy logic for infrared small-target detection,” IEEE Trans. Geosci. Remote Sens. ,vol. 64, pp. 1–16, 2026. [34] L. Guo, C. Xiao, Y. Zhang, and B. Tu, “MSSLNet: Multiscale sparse large-kernel net for infrared small target detection,” IEEE Geosci. Remote Sens. Lett. , vol. 23, pp. 1–5, 2026. [35] K. Li, Y. Wang, F. Han, H. Wang, Z. Xiong, and Y. Tian, “HSTNet: A hybrid spatial-channel sparse transformer network for infrared small target detection,” IEEE Trans. Geosci. Remote Sens. , vol. 63, pp. 1–18, 2025. [36] M. Xu, C. Yu, Z. Li, H. Tang, Y. Hu, and L. Nie, “HDNet: Ahybrid domain network with multiscale high-frequency information enhancement for infrared small-target detection,” IEEE Trans. Geosci. Remote Sens. , vol. 63, pp. 1–15, 2025. [37] P. Liu, A. Li, Y. Lu, T. Zhang, M. Yang, and Q. Zhou, “PQGNet: Perceptual query guided network for infrared small target detection,” 
+
+IEEE Trans. Geosci. Remote Sens. , vol. 64, pp. 1–12, 2026. [38] Y. Zhang, W. Bao, Y. Yang, W. Wan, Q. Xiao, and X. Zou, “MPCNet: Multiscale perception and cross-attention feature fusion network for infrared small target detection,” IEEE Trans. Geosci. Remote Sens. ,vol. 64, pp. 1–15, 2026. [39] S. Peng, Y. Liao, Y. Tong, Z. Wang, and H. Yang, “Infrared small target detection with frequency guidance and aliasing rectification,” 
+
+IEEE Trans. Geosci. Remote Sens. , vol. 64, pp. 1–12, 2026. [40] X. Liu, M. Qiao, B. Wang, Q. Sheng, J. Li, and X. Ling, “MDS-DWGANet: a lightweight network for infrared small target detection via directional sparse convolution and dynamic attention,” Signal Image Video Process. , vol. 19, no. 16, p. 1379, 2025. [41] T. Huang, X. Pei, S. You, F. Wang, C. Qian, and C. Xu, “LocalMamba: Visual state space model with windowed selective scan,” in Proc. Eur. Conf. Comput. Vis. Workshops (ECCVW) , 2025, pp. 12–22. [42] Y. Shi, M. Dong, and C. Xu, “Multi-scale VMamba: Hierarchy in hierarchy visual state space model,” in Adv. Neural Inf. Process. Syst. ,vol. 37, 2024, pp. 25 687–25 708. [43] A. Hatamizadeh and J. Kautz, “MambaVision: A hybrid Mamba-transformer vision backbone,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , 2025, pp. 25 261–25 270. [44] J. Ma, F. Li, and B. Wang, “U-Mamba: Enhancing long-range depen-dency for biomedical image segmentation,” 2024, arXiv:2401.04722. [45] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for image recognition,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR) , 2016, pp. 770–778. [46] M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, and L.-C. Chen, “MobileNetV2: Inverted residuals and linear bottlenecks,” in Proc. IEEE/CVF Conf. Comput. Vis. Pattern Recognit. (CVPR) , 2018, pp. 4510–4520. [47] T.-Y. Lin, P. Doll´ ar, R. Girshick, K. He, B. Hariharan, and S. Belongie, “Feature pyramid networks for object detection,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit. (CVPR) , 2017, pp. 936–944. [48] K. Cho, B. van Merri¨ enboer, C. Gulcehre, D. Bahdanau, F. Bougares, H. Schwenk, and Y. Bengio, “Learning phrase representations using RNN encoder–decoder for statistical machine translation,” in Proc. Conf. Empirical Methods Natural Lang. Process. (EMNLP) , 2014, pp. 1724– 1734.
