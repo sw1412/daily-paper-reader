@@ -1,0 +1,402 @@
+Title: LegoQ: Density-Matrix Representation Learning with Spectral-Spatial State Transitions for Hyperspectral Classification
+
+URL Source: https://arxiv.org/pdf/2607.28970v1
+
+Published Time: Mon, 03 Aug 2026 00:26:17 GMT
+
+Number of Pages: 6
+
+Markdown Content:
+PREPRINT 1
+
+# LegoQ: Density-Matrix Representation Learning with Spectral-Spatial State Transitions for Hyperspectral Image Classification 
+
+Weijia Cao, Xiaofei Yang, Fu Wang, Yicong Zhou, and Xiang Zhou 
+
+✦
+
+Abstract —Hyperspectral image classification is complicated by mixed pixels, spectral ambiguity, class imbalance, and limited annotations. Most current classifiers encode a pixel or patch as a deterministic vector and apply a linear or multilayer softmax head. Although effective for dis-crimination, this representation does not directly expose how mixed or uncertain a sample is. This paper presents LegoQ, a classical density-matrix representation learning framework for hyperspectral images. The spectral bands are divided into groups and each group is mapped to a positive semi-definite, Hermitian, trace-normalized matrix state. A composable stack of spectral, spatial, and inter-group transitions then updates the states while repeatedly projecting them back to the valid state set. Instead of flattening the final features, LegoQ aggregates the group states and compares them with learnable class-prototype density matrices through Uhlmann fidelity. The normalized eigenspectrum, von Neumann entropy, purity, and prototype fidelity provide sample-level diagnostics that are unavailable from a conventional vector head. On Indian Pines, ten runs yield an overall accuracy of 96 .20 ± 0.70% ,an average accuracy of 95 .57 ± 1.29% , and a kappa coefficient of 
+
+95 .66 ± 0.80% . On WHU-Hi-LongKou, the best of ten runs reaches 
+
+97 .52% overall accuracy. Classification maps and feature projections show that the transition stack produces compact and better separated class structures. The results support constrained matrix-state learning as a practical alternative to vector-only hyperspectral classification with-out requiring quantum hardware. 
+
+Index Terms —Hyperspectral image classification, density matrix, struc-tured representation learning, prototype learning, spectral-spatial mod-eling, quantum-inspired learning. 
+
+1 INTRODUCTION 
+
+# HYPERSPECTRAL images record a densely sampled spec-trum at each spatial location. The resulting data cube supports fine material discrimination in agriculture, en-vironmental monitoring, and urban analysis, but it also creates difficult recognition conditions. A single pixel may contain multiple materials, adjacent classes may exhibit sim-ilar spectra, and labeled samples are commonly sparse and imbalanced [1]–[3]. These effects are pronounced around object boundaries and heterogeneous regions, where a point representation can hide the mixture structure that generated the observation. Deep hyperspectral image (HSI) classifiers have pro-gressed from spectral convolution to joint spectral-spatial convolution, residual learning, transformers, and selective state-space models [4]–[10]. Their feature extractors differ substantially, but their last stage is usually similar: a tensor is flattened or pooled into a vector, followed by a linear or multilayer softmax classifier. Such classifiers provide a decision score, but the score is not itself a measurement of representation mixedness. In particular, a low softmax con-fidence may arise from class overlap, limited training, poor calibration, or mixed materials, and these causes cannot be separated from the vector output alone. We study a different representation space. A density matrix is Hermitian, positive semi-definite (PSD), and nor-malized to unit trace [11]. The trace constraint converts its eigenvalues into a normalized spectrum. This makes entropy and purity comparable across samples and gives the off-diagonal entries a direct role as cross-mode correlations. We use this mathematical structure as a classical neural rep-resentation; the method does not require quantum hardware and does not claim quantum computational advantage. The proposed framework, termed LegoQ, constructs one density-matrix state for each spectral group and preserves these states throughout feature refinement and classifica-tion. The states evolve through three explicit transforma-tions: an intra-group spectral transition, a spatially condi-tioned transition, and an inter-group coupling transition. Each transformation is followed by a spectral projection that restores Hermiticity, PSD structure, and unit trace. The final group states are averaged and compared with learnable class-prototype density matrices using Uhlmann fidelity. Figure 1 summarizes the complete pipeline. The contributions are as follows. 
+
+• We formulate HSI classification as persistent density-matrix state learning rather than temporary ma-trix pooling. The learned state remains valid from encoding through classification and provides eigenspectrum-, entropy-, and purity-based diagnos-tics. 
+
+• We introduce a composable spectral-spatial-coupling transition stack that models intra-group spectral vari-ation, local spatial context, and adjacent-group de-pendency in the same constrained matrix space. 
+
+• We replace vector-to-softmax discrimination with prototype-state matching based on density-matrix fidelity. The class representation is therefore a valid matrix state rather than an unconstrained weight vector. arXiv:2607.28970v1 [cs.CV] 31 Jul 2026 PREPRINT 2 
+
+> •
+
+We report ten-run evaluation on Indian Pines, best-of-ten evaluation on WHU-Hi-LongKou, per-class analysis, classification maps, and a representation-evolution visualization under a reproducible soft-ware and hardware configuration. 
+
+2 RELATED WORK 
+
+2.1 Spectral-Spatial HSI Classification 
+
+Early deep HSI methods learned spectral representations through stacked autoencoders and one-dimensional convo-lution [4]. Joint spectral-spatial CNNs then exploited image patches and three-dimensional kernels [5]. SSRN introduced residual spectral and spatial blocks [6], while HybridSN combined 3-D and 2-D convolutions [7]. SpectralFormer used transformer layers to model spectral sequence rela-tions [8], and recent Mamba-based models introduced selec-tive state-space mechanisms for long-range spectral-spatial interaction [9], [10]. These methods mainly advance the fea-ture extractor. LegoQ instead focuses on the mathematical form of the persistent representation and the geometry of the classification head. 
+
+2.2 Structured Matrix Representations 
+
+Covariance and SPD representations encode second-order relations in matrix-valued features. SPDNet constructs a deep architecture on the SPD manifold [12]; later work investigated Riemannian matrix summarization and opti-mization [13], [14]. Density matrices share PSD structure with covariance matrices but additionally impose unit trace. The trace constraint removes arbitrary scale from the spec-trum and yields bounded state diagnostics. LegoQ uses a Euclidean spectral projection after every transition rather than a full Riemannian optimization routine. This choice keeps the implementation lightweight for small state dimen-sions while retaining explicit state validity. 
+
+2.3 Quantum-Inspired and Prototype Learning 
+
+Quantum-inspired models use amplitudes, phases, mea-surements, or density matrices as classical computational structures. Quantum-like density-matrix representations have been explored in language modeling [15]. In HSI classification, QSSPN introduces phase prediction and measurement-like spectral-spatial fusion [16]. The distinc-tion is not the mere presence of a density matrix. QSSPN uses it inside an intermediate fusion mechanism and then returns to vector classification; LegoQ preserves matrix states through the final prediction layer. Prototype and metric learning classify samples by their proximity to class representatives [17]–[19]. We extend this principle from Eu-clidean vectors to learned density-matrix prototypes. 
+
+3 METHODOLOGY 
+
+3.1 Problem Formulation 
+
+Let xi ∈ Rs×s×B be an HSI patch with spatial size s × s and 
+
+B spectral bands, and let yi ∈ { 1, . . . , C } denote its class            
+
+> Aspect QSSPN LegoQ Matrix role Intermediate measurement-like fusion Persistent representation from encoding to classi-fication Spectral organi-zation Whole input cuboid Grouped spectral states with explicit coupling State update Pyramid feature oper-ations Spectral, spatial, and coupling transitions with projection Classifier Vector softmax head Density-matrix prototypes with fidelity Diagnostics Phase/fusion response Eigenspectrum, entropy, purity, and prototype fi-delity
+> TABLE 1 Conceptual distinction between QSSPN and LegoQ.
+
+label. Instead of learning only a Euclidean feature vector, LegoQ learns a matrix state 
+
+Fθ : xi 7 −→ ¯ρi ∈ D (H), (1) where 
+
+D(H) = 
+
+n
+
+ρ ∈ Cds×ds : ρ ⪰ 0, Tr( ρ) = 1 , ρ = ρ†o
+
+. (2) The output is compared with class prototypes {πc}Cc=1 ⊂D(H).
+
+3.2 Grouped Spectral Baseplate 
+
+The B bands are partitioned into G contiguous groups. For group g, a lightweight encoder produces 
+
+zg = fg (x[: , :, Ig ]) ∈ Rde , (3) where Ig is the band index set of the group. In parallel, a spatial branch maps the full patch to a global context vector hctx ∈ Rde . Uniform grouping is used in the reported implementation because it is deterministic and sensor-independent. The grouping operation does not assume that its boundaries exactly coincide with physical wavelength regions; its purpose is to keep local spectral continuity while making inter-group interaction explicit. 
+
+3.3 Density-Matrix State Encoding 
+
+A complex-valued projection reshapes each group embed-ding into Ug ∈ Cds×ds . The initial state is 
+
+ρ(0)  
+
+> g
+
+= Ug U† 
+
+> g
+
++ ϵI
+
+Tr 
+
+
+
+Ug U† 
+
+> g
+
++ ϵI
+
+ . (4) For any v,
+
+v†Ug U† 
+
+> g
+
+v = U† 
+
+> g
+
+v 22 ≥ 0, (5) so the numerator is PSD; normalization gives unit trace, and the product is Hermitian. The small ϵI term prevents exactly singular states. Let λj (ρ) denote the eigenvalues of a state. Since λj ≥ 0
+
+and P 
+
+> j
+
+λj = 1 , the eigenspectrum behaves as a normalized mixture profile. Two state diagnostics are 
+
+Pur( ρ) = Tr( ρ2), S(ρ) = − Tr( ρ log ρ). (6) Purity approaches one for a rank-one state and decreases as the spectrum becomes more distributed. Entropy behaves oppositely. PREPRINT 3            
+
+> HSI patch
+> x∈Rs×s×B
+> Grouped spectral baseplate
+> {zg}Gg=1 and spatial context
+> Density-matrix encoder
+> ρ(0)
+> g⪰
+> 0,Tr( ρ(0)
+> g) = 1
+> Spectral transition
+> Spatial transition
+> Coupling transition
+> Spectral transition
+> Composable state-transition stack
+> State aggregation
+> ¯ρ=G−1P
+> gρ(L)
+> g
+> Prototype-state head
+> F(¯ ρ, π c)
+> Class prediction and state diagnostics
+
+Fig. 1. Overview of LegoQ. Grouped spectral responses are mapped to valid density-matrix states, updated by composable spectral, spatial, and coupling transitions, and classified by fidelity to learned class-prototype states. Every transition is followed by projection onto the PSD, Hermitian, unit-trace state set. 
+
+3.4 Projection onto the State Set 
+
+The transition blocks may introduce small violations of state validity. We therefore apply 
+
+P(A) = Q max( Λ, ϵ I) Q†
+
+Tr[ Q max( Λ, ϵ I) Q†] , (7) where (A + A†)/2 = QΛQ †. Equation (7) symmetrizes the input, clips eigenvalues, and restores unit trace. This is a Euclidean spectral projection, not a claim that each neural block is a physical quantum channel. 
+
+3.5 Composable State Transitions 
+
+Let ρ(ℓ) = {ρ(ℓ) 
+
+> g
+
+}Gg=1 . The transition stack applies 
+
+ρ(ℓ+1) = E(ℓ)
+
+ρ(ℓ), hctx 
+
+
+
+. (8) The default order is spectral–spatial–coupling–spectral. 
+
+3.5.1 Spectral Transition 
+
+Each group is updated independently: 
+
+ρ′ 
+
+> g
+
+= P
+
+
+
+Wspec ρg W† 
+
+> spec
+
++ Bspec 
+
+
+
+, (9) where Bspec is Hermitian. This operation changes the inter-nal mode correlations of each spectral group. 
+
+3.5.2 Spatial Transition 
+
+A context modulation network produces a Hermitian matrix 
+
+Mg from the spatial descriptor and the current state: 
+
+ρ′ 
+
+> g
+
+= P(ρg + αg Mg (hctx , ρ g )) , (10) where αg is a learned gate. This block conditions spectral states on local spatial structure without flattening them. 
+
+3.5.3 Coupling Transition 
+
+Adjacent groups are combined through a Kronecker prod-uct: 
+
+eρg,g +1 = P
+
+
+
+Vg (ρg ⊗ ρg+1 )V†
+
+> g
+
+
+
+. (11) A learned Hermitian reduction maps the coupled represen-tation back to two ds × ds states, after which Eq. (7) is applied again. The reduction is a flexible classical operation rather than a strictly completely positive trace-preserving map. Its role is to let transitions that span group boundaries influence both neighboring states. 
+
+Dataset Spatial size Bands Classes Indian Pines 145 × 145 200 16 WHU-Hi-LongKou 550 × 400 270 9
+
+TABLE 2 Datasets used in this preprint. Indian Pines is summarized over ten runs; WHU-Hi-LongKou reports the best of ten runs. 
+
+3.6 Prototype-State Discrimination 
+
+The final group states are averaged: 
+
+¯ρ = 1
+
+G
+
+> G
+
+X
+
+> g=1
+
+ρ(L) 
+
+> g
+
+. (12) Each class is represented by a learnable valid state πc.Similarity is measured by Uhlmann fidelity, 
+
+F (ρ, σ ) = 
+
+
+
+Tr 
+
+q√ρ σ √ρ
+
+2
+
+, (13) and logits are formed as ℓc = F (¯ ρ, π c)/τ , where τ is a temperature. The class probability is 
+
+p(y = c | ¯ρ) = exp( ℓc)
+
+PCj=1 exp( ℓj ) . (14) The model is optimized with cross-entropy. The prototype head retains a direct semantic interpretation: prediction asks which class state has the largest fidelity with the sample state. 
+
+3.7 Computational Cost 
+
+State encoding requires O(Gd ed2
+
+> s
+
+) operations. A transition stack with L blocks has cost O(LGd 4
+
+> s
+
+) under the small dense-matrix implementation, while fidelity computation costs O(CGd 3
+
+> s
+
+). With G = 4 and ds = 4 , these matrix operations remain small relative to the patch encoder. 
+
+4 EXPERIMENTAL SETUP 
+
+4.1 Datasets 
+
+We use Indian Pines and WHU-Hi-LongKou. Indian Pines was acquired by AVIRIS over an agricultural area in In-diana and contains 145 × 145 pixels, 200 commonly used spectral bands after noisy-band removal, and 16 land-cover classes [20]. WHU-Hi-LongKou is a UAV-borne scene with 270 spectral bands and nine crop and land-cover classes [21]. Background pixels are excluded from metric computation. PREPRINT 4
+
+4.2 Metrics 
+
+Overall accuracy (OA), average accuracy (AA), Cohen’s kappa, and Macro-F1 are reported. OA and AA are 
+
+OA = 
+
+P 
+
+> c
+
+ncorrect 
+
+> c
+
+P 
+
+> c
+
+nc
+
+, AA = 1
+
+C
+
+> C
+
+X
+
+> c=1
+
+ncorrect 
+
+> c
+
+nc
+
+. (15) AA and Macro-F1 give additional weight to minority classes and are therefore important for the imbalanced HSI setting. 
+
+4.3 Implementation Details 
+
+All experiments use 15 × 15 patches, G = 4 spectral groups, group embedding dimension de = 16 , state dimension 
+
+ds = 4, and the transition order Spec–Spa–Coup–Spec. The model is trained with AdamW, learning rate 10 −3,weight decay 10 −4, batch size 64, a maximum of 150 epochs, and early-stopping patience 20. No data augmentation or learning-rate scheduler is used in the reported runs. The fidelity temperature is τ = 0 .1 and ϵ = 10 −6.Experiments were executed on an NVIDIA RTX 4090 GPU and an Intel Xeon Gold 6530 CPU under Ubuntu 22.04.3. The software environment consisted of Python 3.12.12, PyTorch 2.3.1+cu121, and CUDA 12.1. The complete implementation, preprocessing scripts, split files, training commands, and evaluation code will be released publicly on GitHub with the preprint. 
+
+5 RESULTS AND ANALYSIS 
+
+5.1 Overall Performance 
+
+Table 3 summarizes the complete-model performance. In-dian Pines is reported as the mean and population standard deviation over ten runs. Following the adopted WHU-Hi-LongKou reporting protocol, the best result among ten runs is reported for that dataset. The Indian Pines results show stable performance across random seeds: OA varies by less than one percentage point in standard deviation, while AA remains above 95% on av-erage. The difference between OA and Macro-F1 reflects the strong class imbalance of the scene. On WHU-Hi-LongKou, the best run reaches 97 .52% OA and 92 .49% AA. The lower AA relative to OA again indicates that the smallest classes remain more difficult than the dominant land-cover categories. 
+
+5.2 Run-to-Run Stability 
+
+Table 4 lists all ten Indian Pines runs. No single seed dominates every metric: run 8 gives the highest OA, run 3 gives the highest AA, and run 4 gives the highest Macro-F1. This metric-dependent ordering is a consequence of class imbalance and shows why the ten-run aggregate is more informative than selecting one operating point. The best epoch ranges from 59 to 134, but the final OA remains within a narrow interval of approximately 2.1 percentage points. 
+
+5.3 Per-Class Performance 
+
+Table 5 reports the mean and standard deviation of Indian Pines class accuracies across ten runs, together with the class accuracies of the best WHU-Hi-LongKou run. The rare Indian Pines classes, especially Oats and Grass-pasture-mowed, exhibit larger variance. This pattern is expected because a small change in the number of correct predic-tions causes a large percentage change for classes with few labeled samples. On WHU-Hi-LongKou, Narrow-leaf soybean, Sesame, and Mixed weed are the most difficult classes in the selected best run. 
+
+5.4 Classification Maps and Representation Evolution 
+
+Figure 2 compares the Indian Pines reference map with the predicted map. The major agricultural and woodland regions are recovered with coherent spatial structure. Most visible errors occur at thin boundaries and within small classes, consistent with the per-class variance in Table 5. The third panel visualizes the feature distribution before and after the transition stack. The projection is used only for visualization and does not enter training. Before the transitions, several classes overlap in the two-dimensional embedding. After the spectral, spatial, and coupling opera-tions, the distribution contains more compact class regions and clearer local separation. This observation is consistent with the intended role of the transition stack: to reorganize grouped matrix states before prototype matching rather than simply add a final vector classifier. 
+
+5.5 Interpretation of the Matrix State 
+
+The model’s diagnostics arise from the state constraints rather than from an additional post-hoc explainer. The eigenvalues of ¯ρ sum to one, so changes in the spectrum can be compared between samples without a separate norm cal-ibration. Entropy increases when the spectrum is distributed over several modes, whereas purity increases when one mode dominates. Prototype fidelity measures how closely a sample state matches each class state. These quantities do not by themselves prove physical material abundance, and we do not interpret them as a substitute for hyperspectral unmixing. Their value is that they provide internally consis-tent, bounded readouts of the learned representation. 
+
+5.6 Discussion and Limitations 
+
+The results establish the feasibility of persistent density-matrix state learning for HSI classification, but several lim-itations should be made explicit. First, the current exper-iments use a fixed state dimension ds = 4 and uniform spectral grouping. Larger states and adaptive group bound-aries may improve capacity at additional computational cost. Second, the learned coupling reduction is flexible but is not constrained to be a physical quantum channel. Third, the present preprint reports complete-model results and a qualitative representation-evolution analysis; a controlled component-wise ablation and boundary-pixel entropy study would provide stronger causal evidence for individual de-sign choices. Finally, the two datasets are agricultural scenes. Evaluation on urban and cross-sensor data would better test transferability. PREPRINT 5                                 
+
+> Dataset Reporting OA (%) AA (%) Kappa (%) Macro-F1 (%) Best epoch Train time (s) Indian Pines 10-run mean ±std. 96 .20 ±0.70 95 .57 ±1.29 95 .66 ±0.80 93 .15 ±1.11 89 .7±21 .5846 .7±159 .1
+> WHU-Hi-LongKou Best of 10 runs 97 .52 92 .49 96 .74 92 .88 136 858 .6
+
+TABLE 3 Classification performance of LegoQ. Indian Pines reports all ten runs, whereas WHU-Hi-LongKou reports the best run among ten executions.                                                                                   
+
+> Run Seed OA (%) AA (%) Kappa (%) Macro-F1 (%) Best epoch 142 95.10 94.62 94.41 91.79 69 2142 96.63 94.99 96.16 94.55 94 3242 96.98 97.71 96.55 93.24 90 4342 95.98 96.45 95.41 95.31 91 5442 95.84 96.26 95.26 93.18 116 6542 97.10 95.46 96.69 93.36 134 7642 95.74 96.01 95.16 91.46 93 8742 97.18 92.69 96.79 92.89 85 9842 96.05 96.45 95.50 93.46 59 10 942 95.37 95.07 94.72 92.27 66 Mean ±std. –96 .20 ±0.70 95 .57 ±1.29 95 .66 ±0.80 93 .15 ±1.11 89 .7±21 .5
+
+TABLE 4 Indian Pines results for all ten random seeds.                                                                                                  
+
+> Indian Pines: 10-run class accuracy (%) WHU-Hi-LongKou: best-run class accuracy (%) ID Class Mean ±std. ID Class Accuracy 1Alfalfa 97 .78 ±3.24 1Corn 99.38 2Corn-notill 95 .23 ±1.56 2Cotton 97.06 3Corn-mintill 95 .44 ±1.97 3Sesame 86.05 4Corn 94 .23 ±4.56 4Broad-leaf soybean 97.78 5Grass-pasture 94 .42 ±1.65 5Narrow-leaf soybean 80.93 6Grass-trees 98 .85 ±1.10 6Rice 97.06 7Grass-pasture-mowed 93 .18 ±9.37 7Water 99.89 8Hay-windrowed 99 .45 ±0.52 8Roads and houses 87.64 9Oats 88 .75 ±14 .74 9Mixed weed 86.66 10 Soybean-notill 93 .55 ±1.89
+> 11 Soybean-mintill 96 .90 ±1.18
+> 12 Soybean-clean 94 .78 ±2.87
+> 13 Wheat 99 .21 ±0.39
+> 14 Woods 98 .49 ±0.86
+> 15 Buildings–Grass–Trees–Drives 91 .04 ±4.01
+> 16 Stone–Steel–Towers 97 .87 ±5.10
+
+TABLE 5 Per-class accuracy on Indian Pines and WHU-Hi-LongKou. Indian Pines values are computed across ten runs; WHU-Hi-LongKou values are from the selected best run. 
+
+These limitations do not affect the main distinction from existing vector-based classifiers: the representation and the class prototypes remain valid density matrices throughout the network. They instead define the next experiments needed to determine which part of the structured state space is most responsible for the observed performance. 
+
+6 CONCLUSION 
+
+This paper introduced LegoQ, a density-matrix representa-tion learning framework for hyperspectral image classifica-tion. Grouped spectral responses are encoded as PSD, Her-mitian, trace-normalized states; spectral, spatial, and cou-pling transitions refine these states; and prediction is per-formed by fidelity to learned class-prototype density matri-ces. The formulation provides normalized spectral diagnos-tics while remaining fully executable on classical hardware. Ten-run experiments on Indian Pines produce 96 .20 ±0.70% 
+
+OA, and the best of ten WHU-Hi-LongKou runs reaches 
+
+97 .52% OA. Per-class analysis, classification maps, and projected representations show both the strengths of the method and the remaining difficulty of minority and bound-ary classes. The study indicates that constrained matrix-state learning is a viable direction for multidimensional image recognition and motivates broader evaluation of state dimension, grouping, and mixed-pixel diagnostics. 
+
+CODE AVAILABILITY 
+
+The complete source code, preprocessing and split scripts, training commands, evaluation routines, and figure-generation utilities will be released publicly on GitHub with the preprint. The repository link is omitted from this working copy. 
+
+REFERENCES 
+
+[1] D. A. Landgrebe, Signal Theory Methods in Multispectral Remote Sensing . Hoboken, NJ, USA: Wiley, 2003. [2] M. Fauvel, Y. Tarabalka, J. A. Benediktsson, J. Chanussot, and J. C. Tilton, “Advances in spectral-spatial classification of hyperspectral images,” Proceedings of the IEEE , vol. 101, no. 3, pp. 652–675, 2013. [3] J. M. Bioucas-Dias, A. Plaza, N. Dobigeon, M. Parente, Q. Du, P. Gader, and J. Chanussot, “Hyperspectral unmixing overview: Geometrical, statistical, and sparse regression-based approaches,” 
+
+IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 5, no. 2, pp. 354–379, 2012. PREPRINT 6
+
+(a) Reference map (b) Prediction map (c) Representation before and after the state-transition stack 
+
+Fig. 2. Qualitative results on Indian Pines. The first two panels compare ground truth and prediction. The third panel shows a two-dimensional projection of the learned representation before and after the transition blocks. 
+
+[4] Y. Chen, Z. Lin, X. Zhao, G. Wang, and Y. Gu, “Deep learning-based classification of hyperspectral data,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 7, no. 6, pp. 2094–2107, 2014. [5] Y. Chen, H. Jiang, C. Li, X. Jia, and P. Ghamisi, “Deep feature extraction and classification of hyperspectral images based on convolutional neural networks,” IEEE Transactions on Geoscience and Remote Sensing , vol. 54, no. 10, pp. 6232–6251, 2016. [6] Z. Zhong, J. Li, Z. Luo, and M. Chapman, “Spectral–spatial resid-ual network for hyperspectral image classification: A 3-d deep learning framework,” IEEE Transactions on Geoscience and Remote Sensing , vol. 56, no. 2, pp. 847–858, 2018. [7] S. K. Roy, G. Krishna, S. R. Dubey, and B. B. Chaudhuri, “Hy-bridSN: Exploring 3-d–2-d CNN feature hierarchy for hyper-spectral image classification,” IEEE Geoscience and Remote Sensing Letters , vol. 17, no. 2, pp. 277–281, 2020. [8] D. Hong, Z. Han, J. Yao, L. Gao, B. Zhang, A. Plaza, and J. Chanussot, “SpectralFormer: Rethinking hyperspectral image classification with transformers,” IEEE Transactions on Geoscience and Remote Sensing , vol. 60, pp. 1–15, 2022. [9] A. Gu and T. Dao, “Mamba: Linear-time sequence modeling with selective state spaces,” arXiv preprint arXiv:2312.00752 , 2023. [10] Y. Li, Y. Luo, L. Zhang, Z. Wang, and B. Du, “MambaHSI: Spatial–spectral Mamba for hyperspectral image classification,” 
+
+IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1– 16, 2024. [11] M. A. Nielsen and I. L. Chuang, Quantum Computation and Quan-tum Information . Cambridge University Press, 2010. [12] Z. Huang and L. Van Gool, “A riemannian network for SPD matrix learning,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 31, 2017, pp. 2036–2042. [13] H. Liu, J. Li, Y. Wu, and R. Ji, “Learning neural bag-of-matrix-summarization with riemannian network,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 33, 2019, pp. 8746– 8753. [14] Z. Huang, K. Jia, and L. Van Gool, “Learning to optimize on SPD manifolds,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 43, no. 3, pp. 1045–1059, 2021. [15] P. Zhang, J. Niu, Z. Su, B. Wang, L. Ma, and D. Song, “End-to-end quantum-like language models with application to question answering,” in Proceedings of the AAAI Conference on Artificial Intelligence , vol. 32, 2018, pp. 5666–5673. [16] J. Zhang, Y. Zhang, and Y. Zhou, “Quantum-inspired spectral-spatial pyramid network for hyperspectral image classification,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition , 2023, pp. 9925–9934. [17] B. Kulis, “Metric learning: A survey,” Foundations and Trends in Machine Learning , vol. 5, no. 4, pp. 287–364, 2013. [18] O. Vinyals, C. Blundell, T. Lillicrap, K. Kavukcuoglu, and D. Wier-stra, “Matching networks for one shot learning,” in Advances in Neural Information Processing Systems , vol. 29, 2016, pp. 3630–3638. [19] J. Snell, K. Swersky, and R. S. Zemel, “Prototypical networks for few-shot learning,” in Advances in Neural Information Processing Systems , vol. 30, 2017, pp. 4077–4087. [20] M. F. Baumgardner, L. L. Biehl, and D. A. Landgrebe, “220 band AVIRIS hyperspectral image data set: June 12, 1992 indian pine test site 3,” Purdue University Research Repository, 2015. [21] Y. Zhong, X. Hu, C. Luo, X. Wang, J. Zhao, and L. Zhang, “WHU-Hi: UAV-borne hyperspectral with high spatial resolution (H2) benchmark datasets and classifier for precise crop identification based on deep convolutional neural network,” Remote Sensing of Environment , vol. 250, p. 112012, 2020.

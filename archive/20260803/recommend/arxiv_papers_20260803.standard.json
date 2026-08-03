@@ -1,0 +1,98 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-03T21:30:07.147795+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 1,
+    "quick_skim_target": 12,
+    "quick_selected": 1
+  },
+  "deep_dive": [
+    {
+      "id": "2607.28970v1",
+      "source": "arxiv",
+      "title": "LegoQ: Density-Matrix Representation Learning with Spectral-Spatial State Transitions for Hyperspectral Classification",
+      "abstract": "Hyperspectral image classification is complicated by mixed pixels, spectral ambiguity, class imbalance, and limited annotations. Most current classifiers encode a pixel or patch as a deterministic vector and apply a linear or multilayer softmax head. Although effective for discrimination, this representation does not directly expose how mixed or uncertain a sample is. This paper presents \\method, a classical density-matrix representation learning framework for hyperspectral images. The spectral bands are divided into groups and each group is mapped to a positive semi-definite, Hermitian, trace-normalized matrix state. A composable stack of spectral, spatial, and inter-group transitions then updates the states while repeatedly projecting them back to the valid state set. Instead of flattening the final features, \\method\\ aggregates the group states and compares them with learnable class-prototype density matrices through Uhlmann fidelity. The normalized eigenspectrum, von Neumann entropy, purity, and prototype fidelity provide sample-level diagnostics that are unavailable from a conventional vector head. On Indian Pines, ten runs yield an overall accuracy of $96.20\\pm0.70\\%$, an average accuracy of $95.57\\pm1.29\\%$, and a kappa coefficient of $95.66\\pm0.80\\%$. On WHU-Hi-LongKou, the best of ten runs reaches $97.52\\%$ overall accuracy. Classification maps and feature projections show that the transition stack produces compact and better separated class structures. The results support constrained matrix-state learning as a practical alternative to vector-only hyperspectral classification without requiring quantum hardware.",
+      "authors": [
+        "Weijia Cao",
+        "Xiaofei Yang",
+        "Fu Wang",
+        "Yicong Zhou",
+        "Xiang Zhou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-31T02:47:16+00:00",
+      "link": "https://arxiv.org/pdf/2607.28970v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Directly targets hyperspectral image classification with density-matrix spectral-spatial state transition representation.",
+      "llm_evidence_cn": "直接针对高光谱图像分类，提出密度矩阵谱空状态转移表示方法。",
+      "llm_evidence": "直接针对高光谱图像分类，提出密度矩阵谱空状态转移表示方法。",
+      "canonical_evidence": "直接针对高光谱图像分类，提出密度矩阵谱空状态转移表示方法。",
+      "llm_tldr_en": "LegoQ introduces density-matrix representation learning for hyperspectral classification, mapping spectral band groups to density matrices and updating them with spectral, spatial, and inter-group transitions, explicitly modeling sample uncertainty and improving classification accuracy.",
+      "llm_tldr_cn": "高光谱图像分类受混合像元、光谱模糊和有限标注困扰。该文提出LegoQ密度矩阵表示学习框架，将光谱波段分组映射为密度矩阵状态，通过谱间、空间和组间转移更新，显式刻画样本的混合程度与不确定性，弥补传统确定性向量分类器的不足。在多个高光谱数据集上验证了该方法的优越性能，为高光谱分类提供了新的表示学习范式，并有望扩展到其他遥感任务。",
+      "llm_tldr": "高光谱图像分类受混合像元、光谱模糊和有限标注困扰。该文提出LegoQ密度矩阵表示学习框架，将光谱波段分组映射为密度矩阵状态，通过谱间、空间和组间转移更新，显式刻画样本的混合程度与不确定性，弥补传统确定性向量分类器的不足。在多个高光谱数据集上验证了该方法的优越性能，为高光谱分类提供了新的表示学习范式，并有望扩展到其他遥感任务。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.29192v1",
+      "source": "arxiv",
+      "title": "Locally Consistent Transductive Information Maximization for Few-Shot Remote Sensing Scene Classification",
+      "abstract": "Remote sensing scene classification is increasingly relying on foundation models pre-trained on large-scale Earth-observation data. Moreover, transductive inference, which exploits the collective statistical structure of the entire unlabeled query set, appears to naturally match remote sensing pipelines where large images are routinely split into patches and inferred as a batch. In this work, we introduce LC-TIM (Locally Consistent Transductive Information Maximization), which extends the state-of-the-art Transductive Information Maximization for Few-Shot CLIP (TIM++) objective with a local consistency regularizer that enforces prediction agreement between each query sample and its $κ$ nearest feature-space neighbors. The regularizer enters as a single multiplicative factor in the closed-form $q$-update, adding negligible computational overhead. We further propose a multi-source extension that fuses the affinity graph from multiple remote sensing foundation model, further boosting classification accuracy. To assess these methods, we establish the first comprehensive, open-source benchmark for transductive few-shot RS scene classification, evaluating LP++, TransCLIP, TIM++, and LC-TIM across ten diverse datasets, two remote sensing vision-language models, and across various few-shot settings. Our experiments show that transductive methods consistently outperform zero-shot baselines, and that LC-TIM achieves state-of-the-art accuracy, with the largest gains in the low-shot regime where neighborhood cues are most informative. Code is publicly available at: https://github.com/elkhouryk/LC-TIM",
+      "authors": [
+        "Karim El Khoury",
+        "Benoît Gérin",
+        "Benoît Macq",
+        "Christophe De Vleeschouwer"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-31T09:13:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.29192v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Few-shot remote sensing scene classification using CLIP and transductive inference, relevant to multimodal remote sensing classification.",
+      "llm_evidence_cn": "基于CLIP和转导推断的少样本遥感场景分类，与多模态遥感分类相关。",
+      "llm_evidence": "基于CLIP和转导推断的少样本遥感场景分类，与多模态遥感分类相关。",
+      "canonical_evidence": "基于CLIP和转导推断的少样本遥感场景分类，与多模态遥感分类相关。",
+      "llm_tldr_en": "Extends transductive information maximization with local consistency regularization for few-shot remote sensing scene classification using CLIP.",
+      "llm_tldr_cn": "针对少样本遥感场景分类中标注数据稀缺的问题，提出局部一致转导信息最大化（LC-TIM）方法。该方法在TIM++基础上引入局部一致性正则项，约束查询样本与其特征近邻的预测一致性，充分利用未标记查询集的集体统计结构。在多个遥感场景分类基准上验证了其优越性，为少样本遥感图像分类提供了有效途径。",
+      "llm_tldr": "针对少样本遥感场景分类中标注数据稀缺的问题，提出局部一致转导信息最大化（LC-TIM）方法。该方法在TIM++基础上引入局部一致性正则项，约束查询样本与其特征近邻的预测一致性，充分利用未标记查询集的集体统计结构。在多个遥感场景分类基准上验证了其优越性，为少样本遥感图像分类提供了有效途径。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
