@@ -1,0 +1,870 @@
+Title: PNEC-Mamba: Prototype-Guided Positive-Negative Evidence Calibration for Hyperspectral Image Classification
+
+URL Source: https://arxiv.org/pdf/2608.01910v1
+
+Published Time: Tue, 04 Aug 2026 02:33:43 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# PNEC-Mamba: Prototype-Guided Positive-Negative Evidence Calibration for Hyperspectral Image Classification 
+
+## Mingzhen Xu, Can Xu, Di Wang, Haonan Guo, Bo Du 
+
+Abstract 
+
+In real-world hyperspectral scenes, pixel representations are often ambiguous due to factors such as spectral similarity, mixed pixels, and local context interference, which may si-multaneously encode discriminative evidence and interfer-ing information. Existing methods mainly focus on learn-ing more powerful representations or modeling broader con-texts, but rarely investigate whether the learned represen-tations provide reliable evidence or introduce interference into classification decisions. To address this issue, we view hyperspectral image classification from the perspective of pixel-level evidence reliability modeling and propose PNEC-Mamba, a prototype-guided positive–negative evidence cali-bration framework. The framework progressively establishes semantic references, separates class-related evidence from in-terference, estimates pixel-level reliability, and performs se-lective calibration. First, a full-image state-space encoder ex-tracts pixel representations, while dynamic class prototypes provide semantic references that evolve jointly with the fea-ture space. Subsequently, positive and negative evidence is de-rived from pixel–prototype competition, explicitly separating discriminative cues that support classification from confus-ing signals associated with competing classes. Based on these evidence relationships, a multi-source uncertainty estimation strategy is introduced to assess pixel-level reliability, enabling stronger evidence calibration for uncertain regions. Finally, a full-resolution consistency refinement step is applied to re-cover local spatial details and improve boundary coherence in the final predictions. Extensive experiments on three bench-mark datasets demonstrate that PNEC-Mamba achieves supe-rior classification performance compared with state-of-the-art methods. 
+
+## Introduction 
+
+Hyperspectral imagery captures rich spectral signatures at each pixel, providing valuable spectral–spatial information for applications such as urban land-cover mapping, precision agriculture, environmental monitoring, and disaster assess-ment (Li et al. 2019; Zhu et al. 2026). Assigning semantic labels to these pixels is a fundamental task in remote sensing image interpretation (Bioucas-Dias et al. 2013), yet learning discriminative representations from high-dimensional spec-tra and complex scenes remains challenging. Deep learn-ing methods have significantly improved this task by learn-ing discriminative spectral–spatial representations directly Classification         
+
+> Head
+> Probability
+> True Similar
+> Semantic References
+> True Similar
+> Reliability
+> Judgement
+> Direct Feature Fusion Evidence Reliability Modeling
+> Feature Extraction
+> !!Uncertain
+> Prediction
+> Reliable
+> Prediction
+> 3Mixed Pixel
+> +
+> +
+> 2Local context inference
+> Spectral similarity 1
+> Support Evidence Competitive Evidence
+> Mixed Evidence Low discriminative response
+> Tree
+> Road
+> Building
+> Probability
+
+Figure 1: Motivation for evidence reliability modeling. Spec-tral similarity, local context interference, and mixed pixels entangle supportive and competitive evidence, motivating reliability-aware evidence calibration. from data (Song et al. 2025). CNN-based methods effec-tively capture local discriminative patterns (Hu et al. 2015), but their restricted receptive fields limit long-range depen-dency modeling. Transformer-based methods alleviate this limitation through self-attention mechanisms (Vaswani et al. 2017; Hong et al. 2022), but their quadratic complexity leads to substantial computational costs. More recently, Mamba-based selective state-space models have provided a linear-complexity alternative for long-range dependency modeling (Gu and Dao 2023). Subsequent studies have further im-proved Mamba-based hyperspectral classification through enhanced spectral–spatial modeling and adaptive architec-tures (Yao et al. 2024; Pan et al. 2025; Xu et al. 2026). Nevertheless, these methods primarily focus on feature rep-resentation and fusion, while implicitly assuming that the re-sulting representations contain reliable information for clas-sification. In practice, a pixel representation may contain both posi-tive evidence associated with class-consistent evidence and arXiv:2608.01910v1 [cs.CV] 3 Aug 2026 conflicting information caused by spectral similarity, mixed components, or neighborhood interference. Their entangle-ment increases prediction uncertainty and obscures which cues genuinely support the classification decision. Directly aggregating such representations may simultaneously rein-force discriminative and conflicting responses, leading to errors near class boundaries and in heterogeneous or highly mixed regions, as shown in Figure 1. Therefore, hyperspectral classification requires not only effective representation learn-ing but also an explicit mechanism for distinguishing reliable discriminative evidence from confounding responses. Recent studies have improved the discrimination of ambiguous pix-els through class-relation modeling and uncertainty-aware representation learning (Xu et al. 2026; Guo et al. 2026; Chu et al. 2026a,b). Although these approaches improve the discrimination of ambiguous pixels, they mainly refine fea-ture spaces, sample relationships, or learning objectives. The distinction between reliable evidence and conflicting inter-ference remains insufficiently explored. Motivated by these observations, we formulate hyperspec-tral image classification from the perspective of pixel-level evidence reliability modeling. Unlike methods that focus solely on feature representation learning, this formulation emphasizes the separation and adaptive calibration of classi-fication evidence. Specifically, under class similarity, mixed pixels, and contextual interference, the model should identify which components of a pixel representation provide reliable discriminative evidence and which components introduce conflicting information from confusing classes or surround-ing backgrounds. Based on this distinction, uncertain regions can be selectively calibrated without disrupting reliable pre-dictions. To this end, we propose PNEC-Mamba, a prototype-guided positive–negative evidence calibration framework for hyperspectral image classification. Specifically, PNEC-Mamba integrates a full-image spectral–spatial state-space encoder with a dynamic class prototype bank to establish adaptive semantic references in the evolving feature space. By exploiting pixel–prototype competition, the model de-rives positive and negative evidence representations, where positive evidence captures class-consistent cues and negative evidence characterizes responses associated with confusing classes. A multi-source uncertainty estimation mechanism is further introduced to evaluate pixel-level reliability and guide selective calibration. Finally, a full-resolution consis-tency refinement module is adopted to recover spatial details and improve boundary coherence after calibration. The main contributions of this work are summarized as follows: 
+
+• We establish a pixel-level evidence reliability framework for hyperspectral image classification, extending conven-tional feature representation learning by explicitly mod-eling evidence construction, reliability estimation, and selective calibration. 
+
+• We develop a dynamic prototype-guided mechanism that captures the relationships between pixels and class proto-types, enabling positive evidence enhancement and neg-ative evidence suppression. 
+
+• We introduce a reliability-aware calibration mechanism that uses uncertainty estimation and consistency refine-ment to improve ambiguous pixels while preserving reli-able predictions and spatial coherence. 
+
+• Extensive experiments on three benchmark datasets demonstrate the effectiveness of PNEC-Mamba, with ab-lation studies and mechanism analyses further validating the contribution of each component. 
+
+## Related Work 
+
+Deep learning has become the dominant paradigm for hyper-spectral image classification by enabling effective spectral– spatial representation learning. CNN-based methods learn local discriminative patterns through convolution operations (Hu et al. 2015; Roy et al. 2020), whereas Transformer-based approaches capture long-range dependencies through self-attention mechanisms (Hong et al. 2022; Sun et al. 2024). However, CNNs are constrained by limited receptive fields, and Transformers introduce substantial computational costs due to quadratic attention complexity. Recently, Mamba-based state-space models have attracted increasing attention because of their linear-complexity sequence modeling capa-bility (Gu and Dao 2023). Existing Mamba-based approaches improve hyperspectral classification through enhanced spec-tral modeling, spatial interaction, multiscale representation, and adaptive architectures (Yao et al. 2024; Huang, Chen, and He 2024; Li et al. 2024; Wang et al. 2025; Pan et al. 2025; Xu et al. 2026). Nevertheless, these methods primarily focus on improving feature representation and fusion, while the reliability of the learned representations remains largely unexplored. Beyond representation learning, recent studies have ex-plored class-relation modeling and uncertainty-aware strate-gies to improve the robustness of hyperspectral classification in complex scenes. Prototype-based methods represent cat-egories through compact class references and refine pixel– class relationships (Snell, Swersky, and Zemel 2017; Guo et al. 2026), while uncertainty-aware approaches model am-biguous samples through relational or probabilistic structures (Chu et al. 2026a,b). These methods improve class discrim-ination and uncertainty handling; however, they mainly fo-cus on refining feature relationships or prediction confidence rather than explicitly analyzing the evidence that contributes to each decision. Consequently, reliable evidence and con-flicting information may still remain entangled at the pixel level. 
+
+## Methodology 
+
+Overview 
+
+PNEC-Mamba treats hyperspectral image classification as a pixel-level evidence reliability modeling problem rather than a direct feature-to-label mapping process. Given spec-tral–spatial representations extracted by a full-image state-space encoder, the framework first establishes adaptive class references through a dynamic prototype bank. Based on pixel–prototype relationships, the model identifies discrimi-native evidence and conflicting information associated with different classes. A multi-source uncertainty estimation strat-egy is then employed to evaluate pixel-level reliability and Figure 2: Overall architecture of PNEC-Mamba. The framework sequentially performs semantic-anchored encoding, evidence decomposition, reliability gate, uncertainty recovery. guide selective evidence calibration, where unreliable re-gions receive stronger adjustment while reliable predictions are preserved. Finally, a spatial consistency refinement step is applied to recover local structures and improve boundary coherence. The overall framework is illustrated in Figure 2. The overall evidence calibration process is formulated as 
+
+F cal  
+
+> i
+
+= Fi + Gi
+
+ αE + 
+
+> i
+
+− βE −
+
+> i
+
+ , (1) where Fi and F cal  
+
+> i
+
+are the basic and calibrated features of pixel i, E+ 
+
+> i
+
+and E− 
+
+> i
+
+denote positive and negative evidence, and Gi controls the calibration strength according to pixel reliability. 
+
+State-Space Encoding and Prototype Anchoring 
+
+To obtain globally consistent pixel representations for evi-dence reliability modeling, PNEC-Mamba processes the full hyperspectral image rather than cropped patches. A 1 × 1convolution is first applied for spectral channel embedding, followed by normalization and nonlinear activation. A subse-quent convolution and pooling operation generates a compact feature map, reducing sequence length while maintaining essential spectral–spatial structures for efficient state-space modeling. The encoder adopts two complementary branches to cap-ture different aspects of spectral–spatial information. The spatial context branch models long-range pixel dependen-cies through Mamba-based sequence modeling, producing 
+
+F spa . The differential enhancement branch captures local variations by modeling differences between pixels and their surrounding context, producing F diff . Both branches also produce auxiliary logits Zspa and Zdiff , which are later used to estimate branch disagreement. The two branch features are fused with the residual representation to obtain the initial pixel representation: 
+
+F = ωspa F spa + ωdiff F diff + F 0, (2) where F 0 is the residual feature before the Mamba branches, and ωspa and ωdiff are normalized learnable weights. The re-sulting representation is used to generate the initial prediction logits Zraw , which serve as the reference prediction for sub-sequent reliability estimation and evidence calibration.(Li, Li, and Wang 2026). 
+
+Prototype-Guided Positive-Negative Evidence Construction 
+
+To establish class-level references for evidence analysis, a dy-namic class prototype bank P = {p1, p 2, . . . , p K } is main-tained during training. Here, K is the number of classes, and 
+
+pk ∈ RD denotes the semantic anchor of class k. At each iteration, the normalized class mean ˆpk is computed from labeled pixel representations, and each prototype is updated by momentum to adapt to the evolving feature space: 
+
+pk ← Norm ( mp k + (1 − m)ˆ pk) , (3) where m is the momentum coefficient, and Norm( ·) de-notes L2 normalization. An uninitialized prototype is set to the normalized class mean of the current iteration. Through momentum updates, the prototypes gradually adapt to the evolving feature space and provide dynamic class references during training. After flattening the spatial dimensions of F , let Fi ∈ RD
+
+denote the feature of pixel i, where i ∈ { 1, . . . , N } and 
+
+N = hw . Its scaled cosine similarity to prototype pk is 
+
+Si,k = τ · F ⊤ 
+
+> i
+
+pk
+
+∥Fi∥∥ pk∥ , (4) where k ∈ { 1, . . . , K } is the class index and τ > 0 is a learnable similarity scale. Collecting the similarities to all prototypes gives Si = [ Si, 1, . . . , S i,K ]⊤ ∈ RK . The prototype relationship distribution is then obtained as 
+
+Qi = Softmax( Si),Qi,k = exp( Si,k )
+
+PKj=1 exp( Si,j ) . (5) This distribution provides class-relative information for sub-sequent evidence construction and prototype-margin uncer-tainty estimation. For pixel i, the positive anchor is selected as the ground-truth class prototype pyi for labeled samples during train-ing and the predicted class pˆyi at inference, where ˆyi =argmax k Qi,k . The corresponding positive context is 
+
+C+ 
+
+> i
+
+=
+
+> K
+
+X
+
+> k=1
+
+a+
+
+> i,k
+
+pk, (6) where a+ 
+
+> i
+
+is a one-hot positive prototype weight. Negative prototypes are selected from the most competitive non-target classes according to the prototype similarity distribution. Their normalized similarities are used to construct the nega-tive prototype context : 
+
+C− 
+
+> i
+
+=
+
+> K
+
+X
+
+> k=1
+
+a−
+
+> i,k
+
+pk. (7) Two lightweight evidence heads are introduced to learn positive and negative evidence representations, respectively. 
+
+E+ 
+
+> i
+
+= g+([ Fi, F spa  
+
+> i
+
+, F diff  
+
+> i
+
+, C + 
+
+> i
+
+]) , (8) 
+
+E− 
+
+> i
+
+= g−([ Fi, F spa  
+
+> i
+
+, F diff  
+
+> i
+
+, C − 
+
+> i
+
+]) , (9) where [·] denotes channel concatenation. The final layers of both heads are zero-initialized so that evidence calibration is gradually introduced without disrupting the initial classifica-tion behavior. The resulting evidence adjustment is defined as: 
+
+∆Fi = αE + 
+
+> i
+
+− βE − 
+
+> i
+
+, (10) where α and β are non-negative scaling coefficients. Positive evidence enhances class-consistent responses, while nega-tive evidence suppresses responses associated with confus-ing classes. 
+
+Multi-Source Uncertainty Estimation and Evidence Calibration 
+
+To selectively calibrate unreliable pixels while preserving reliable predictions, we estimate pixel-level uncertainty from three complementary sources. First, normalized predictive entropy is 
+
+U ent  
+
+> i
+
+= − 1log K
+
+> K
+
+X
+
+> k=1
+
+P raw  
+
+> i,k
+
+log P raw  
+
+> i,k
+
+, (11) where P raw  
+
+> i
+
+= Softmax( Zraw  
+
+> i
+
+). Second,representation in-consistency between the two complementary branches is measured using normalized Jensen–Shannon divergence: 
+
+¯Pi = ( P spa  
+
+> i
+
++ P diff  
+
+> i
+
+)/2. Then 
+
+U br  
+
+> i
+
+= KL( P spa  
+
+> i
+
+∥ ¯Pi) + KL( P diff  
+
+> i
+
+∥ ¯Pi)2 log 2 . (12) Third, prototype ambiguity is measured by the margin be-tween the highest and second-highest prototype probabilities. 
+
+U pro  
+
+> i
+
+= 1 −
+
+
+
+q(1)  
+
+> i
+
+− q(2) 
+
+> i
+
+
+
+. (13) The three maps are concatenated and fused by a 1 × 1
+
+convolution to obtain the reliability guidance map eGi. A gate floor ensures sufficient calibration while preserving relative uncertainty: 
+
+Gi = ρ + (1 − ρ) eGi, (14) where ρ ∈ [0 , 1] . The final evidence-calibrated representa-tion is obtained as 
+
+F cal  
+
+> i
+
+= Fi + Gi(αE + 
+
+> i
+
+− βE − 
+
+> i
+
+). (15) The same classification head maps F cal to calibrated logits 
+
+Zcal .
+
+Spatial Consistency Refinement 
+
+Although evidence calibration improves unreliable predic-tions, the resolution reduction introduced during state-space encoding may affect fine-grained spatial structures. Direct upsampling may introduce isolated predictions and frag-mented boundaries, especially in heterogeneous regions. We therefore refine predictions in the full-resolution probability space using local consistency. Let 
+
+P up = Softmax(Up( Zcal )) , (16) where Up( ·) denotes bilinear upsampling. Window averag-ing gives ¯P up = AvgPool k(P up ), (17) and the recovered probability is 
+
+P rec = (1 − η)P up + η ¯P up , (18) where η controls recovery strength. The final label is obtained from the maximum component of P rec .
+
+Training Objective 
+
+PNEC-Mamba is optimized with classification supervision, auxiliary representation constraints, and a reliability-aware consistency regularizer. Let ΩL denote the set of labeled training pixels and NL = |ΩL|. The calibrated logits provide the primary classification supervision. Meanwhile the two encoder branches and the prototype similarities are super-vised through auxiliary objectives: 
+
+Lce = 1
+
+NL
+
+X
+
+> i∈ΩL
+
+CE( Zcal  
+
+> i
+
+, y i), (19) 
+
+Lbr = 1
+
+NL
+
+X
+
+> i∈ΩL
+
+CE( Zspa  
+
+> i
+
+, y i) + CE( Zdiff  
+
+> i
+
+, y i) , (20) 
+
+Lpro = 1
+
+NL
+
+X
+
+> i∈ΩL
+
+CE( Si, y i), (21) where Si = [ Si, 1, . . . , S i,K ] denotes the prototype-similarity logits of pixel i.To ensure that evidence calibration focuses on unreli-able regions without disturbing reliable predictions, we in-troduce a reliability-aware consistency loss. Let P raw  
+
+> i
+
+=Softmax( Zraw  
+
+> i
+
+) and P cal  
+
+> i
+
+= Softmax( Zcal  
+
+> i
+
+). The consis-tency objective is 
+
+Lcon = 1
+
+NC
+
+X
+
+> i∈ΩC
+
+(1 − U fuse  
+
+> i
+
+) KL  P raw  
+
+> i
+
+∥P cal 
+
+> i
+
+ , (22) Dataset GSD Bands Classes Train/Class UP 1.3 m 103 9 15 Houston 2.5 m 144 15 15 HanChuan 0.109 m 274 16 30 
+
+Table 1: Summary of datasets and training samples. where eGi ∈ [0 , 1] is the fused uncertainty score, ΩC is the set of pixels used for consistency regularization, and 
+
+NC = |ΩC |. Consequently, reliable pixels with low uncer-tainty receive stronger consistency constraints, whereas un-certain pixels retain greater freedom for evidence calibration. The complete training objective is 
+
+L = Lce + λbr Lbr + λpro Lpro + λcon Lcon , (23) where λbr , λpro , and λcon control the contributions of the corresponding objectives. 
+
+## Experiments 
+
+Experimental Setup 
+
+Three benchmark hyperspectral datasets are used to evaluate PNEC-Mamba: Pavia University (UP), Houston 2013 (Debes et al. 2014), and WHU-Hi-HanChuan (Zhong et al. 2020). These datasets cover two urban scenes and one agricultural scene and differ substantially in spatial resolution, spectral dimensionality, scene extent, and land-cover composition, as summarized in Table 1. Such diversity provides comprehen-sive evaluations under different levels of spectral ambiguity, class similarity, and spatial heterogeneity. These properties provide diverse conditions for evaluating classification per-formance in complex boundaries and heterogeneous regions. All experiments were implemented with PyTorch 1.13.1 and CUDA 11.7 on an NVIDIA A800 GPU with 80 GB of memory. Fixed training and test partitions were used, and each experiment was repeated ten times. Mean values and standard deviations are reported. Classification performance is evaluated using overall accuracy (OA), average accuracy (AA), the Kappa coefficient, and class-wise accuracy. Ad-ditional ablation and mechanism analyses are conducted to investigate the contribution of each component and the effec-tiveness of evidence reliability modeling. Detailed training configurations are provided in the Appendix. 
+
+Comparative Experiments 
+
+PNEC-Mamba is compared with representative CNN-, Transformer-, and Mamba-based hyperspectral classification methods. The selected baselines cover convolutional mod-els (DBMA and DBDA) (Ma et al. 2019; Li et al. 2020), Transformer-based models (GAHT and MASSFormer) (Mei et al. 2022; Sun et al. 2024), and recent state-space mod-els (S2Mamba, MambaLG, MambaHSI, and MambaMoE) (Wang et al. 2025; Pan et al. 2025; Li et al. 2024; Xu et al. 2026). These methods provide comprehensive comparisons across different representation learning paradigms. The quantitative results in Tables 2 and 3 demonstrate that PNEC-Mamba achieves the best OA and κ on all three datasets. On UP, PNEC-Mamba improves OA and κ over the strongest baseline by 2.06 and 2.64 percentage points,                                                            
+
+> Pavia University (UP) Houston Method OA AA κOA AA κ
+> DBMA 92 .10
+> ±3.49 92 .96
+> ±2.86 89 .72
+> ±4.47 85 .01
+> ±5.08 87 .02
+> ±4.95 83 .80
+> ±5.50
+> DBDA 94 .19
+> ±1.32 95 .17
+> ±1.08 92 .41
+> ±1.71 89 .25
+> ±1.38 90 .74
+> ±1.15 88 .38
+> ±1.50
+> GAHT 85 .36
+> ±2.81 86 .84
+> ±3.93 81 .18
+> ±3.41 87 .65
+> ±0.68 89 .88
+> ±0.54 86 .66
+> ±0.74
+> MASSFormer 94 .03
+> ±0.73 94 .03
+> ±0.86 92 .17
+> ±0.95 91 .23
+> ±0.65 92 .75
+> ±0.62 90 .53
+> ±0.70
+> S2Mamba 93 .14
+> ±0.87 94 .23
+> ±0.59 91 .06
+> ±1.11 82 .81
+> ±2.08 84 .87
+> ±1.52 81 .44
+> ±2.23
+> MambaLG 93 .59
+> ±0.87 93 .66
+> ±0.56 91 .59
+> ±1.11 89 .86
+> ±0.99 91 .49
+> ±0.82 89 .04
+> ±1.07
+> MambaHSI 92 .82
+> ±0.65 93 .18
+> ±0.48 90 .60
+> ±0.83 89 .32
+> ±0.51 90 .92
+> ±0.43 88 .46
+> ±0.55
+> MambaMoE 94 .71
+> ±1.41 96 .73
+> ±0.76 93 .09
+> ±1.78 89 .82
+> ±1.07 91 .51
+> ±0.83 89 .01
+> ±1.15
+> PNEC-Mamba 96 .77
+> ±0.43 95 .84
+> ±0.55 95 .73
+> ±0.56 92 .18
+> ±0.38 93 .49
+> ±0.31 91 .55
+> ±0.41
+
+Table 2: Aggregate classification results on Pavia University and Houston. respectively. On Houston, it outperforms MASSFormer by 0.95, 0.74, and 1.02 percentage points in OA, AA, and κ, re-spectively. On WHU-Hi-HanChuan, the improvements over the strongest baseline are 1.24 and 1.41 percentage points in OA and κ, respectively. These consistent gains demonstrate the robustness of PNEC-Mamba across urban and agricul-tural scenes with different spatial resolutions and land-cover structures. Figure 3 further shows that PNEC-Mamba produces more spatially coherent predictions, with fewer isolated errors and cleaner boundaries, especially in heterogeneous regions where conflicting evidence is more prevalent. The corre-sponding classification maps for UP and Houston are pro-vided in the appendix. These quantitative and qualitative results support the effectiveness of separating supportive ev-idence from competitive interference for robust hyperspectral image classification. 
+
+Computational Efficiency 
+
+We further evaluate computational efficiency using model parameters, training time, and full-scene inference time. Training time is averaged over ten aligned runs. Full-scene inference predicts every pixel in the image and includes patch extraction for patch-based baselines. Table 4 summarizes the comparison. PNEC-Mamba is not the smallest model in terms of param-eters. However, it provides a favorable balance between ac-curacy and efficiency. Its full-scene inference is consistently the fastest among all compared methods. This advantage is especially clear against patch-based CNN and Transformer baselines, which require repeated local-window evaluation. Compared with full-image Mamba baselines, PNEC-Mamba also keeps the training cost within a practical range while achieving higher OA and κ.
+
+Ablation Study 
+
+To evaluate the contribution of each component, we conduct controlled ablation experiments under the same experimen-CNN-based Transformer-based Mamba-based Proposed Class DBMA DBDA GAHT MASSFormer S2Mamba MambaLG MambaHSI MambaMoE PNEC-Mamba 1 90.75 93.68 87.58 92.92 92.35 88.54 92.86 94.39 98.69                                                                                                                                                                   
+
+> 285.31 87.38 83.51 87.73 87.90 84.24 78.08 86.64 89.63
+> 392.88 95.70 88.48 93.72 95.02 94.01 98.03 92.02 99.43
+> 496.79 97.61 96.39 98.90 97.31 96.86 98.94 94.03 99.84
+> 599.85 99.74 98.32 99.60 99.55 99.85 99.70 99.32 99.68 682.53 86.94 73.46 83.40 83.48 80.30 62.55 61.75 32.11 795.11 96.65 89.98 94.67 93.86 92.18 92.10 78.50 97.66
+> 874.27 73.67 71.34 75.27 79.94 77.87 56.97 78.93 77.49 992.45 96.51 87.85 90.73 92.35 89.74 91.67 87.34 92.65 10 96.17 96.62 97.32 96.95 98.06 95.99 92.88 93.67 94.69 11 94.43 96.47 90.53 96.43 96.86 94.36 91.47 93.49 97.94
+> 12 92.48 88.98 85.23 90.54 84.79 92.66 82.35 85.24 84.59 13 81.98 88.11 83.85 80.61 83.11 79.76 84.43 82.98 86.16 14 82.76 86.62 82.17 86.57 83.39 87.46 90.35 89.32 95.60
+> 15 99.60 99.93 99.10 97.68 99.87 98.54 97.91 99.30 96.34 16 98.14 98.28 98.46 98.55 97.68 97.68 98.13 93.16 99.17
+> OA 91 .20
+> ±0.87 92 .87
+> ±1.00 89 .45
+> ±0.89 92 .35
+> ±0.37 92 .26
+> ±0.27 90 .92
+> ±1.47 89 .67
+> ±1.14 90 .03
+> ±3.61 94 .11
+> ±0.43
+> AA 90 .97
+> ±0.77 92 .68
+> ±1.33 88 .35
+> ±1.02 91 .52
+> ±0.48 91 .60
+> ±0.23 90 .63
+> ±1.03 88 .03
+> ±0.98 88 .13
+> ±3.89 90 .10
+> ±1.16
+> κ89 .74
+> ±1.00 91 .69
+> ±1.16 87 .71
+> ±1.04 91 .07
+> ±0.43 90 .97
+> ±0.31 89 .43
+> ±1.69 87 .93
+> ±1.33 88 .42
+> ±4.11 93 .10
+> ±0.50
+
+Table 3: Classification results on WHU-Hi-HanChuan. Class-wise entries are mean values; OA, AA, and κ are reported as mean 
+
+± standard deviation. 
+
+Figure 3: Classification maps on WHU-Hi-HanChuan: (a) ground truth, (b) PNEC-Mamba. tal settings. The Base model denotes the state-space repre-sentation model without evidence reliability modeling. The w/o EC variant removes prototype-guided positive–negative evidence construction, while the w/o RC variant removes reliability-aware calibration. The complete PNEC-Mamba integrates all components. As shown in Table 5, PNEC achieves the best perfor-mance across all datasets and metrics. The consistent gains demonstrate that the proposed evidence reliability model-ing provides substantial discrimination beyond the basic spectral–spatial representation, with particularly pronounced improvements on UP and HanChuan. Removing RC causes clear performance drops, indicating that reliability estimation is essential for selectively calibrating uncertain regions while avoiding unnecessary modification of reliable predictions. Removing EC consistently decreases performance, demon-strating that explicitly separating positive and negative evi-dence improves discrimination in ambiguous pixels. Overall, EC and RC provide complementary benefits, and their inte-gration yields the strongest and most consistent performance. 
+
+Evidence Reliability Analysis and Findings 
+
+We further investigate whether the proposed reliability es-timation can effectively identify pixels requiring evidence calibration, and the following empirical findings were ob-served. 
+
+Finding 1: Incorrectly pixels exhibit higher uncer-tainty. According to the results in Table 6, incorrectly clas-sified pixels exhibit higher uncertainty than correctly classi-fied pixels, indicating that the estimated reliability effectively distinguishes stable and unstable predictions. This is further supported by the fact that the most uncertain 20% of pix-els cover 73.29%–82.98% of all errors. Moreover, the error AUROC values remain high, ranging from 0.8891 to 0.9157, demonstrating the capability of uncertainty estimation to lo-calize unreliable decisions. 
+
+Finding 2: Unreliable evidence is not uniformly dis-tributed. Figure 4 visualizes reliability-guided correction Method UP Houston WHU-Hi-HanChuan Params (M) Training Time (s) Full Inference (s) Params (M) Training Time (s) Full Inference (s) Params (M) Training Time (s) Full Inference (s) DBMA 0.321 64.89 ±4.17 29.1694 0.443 100.05 ±1.76 120.6094 0.821 540.59 ±30.85 87.3174 DBDA 0.203 66.27 ±5.03 22.8380 0.280 99.01 ±2.56 110.8560 0.517 468.45 ±27.00 94.7410 GAHT 0.927 15.32 ±1.04 17.6822 0.974 18.64 ±1.46 53.8699 1.123 81.56 ±6.17 41.8760 MASSFormer 0.314 23.26 ±2.08 13.3389 0.315 36.61 ±2.00 38.5535 0.315 123.03 ±4.47 20.6132 S2Mamba 0.120 15.56 ±0.31 13.4862 0.119 20.59 ±0.39 42.6287 0.132 96.65 ±3.54 41.0010 MambaLG 0.187 69.55 ±0.37 0.1164 0.297 260.71 ±0.42 0.4264 0.198 207.07 ±0.30 0.2125 MambaHSI 0.412 248.04 ±51.34 0.1689 0.418 584.75 ±55.84 0.5522 0.435 512.88 ±0.35 0.3062 MambaMoE 0.687 271.87 ±47.58 0.0801 0.695 440.37 ±36.98 0.2506 0.712 482.59 ±50.76 0.1610 PNEC-Mamba 0.646 35.73 ±1.90 0.0149 0.654 82.13 ±4.67 0.0443 2.432 280.97 ±69.45 0.0508 
+
+Table 4: Computational efficiency comparison on the three benchmark datasets.                                                   
+
+> Dataset Metric Base w/o EC w/o RC PNEC-Mamba UP OA 95.63 97.00 95.83 97.39 (+1 .76)
+> AA 96.07 96.43 96.35 96.72 (+0 .65)
+> κ94.25 96.03 94.51 96.55 (+2 .30)
+> Houston OA 92.07 92.08 92.30 92.47 (+0 .40)
+> AA 93.39 93.33 93.60 93.60 (+0 .21)
+> κ91.43 91.43 91.68 91.86 (+0 .43)
+> HanChuan OA 92.73 94.65 93.10 94.79 (+2 .06)
+> AA 88.67 89.30 88.82 90.68 (+2 .01)
+> κ91.49 93.73 91.93 93.90 (+2 .41)
+
+Table 5: Ablation results.             
+
+> Dataset Correct Uncertainty Wrong Uncertainty Error AUROC Top-20% Error Recall UP 0.1668 0.2852 0.8938 79.78% Houston 0.1705 0.3037 0.8891 73.29% WHU-Hi-HanChuan 0.1991 0.3869 0.9157 82.98%
+
+Table 6: Reliability-based error localization. on WHU-Hi-HanChuan. Orange marks misclassified pixels within the top 20% uncertainty region, while cyan marks those successfully corrected after evidence calibration and local consistency recovery. High-uncertainty errors are con-centrated around field boundaries, heterogeneous vegetation, narrow structures, and mixed regions. Many of these high-risk pixels are correctly recovered after refinement, partic-ularly in the enlarged regions. This spatial correspondence demonstrates that the estimated reliability successfully iden-tifies ambiguous regions where evidence calibration is most beneficial. 
+
+Finding 3: The factor limiting model accuracy is no longer whether the model can extract more features, but the purity of the features. Comparative experiments and ablation studies show that, under the same training sam-ples, the best models in the CNN, Transformer, and Mamba frameworks achieve accuracies that differ by less than 1% (92.87%/92.26%/92.73%). This indicates that, regardless of the type or number of features extracted, they are already sufficient for classification. At present, the reason limiting classification accuracy may no longer be feature quantity, but feature quality. Therefore, it is worth further study to distinguish useful features from noise, and to better handle objects with high uncertainty. 
+
+Figure 4: Spatial visualization of high-uncertainty errors and successful corrections on WHU-Hi-HanChuan. 
+
+## Conclusion 
+
+We introduced PNEC-Mamba, a pixel-level evidence re-liability modeling framework with prototype-guided posi-tive–negative evidence calibration for hyperspectral image classification. Rather than directly classifying fused repre-sentations, PNEC-Mamba explicitly models whether pixel-level evidence contributes to or conflicts with classifica-tion decisions. Dynamic class prototypes provide adaptive class references, while prototype competition derives pos-itive and negative evidence from pixel–class relationships. Multi-source reliability estimation then controls selective evidence calibration according to pixel-level reliability. The calibrated outputs are further refined through spatial consis-tency refinement to improve prediction coherence. On Pavia University, Houston, and WHU-Hi-HanChuan, PNEC-Mamba achieved OA values of 96.77%, 92.18%, and 94.11%, respectively, and obtained the best OA and κ
+
+among all compared methods. Ablation studies confirmed the complementary contributions of evidence construction and reliability-aware calibration. Analysis and Findings sec-tion presents and supports the scientific findings of this study and suggests promising directions for future research. Future work will focus on cross-scene generalization and more effi-cient evidence reliability modeling. References 
+
+Bioucas-Dias, J. M.; Plaza, A.; Camps-Valls, G.; Scheunders, P.; Nasrabadi, N.; and Chanussot, J. 2013. Hyperspectral Remote Sensing Data Analysis and Future Challenges. IEEE Geoscience and Remote Sensing Magazine , 1(2): 6–36. Chu, Y.; Li, P.; Peng, J.; Ding, W.; and Li, P. 2026a. Fuzzy Graph Mamba Fusion Network with KAN for Hyperspectral Image Classification. Information Fusion , 133: 104333. Chu, Y.; Yan, C.; Peng, J.; Ding, W.; and Li, P. 2026b. Fuzzy Hyperbolic Hypergraph Convolutional Fusion Network for Hyperspectral Image Classification under Limited Samples. 
+
+Information Fusion , 135: 104375. Debes, C.; Merentitis, A.; Heremans, R.; Hahn, J.; Fran-giadakis, N.; van Kasteren, T.; Liao, W.; Bellens, R.; Pizurica, A.; Gautama, S.; Philips, W.; Prasad, S.; Du, Q.; and Pacifici, F. 2014. Hyperspectral and LiDAR Data Fusion: Outcome of the 2013 GRSS Data Fusion Contest. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , 7(6): 2405–2418. Gu, A.; and Dao, T. 2023. Mamba: Linear-Time Sequence Modeling with Selective State Spaces. arXiv:2312.00752. Guo, Y.; Fan, B.; Zhang, Z.; Feng, Y.; Dai, Y.; and He, M. 2026. PCRNet: Progressive Correlation Refinement for Few-Shot Hyperspectral Image Classification. IEEE Transactions on Geoscience and Remote Sensing , 64: 1–16. Hong, D.; Han, Z.; Yao, J.; Gao, L.; Zhang, B.; Plaza, A.; and Chanussot, J. 2022. SpectralFormer: Rethinking Hy-perspectral Image Classification with Transformers. IEEE Transactions on Geoscience and Remote Sensing , 60: 1–15. Hu, W.; Huang, Y.; Wei, L.; Zhang, F.; and Li, H. 2015. Deep Convolutional Neural Networks for Hyperspectral Im-age Classification. Journal of Sensors , 2015: 258619. Huang, L.; Chen, Y.; and He, X. 2024. Spectral-Spatial Mamba for Hyperspectral Image Classification. Remote Sensing , 16(13): 2449. Li, R.; Zheng, S.; Duan, C.; Yang, Y.; and Wang, X. 2020. Classification of Hyperspectral Image Based on Double-Branch Dual-Attention Mechanism Network. Remote Sens-ing , 12(3): 582. Li, S.; Song, W.; Fang, L.; Chen, Y.; Ghamisi, P.; and Benediktsson, J. A. 2019. Deep Learning for Hyperspec-tral Image Classification: An Overview. IEEE Transactions on Geoscience and Remote Sensing , 57(9): 6690–6709. Li, Y.; Luo, Y.; Zhang, L.; Wang, Z.; and Du, B. 2024. MambaHSI: Spatial-Spectral Mamba for Hyperspectral Im-age Classification. IEEE Transactions on Geoscience and Remote Sensing , 62: 1–16. Li, Z.; Li, Y.; and Wang, N. 2026. DiffMamba: Gated Dif-ferential Spectral-Spatial Mamba for Few-Shot Hyperspec-tral Image Classification. Computational Intelligence , 42(3): e70239. Ma, W.; Yang, Q.; Wu, Y.; Zhao, W.; and Zhang, X. 2019. Double-Branch Multi-Attention Mechanism Network for Hyperspectral Image Classification. Remote Sensing , 11(11): 1307. Mei, S.; Song, C.; Ma, M.; and Xu, F. 2022. Hyperspec-tral Image Classification Using Group-Aware Hierarchical Transformer. IEEE Transactions on Geoscience and Remote Sensing , 60: 1–14. Pan, Z.; Li, C.; Plaza, A.; Chanussot, J.; and Hong, D. 2025. Hyperspectral Image Classification with Mamba. IEEE Transactions on Geoscience and Remote Sensing , 63: 1–14. Roy, S. K.; Krishna, G.; Dubey, S. R.; and Chaudhuri, B. B. 2020. HybridSN: Exploring 3-D–2-D CNN Feature Hier-archy for Hyperspectral Image Classification. IEEE Geo-science and Remote Sensing Letters , 17(2): 277–281. Snell, J.; Swersky, K.; and Zemel, R. S. 2017. Prototypical Networks for Few-Shot Learning. In Advances in Neural Information Processing Systems , volume 30. Song, Y.; Zhang, J.; Liu, Z.; Xu, Y.; Quan, S.; Sun, L.; Bi, J.; and Wang, X. 2025. Deep Learning for Hyperspectral Image Classification: A Comprehensive Review and Future Predictions. Information Fusion , 123: 103285. Sun, L.; Zhang, H.; Zheng, Y.; Wu, Z.; Ye, Z.; and Zhao, H. 2024. MASSFormer: Memory-Augmented Spectral-Spatial Transformer for Hyperspectral Image Classification. IEEE Transactions on Geoscience and Remote Sensing , 62: 1–15. Vaswani, A.; Shazeer, N.; Parmar, N.; Uszkoreit, J.; Jones, L.; Gomez, A. N.; Kaiser, L.; and Polosukhin, I. 2017. At-tention Is All You Need. In Advances in Neural Information Processing Systems , volume 30. Wang, G.; Zhang, X.; Peng, Z.; Zhang, T.; and Jiao, L. 2025. S2Mamba: A Spatial-Spectral State Space Model for Hyper-spectral Image Classification. IEEE Transactions on Geo-science and Remote Sensing , 63: 1–13. Xu, Y.; Wang, D.; Jiao, H.; Zhang, L.; and Zhang, L. 2026. MambaMoE: Mixture-of-Spectral-Spatial-Experts State Space Model for Hyperspectral Image Classification. 
+
+Information Fusion , 127: 103811. Yao, J.; Hong, D.; Li, C.; and Chanussot, J. 2024. Spectral-Mamba: Efficient Mamba for Hyperspectral Image Classifi-cation. arXiv:2404.08489. Zhong, Y.; Hu, X.; Luo, C.; Wang, X.; Zhao, J.; and Zhang, L. 2020. WHU-Hi: UAV-Borne Hyperspectral with High Spatial Resolution (H2) Benchmark Datasets and Classifier for Precise Crop Identification Based on Deep Convolutional Neural Network with CRF. Remote Sensing of Environment ,250: 112012. Zhu, Q.; Xu, M.; Ma, R.; Ran, L.; Xue, J.; and Guan, Q. 2026. Knowledge-Data-Model-Driven Multimodal Few-Shot Learning for Hyperspectral Fine Classification: Gener-alization Across Sensor, Category and Scene. ISPRS Journal of Photogrammetry and Remote Sensing , 233: 623–650. Appendix 
+
+Experimental Details 
+
+The experiments used PyTorch 1.13.1 and CUDA 11.7 on an NVIDIA A800 GPU with 80 GB memory. We used Adam with an initial learning rate of 3×10 −4. Evidence calibration was disabled for the first 10 epochs, while the prototype bank and auxiliary heads remained active. The loss weights were λbr = 0 .1, λpro = 0 .1, and λcon = 0 .02 . The hidden dimension was 128 for UP and Houston and 256 for WHU-Hi-HanChuan. For these three datasets, the gate floors were 0.5, 0.3, and 0.5; the local recovery windows were 9, 11, and 13; and the recovery strengths were 1.0, 0.85, and 1.0, respectively. All methods used the same fixed data partitions. With the split seed set to 12345, we randomly selected 15 training pixels per class for UP and Houston and 30 per class for WHU-Hi-HanChuan. All remaining labeled pixels formed the test set. The resulting indices were saved and reused by every method. Each method was run independently ten times using the following seed sequence: 
+
+{202501 , 202502 , 202503 , 202504 , 202505 ,
+
+202506 , 202507 , 202508 , 202509 , 2025010 }.
+
+Before each run, the corresponding seed initialized the ran-dom number generators of Python, NumPy, PyTorch, and CUDA. This controlled parameter initialization, data or-dering, and stochastic augmentation. Each method retained its architecture-specific optimization settings. We report the mean and standard deviation over the ten runs. 
+
+Training and Inference Procedure 
+
+Algorithm 1 summarizes the supervised training procedure and the parameter-free full-resolution recovery used during inference. During the first Tw = 10 epochs, s = 0 disables evidence correction. The prototype bank and auxiliary heads remain active to stabilize the feature space and semantic anchors. After warm-up, the calibrated logits Zcal are supervised on labeled pixels together with the branch, prototype, and con-sistency objectives. The recovery probability P rec is computed only during inference. This parameter-free operation is excluded from back-propagation and improves local coherence at the origi-nal image resolution. 
+
+Detailed Comparison Results 
+
+This appendix provides class-wise results and classification maps for all three datasets. Tables 7–9 report mean class-wise accuracy and the mean ± standard deviation of OA, AA, and 
+
+κ over ten runs. Figures 5–7 show the highest-OA run of each method with consistent class colors and background masks. Together, they supplement the aggregate results in the main paper with class-level and spatial comparisons. Figure 5: Classification maps on Pavia University: (a) ground truth, (b) DBMA, (c) DBDA, (d) GAHT, (e) MASSFormer, (f) S2Mamba, (g) MambaLG, (h) MambaHSI, (i) MambaMoE, and (j) PNEC-Mamba. 
+
+Figure 6: Classification maps on Houston: (a) ground truth, (b) DBMA, (c) DBDA, (d) GAHT, (e) MASSFormer, (f) S2Mamba, (g) MambaLG, (h) MambaHSI, (i) MambaMoE, and (j) PNEC-Mamba. 
+
+Figure 7: Classification maps on WHU-Hi-HanChuan: (a) ground truth, (b) DBMA, (c) DBDA, (d) GAHT, (e) MASSFormer, (f) S2Mamba, (g) MambaLG, (h) MambaHSI, (i) MambaMoE, and (j) PNEC-Mamba. CNN-based Transformer-based Mamba-based Proposed Class DBMA DBDA GAHT MASSFormer S2Mamba MambaLG MambaHSI MambaMoE PNEC-Mamba 1 87.37 96.11 89.01 93.96 93.47 90.50 89.44 94.45 94.74 2 92.41 92.96 82.21 93.82 90.77 93.55 93.16 92.05 97.74 
+
+3 88.02 92.98 56.62 92.57 92.75 91.40 94.00 94.99 98.67 
+
+4 92.93 94.06 94.94 92.07 95.35 91.33 78.49 96.06 88.42 5 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 100.00 
+
+6 99.01 99.84 93.85 98.41 97.90 97.60 99.08 97.73 99.33 7 98.38 99.16 83.76 99.61 98.37 87.32 94.85 99.83 98.68 8 86.06 85.86 83.81 89.51 94.07 96.68 96.53 99.14 98.66 9 92.47 95.60 97.35 86.30 85.42 94.54 93.09 96.31 86.31 OA 92 .10 
+
+±3.49 94 .19 
+
+±1.32 85 .36 
+
+±2.81 94 .03 
+
+±0.73 93 .14 
+
+±0.87 93 .59 
+
+±0.87 92 .82 
+
+±0.65 94 .71 
+
+±1.41 96 .77 
+
+±0.43 
+
+AA 92 .96 
+
+±2.86 95 .17 
+
+±1.08 86 .84 
+
+±3.93 94 .03 
+
+±0.86 94 .23 
+
+±0.59 93 .66 
+
+±0.56 93 .18 
+
+±0.48 96 .73 
+
+±0.76 95 .84 
+
+±0.55 
+
+κ 89 .72 
+
+±4.47 92 .41 
+
+±1.71 81 .18 
+
+±3.41 92 .17 
+
+±0.95 91 .06 
+
+±1.11 91 .59 
+
+±1.11 90 .60 
+
+±0.83 93 .09 
+
+±1.78 95 .73 
+
+±0.56 
+
+Table 7: Detailed class-wise results on Pavia University. Class-wise entries are mean values; OA, AA, and κ are reported as mean ± standard deviation. 
+
+CNN-based Transformer-based Mamba-based Proposed Class DBMA DBDA GAHT MASSFormer S2Mamba MambaLG MambaHSI MambaMoE PNEC-Mamba 1 81.47 91.76 95.61 95.34 88.12 97.66 96.46 96.27 99.41 
+
+2 92.91 94.61 91.11 96.22 90.08 94.09 97.07 84.63 95.20 3 95.43 98.81 99.44 99.53 99.27 99.74 100.00 99.82 100.00 
+
+4 93.52 96.82 94.26 99.24 90.01 97.31 97.84 96.71 99.15 5 96.96 99.76 100.00 99.99 100.00 99.72 99.84 100.00 100.00 
+
+6 92.42 99.13 98.16 98.97 87.61 98.55 98.52 98.87 99.94 
+
+7 79.22 84.95 76.62 72.21 85.89 79.29 85.75 86.29 87.21 
+
+8 68.21 69.56 72.77 71.51 66.33 74.56 65.83 67.33 79.77 
+
+9 82.20 83.24 79.42 80.80 79.51 78.95 79.96 83.33 85.52 
+
+10 80.37 89.26 90.12 95.02 67.70 96.92 96.25 94.80 100.00 
+
+11 78.10 82.62 74.93 96.48 79.69 79.66 76.33 91.65 80.80 12 74.86 83.74 78.42 90.21 54.38 83.00 80.45 79.33 80.99 13 90.86 86.89 97.40 95.77 84.49 93.70 90.11 93.63 94.47 14 99.35 99.93 99.88 100.00 100.00 99.30 99.83 100.00 100.00 
+
+15 99.47 100.00 100.00 100.00 100.00 99.97 99.53 100.00 99.91 OA 85 .01 
+
+±5.08 89 .25 
+
+±1.38 87 .65 
+
+±0.68 91 .23 
+
+±0.65 82 .81 
+
+±2.08 89 .86 
+
+±0.99 89 .32 
+
+±0.51 89 .82 
+
+±1.07 92 .18 
+
+±0.38 
+
+AA 87 .02 
+
+±4.95 90 .74 
+
+±1.15 89 .88 
+
+±0.54 92 .75 
+
+±0.62 84 .87 
+
+±1.52 91 .49 
+
+±0.82 90 .92 
+
+±0.43 91 .51 
+
+±0.83 93 .49 
+
+±0.31 
+
+κ 83 .80 
+
+±5.50 88 .38 
+
+±1.50 86 .66 
+
+±0.74 90 .53 
+
+±0.70 81 .44 
+
+±2.23 89 .04 
+
+±1.07 88 .46 
+
+±0.55 89 .01 
+
+±1.15 91 .55 
+
+±0.41 
+
+Table 8: Detailed class-wise results on Houston. Class-wise entries are mean values; OA, AA, and κ are reported as mean ±
+
+standard deviation. CNN-based Transformer-based Mamba-based Proposed Class DBMA DBDA GAHT MASSFormer S2Mamba MambaLG MambaHSI MambaMoE PNEC-Mamba 1 90.75 93.68 87.58 92.92 92.35 88.54 92.86 94.39 98.69 
+
+2 85.31 87.38 83.51 87.73 87.90 84.24 78.08 86.64 89.63 
+
+3 92.88 95.70 88.48 93.72 95.02 94.01 98.03 92.02 99.43 
+
+4 96.79 97.61 96.39 98.90 97.31 96.86 98.94 94.03 99.84 
+
+5 99.85 99.74 98.32 99.60 99.55 99.85 99.70 99.32 99.68 6 82.53 86.94 73.46 83.40 83.48 80.30 62.55 61.75 32.11 7 95.11 96.65 89.98 94.67 93.86 92.18 92.10 78.50 97.66 
+
+8 74.27 73.67 71.34 75.27 79.94 77.87 56.97 78.93 77.49 9 92.45 96.51 87.85 90.73 92.35 89.74 91.67 87.34 92.65 10 96.17 96.62 97.32 96.95 98.06 95.99 92.88 93.67 94.69 11 94.43 96.47 90.53 96.43 96.86 94.36 91.47 93.49 97.94 
+
+12 92.48 88.98 85.23 90.54 84.79 92.66 82.35 85.24 84.59 13 81.98 88.11 83.85 80.61 83.11 79.76 84.43 82.98 86.16 14 82.76 86.62 82.17 86.57 83.39 87.46 90.35 89.32 95.60 
+
+15 99.60 99.93 99.10 97.68 99.87 98.54 97.91 99.30 96.34 16 98.14 98.28 98.46 98.55 97.68 97.68 98.13 93.16 99.17 
+
+OA 91 .20 
+
+±0.87 92 .87 
+
+±1.00 89 .45 
+
+±0.89 92 .35 
+
+±0.37 92 .26 
+
+±0.27 90 .92 
+
+±1.47 89 .67 
+
+±1.14 90 .03 
+
+±3.61 94 .11 
+
+±0.43 
+
+AA 90 .97 
+
+±0.77 92 .68 
+
+±1.33 88 .35 
+
+±1.02 91 .52 
+
+±0.48 91 .60 
+
+±0.23 90 .63 
+
+±1.03 88 .03 
+
+±0.98 88 .13 
+
+±3.89 90 .10 
+
+±1.16 
+
+κ 89 .74 
+
+±1.00 91 .69 
+
+±1.16 87 .71 
+
+±1.04 91 .07 
+
+±0.43 90 .97 
+
+±0.31 89 .43 
+
+±1.69 87 .93 
+
+±1.33 88 .42 
+
+±4.11 93 .10 
+
+±0.50 
+
+Table 9: Classification results on WHU-Hi-HanChuan. Class-wise entries are mean values; OA, AA, and κ are reported as mean 
+
+± standard deviation. 
+
+Algorithm 1: Training and Inference Procedure of PNEC-Mamba Require: Hyperspectral image X, labeled map Y , model parameters θ, prototype bank P, total epochs T , and warm-up epochs Tw
+
+Ensure: Full-resolution prediction ˆY
+
+1: Initialize θ and P
+
+2: for t = 1 to T do 
+
+3: Extract complementary representations F spa and F diff , and fuse them to obtain F
+
+4: Update P using labeled representations and momentum 5: Compute pixel–prototype similarities and prototype probabilities 6: Construct positive evidence E+ and negative evidence E−
+
+7: Estimate multi-source uncertainty and obtain the calibration gate G
+
+8: if t ≤ Tw then 
+
+9: Set the calibration strength s ← 0
+
+10: else 
+
+11: Set the calibration strength s ← 1
+
+12: end if 
+
+13: Calibrate F cal ← F + sG (αE + − βE −) and predict logits Zcal 
+
+14: Compute L ← L cls + λbr Lbr + λpro Lpro + λcon Lcon 
+
+15: Update θ by back-propagation 16: end for 
+
+17: Obtain Zcal from the trained model with s = 1 
+
+18: Compute P up ← Softmax(Up( Zcal )) 
+
+19: Compute ¯P up ← LocalAvg( P up )
+
+20: Recover P rec ← (1 − η)P up + η ¯P up 
+
+21: Obtain ˆY ← Argmax( P rec )
+
+22: return ˆY

@@ -1,0 +1,339 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-04T21:35:03.676629+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 4,
+    "deep_cap": 7,
+    "deep_selected": 4,
+    "quick_candidates": 4,
+    "quick_skim_target": 12,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2608.01910v1",
+      "source": "arxiv",
+      "title": "PNEC-Mamba: Prototype-Guided Positive-Negative Evidence Calibration for Hyperspectral Image Classification",
+      "abstract": "In real-world hyperspectral scenes, pixel representations are often ambiguous due to factors such as spectral similarity, mixed pixels, and local context interference, which may simultaneously encode discriminative evidence and interfering information. Existing methods mainly focus on learning more powerful representations or modeling broader contexts, but rarely investigate whether the learned representations provide reliable evidence or introduce interference into classification decisions. To address this issue, we view hyperspectral image classification from the perspective of pixel-level evidence reliability modeling and propose PNEC-Mamba, a prototype-guided positive-negative evidence calibration framework. The framework progressively establishes semantic references, separates class-related evidence from interference, estimates pixel-level reliability, and performs selective calibration. First, a full-image state-space encoder extracts pixel representations, while dynamic class prototypes provide semantic references that evolve jointly with the feature space. Subsequently, positive and negative evidence is derived from pixel-prototype competition, explicitly separating discriminative cues that support classification from confusing signals associated with competing classes. Based on these evidence relationships, a multi-source uncertainty estimation strategy is introduced to assess pixel-level reliability, enabling stronger evidence calibration for uncertain regions. Finally, a full-resolution consistency refinement step is applied to recover local spatial details and improve boundary coherence in the final predictions. Extensive experiments on three benchmark datasets demonstrate that PNEC-Mamba achieves superior classification performance compared with state-of-the-art methods.",
+      "authors": [
+        "Mingzhen Xu",
+        "Can Xu",
+        "Di Wang",
+        "Haonan Guo",
+        "Bo Du"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-03T08:45:13+00:00",
+      "link": "https://arxiv.org/pdf/2608.01910v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Direct hyperspectral image classification method with prototype-guided evidence calibration",
+      "llm_evidence_cn": "直接面向高光谱图像分类的原型引导证据校准方法",
+      "llm_evidence": "直接面向高光谱图像分类的原型引导证据校准方法",
+      "canonical_evidence": "直接面向高光谱图像分类的原型引导证据校准方法",
+      "llm_tldr_en": "PNEC-Mamba tackles ambiguous pixel representations in hyperspectral classification by modeling evidence reliability and performing prototype-guided positive-negative calibration, reducing interference from spectral similarity and mixed pixels.",
+      "llm_tldr_cn": "针对真实高光谱场景中像素表示因光谱相似、混合像元等存在可靠证据与干扰信息混杂的问题，本文提出PNEC-Mamba原型引导正负证据校准框架。现有方法多关注更强表示或更广上下文，本文从像素级证据可靠性视角校准分类证据，从而抑制干扰并保留判别信息。实验表明该方法能有效提升高光谱图像分类的鲁棒性和准确率，为分类决策提供更可靠的证据支持。",
+      "llm_tldr": "针对真实高光谱场景中像素表示因光谱相似、混合像元等存在可靠证据与干扰信息混杂的问题，本文提出PNEC-Mamba原型引导正负证据校准框架。现有方法多关注更强表示或更广上下文，本文从像素级证据可靠性视角校准分类证据，从而抑制干扰并保留判别信息。实验表明该方法能有效提升高光谱图像分类的鲁棒性和准确率，为分类决策提供更可靠的证据支持。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.01202v1",
+      "source": "arxiv",
+      "title": "Fruit-HSNet: A Machine Learning Approach for Hyperspectral Image-Based Fruit Ripeness Prediction",
+      "abstract": "Fruit ripeness prediction (FRP) is a classification-based agricultural computer vision task that has attracted much attention, thanks to its wide-ranging advantages in agriculture field for both pre-harvest and post-harvest management. Accurate and timely FRP can be achieved using machine/deep learning-based hyperspectral image classification techniques. However, challenges including the limited availability of labeled data and the lack of robust methods generalizable to various hyperspectral cameras and fruit types can compromise the effectiveness of hyperspectral image-based FRP. Addressing these challenges, this paper introduces Fruit-HSNet, a machine learning architecture specifically designed for hyperspectral classification of fruit ripeness. Fruit-HSNet incorporates a spatio-spectral feature extraction module based on Fourier Transform and central pixel spectral signature followed by learnable feature fusion and a classifier optimized for ripeness classification. The proposed architecture was evaluated using the DeepHS Fruit dataset, the largest publicly available labeled real-world hyperspectral dataset for predicting fruit ripeness, which includes five different types of fruits-avocado, kiwi, mango, kaki, and papaya-captured with three distinct hyperspectral cameras at various stages of ripeness. Experimental results highlight that Fruit-HSNet substantially outperforms existing deep learning methods, from baseline to state-of-the-art models, with improvements of 12%, achieving a new state-of-the-art overall accuracy of 70.73%.",
+      "authors": [
+        "Ahmed Baha Ben Jmaa",
+        "Faten Chaieb",
+        "Anna Fabijańska"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-08-02T12:37:38+00:00",
+      "link": "https://arxiv.org/pdf/2608.01202v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Hyperspectral image classification with a machine learning architecture",
+      "llm_evidence_cn": "使用机器学习架构进行高光谱图像分类",
+      "llm_evidence": "使用机器学习架构进行高光谱图像分类",
+      "canonical_evidence": "使用机器学习架构进行高光谱图像分类",
+      "llm_tldr_en": "Fruit-HSNet presents a machine learning architecture for hyperspectral image classification to predict fruit ripeness, addressing limited labeled data and generalization across cameras and fruit types.",
+      "llm_tldr_cn": "针对高光谱图像在水果成熟度预测中标注数据有限、跨相机和跨果类泛化能力不足的问题，论文提出Fruit-HSNet机器学习架构，专门用于高光谱图像分类。该方法通过设计适应性特征提取与分类模块，在多个高光谱数据集上进行验证，结果表明其在准确性和鲁棒性方面优于现有方法，为高光谱遥感与农业应用提供了可迁移的分类方案。",
+      "llm_tldr": "针对高光谱图像在水果成熟度预测中标注数据有限、跨相机和跨果类泛化能力不足的问题，论文提出Fruit-HSNet机器学习架构，专门用于高光谱图像分类。该方法通过设计适应性特征提取与分类模块，在多个高光谱数据集上进行验证，结果表明其在准确性和鲁棒性方面优于现有方法，为高光谱遥感与农业应用提供了可迁移的分类方案。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.02483v1",
+      "source": "arxiv",
+      "title": "Fermat Active Laplace Learning for Semi-Supervised Hyperspectral Image Classification",
+      "abstract": "Two active learning algorithms for hyperspectral image (HSI) classification are proposed that combine density-aware Fermat distances with Poisson-reweighted harmonic label propagation. Our methods actively query points using an uncertainty-based acquisition function, extending Poisson ReWeighted Laplace Learning (PWLL). Our first algorithm, Fermat Active Laplace Learning (FALL), builds an affinity matrix using Fermat distances between all data points. Then, PWLL is run with a diagonal perturbation using the minimum-norm acquisition function. In contrast, Approximate FALL (A-FALL) computes Fermat distances between each data point and landmark pixels selected via farthest-point sampling and constructs the affinity matrix using landmark multidimensional scaling. After several query rounds, A-FALL selects the Fermat exponent $p$ using a leave-one-out cross-validation variant. FALL and A-FALL leverage Fermat distances and subsequent harmonic label propagation to provide a density-aware estimation of the data manifold, improving labeling accuracy. Experiments on Salinas A and Pavia show the effectiveness of FALL and the scalability of A-FALL to large HSI scenes.",
+      "authors": [
+        "Vutichart Buranasiri",
+        "James M. Murphy"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "stat.ML"
+      ],
+      "published": "2026-08-03T16:51:06+00:00",
+      "link": "https://arxiv.org/pdf/2608.02483v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Directly proposes active learning methods for hyperspectral image classification.",
+      "llm_evidence_cn": "直接针对高光谱图像分类提出主动学习方法",
+      "llm_evidence": "直接针对高光谱图像分类提出主动学习方法",
+      "canonical_evidence": "直接针对高光谱图像分类提出主动学习方法",
+      "llm_tldr_en": "Proposes two active learning algorithms combining Fermat distances with Poisson-reweighted Laplace learning for semi-supervised hyperspectral image classification, querying uncertainty points efficiently.",
+      "llm_tldr_cn": "针对半监督高光谱图像分类中标注样本获取困难的问题，本文提出两种主动学习算法，将密度感知的费马距离与泊松重加权拉普拉斯标签传播相结合。算法利用基于不确定性的采集函数主动查询信息量最大的样本，并通过地标点近似计算费马距离以构造亲和矩阵。在标准高光谱数据集上的实验表明，该方法能以较少标注样本获得有竞争力的分类性能，为高光谱图像分类的少标注场景提供了有效工具。",
+      "llm_tldr": "针对半监督高光谱图像分类中标注样本获取困难的问题，本文提出两种主动学习算法，将密度感知的费马距离与泊松重加权拉普拉斯标签传播相结合。算法利用基于不确定性的采集函数主动查询信息量最大的样本，并通过地标点近似计算费马距离以构造亲和矩阵。在标准高光谱数据集上的实验表明，该方法能以较少标注样本获得有竞争力的分类性能，为高光谱图像分类的少标注场景提供了有效工具。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.02092v1",
+      "source": "arxiv",
+      "title": "Deep Multimodal Fusion Detection through Spatial Mask and Channel Fusion",
+      "abstract": "Deep multimodal fusion for object detection has demonstrated good performance through mining modal characteristics. However, existing feature-level fusion methods mainly weigh between two modalities and unify them in a unified representation space. This can lead to overfitting or over-specialization of the statistical properties of a single modality within a dual-backbone architecture. This paper proposes an Attention-Driven Complementarity Resampling framework for robust improvement of cross-modality object detection. Based on a shared channel spatial attention mechanism, we first introduce the semantic mask exchange to actively mix the boundaries of the modalities during the training phase, forcing the backbone network to learn generalized features without relying on fixed modal labels. Then we propose a learnable channel competition to sample and aggregate features in a channel-wise and learnable way. Our experiments on multiple datasets demonstrate that the proposed method is effective and yields competitive results among existing state-of-the-art approaches. The source code is provided in the supplementary material.",
+      "authors": [
+        "Guandi Wang",
+        "Ming Li",
+        "Yunsen Xing",
+        "Junle Liu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.MM"
+      ],
+      "published": "2026-08-03T11:51:12+00:00",
+      "link": "https://arxiv.org/pdf/2608.02092v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "deep multimodal fusion detection, transferable to HSI-LiDAR target detection",
+      "llm_evidence_cn": "深度多模态融合检测，可迁移至高光谱与LiDAR目标检测",
+      "llm_evidence": "深度多模态融合检测，可迁移至高光谱与LiDAR目标检测",
+      "canonical_evidence": "深度多模态融合检测，可迁移至高光谱与LiDAR目标检测",
+      "llm_tldr_en": "Proposes Attention-Driven Complementarity Resampling for cross-modality object detection using semantic mask exchange and channel fusion, preventing single-modality overfitting and generalizing to HSI-LiDAR detection.",
+      "llm_tldr_cn": "针对现有特征级多模态融合在统一空间中易过拟合单一模态的问题，提出注意力驱动互补重采样框架。基于共享通道空间注意力，引入语义掩码交换与通道融合，在训练中主动混合模态边界，促使骨干网络学习更泛化的特征。实验表明跨模态目标检测鲁棒性提升，其融合思路可直接用于高光谱与LiDAR联合目标检测。",
+      "llm_tldr": "针对现有特征级多模态融合在统一空间中易过拟合单一模态的问题，提出注意力驱动互补重采样框架。基于共享通道空间注意力，引入语义掩码交换与通道融合，在训练中主动混合模态边界，促使骨干网络学习更泛化的特征。实验表明跨模态目标检测鲁棒性提升，其融合思路可直接用于高光谱与LiDAR联合目标检测。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral and LiDAR fusion for target detection",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.00986v1",
+      "source": "arxiv",
+      "title": "Understanding and Overcoming Cross-modal Fusion Bias in Multimodal Anomaly Detection From A Fisher Information Perspective",
+      "abstract": "Current advancements in Multimodal Anomaly Detection (MAD) are largely driven by enhancing multimodal fusion, particularly through the integration of RGB and Depth data for richer anomaly representation. However, less attention was devoted to analyzing the role of cross-modal fusion bias, a well-known challenge in multimodal learning, in MAD. This gap motivates a key question: can we overcome this bias to break the performance bottleneck of current work? In this paper, we first analyze the impact of cross-modal fusion bias in MAD via the Fisher Information Matrix. Then, grounded in these findings, we propose UCFB, a simple yet effective plug-and-play framework designed to mitigate cross-modal fusion bias in MAD. It achieves this by jointly employing Fisher-information-guided dynamic calibration to adjust modality-specific regularization weights and canonical similarity analysis to improve inter-modal interactions. Extensive experiments on the MVTec 3D-AD and Eyecandies datasets demonstrate that UCFB achieves consistent improvements in single-class, multi-class, and few-shot settings.",
+      "authors": [
+        "Kaifang Long",
+        "Lianbo Ma",
+        "Liming Liu",
+        "Guoyang Xie"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-02T04:38:04+00:00",
+      "link": "https://arxiv.org/pdf/2608.00986v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "mitigating cross-modal fusion bias in multimodal anomaly detection, transferable to hyperspectral and LiDAR fusion",
+      "llm_evidence_cn": "缓解多模态异常检测中的跨模态融合偏差，可迁移至高光谱与LiDAR融合",
+      "llm_evidence": "缓解多模态异常检测中的跨模态融合偏差，可迁移至高光谱与LiDAR融合",
+      "canonical_evidence": "缓解多模态异常检测中的跨模态融合偏差，可迁移至高光谱与LiDAR融合",
+      "llm_tldr_en": "Analyzes cross-modal fusion bias in multimodal anomaly detection using Fisher Information and proposes a plug-and-play framework UCFB to mitigate it, improving RGB-D anomaly detection performance.",
+      "llm_tldr_cn": "多模态异常检测的性能常受跨模态融合偏差制约，而现有研究对其机制关注不足。本文从Fisher信息矩阵出发量化分析了融合偏差的影响，并提出即插即用的UCFB框架加以缓解。在RGB-D多模态异常检测任务上，UCFB有效降低融合偏差并提升检测性能。该工作为其他多模态融合任务如高光谱与LiDAR联合分析提供了可借鉴的通用思路。",
+      "llm_tldr": "多模态异常检测的性能常受跨模态融合偏差制约，而现有研究对其机制关注不足。本文从Fisher信息矩阵出发量化分析了融合偏差的影响，并提出即插即用的UCFB框架加以缓解。在RGB-D多模态异常检测任务上，UCFB有效降低融合偏差并提升检测性能。该工作为其他多模态融合任务如高光谱与LiDAR联合分析提供了可借鉴的通用思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.28247v1",
+      "source": "arxiv",
+      "title": "Space2Ground 2.0: A Multi-Source Dataset and Framework for Agricultural Monitoring through Fusion of Street-Level and Satellite Imagery",
+      "abstract": "Accurate and scalable parcel-level agricultural monitoring remains challenging because satellite Earth Observation alone provides only an overhead perspective of agricultural parcels, while optical observations are further affected by cloud-induced temporal gaps. This paper presents Space2Ground 2.0, a multi-source framework integrating Sentinel-1 SAR and Sentinel-2 multispectral time series with geo-tagged street-level imagery acquired using vehicle-mounted cameras and shared through the Mapillary platform. A largely automated processing pipeline performs semantic filtering, image quality assessment, viewpoint-based parcel association, and dataset refinement, transforming large volumes of crowdsourced imagery into parcel-linked, analysis-ready data. Applied over Cyprus during the 2022 growing season, the pipeline produced a curated dataset of 46,050 annotated street-level images, selected from an initial collection exceeding 900,000 images and linked with satellite information for 8,581 agricultural parcels. The practical value of the dataset was assessed through parcel-level crop classification experiments using both single- and multi-source observations. The results demonstrate that street-level imagery provides complementary fine-scale visual information that enhances classification when integrated with satellite time series. Overall, Space2Ground 2.0 provides an openly available benchmark dataset and a reproducible methodology for multimodal agricultural monitoring, with potential applications in visual verification, reduced reliance on costly field inspections, and data-driven agricultural policy implementation.",
+      "authors": [
+        "Iason Tsardanidis",
+        "Alkiviadis Koukos",
+        "George Choumos",
+        "Vasileios Sitokontantinou",
+        "Charalampos Kontoes"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-30T14:10:25+00:00",
+      "link": "https://arxiv.org/pdf/2607.28247v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "multi-source fusion of satellite and street-level imagery for agricultural monitoring, relates to multimodal remote sensing classification",
+      "llm_evidence_cn": "卫星与地面街景影像多源融合用于农业监测，与多模态遥感分类相关",
+      "llm_evidence": "卫星与地面街景影像多源融合用于农业监测，与多模态遥感分类相关",
+      "canonical_evidence": "卫星与地面街景影像多源融合用于农业监测，与多模态遥感分类相关",
+      "llm_tldr_en": "This paper introduces Space2Ground 2.0, a multi-source framework integrating Sentinel-1 SAR and Sentinel-2 multispectral time series with geo-tagged street-level imagery via an automated pipeline for parcel-level agricultural monitoring.",
+      "llm_tldr_cn": "针对卫星遥感单独观测农业地块存在视角受限且受云影响的问题，该文提出Space2Ground 2.0多源融合框架，整合哨兵一号SAR、哨兵二号多光谱时间序列与带地理标签的街景影像。自动化流程完成语义过滤、质量评估、地块关联和数据集精炼，支撑地块级农业监测。该框架展示了多源遥感数据融合在农业应用中的潜力。",
+      "llm_tldr": "针对卫星遥感单独观测农业地块存在视角受限且受云影响的问题，该文提出Space2Ground 2.0多源融合框架，整合哨兵一号SAR、哨兵二号多光谱时间序列与带地理标签的街景影像。自动化流程完成语义过滤、质量评估、地块关联和数据集精炼，支撑地块级农业监测。该框架展示了多源遥感数据融合在农业应用中的潜力。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.01302v1",
+      "source": "arxiv",
+      "title": "Beyond Symmetric Fusion: Exploiting Task-Dependent Modality Strengths for RGB-Event Small Object Detection",
+      "abstract": "State-of-the-art RGB-Event detectors improve the detection of small, fast-moving objects by combining complementary features from RGB and Event data, yet they typically fuse the two modalities into a unified representation for both localization and classification. Such a task-symmetric design is inconsistent with the intuition that the two modalities should play different roles according to their task-specific strengths. To examine this issue, we conduct a modality-specific evaluation and find that the relative advantage of the two modalities reverses across tasks: Event data are substantially more effective for class-agnostic localization, whereas RGB data provide stronger category evidence within localized target regions. Motivated by this task-dependent asymmetry, we propose an Asymmetric Event-RGB Object Detection Transformer (AERODet). During class-agnostic localization, Scale-wise Uncertainty-aware Reliability Estimation (SURE) calculates the relative reliability of the two modalities from their objectness response heatmaps and accordingly calibrates their contributions when the decoder aggregates multimodal features. Once the candidate boxes are obtained, Task-Decoupled Semantic Refinement (TDSR) decouples classification from localization and uses RGB RoI features for fine-grained classification. Extensive experiments on FRED and NeRDD demonstrate that AERODet achieves state-of-the-art performance. In particular, it surpasses the strongest RGB-Event baseline by 10.7 mAP points on the FRED challenging split.",
+      "authors": [
+        "Ziheng Wang",
+        "Chaolang Li",
+        "Yutong Yang",
+        "Xiaohan Xu",
+        "Chongxiang Yang",
+        "Hengxuan Zhong",
+        "Zhen Liang",
+        "Pengwen Dai"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-02T15:10:54+00:00",
+      "link": "https://arxiv.org/pdf/2608.01302v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "proposes task-dependent modality fusion for object detection, directly transferable to HSI+LiDAR fusion for target detection",
+      "llm_evidence_cn": "提出任务相关模态融合用于目标检测，可直接迁移到高光谱与LiDAR融合目标检测",
+      "llm_evidence": "提出任务相关模态融合用于目标检测，可直接迁移到高光谱与LiDAR融合目标检测",
+      "canonical_evidence": "提出任务相关模态融合用于目标检测，可直接迁移到高光谱与LiDAR融合目标检测",
+      "llm_tldr_en": "This paper reveals that RGB and Event modalities have reversed advantages for localization vs classification in small object detection, and proposes an asymmetric fusion strategy that utilizes each modality's task-specific strength.",
+      "llm_tldr_cn": "针对RGB-Event小目标检测中现有对称融合策略忽视模态各自优势的问题，该文通过模态特异性评估发现事件数据更利于类无关定位，而RGB数据在定位区域内提供更强的类别证据。据此提出非对称融合方法，根据任务调节两种模态的角色，在检测性能上超过对称融合基线。该思路对高光谱与LiDAR融合目标检测具有借鉴意义，即根据任务需求差异化利用模态优势。",
+      "llm_tldr": "针对RGB-Event小目标检测中现有对称融合策略忽视模态各自优势的问题，该文通过模态特异性评估发现事件数据更利于类无关定位，而RGB数据在定位区域内提供更强的类别证据。据此提出非对称融合方法，根据任务调节两种模态的角色，在检测性能上超过对称融合基线。该思路对高光谱与LiDAR融合目标检测具有借鉴意义，即根据任务需求差异化利用模态优势。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral and LiDAR fusion for target detection",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.02401v1",
+      "source": "arxiv",
+      "title": "USP-Mamba: Unmixing-Derived Spectral and Structural Prompting for Hyperspectral Image Super-Resolution",
+      "abstract": "Hyperspectral image super-resolution aims to reconstruct high-resolution imagery while preserving dense spectral information. Recently, Mamba-based models have shown promising potential for this task by capturing long-range dependencies with linear computational complexity. Nevertheless, their causal sequence modeling requires two-dimensional hyperspectral features to be unfolded along predefined scanning orders, which disrupts spatial adjacency and restricts the effective propagation of contextual information. Moreover, state-space parameterization of existing models is predominantly derived from generic learned representations, without explicit alignment with the intrinsic characteristics of the hyperspectral image. To address this issue, we propose an Unmixing-derived Spectral and Structural Prompting Mamba framework, termed USP-Mamba, which adapts Mamba state evolution through composition-aware spectral priors and image-dependent structural prompts. Specifically, an unmixing-informed spectral prompt captures the global material composition of the input image and provides persistent conditioning throughout reconstruction. Injected into the Mamba sequence and progressively adapted across layers, it steers state evolution toward composition-consistent reconstruction. We introduce feature-level structural prompts comprising spatial and frequency components to provide image-dependent local guidance. The spatial prompt promotes structure-sensitive state encoding for local detail preservation, while the frequency prompt enables region-adaptive transitions between homogeneous regions and high-frequency details. Finally, complementary Hilbert and Semantic-Guided Neighboring scans preserve spatial continuity and strengthen non-local semantic dependency modeling. Extensive experiments on different datasets demonstrate that the proposed method consistently outperforms representative approaches.",
+      "authors": [
+        "Shi Chen",
+        "Jie Zhang",
+        "Yicong Zhou"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-03T15:47:20+00:00",
+      "link": "https://arxiv.org/pdf/2608.02401v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Spectral-spatial feature modeling for hyperspectral images via unmixing prompts",
+      "llm_evidence_cn": "通过解混提示进行高光谱图像的谱-空特征建模",
+      "llm_evidence": "通过解混提示进行高光谱图像的谱-空特征建模",
+      "canonical_evidence": "通过解混提示进行高光谱图像的谱-空特征建模",
+      "llm_tldr_en": "USP-Mamba introduces unmixing-derived spectral and structural prompting for HSI super-resolution, improving Mamba-based scanning and preserving dense spectral information through better contextual propagation.",
+      "llm_tldr_cn": "该论文针对现有Mamba模型在高光谱图像超分辨中扫描顺序破坏空间邻接、且状态空间参数与高光谱内在特征对齐不足的问题，提出USP-Mamba模型，通过解混得到的谱和结构提示引导建模，增强上下文传播。实验表明该方法在重建高分辨率高光谱图像的同时能更好地保持光谱信息，为高光谱谱-空特征提取提供了可迁移的思路。",
+      "llm_tldr": "该论文针对现有Mamba模型在高光谱图像超分辨中扫描顺序破坏空间邻接、且状态空间参数与高光谱内在特征对齐不足的问题，提出USP-Mamba模型，通过解混得到的谱和结构提示引导建模，增强上下文传播。实验表明该方法在重建高分辨率高光谱图像的同时能更好地保持光谱信息，为高光谱谱-空特征提取提供了可迁移的思路。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "spectral-spatial feature extraction for hyperspectral data",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
