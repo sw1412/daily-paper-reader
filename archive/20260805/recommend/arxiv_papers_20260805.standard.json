@@ -1,0 +1,138 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-05T20:24:36.555966+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 12,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2608.02045v1",
+      "source": "arxiv",
+      "title": "Mapping melliferous tree species in Kenya via one-class classification with hyperspectral unsupervised domain adaptation",
+      "abstract": "The beekeeping sector holds significant potential for livelihood diversification among the agropastoral communities in Kenya. Melliferous tree species play a critical role by providing essential nectar sources for bees. However, limited knowledge of their precise spatial distributions constrains the full development of beekeeping. One-class classification (OCC) offers a practical solution for detecting single target species without requiring extensive labeled data from other classes. Although existing OCC methods perform well in trained domains, the generalization capability to unseen domains remains limited due to domain shift. To address these challenges, this study proposes a hyperspectral unsupervised domain adaptation OCC framework (HyUDA-One) for tree species mapping using airborne hyperspectral imagery and laser scanning data. The spatial-spectral regularized pseudo-positive learning was designed to mitigate domain shift and improve model generalizability. The effectiveness of HyUDA-One was demonstrated by mapping three key melliferous tree species in two savanna landscapes in southern Kenya. The results show that HyUDA-One significantly improves performance in unlabeled domains. The F1-scores of 0.788, 0.845, and 0.768 were achieved for Senegalia mellifera, Vachellia tortilis, and Commiphora africana in the trained domain, respectively. In the untrained domain, the F1-scores of Senegalia mellifera and Vachellia tortilis were 0.756 and 0.884, respectively. The distribution maps revealed the spatial patterns of these melliferous tree species and the nectar source availability, offering an important reference for sustainable beekeeping development in savanna landscapes. Furthermore, the proposed framework can potentially be extended to other mapping applications, such as invasive species detection.",
+      "authors": [
+        "Zhaozhi Luo",
+        "Janne Heiskanen",
+        "Ilja Vuorinne",
+        "Ian Ocholla",
+        "Shiqi Zhang",
+        "Saana Järvinen",
+        "Xinyu Wang",
+        "Yanfei Zhong",
+        "Petri Pellikka"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.CV"
+      ],
+      "published": "2026-08-03T10:42:50+00:00",
+      "link": "https://arxiv.org/pdf/2608.02045v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Hyperspectral one-class classification with unsupervised domain adaptation for species mapping",
+      "llm_evidence_cn": "高光谱单类分类结合无监督域自适应用于树种制图",
+      "llm_evidence": "高光谱单类分类结合无监督域自适应用于树种制图",
+      "canonical_evidence": "高光谱单类分类结合无监督域自适应用于树种制图",
+      "llm_tldr_en": "Proposes hyperspectral one-class classification with unsupervised domain adaptation to map melliferous tree species in Kenya, improving cross-domain generalization for species detection.",
+      "llm_tldr_cn": "针对高光谱单类分类模型在跨域时因域偏移导致泛化受限的问题，提出一种基于高光谱数据的无监督域自适应单类分类方法，用于在肯尼亚识别蜜源树种的空间分布。该方法利用未标记目标域数据缓解域间差异，不需要大量其他类别标签。实验证明所提方法在跨域情况下性能优于已有单类分类方法，能够更准确地绘制蜜源树种分布，为养蜂业规划提供可靠的空间信息。",
+      "llm_tldr": "针对高光谱单类分类模型在跨域时因域偏移导致泛化受限的问题，提出一种基于高光谱数据的无监督域自适应单类分类方法，用于在肯尼亚识别蜜源树种的空间分布。该方法利用未标记目标域数据缓解域间差异，不需要大量其他类别标签。实验证明所提方法在跨域情况下性能优于已有单类分类方法，能够更准确地绘制蜜源树种分布，为养蜂业规划提供可靠的空间信息。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2607.28743v1",
+      "source": "arxiv",
+      "title": "Multiplicative Errors-in-Variables Models for Hyperspectral Unmixing",
+      "abstract": "Estimating endmember spectra and their corresponding abundances from hyperspectral images is a fundamental inverse problem in remote sensing. The standard linear mixing model relies on additive homoscedastic errors, which misspecifies the mean-variance relationship inherent to optical measurements for which the noise intensity might be proportional to the signal magnitude. This leads to confidence intervals with poor coverage. To address these limitations, we propose a hierarchical Bayesian multiplicative Errors-in-Variables (EIV) model. Motivated by the physics of light propagation, our formulation captures signal-dependent noise through a multivariate log-normal specification that naturally accommodates dependence across spectral bands. The EIV framework treats endmember signatures as random and allows for class-specific variance scaling, yielding a flexible and physically grounded data-generating process. We establish that the MLE of the abundance vector under the multiplicative model has a constant asymptotic multivariate coefficient of variation, implying that well-calibrated confidence intervals should scale proportionally with signal magnitude. The additive model, by contrast, produces intervals of constant width regardless of signal magnitude, leading to overcoverage at low abundance and undercoverage at high abundance when the true noise is multiplicative. Practical implementation and inference for the full hierarchical model is obtained from posterior distributions over the model parameters. Experiments on several real and simulated datasets demonstrate that confidence intervals derived from the proposed model achieve improved coverage across abundance levels compared to those from a standard additive model, with widths that scale proportionally with signal magnitude, while achieving comparable or superior signal reconstruction error.",
+      "authors": [
+        "Vivek Singh",
+        "Peter Hoff"
+      ],
+      "primary_category": "stat.ME",
+      "categories": [
+        "stat.ME"
+      ],
+      "published": "2026-07-30T18:03:46+00:00",
+      "link": "https://arxiv.org/pdf/2607.28743v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Hyperspectral unmixing for spectral abundance estimation",
+      "llm_evidence_cn": "高光谱解混用于光谱丰度估计",
+      "llm_evidence": "高光谱解混用于光谱丰度估计",
+      "canonical_evidence": "高光谱解混用于光谱丰度估计",
+      "llm_tldr_en": "This paper presents a hierarchical Bayesian multiplicative errors-in-variables model for hyperspectral unmixing, using a log-normal distribution to capture signal-dependent noise and improve abundance estimation and confidence intervals.",
+      "llm_tldr_cn": "针对高光谱图像线性混合模型假设加性同方差噪声、与实际光学测量中噪声随信号大小变化不符的问题，提出一种分层贝叶斯乘性误差变量模型。该模型用多元对数正态分布描述信号相关噪声并建模谱带间的依赖性，提升端元光谱与丰度估计的准确性。在实验数据集上，该模型改善了丰度估计精度与置信区间覆盖率，为高光谱图像的分类、目标检测等下游任务提供了更可靠的特征基础。",
+      "llm_tldr": "针对高光谱图像线性混合模型假设加性同方差噪声、与实际光学测量中噪声随信号大小变化不符的问题，提出一种分层贝叶斯乘性误差变量模型。该模型用多元对数正态分布描述信号相关噪声并建模谱带间的依赖性，提升端元光谱与丰度估计的准确性。在实验数据集上，该模型改善了丰度估计精度与置信区间覆盖率，为高光谱图像的分类、目标检测等下游任务提供了更可靠的特征基础。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "spectral-spatial feature extraction for hyperspectral data",
+      "matched_requirement_id": "req-13",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.03370v1",
+      "source": "arxiv",
+      "title": "DRPFNet: Dual-domain Residual Progressive Fusion Network for RGB-Thermal Object Detection",
+      "abstract": "RGB-thermal (RGB-T) object detection aims to fuse complementary information from visible and thermal modalities to achieve robust detection under varying illumination and weather conditions. Current methods typically employ attention mechanisms or transformers to perform cross-modal fusion independently at each feature scale, directly combining RGB and thermal features in the spatial domain. However, they still face significant limitations: cross-level knowledge inheritance caused by independent fusion at each scale,suppressing noise continuously due to the lack of bidirectional optimization, and information degradation induced by the absence of frequency-spatial collaboration. To address these issues, we propose DRPFNet, a Dual-domain Residual Progressive Fusion Network that constructs a unified information flow optimization system from three synergistic levels:structure, feature, and enhancement. At the structural level, we establish cross-scale propagation through bottom-up knowledge accumulation and bidirectional enhancement,ensuring smooth information flow. At the feature level, we collaboratively extract RGB high-frequency edges and thermal low-frequency structures via frequency band separation and edge guidance, guaranteeing representation quality. At the enhancement level, we enhance foreground-background discrimination through edge-guided dual-domain refinement,achieving precise object localization.Extensive experiments on two public RGB-T datasets demonstrate that our method achieves competitive performance with competitive efficiency, validating the effectiveness of this hierarchical collaborative strategy.",
+      "authors": [
+        "Zian Wang",
+        "Changchun Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-04T09:20:31+00:00",
+      "link": "https://arxiv.org/pdf/2608.03370v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Multimodal fusion for object detection; dual-domain residual progressive fusion method transferable to HSI-LiDAR fusion",
+      "llm_evidence_cn": "多模态融合目标检测；双域残差渐进融合方法可迁移至高光谱与LiDAR融合",
+      "llm_evidence": "多模态融合目标检测；双域残差渐进融合方法可迁移至高光谱与LiDAR融合",
+      "canonical_evidence": "多模态融合目标检测；双域残差渐进融合方法可迁移至高光谱与LiDAR融合",
+      "llm_tldr_en": "Addresses limitations of cross-modal fusion by proposing DRPFNet, a dual-domain residual progressive fusion network for RGB-Thermal detection, achieving robust performance under varying conditions.",
+      "llm_tldr_cn": "针对现有跨模态融合方法在逐尺度独立融合、缺乏双向优化及频空协同不足等问题，本文提出DRPFNet双域残差渐进融合网络。该方法在RGB与热红外目标检测中联合建模空间域与频率域，通过渐进式残差融合抑制噪声并增强信息保持。实验结果表明其在不同光照和天气条件下均达到稳健的检测性能。该融合框架可直接迁移至高光谱与LiDAR等多模态遥感数据融合任务。",
+      "llm_tldr": "针对现有跨模态融合方法在逐尺度独立融合、缺乏双向优化及频空协同不足等问题，本文提出DRPFNet双域残差渐进融合网络。该方法在RGB与热红外目标检测中联合建模空间域与频率域，通过渐进式残差融合抑制噪声并增强信息保持。实验结果表明其在不同光照和天气条件下均达到稳健的检测性能。该融合框架可直接迁移至高光谱与LiDAR等多模态遥感数据融合任务。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

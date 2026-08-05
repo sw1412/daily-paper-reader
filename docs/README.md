@@ -6,44 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-04
-- 运行时间：2026-08-04 21:40:22 UTC
+- 最新运行日期：2026-08-05
+- 运行时间：2026-08-05 20:27:30 UTC
 - 运行状态：成功
-- 本次总论文数：8
-- 精读区：4
-- 速读区：4
+- 本次总论文数：3
+- 精读区：1
+- 速读区：2
 
 ### 今日简报（AI）
-今日精读聚焦高光谱图像分类与水果成熟度预测，速读涉及多模态异常检测及农业遥感融合。最值得关注的是PNEC-Mamba的原型引导正负证据校准方法（10分）与Fruit-HSNet的果实成熟度机器学习方案（9分）。建议优先精读这两篇高分论文，并关注其在高光谱农业应用中的实际效果。
-- 详情：[/202608/04/README](/202608/04/README)
+今日精读聚焦肯尼亚蜜源树种高光谱遥感识别，另速读高光谱解混误差建模与RGB-T融合检测两篇。最值得关注的是利用单类分类与无监督域适应提升树种分类精度（8.0分），以及高光谱解混中乘性误差变量的修正思路（7.0分）。后续可结合本地树种光谱库，尝试将域适应方法迁移到区域生态监测场景。
+- 详情：[/202608/05/README](/202608/05/README)
 
 ### 精读区论文标签
-1. [PNEC-Mamba: Prototype-Guided Positive-Negative Evidence Calibration for Hyperspectral Image Classification](/202608/04/2608.01910v1-pnec-mamba-prototype-guided-positive-negative-evidence-calibration-for-hyperspectral-image-classification)  
-   标签：评分：10.0/10、query:hsi-lidar
-   evidence：直接面向高光谱图像分类的原型引导证据校准方法
-2. [Fruit-HSNet: A Machine Learning Approach for Hyperspectral Image-Based Fruit Ripeness Prediction](/202608/04/2608.01202v1-fruit-hsnet-a-machine-learning-approach-for-hyperspectral-image-based-fruit-ripeness-prediction)  
-   标签：评分：9.0/10、query:hsi
-   evidence：使用机器学习架构进行高光谱图像分类
-3. [Fermat Active Laplace Learning for Semi-Supervised Hyperspectral Image Classification](/202608/04/2608.02483v1-fermat-active-laplace-learning-for-semi-supervised-hyperspectral-image-classification)  
-   标签：评分：9.0/10、query:hsi-lidar
-   evidence：直接针对高光谱图像分类提出主动学习方法
-4. [Deep Multimodal Fusion Detection through Spatial Mask and Channel Fusion](/202608/04/2608.02092v1-deep-multimodal-fusion-detection-through-spatial-mask-and-channel-fusion)  
-   标签：评分：8.0/10、query:hsi-lidar
-   evidence：深度多模态融合检测，可迁移至高光谱与LiDAR目标检测
+1. [Mapping melliferous tree species in Kenya via one-class classification with hyperspectral unsupervised domain adaptation](/202608/05/2608.02045v1-mapping-melliferous-tree-species-in-kenya-via-one-class-classification-with-hyperspectral-unsupervised-domain-adaptation)  
+   标签：评分：8.0/10、query:hsi
+   evidence：高光谱单类分类结合无监督域自适应用于树种制图
 
 ### 速读区论文标签
-1. [Understanding and Overcoming Cross-modal Fusion Bias in Multimodal Anomaly Detection From A Fisher Information Perspective](/202608/04/2608.00986v1-understanding-and-overcoming-cross-modal-fusion-bias-in-multimodal-anomaly-detection-from-a-fisher-information-perspective)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：缓解多模态异常检测中的跨模态融合偏差，可迁移至高光谱与LiDAR融合
-2. [Beyond Symmetric Fusion: Exploiting Task-Dependent Modality Strengths for RGB-Event Small Object Detection](/202608/04/2608.01302v1-beyond-symmetric-fusion-exploiting-task-dependent-modality-strengths-for-rgb-event-small-object-detection)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：提出任务相关模态融合用于目标检测，可直接迁移到高光谱与LiDAR融合目标检测
-3. [Space2Ground 2.0: A Multi-Source Dataset and Framework for Agricultural Monitoring through Fusion of Street-Level and Satellite Imagery](/202608/04/2607.28247v1-space2ground-20-a-multi-source-dataset-and-framework-for-agricultural-monitoring-through-fusion-of-street-level-and-satellite-imagery)  
+1. [Multiplicative Errors-in-Variables Models for Hyperspectral Unmixing](/202608/05/2607.28743v1-multiplicative-errors-in-variables-models-for-hyperspectral-unmixing)  
+   标签：评分：7.0/10、query:hsi
+   evidence：高光谱解混用于光谱丰度估计
+2. [DRPFNet: Dual-domain Residual Progressive Fusion Network for RGB-Thermal Object Detection](/202608/05/2608.03370v1-drpfnet-dual-domain-residual-progressive-fusion-network-for-rgb-thermal-object-detection)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：卫星与地面街景影像多源融合用于农业监测，与多模态遥感分类相关
-4. [USP-Mamba: Unmixing-Derived Spectral and Structural Prompting for Hyperspectral Image Super-Resolution](/202608/04/2608.02401v1-usp-mamba-unmixing-derived-spectral-and-structural-prompting-for-hyperspectral-image-super-resolution)  
-   标签：评分：6.0/10、query:hsi
-   evidence：通过解混提示进行高光谱图像的谱-空特征建模
+   evidence：多模态融合目标检测；双域残差渐进融合方法可迁移至高光谱与LiDAR融合
 
 
 <div class="dpr-home-promo-card">

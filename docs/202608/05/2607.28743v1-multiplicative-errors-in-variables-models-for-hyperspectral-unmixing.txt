@@ -1,0 +1,803 @@
+Title: Multiplicative Errors-in-Variables Models for Hyperspectral Unmixing
+
+URL Source: https://arxiv.org/pdf/2607.28743v1
+
+Published Time: Mon, 03 Aug 2026 00:04:38 GMT
+
+Number of Pages: 21
+
+Markdown Content:
+# Multiplicative Errors-in-Variables Models for Hyperspectral Unmixing 
+
+Vivek Singh and Peter Hoff Department of Statistical Science, Duke University August 3, 2026 
+
+Abstract 
+
+Estimating endmember spectra and their corresponding abundances from hyper-spectral images is a fundamental inverse problem in remote sensing. The standard linear mixing model relies on additive homoscedastic errors, which misspecifies the mean-variance relationship inherent to optical measurements for which the noise in-tensity might be proportional to the signal magnitude. This leads to confidence in-tervals with poor coverage. To address these limitations, we propose a hierarchical Bayesian multiplicative Errors-in-Variables (EIV) model. Motivated by the physics of light propagation, our formulation captures signal-dependent noise through a mul-tivariate log-normal specification that naturally accommodates dependence across spectral bands. The EIV framework treats endmember signatures as random and allows for class-specific variance scaling, yielding a flexible and physically grounded data-generating process. We establish that the MLE of the abundance vector under the multiplicative model has a constant asymptotic multivariate coefficient of vari-ation, implying that well-calibrated confidence intervals should scale proportionally with signal magnitude. The additive model, by contrast, produces intervals of con-stant width regardless of signal magnitude, leading to overcoverage at low abundance and undercoverage at high abundance when the true noise is multiplicative. Prac-tical implementation and inference for the full hierarchical model is obtained from posterior distributions over the model parameters. Experiments on several real and simulated datasets demonstrate that confidence intervals derived from the proposed model achieve improved coverage across abundance levels compared to those from a standard additive model, with widths that scale proportionally with signal magnitude, while achieving comparable or superior signal reconstruction error. Keywords: Bayesian inference, Errors-in-Variables, hyperspectral unmixing, Markov chain Monte Carlo, multiplicative noise, uncertainty quantification. 
+
+# 1 Introduction 
+
+Hyperspectral imaging serves as a robust analytical framework for the spectroscopic char-acterization of materials within an observed surface area of interest, or scene Bioucas-Dias 1arXiv:2607.28743v1 [stat.ME] 30 Jul 2026 et al. [2013]. However, due to inherent sensor resolution constraints and the spatial het-erogeneity of the Earth’s surface, individual pixels often represent a mixture of multiple distinct materials Keshava and Mustard [2002]. This phenomenon necessitates spectral unmixing, a source separation task aimed at identifying the constituent substances (end-members) and quantifying their respective spatial proportions (abundances) within the mixed observations. The linear mixing model is the predominant paradigm in spectral unmixing literature Keshava and Mustard [2002], Bioucas-Dias et al. [2012]. It postulates that the observation vector y ∈ Rn
+
+> +
+
+, where n is the number of bands, is a linear combination of the scene’s p endmembers perturbed by additive noise: 
+
+y = M b + ϵ, (1) where b ∈ Rp 
+
+> +
+
+represents the abundance vector subject to non-negativity constraints, 
+
+M ∈ Rn×p 
+
+> +
+
+represents the matrix of endmember spectra, and ϵ ∈ Rn denotes the noise term. Standard formulations assume ϵ follows a zero mean Gaussian distribution. Non-negative matrix factorization (NMF) approaches that estimate the abundance vector b also implicitly rely on this additive assumption by minimizing the residual sum of squared error, which is equivalent to maximum likelihood estimation under a Gaussian noise model Lee and Seung [1999]. However, beyond point estimation, a critical question is how reliable these estimates are. For uncertainty quantification, what matters is that the noise model correctly captures the variance of the observations, since confidence intervals depend on the estimated vari-ance. Under the additive formulation, the variance of y is assumed to be constant across different levels of the signal, which is at odds with the physics of optical measurements where noise intensity is multiplicative, scaling with signal magnitude due to effects such as atmospheric path radiance and topographic shading Richter and Schläpfer [2002]. Indeed, signal-dependent multiplicative noise in hyperspectral imagery has been acknowledged in prior work. Li et al. [2015] minimizes the Itakura-Saito divergence, equivalent to maxi-mum likelihood estimation under a multiplicative Gamma noise model, and Acito et al. [2011] explicitly models signal-dependent noise parameters. However, both approaches as-sume independence across spectral bands and focus exclusively on point estimation, leaving uncertainty quantification unaddressed. The misspecified mean-variance relationship in the additive model leads to a funda-mental miscalibration: the additive model produces confidence intervals that are too wide at low abundance values and too narrow at high ones. A correctly specified model must instead yield confidence intervals whose width scales proportionally with the signal, a prop-erty we establish theoretically and demonstrate empirically for our proposed multiplicative formulation. Figure 1 illustrates the two key features of the data that motivate our model on the Asphalt endmember from the Urban dataset Zhu et al. [2014]. The left panel shows the marginal distribution of reflectance at a single band across reference pixels, which is clearly right-skewed, a signature of signal-dependent multiplicative noise rather than sym-metric additive noise. The right panel shows the estimated log-scale covariance matrix across all spectral bands, revealing strong positive dependence across bands that cannot be captured by a diagonal covariance structure. 2Figure 1: Marginal distribution and inter-band dependence structure of the Asphalt end-member class from the Urban dataset Zhu et al. [2014]. Left: histogram and kernel density estimate of the reflectance at a single spectral band across reference pixels, illustrating the right-skewed marginal distribution characteristic of multiplicative noise. Right: estimated log-scale correlation matrix across all spectral bands, showing strong positive dependence across bands that motivates the use of a full covariance matrix Σ.The standard practive with LMM is to take the endmember matrix M as given. In many applications, however, M is never directly observed. Even pixels known to be composed predominantly of a single material class exhibit significant within-class spectral variability due to intrinsic material heterogeneity, localized degradation, and micro-topography Borsoi et al. [2021]. This naturally motivates an Errors-in-Variables (EIV) formulation Fuller [1987], where the reference pixels are treated as samples from a class-specific distribution rather than exact observations of the true signatures. It is well established that plugging in aggregated estimates of M in place of the true signatures introduces bias in the resulting abundance estimates Fuller [1987]. Furthermore, this within-class variability is not uniform across material classes. Com-plex organic surfaces such as vegetation exhibit higher spectral variance due to differences in chlorophyll content and leaf structure, whereas man-made surfaces like concrete or as-phalt tend to be relatively homogeneous Borsoi et al. [2021]. A principled model must therefore allow for class-specific variance profiles rather than assuming a single global level of spectral variability across all endmembers. In this article, we propose a hierarchical approach to hyperspectral unmixing that addresses the issues raised above. We model the data generation process using a multi-plicative error model, which is robust in scenarios where signal-dependent noise dominates. Our contributions are as follows: 
+
+• Uncertainty quantification: We model the observations using a multivariate log-normal distribution, which captures the signal-dependent mean-variance relation-3ship inherent to optical measurements. As established in Section 2, this yields well-calibrated confidence intervals whose width scales proportionally with the sig-nal magnitude, in contrast to the constant-width intervals produced by the additive model. 
+
+• Within and across-class spectral variability: We adopt a hierarchical EIV formulation where the reference pixels are treated as samples from class-specific distributions, accommodating endmember heterogeneity within each material class. Furthermore, the degree of spectral variability is allowed to differ across classes, reflecting the physical differences between material classes. A shared full covariance matrix Σ
+
+explicitly captures inter-band dependencies across spectral channels, common to both the mixed pixel and the reference pixels. Both contributions are essential for well-calibrated uncertainty quantification. The scal-ing of interval widths with signal magnitude is established theoretically in Section 2, while the EIV formulation accounts for the additional uncertainty introduced by the unobserved endmember signatures. The rest of the article is organized as follows. Section 2 considers a simplified setting with known endmember matrix and scalar covariance, and establishes that the MLE of the abundance vector under the multiplicative model has a constant asymptotic multivariate coefficient of variation, suggesting that the interval widths should scale with signal mag-nitude, and demonstrates via simulation that intervals constructed assuming the additive model are miscalibrated when the true noise is multiplicative. Section 3 introduces the full hierarchical EIV model with class-specific variance scaling and a shared spectral co-variance structure, and describes an MCMC algorithm for posterior inference. Section 4 evaluates both models on real datasets, comparing coverage rates, interval widths, and signal reconstruction error across abundance levels. Section 5 discusses limitations of our multiplicative model and directions for future work. The replication code and an R package implementing the proposed model are available on the first author’s webpage. 
+
+# 2 Adaptive Confidence Intervals via a Multiplicative Model 
+
+To understand the effect of the noise model on uncertainty quantification, we consider a simplified unmixing setting where the endmember matrix M is assumed to be known and the covariance is proportional to the identity matrix. Under these assumptions, we compare the asymptotic behavior of confidence intervals for the abundance vector b under the additive and multiplicative formulations. The additive model assumes the observed pixel is a linear mixture of endmembers perturbed by homoscedastic noise: 
+
+y = M b + ϵ, ϵ ∼ N n(0 , σ 2I), (2) where y ∈ Rn 
+
+> +
+
+is the observed spectral signature, M ∈ Rn×p 
+
+> +
+
+is the endmember matrix, 
+
+b ∈ Rp 
+
+> +
+
+is the unknown abundance vector, and σ2 controls the noise level. The key feature 4of this model is that the noise is independent of the signal: the variance of y is σ2I
+
+regardless of the value of M b .The multiplicative model assumes the noise scales with the signal, so that the observed spectrum is an element-wise product of the signal and a noise term: 
+
+y = ( M b ) ⊙ ε, log( ε) ∼ N n(0 , σ 2I), (3) where y ∈ Rn 
+
+> +
+
+and all other quantities are as above. Here the standard deviation of 
+
+yi is proportional to mTi b, reflecting the mean-variance relationship inherent to optical measurements. 
+
+2.1 Asymptotic Properties 
+
+We characterize the MLE under the correctly specified multiplicative model (3). Write mTi
+
+for the i-th row of M , let b0 denote the true abundance vector, and set wi(b) := mi/(mTi b)
+
+and wi := wi(b0).Taking logarithms in (3) turns the model into the nonlinear regression 
+
+zi := log yi = log( mTi b) + ηi, ηi iid 
+
+∼ N (0 , σ 2), (4) so that the MLE coincides with the nonlinear least squares estimator 
+
+ˆbMLE = arg min 
+
+> b∈Θ
+> n
+
+X
+
+> i=1
+
+ zi − log( mTi b)2, (5) with regression function fi(b) = log( mTi b), gradient f ′ 
+
+> i
+
+(b) = wi(b), and Hessian f ′′  
+
+> i
+
+(b) = 
+
+−wi(b)wi(b)T . Its large-sample behaviour therefore follows from the classical asymptotic theory of nonlinear least squares Wu [1981], once the following regularity conditions are met. 
+
+Assumption 1. 
+
+(A1) b0 ∈ int(Θ) for a compact convex parameter set Θ ⊂ Rp.(A2) sup i ∥mi∥ < ∞ and inf i inf b∈Θ mTi b > 0. In particular sup i, b ∈Θ ∥wi(b)∥ ≤ W < ∞.(A3) 1
+
+n
+
+> n
+
+X
+
+> i=1
+
+mimTi
+
+(mTi b0)2 −→ ¯I(b0), positive definite. 
+
+Lemma 1 (Consistency) . Under model (3) and Assumption 1, ˆbMLE → b0 almost surely as n → ∞ .
+
+Theorem 1 (Asymptotic Normality) . Under model (3) and Assumption 1, 
+
+√n(ˆbMLE − b0) d
+
+−→ N (0 , V (b0)) , V (b0) = σ2 ¯I(b0)−1.
+
+5Under Assumption 1, the consistency and asymptotic normality of ˆbMLE follow from the nonlinear least squares theory of Wu [1981] applied to (5). The verification of the conditions of Wu [1981] is given in Appendix A. A notable feature of the limiting variance V (b) is that it possesses a constant multi-variate coefficient of variation (MCV) Aerts et al. [2015], formalized below. 
+
+Lemma 2 (Constant Multivariate Coefficient of Variation) . Let ¯I(b) := lim n→∞ 1
+
+> n
+
+Pni=1   
+
+> mimTi
+> (mTib)2
+
+.At every b with mTi b > 0 for all i at which ¯I(b) exists and is nonsingular, the asymptotic variance V (b) = σ2 ¯I(b)−1 satisfies 
+
+bT V (b)−1b = σ−2.
+
+Proof. Since V (b) = σ2 ¯I(b)−1, we have V (b)−1 = σ−2 ¯I(b), so bT V (b)−1b = σ−2 bT ¯I(b) b.It remains to show bT ¯I(b) b = 1 . Because mTi b is scalar, 
+
+bT mimTi
+
+(mTi b)2 b = (mTi b)2
+
+(mTi b)2 = 1 for every i, 
+
+and therefore 
+
+bT ¯I(b) b = lim 
+
+> n→∞
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+bT mimTi
+
+(mTi b)2 b = lim 
+
+> n→∞
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+1 = 1 .
+
+Hence bT V (b)−1b = σ−2.Lemma 2 implies that the width of confidence intervals for bj scales proportionally with the true abundance bj . For example, if p = 1 , pV (b) = σ · b, so the asymptotic standard deviation of ˆbMLE is proportional to the true abundance. If instead the multiplicative model is misspecified as additive (2), the MLE reduces to the ordinary least squares estimator 
+
+ˆbOLS = ( M T M )−1M T y, 
+
+whose variance σ2(M T M )−1 does not depend on b. Consequently, the resulting confi-dence intervals have constant width regardless of the true abundance, leading to system-atic miscalibration: overestimated interval lengths at low abundance values and insufficient coverage at high abundance values. 
+
+2.2 Numerical Illustration 
+
+We provide numerical validation for Lemma 2 through simulation. Simulated data are gen-erated according to the simplified multiplicative model (3) above, with known endmember signatures M and homoscedastic noise log( ε) ∼ N (0 , σ 2I). Figure 2 compares the coverage rates and interval widths of the confidence intervals obtained from the multiplicative and misspecfied additive models for n = 200 spectral bands and p = 4 endmembers. σ2 is set to 0.1. The additive model (2) produces interval widths that are approximately constant 6across abundance values, while the multiplicative model yields widths that scale propor-tionally with the abundance, consistent with the constant MCV property. Consequently, both models achieve correct coverage at low abundance values, though the multiplicative intervals are narrower. At high abundance values, the additive model undercovers while the multiplicative model maintains correct coverage. 
+
+# 3 Hierarchical Multiplicative Errors-in-Variables Model 
+
+Let y ∈ Rn 
+
+> +
+
+denote the observed mixed spectrum across n spectral bands, and let p denote the number of endmember classes in the scene. The goal of unmixing is to recover the abundance vector b ∈ Rp
+
+> +
+
+, where bj quantifies the contribution of the j-th material class to the mixed spectrum. Let μj ∈ Rn 
+
+> +
+
+denote the median spectrum of the j-th endmember class and collect these into the matrix M = [ μ1, . . . , μ p] ∈ Rn×p 
+
+> +
+
+. We model the mixed spectrum as 
+
+y = M b ⊙ ε, 
+
+where the multiplicative structure ensures that the noise scales with the signal magnitude. If M were known, this reduces to a non-linear regression problem. In practice, however, M
+
+is unobserved and must be estimated from reference spectra. Let {xij }nj 
+
+> i=1
+
+denote the nj
+
+reference spectra associated with the j-th endmember class, which are samples from the distribution of that material class. We model them as 
+
+xij = μj ⊙ εij ,
+
+where εij captures the within-class spectral variability of the i-th reference spectrum. This is precisely the Errors-in-Variables (EIV) setting of Fuller [1987]. It is well established in the EIV literature that naive substitution of an estimate of M , such as the sample median of the reference spectra, in place of the true μj leads to biased abundance estimates Fuller [1987]. Our model instead treats M as unknown and infers it jointly with b from the data. 
+
+3.1 Within and Across Endmember Variability 
+
+The multiplicative noise terms ε and εij are modeled using a multivariate log-normal dis-tribution, which simultaneously captures three sources of variability in the data. First, the noise intensity scales with the signal magnitude, reflecting the mean-variance relation-ship inherent to optical measurements. Second, spectral bands are dependent and a full covariance matrix Σ ∈ S n 
+
+> +
+
+captures these inter-band dependencies. Third, the degree of within-class spectral variability differs across material classes. To capture these sources jointly, we share the covariance matrix Σ across the entire scene while allowing class-specific scaling. Since the reference spectra and the mixed spectrum are drawn from the same scene, they are subject to the same atmospheric and environmental conditions, justifying a common Σ. Let τy represent the variance scaling for the mixed spectrum and τj the variance scaling for the j-th endmember class. The complete model 7Figure 2: Conditional coverage rates (left) and mean 90% quantile interval widths (right) as a function of true abundance for each endmember for the multiplicative and misspecified additive fits on simulated data with n = 200 spectral bands and p = 4 endmembers. Each bin approximately contains 175 pixels. The dashed line indicates nominal 90% coverage. Blue corresponds to the additive model and red to the multiplicative model. 8is 
+
+y = M b ⊙ ε, log( ε) | τy, Σ ∼ N (0 , τ yΣ) ,xij = μj ⊙ εij , log( εij ) | τj , Σ ∼ N (0 , τ j Σ) , i = 1 , . . . , n j .
+
+Figure 3 shows a graphical representation of the model. This formulation allows the model to learn a spectral dependence structure ( Σ) shared across the scene, while the scaling parameters τj adaptively quantify the intrinsic variability of each material class. Wolbers and Stahel [2005] also employ a log-normal structure in a linear unmixing context but performs point estimation assuming a diagonal error covariance, ignoring inter-band dependencies. Li et al. [2015], Acito et al. [2011] acknowledge signal-dependent multiplicative noise but likewise focus on point estimation and do not model inter-band dependence. Our formulation addresses all three sources of variability within a unified hierarchical framework that supports full uncertainty quantification. 
+
+Σ
+
+τyb
+
+y
+
+τj μj
+
+xij 
+
+i = 1 : nj
+
+j = 1 : p
+
+Figure 3: Graphical representation of the proposed model. Shaded nodes denote observed quantities. The shared covariance Σ governs inter-band dependence across the scene, while 
+
+τy and τj control the variance scaling for the mixed pixel and the endmember classes respectively. 
+
+3.2 Bayesian Inference and Priors 
+
+We employ a Bayesian framework to jointly infer the abundances b, the median endmember signatures M , and the variance parameters. The complexity of the multiplicative model precludes a closed-form for the posterior distribution, therefore, we utilize the Metropolis-Hastings algorithm to generate approximate samples. 
+
+3.2.1 Prior Specification. We assign the following priors to the parameters: 
+
+• Abundances. We employ an Exponential prior on the abundance coefficients to enforce non-negativity: bj i.i.d. 
+
+∼ Exp (p), for j = 1 , . . . , p , which makes E[bk] = 1 /p .9We do not impose the sum-to-one constraint as it may not reflect physical reality. For instance, if the scene contains materials not captured by the chosen endmember set, the abundances of the identified classes need not sum to one. 
+
+• Variance Scaling. We employ Inverse-Gamma priors to the scaling factors with the constraint that their prior expectation is one. Specifically, τy, τ j ∼ Inverse-Gamma (ν/ 2, ν/ 2) ,where ν controls the variance of the scaling factor. 
+
+• Covariance Structure. We employ a conjugate Inverse-Wishart (Ψ , ρ ) prior distri-bution to the shared covariance matrix. 
+
+• Endmember Class Medians. We employ a log-normal prior on the median end-member signature μj centered around a prior value, so that log( μj ) ∼ N (log( mj ), σ 2In).In practice, the hyperparameters Θ = {ν, Ψ, ρ, σ 2, m j } are estimated from the reference pixels {xij } prior to running the MCMC. Specifically, log( mj ) is set to the sample mean of 
+
+log( xij ) across i, Ψ is initialized to the sample covariance of the log-transformed reference pixels pooled across classes, and σ2 is set to a large value to reflect diffuse prior uncertainty on μj . The degrees of freedom ρ = n + 1 is chosen as the minimum value for which the Inverse-Wishart prior is proper, yielding a diffuse prior on Σ. The hyperparameter ν = 3 is chosen to give the scaling factors a prior mean of one while retaining heavy tails, allowing the data to pull τy and τj away from one if warranted. 
+
+3.2.2 Posterior Inference: Parameter estimation and confidence intervals. Given the ob-served mixed spectrum y and reference spectra {xij }, we draw approximate samples from the joint posterior distribution p(b, M, Σ, τ y, {τj } | y, {xij }) using a Markov chain Monte Carlo (MCMC) algorithm. Each iteration produces one sample of all parameters. After running the chain for T iterations and discarding the first T0 as burn-in, point estimates are obtained by averaging the remaining samples, and a (1 − α) confidence interval for the j-th abundance is given by the empirical α/ 2 and 1 − α/ 2 quantiles of the posterior samples for bj . The reconstructed spectrum is estimated as the posterior mean of M b .
+
+Algorithm 1. MCMC Sampler for the Hierarchical Multiplicative EIV Model 
+
+Input: Mixed spectrum y, reference spectra {xij }, hyperparameters Θ, number of itera-tions T .
+
+Initialize: b(0) , M (0) , Σ(0) , τ (0)  
+
+> y
+
+, {τ (0)  
+
+> j
+
+} sampled from their respective prior distributions. 
+
+For t = 1 , . . . , T , repeat: 
+
+Metropolis-Hastings Updates: 
+
+1. Update b. Define D(b, M ) = diag (M b )−1 and the curvature-adapted proposal co-variance 
+
+H(b, M, τ y) =  M T D(b, M )T (τyΣ) −1D(b, M )M −1 .
+
+Propose b∗ from a multivariate normal distribution centered at b(t−1) with covari-ance H(b(t−1) , M (t−1) , τ (t−1)  
+
+> y
+
+), truncated to the positive orthant Rp 
+
+> +
+
+to enforce non-negativity of the abundances. We write this as b∗ ∼ T N +
+
+
+
+b(t−1) , H (b(t−1) , M (t−1) , τ (t−1)  
+
+> y
+
+)
+
+
+
+.
+
+10 Sampling from this distribution and evaluating its density q+ are performed using the minimax tilting algorithm of Botev [2017]. Since H depends on b, the proposal is asymmetric and both directions must be evaluated, set 
+
+b(t) =
+
+(
+
+b∗ with probability min(1 , r ),b(t−1) otherwise, where 
+
+log r = log p(b∗ | · ) − log p(b(t−1) | · ) + log q+(b(t−1) | b∗) − log q+(b∗ | b(t−1) ),
+
+with p(b | · ) ∝ exp 
+
+
+
+− 12τ (t−1) 
+
+> y
+
+(log y − log M (t−1) b)T (Σ (t−1) )−1(log y − log M (t−1) b)
+
+
+
+·
+
+exp 
+
+
+
+−p P 
+
+> j
+
+bj
+
+
+
+.2. Update M . For each j = 1 , . . . , p , define the proposal covariance 
+
+Λj = nj
+
+τ (t−1) 
+
+> j
+
+(Σ (t−1) )−1 + 1
+
+σ2 In
+
+!−1
+
+.
+
+Propose log( μ∗ 
+
+> j
+
+) ∼ N 
+
+
+
+log μ(t−1)  
+
+> j
+
+, Λj /5
+
+
+
+. The proposal is a symmetric random walk on the log scale, set 
+
+μ(t) 
+
+> j
+
+=
+
+(μ∗ 
+
+> j
+
+with probability min(1 , r ),μ(t−1)  
+
+> j
+
+otherwise, where log r = log p(μ∗ 
+
+> j
+
+| · ) − log p(μ(t−1)  
+
+> j
+
+| · ) and p(μj | · ) combines the contributions of y through log( M (t)b(t)) and the reference pixels {xij } for the j-th endmember class. 
+
+Full conditional updates: 
+
+3. Update Σ. Sample from the closed-form full conditional: 
+
+Σ(t) | · ∼ Inverse-Wishart 
+
+Ψ + ryrTy
+
+τ (t−1) 
+
+> y
+
++
+
+> p
+
+X
+
+> j=1
+
+1
+
+τ (t−1) 
+
+> jnj
+
+X
+
+> i=1
+
+rij rTij , ρ + 1 + 
+
+> p
+
+X
+
+> j=1
+
+nj
+
+ ,
+
+where ry = log y − log( M (t)b(t)) and rij = log xij − log μ(t) 
+
+> j
+
+.4. Update τj , j = 1 , . . . , p . Sample from the closed-form full conditional: 
+
+τ (t) 
+
+> j
+
+| · ∼ Inverse-Gamma n · nj + ν
+
+2 , ν + Pnj 
+
+> i=1
+
+rTij (Σ (t))−1rij 
+
+2
+
+!
+
+.
+
+11 5. Update τy. Sample from the closed-form full conditional: 
+
+τ (t) 
+
+> y
+
+| · ∼ Inverse-Gamma n + ν
+
+2 , ν + rTy (Σ (t))−1ry
+
+2
+
+!
+
+.
+
+Output: After discarding the first T0 samples as burn-in, the remaining T −T0 samples are used as follows. The posterior mean abundance vector is estimated as ˆb = 1 
+
+> T−T0
+
+PTt=T0+1 b(t),and the reconstructed spectrum as ˆy = 1 
+
+> T−T0
+
+PTt=T0+1 M (t)b(t). A (1 −α)-confidence interval for the j-th abundance is given by the empirical α/ 2 and 1 − α/ 2 quantiles of {b(t) 
+
+> j
+
+}Tt=T0+1 .
+
+# 4 Experiments 
+
+We evaluate the proposed multiplicative model on two hyperspectral imaging datasets. For each dataset, we select two patches of size 30 × 30 from the image. The patches are chosen to contain material boundaries and significant contributions from all endmembers. We compare the multiplicative model against an additive Gaussian model with an iden-tical hierarchical structure, where the mixed spectrum and reference spectra are modeled as 
+
+y = M b + ε, ε | τy, Σ ∼ N (0 , τ yΣ) ,xij = μj + εij , εij | τj , Σ ∼ N (0 , τ j Σ) , i = 1 , . . . , n j .
+
+Posterior inference for the additive model proceeds via a similar MCMC algorithm, with the log-scale likelihood replaced by its Gaussian counterpart. Our metrics of comparison are the coverage rates of the 90% quantile intervals, defined as the 5th and 95th percentile of the posterior samples, the width of those intervals as a function of the abundance, and the signal reconstruction error (SRE). The SRE for a pixel is defined as SRE = 10 log 10 
+
+ ∥y∥22
+
+∥y − ˆy∥22
+
+
+
+,
+
+where y is the observed pixel reflectance and ˆy = E[M b |y, {xij }], the posterior mean of 
+
+M b .For both datasets, abundance maps are available as part of the ground truth. We construct 90% quantile intervals from the MCMC output for each pixel and endmember. Since posterior samples are strictly positive by construction, the interval lower bound cannot reach zero exactly. For both models, any lower bound below 0.01 is treated as zero when assessing coverage, reflecting the fact that the posterior is supported on Rp 
+
+> +
+
+and the 5th percentile of a finite MCMC chain cannot reach zero exactly. To assess how coverage and interval width vary as a function of the signal strength, we bin the remaining pixels for each endmember into 10 quantile-based bins according to their true abundance values. Each bin contains approximately the same number of pixels, avoiding the sparsely populated bins that would arise from equal-width binning on the skewed abundance distribution. 12 4.1 Experiment Results on the Jasper Ridge Dataset 
+
+The Jasper Ridge dataset was captured by the Airborne Visible/Infrared Imaging Spec-trometer (AVIRIS) sensor Green et al. [1998] operated by the Jet Propulsion Laboratory (JPL) over the Jasper Ridge Biological Preserve in California. The full scene consists of 
+
+512 × 614 pixels recorded across 224 spectral bands spanning 380–2500 nm at a spectral resolution of 9.46 nm. Following standard preprocessing, a 100 × 100 pixel subimage is extracted starting from pixel (105 , 269) in the original scene, and bands 1–3, 108–112, 154–166, and 220–224 are removed due to water vapor absorption and atmospheric effects, leaving n = 198 channels. The scene contains p = 4 endmembers: Road, Soil, Water, and Tree, with ground truth abundance maps provided by Zhu et al. [2014]. Patch 1 Road Soil Water Tree 
+
+> Patch 2  00.5 1
+
+Figure 4: Ground truth abundance maps for both 30 ×30 patches extracted from the Jasper Ridge dataset, for each of the four endmember classes: Road, Soil, Water, and Tree. We extract two 30 × 30 patches from the image and identify reference pure pixels by thresholding the ground truth abundances at 0.99 . See Figure 4 for the ground truth abundance maps of both patches. Figures 5 and 6 summarize the results. The left column of Figure 5 shows the conditional coverage rates of the confidence intervals obtained un-der the multiplicative and additive models for each endmember across the 10 abundance bins. The multiplicative model achieves higher coverage than the additive model in almost every bin, which is the relevant criterion since coverage should hold conditionally at each abundance level rather than on average. The right column shows the mean 90% quan-tile interval width as a function of true abundance. While the additive model produces approximately constant interval widths regardless of abundance value, the multiplicative model interval widths scale with the abundance value, consistent with the constant MCV property established in Lemma 2. 13 Road 
+
+0.0 0.3 0.6 0.9 0.00 0.25 0.50 0.75 Coverage rate 
+
+0.0 0.3 0.6 0.9 0.00 0.25 0.50 0.75 Mean interval width 
+
+Soil 
+
+0.0 0.3 0.6 0.9 0.00 0.25 0.50 0.75 1.00 Coverage rate 
+
+0.0 0.3 0.6 0.9 0.00 0.25 0.50 0.75 1.00 Mean interval width Water 
+
+0.0 0.3 0.6 0.9 0.25 0.50 0.75 Coverage rate 
+
+0.0 0.3 0.6 0.9 0.25 0.50 0.75 Mean interval width Tree 
+
+0.0 0.3 0.6 0.9 0.00 0.25 0.50 0.75 btrue (bin midpoint) Coverage rate 
+
+0.0 0.3 0.6 0.9 0.00 0.25 0.50 0.75 btrue (bin midpoint) Mean interval width Additive Multiplicative Figure 5: Conditional coverage rates (left) and mean 90% quantile interval widths (right) as a function of the true abundance value for each endmember on the Jasper Ridge dataset, combined over 1800 pixels from both patches. The dashed line indicates nominal 90% coverage. Blue corresponds to the additive model and red to the multiplicative model. 14 Figure 6 plots SRE mult − SRE add for each pixel, where red indicates pixels where the multiplicative model reconstructs the signal better and blue the reverse. The difference map is broadly balanced, with neither model consistently dominating. The primary ad-vantage of the multiplicative model lies in its better-calibrated uncertainty quantification, as evidenced by the coverage results. Patch 1  
+
+> ΔSRE (dB)
+> -20 -10 010 20
+
+Patch 2 
+
+Figure 6: Pixel-wise SRE difference SRE mult − SRE add (dB) for both patches on the Jasper Ridge dataset. Red indicates pixels where the multiplicative model achieves better signal reconstruction, blue indicates the reverse. 
+
+4.2 Experiment Results on the Urban Dataset 
+
+The Urban dataset Zhu et al. [2014] was acquired by the HYDICE sensor over an urban area at Copperas Cove, TX, USA in October 1995. The scene consists of 307 × 307 pixels at a spatial resolution of 2 × 2 m2, with 210 spectral bands spanning 400–2500 nm at 10 nm spectral resolution. Following standard preprocessing, bands 1–4, 76, 87, 101–111, 136–153, and 198–210 are removed due to water vapor absorption and atmospheric effects, and the remaining bands are further truncated to the first 80, as the reflectance values of certain endmember classes drop to near zero at higher band indices, which we attribute to sensor artifacts rather than physical signal, leaving n = 80 channels. We adopt p = 4 endmember classes derived from the 6-endmember ground truth pro-vided with the dataset Zhu et al. [2014]. Specifically, we merge Asphalt and Metal into a single class due to their high spectral similarity, and likewise merge Grass and Tree. The spectral angle mapper (SAM) distance between Asphalt and Metal is 6.97 ◦ with a Pearson correlation of 0.853 , and between Grass and Tree is 14 .66 ◦ with a Pearson correlation of 
+
+0.955 , justifying the merging of these pairs. The resulting four classes are: Asphalt (As-phalt + Metal), Grass/Tree, Roof and Dirt. The ground truth abundance for each merged 15 class is obtained by summing the constituent abundances. We extract two 30 × 30 patches and identify reference pure pixels by thresholding the ground truth abundances at 0.99 . See Figure 7 for the ground truth abundance maps of both patches. Patch 1 Asphalt/Metal Grass/Tree Roof Dirt 
+
+> Patch 2  00.5 1
+
+Figure 7: Ground truth abundance maps for both 30 × 30 patches extracted from the Urban dataset, for each of the four endmember classes: Asphalt/Metal, Grass/Tree, Roof, and Dirt. The left column of Figure 8 compares the conditional coverage rates for each endmember across the 10 abundance bins. Consistent with the results of Section 4.1, the multiplicative model achieves higher coverage than the additive model in almost every bin. The right column shows the interval widths as a function of true abundance, again consistent with the constant MCV property of Lemma 2. Figure 9 plots SRE mult − SRE add for each pixel, where red indicates pixels for which the multiplicative model reconstructs the signal better and blue is the reverse. The map is predominantly red, suggesting that the multiplicative model is better suited for signal reconstruction on this dataset. 
+
+# 5 Discussion 
+
+We developed a hierarchical Bayesian multiplicative Errors-in-Variables model for hyper-spectral unmixing that accounts for signal-dependent noise, intra-class spectral variability, and inter-band dependence. We establish that the multiplicative model yields abundance confidence intervals that scale proportionally with the abundance value. The experiments on the Urban and Jasper Ridge datasets validate this: the multiplicative model produces 16 Asphalt/Metal 
+
+0.0 0.3 0.6 0.9 0.25 0.50 0.75 1.00 Coverage rate 
+
+0.0 0.5 1.0 0.25 0.50 0.75 1.00 Mean interval width 
+
+Grass/Tree 
+
+0.0 0.3 0.6 0.9 0.25 0.50 0.75 1.00 Coverage rate 
+
+0.0 0.5 1.0 0.25 0.50 0.75 1.00 Mean interval width 
+
+Roof 
+
+0.0 0.3 0.6 0.9 0.25 0.50 0.75 1.00 Coverage rate 
+
+0.0 0.5 1.0 0.25 0.50 0.75 1.00 Mean interval width Dirt 
+
+0.0 0.3 0.6 0.9 0.2 0.4 0.6 btrue (bin midpoint) Coverage rate 
+
+0.0 0.5 1.0 0.2 0.4 0.6 btrue (bin midpoint) Mean interval width Additive Multiplicative Figure 8: Conditional coverage rates (left) and mean 90% quantile interval widths (right) as a function of the true abundance value for each endmember on the Urban dataset, combined over 1800 pixels from both patches. The dashed line indicates nominal 90% coverage. Blue corresponds to the additive model and red to the multiplicative model. 17 Patch 1  
+
+> ΔSRE (dB)
+> -10 010
+
+Patch 2 Figure 9: Pixel-wise SRE difference SRE mult − SRE add (dB) for both patches on the Ur-ban dataset. Red indicates pixels where the multiplicative model achieves better signal reconstruction, blue indicates the reverse. The predominantly red map suggests the mul-tiplicative model is a better generative model for this scene. better-calibrated coverage rates across abundance levels, with the miscalibration of the additive model being most pronounced at high abundance values. Signal reconstruction quality is comparable between the two models on Jasper Ridge, while the multiplicative model achieves better SRE on the Urban dataset, suggesting it is also a more faithful generative model for scenes dominated by multiplicative noise sources such as topographic shading and atmospheric path radiance. Several directions remain open for future work. The current model is not well-suited for handling near-zero abundances. When the true abundance of a material is absent or negligible in a pixel, a zero-inflated formulation for b would provide a more principled treatment. The shared covariance matrix Σ could be modeled more parsimoniously using a factor model structure, which would reduce the number of parameters and improve scalability to images with a large number of spectral bands. Additionally, while the current model treats the noise as purely multiplicative, real hyperspectral scenes may exhibit a combination of additive and multiplicative perturbations. Incorporating an additive noise component alongside the multiplicative structure would yield a more general model. The current formulation also operates on individual pixels independently. Extending inference to the full image by incorporating spatial structure across pixels represents a natural next step. While developing our methodology, we also explored a more general formulation in which the endmember contributing to a mixed pixel is treated as a particular realization from the distribution of that class rather than the class median. For example, the tree 18 species present in a given pixel is a random sample from the distribution of trees in the scene, and is not directly observed. This motivates a model where the pixel is a mixture of latent endmember samples X∗ = [ x∗
+
+> 1
+
+, . . . , x ∗
+
+> p
+
+], where each x∗ 
+
+> j
+
+is an unobserved realization from the j-th endmember distribution, rather than a mixture of the class medians μj :
+
+y = ( X∗b) ⊙ ε, log( ε) | τy, Σ ∼ N (0 , τ yΣ) ,x∗ 
+
+> j
+
+= μj ⊙ εj , log( εj ) | τj , Σ ∼ N (0 , τ j Σ) ,xij = μj ⊙ εij , log( εij ) | τj , Σ ∼ N (0 , τ j Σ) , i = 1 , . . . , n j .
+
+While this model is more realistic, it introduces additional latent variables that must be marginalized over during inference. In numerical experiments, we did not observe significant performance advantages in coverage or signal reconstruction over the simpler formulation presented here, and therefore have adopted the latter for our main analysis. 
+
+# References 
+
+N. Acito, M. Diani, and Giovanni Corsini. Signal-dependent noise modeling and model parameter estimation in hyperspectral images. IEEE Transactions on Geoscience and Remote Sensing , 49:2957–2971, 2011. S Aerts, G Haesbroeck, and C Ruwet. Multivariate coefficients of variation: Comparison and influence functions. Journal of Multivariate Analysis , 142:183–198, 2015. José M. Bioucas-Dias, Antonio Plaza, Nicolas Dobigeon, Mario Parente, Qian Du, Paul Gader, and Jocelyn Chanussot. Hyperspectral unmixing overview: Geometrical, statisti-cal, and sparse regression-based approaches. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , 5(2):354–379, 2012. José M. Bioucas-Dias, Antonio J. Plaza, Gustau Camps-Valls, Paul Scheunders, Nasser M. Nasrabadi, and Jocelyn Chanussot. Hyperspectral remote sensing data analysis and future challenges. IEEE Geoscience and Remote Sensing Magazine , 1:6–36, 2013. Ricardo Augusto Borsoi, Tales Imbiriba, José Carlos Moreira Bermudez, Cédric Richard, Jocelyn Chanussot, Lucas Drumetz, Jean-Yves Tourneret, Alina Zare, and Christian Jutten. Spectral variability in hyperspectral data unmixing: A comprehensive review. 
+
+IEEE Geoscience and Remote Sensing Magazine , 9(4):223–270, 2021. Zdravko I Botev. The normal law under linear restrictions: simulation and estimation via minimax tilting. Journal of the Royal Statistical Society Series B: Statistical Methodol-ogy , 79(1):125–148, 2017. Wayne A. Fuller. Measurement Error Models . John Wiley & Sons, New York, 1987. Robert O Green, Michael L Eastwood, Charles M Sarture, Thomas G Chrien, Mikael Aronsson, Bruce J Chippendale, Jessica A Faust, Betina E Pavri, Christopher J Chovit, Manuel Solis, Martin R Olah, and Orlesa Williams. Imaging spectroscopy and the 19 airborne visible/infrared imaging spectrometer (aviris). Remote Sensing of Environment ,65(3):227–248, 1998. N. Keshava and J.F. Mustard. Spectral unmixing. IEEE Signal Processing Magazine , 19 (1):44–57, 2002. Daniel D. Lee and H. Sebastian Seung. Learning the parts of objects by non-negative matrix factorization. Nature , 401(6755):788–791, 1999. Chunzhi Li, Xiaohua Chen, and Yunliang Jiang. On diverse noises in hyperspectral unmix-ing. IEEE Transactions on Geoscience and Remote Sensing , 53(10):5388–5402, 2015. R. Richter and D. Schläpfer. Geo-atmospheric processing of airborne imaging spectrometry data. part 2: Atmospheric/topographic correction. International Journal of Remote Sensing , 23(13):2631–2649, 2002. Marcel Wolbers and Werner Stahel. Linear unmixing of multivariate observations: Astructural model. Journal of the American Statistical Association , 100(472):1328–1342, 2005. Chien-Fu Wu. Asymptotic theory of nonlinear least squares estimation. The Annals of Statistics , 9(3):501–513, 1981. Feiyun Zhu, Ying Wang, Bin Fan, Shiming Xiang, Geofeng Meng, and Chunhong Pan. Spectral unmixing via data-guided sparsity. IEEE Transactions on Image Processing ,23(12):5412–5427, 2014. 
+
+# A Verification of the Conditions of Wu [1981] 
+
+We verify the conditions of Wu [1981] for the nonlinear least squares problem (5), with re-gression function fi(b) = log( mTi b), gradient f ′ 
+
+> i
+
+(b) = wi(b), and Hessian f ′′  
+
+> i
+
+(b) = −wi(b)wi(b)T ,using normalizing sequence τn = n.For consistency, Assumption A of Wu [1981] requires the identifiability condition Pni=1 (fi(b)−
+
+fi(b0)) 2 → ∞ for every b̸ = b0, together with a growth-rate and a Lipschitz condition. Let 
+
+c = inf i, b ∈Θ mTi b and C+ = sup i, b ∈Θ mTi b, which are finite and positive by (A1)–(A2). By the mean value theorem applied to log between mTi b and mTi b0, there is ξi ∈ [c, C +] with 
+
+fi(b) − fi(b0) = ξ−1 
+
+> i
+
+mTi (b − b0), so (fi(b) − fi(b0)) 2 ≥ C−2+ (mTi (b − b0)) 2 and hence 
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+(fi(b) − fi(b0)) 2 ≥ 1
+
+C2+
+
+(b − b0)T  1
+
+n
+
+> n
+
+X
+
+> i=1
+
+mimTi
+
+
+
+(b − b0).
+
+Since (mTi b0)2 ≥ c2, we have 1
+
+> n
+
+P 
+
+> i
+
+mimTi ⪰ c2 · 1
+
+> n
+
+P  
+
+> imimTi
+> (mTib0)2
+
+→ c2 ¯I(b0), so by monotonicity of the minimum eigenvalue lim inf n λmin 
+
+  1
+
+> n
+
+P 
+
+> i
+
+mimTi
+
+ ≥ c2λmin ( ¯I(b0)) > 0. With κn := 
+
+20 C−2+ λmin 
+
+  1
+
+> n
+
+P 
+
+> i
+
+mimTi
+
+,
+
+1
+
+n
+
+> n
+
+X
+
+> i=1
+
+(fi(b) − fi(b0)) 2 ≥ κn∥b − b0∥2, lim inf  
+
+> n
+
+κn ≥ c2
+
+C2+
+
+λmin ( ¯I(b0)) > 0,
+
+which gives both the divergence and the growth-rate condition. The Lipschitz condition holds because (A2) bounds ∥f ′ 
+
+> i
+
+(b)∥ = ∥wi(b)∥ ≤ W uniformly. Hence [Wu, 1981, Theorem 3] yields strong consistency. For asymptotic normality, Assumption B of Wu [1981] is met as follows. Condition B(i) is (A3), namely 1
+
+> n
+
+P 
+
+> i
+
+f ′ 
+
+> i
+
+(b0)f ′ 
+
+> i
+
+(b0)T = 1
+
+> n
+
+P 
+
+> i
+
+wiwTi → ¯I(b0) positive definite, with b0 interior by (A1). Condition B(ii) holds since ∥wi∥ ≤ W makes each term O(n−1). Condition B(iii) holds because wi(b)wi(b)T is Lipschitz in b uniformly in i, giving 1
+
+> n
+
+P 
+
+> i
+
+wi(b)wi(b)T → ¯I(b0)
+
+as b → b0. Conditions B(iv)–B(v) hold because ∥f ′′  
+
+> i
+
+(b)∥ ≤ W 2 uniformly and f ′′  
+
+> i
+
+is likewise uniformly Lipschitz. Since the errors are Gaussian, the least squares estimator is the MLE, and [Wu, 1981, Theorem 5] gives the stated limit with variance σ2 ¯I(b0)−1.21
