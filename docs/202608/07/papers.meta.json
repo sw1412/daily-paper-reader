@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-07",
+  "date": "2026-08-07",
+  "generated_at": "2026-08-07T02:14:17",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/07/2608.04154v1-trnet-topography-guided-frequency-rectification-and-structure-aware-decoding-for-multimodal-paddy-rice-segmentation",
+      "section": "deep",
+      "title_en": "TRNet: Topography-Guided Frequency Rectification and Structure-Aware Decoding for Multimodal Paddy Rice Segmentation",
+      "authors": "Kaiwen Xiao, Chunlong Fu, Liping Zheng, Yanfeng Su",
+      "date": "2026-08-04",
+      "pdf": "https://arxiv.org/pdf/2608.04154v1",
+      "score": "8.0",
+      "evidence": "结合光学与DEM数据的多模态遥感分割",
+      "tldr": "山区水田遥感分割受地形和相似植被干扰，传统方法精度不足。TRNet利用视觉与地形双编码器，通过地形能量谱修正抑制陡坡杂波、增强缓坡水稻特征，并结合地形引导的解码结构整合语义与边界线索。在0.5米高分影像上，水稻IoU分别达85.10%和80.68%，较基准提升显著，验证了粗分辨率DEM作为先验的有效性。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Mapping paddy rice from very-high-resolution imagery in mountainous and hilly regions is difficult because terrain alters optical appearance and increases confusion with visually similar vegetation. We present TRNet for 0.5-m GaoJing-1 red--green--blue (RGB) imagery, a 5-m TanDEM-X digital elevation model (DEM), and derived slope. Separate visual and terrain encoders preserve modality-specific features. At an early encoder stage, Topographic Energy-Spectral Rectification applies terrain-conditioned low-frequency modulation and asymmetric high-frequency regulation to suppress steep-slope clutter and conditionally enhance compatible low-slope rice cues. The Topography-guided Paddy Structure Decoder combines semantic, rice--background boundary, and interior cues, using coarse terrain as context. Experiments used an Area A internal test set and held-out Area B, which had steeper terrain and lower rice prevalence. TRNet achieved rice intersection-over-union (IoU) values of 85.10\\% and 80.68\\%, exceeding the original Dual-Encoder U-Net by 9.15 and 18.83 percentage points, respectively. Ablation and slope-stratified results linked these gains to frequency rectification, structure learning, and fewer steep-terrain false positives. The results support coarse topography as a contextual prior for very-high-resolution paddy rice mapping.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/07/2608.04175v1-tricle-tri-modal-vision-language-reasoning-for-edge-deployed-fine-grained-clustering",
+      "section": "quick",
+      "title_en": "TriCLE: Tri-Modal Vision-Language Reasoning for Edge-Deployed Fine-Grained Clustering",
+      "authors": "Kishor Datta Gupta, Md. Mahfuzur Rahman, Fahad Rahman, Ahmed Rafi Hasan, Faysal Mehrab Chowdhury, Mohd Ariful Haque, Roy George",
+      "date": "2026-08-04",
+      "pdf": "https://arxiv.org/pdf/2608.04175v1",
+      "score": "7.0",
+      "evidence": "RGB/热成像/伪LiDAR三模态航空器分类，属于多模态遥感图像分类",
+      "tldr": "边缘平台航空观测需在有限内存与算力下识别飞机，RGB模型和通用VLM效果不佳。TriCLE从单张RGB图像生成热成像和伪LiDAR深度图，融合三模态输入并基于专家分类体系进行对齐。采用序列级GSPO策略，验证准确率88.33%，测试集78.00%且格式可解析率94%。4bit量化后适配8GB边缘设备，单样本1.48秒，支持可解释的飞机分组。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Edge platforms used for aerial observation must interpret aircraft imagery under limited memory, limited compute, and intermittent connectivity. This setting is difficult for standard RGB-only recognition models and general-purpose vision-language models, especially when calibrated thermal and LiDAR aircraft data are unavailable. We present TriCLE, an application-oriented tri-modal vision-language system for aircraft taxonomic grouping under edge constraints. From a single RGB aircraft image, TriCLE generates a structure-preserving FLIR-style thermal view and a pseudo-LiDAR depth projection, then fuses the aligned views with task instructions in a compact Qwen3-VL backbone. The model is aligned to an expert aircraft taxonomy based on propulsion, airframe family, size, design era, and configuration, so its outputs reflect engineering-relevant similarity rather than only surface appearance. We evaluate supervised fine-tuning, rotation-preserving SFT, and three policy-alignment strategies: GRPO, GSPO, and DAPO. Sequence-level GSPO gives the strongest validation performance, reaching 88.33\\% validation accuracy and 0.91 weighted F1 on valid aircraft outputs. On a held-out aircraft test partition, GSPO achieves 78.00\\% accuracy and 0.793 weighted F1 while preserving 94.00\\% parseable output formatting. After 4-bit quantization and attention-memory optimization, the aligned 4B model fits an 8GB deployment target and processes each tri-modal triplet in 1.48 seconds. These results support TriCLE as a practical prototype for interpretable, edge-feasible aircraft grouping, while emphasizing the need for further validation on real aligned thermal and LiDAR sensor streams.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/07/2608.04833v1-registerbridgemm-a-register-centric-framework-for-rgb-infrared-object-detection",
+      "section": "quick",
+      "title_en": "RegisterBridgeMM: A Register-Centric Framework for RGB-Infrared Object Detection",
+      "authors": "Zian Wang, Hangchuan Liang, Yuehua Chen, Changchun Li, Chaoyi Guo, Mingzhe Liu, Fangming Gu",
+      "date": "2026-08-05",
+      "pdf": "https://arxiv.org/pdf/2608.04833v1",
+      "score": "6.0",
+      "evidence": "RGB-红外融合目标检测，其跨模态寄存器融合方法可迁移至高光谱/LiDAR目标检测",
+      "tldr": "RGB-IR目标检测面临光照变化和杂乱场景下的融合难题，现有方法常在交互表达与轻量化间权衡。本文提出RegisterBridgeMM，利用预训练register token同时蕴含模态共享与专属信息，构建三阶段register生命周期：聚合保留模态摘要，桥接进行双向读取并加共识残差调节，投影生成空间自适应校准。在冻结双骨干下，该方法在LLVIP、M3FD、DroneVehicle和FLIR-Aligned四个基准上均取得最高mAP50-95，避免密集patch交互而保持预训练表达。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "RGB-infrared (RGB-IR) object detection benefits from complementary visible and thermal cues, but effective fusion remains challenging under illumination changes, weather variation, and cluttered scenes. Existing RGB-IR fusion methods often trade expressive patch-level interaction for lighter but more constrained adaptation mechanisms. We empirically observe that pretrained register tokens contain both modality-shared and modality-specific information on paired RGB-IR inputs, suggesting that they can serve as a compact substrate for cross-modal communication. Building on this observation, we propose RegisterBridgeMM, a register-mediated fusion framework organized as a three-stage register lifecycle. Aggregate preserves per-modality register summarization inherited from pretraining; Bridge performs bidirectional register-to-patch reading with consensus-residual regulation; and Project translates the resulting register summary into spatially adaptive calibration of patch features. This register pathway avoids dense patch-to-patch cross-modal interaction while preserving the pretrained patch representation. With both backbone streams frozen, RegisterBridgeMM achieves the highest mAP50-95 among the evaluated methods on all four benchmarks: LLVIP, M3FD, DroneVehicle, and FLIR-Aligned.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

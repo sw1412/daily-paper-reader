@@ -1,0 +1,144 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-07T02:10:32.480332+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 12,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2608.04154v1",
+      "source": "arxiv",
+      "title": "TRNet: Topography-Guided Frequency Rectification and Structure-Aware Decoding for Multimodal Paddy Rice Segmentation",
+      "abstract": "Mapping paddy rice from very-high-resolution imagery in mountainous and hilly regions is difficult because terrain alters optical appearance and increases confusion with visually similar vegetation. We present TRNet for 0.5-m GaoJing-1 red--green--blue (RGB) imagery, a 5-m TanDEM-X digital elevation model (DEM), and derived slope. Separate visual and terrain encoders preserve modality-specific features. At an early encoder stage, Topographic Energy-Spectral Rectification applies terrain-conditioned low-frequency modulation and asymmetric high-frequency regulation to suppress steep-slope clutter and conditionally enhance compatible low-slope rice cues. The Topography-guided Paddy Structure Decoder combines semantic, rice--background boundary, and interior cues, using coarse terrain as context. Experiments used an Area A internal test set and held-out Area B, which had steeper terrain and lower rice prevalence. TRNet achieved rice intersection-over-union (IoU) values of 85.10\\% and 80.68\\%, exceeding the original Dual-Encoder U-Net by 9.15 and 18.83 percentage points, respectively. Ablation and slope-stratified results linked these gains to frequency rectification, structure learning, and fewer steep-terrain false positives. The results support coarse topography as a contextual prior for very-high-resolution paddy rice mapping.",
+      "authors": [
+        "Kaiwen Xiao",
+        "Chunlong Fu",
+        "Liping Zheng",
+        "Yanfeng Su"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-04T19:04:03+00:00",
+      "link": "https://arxiv.org/pdf/2608.04154v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Multimodal remote sensing segmentation combining optical and DEM data",
+      "llm_evidence_cn": "结合光学与DEM数据的多模态遥感分割",
+      "llm_evidence": "结合光学与DEM数据的多模态遥感分割",
+      "canonical_evidence": "结合光学与DEM数据的多模态遥感分割",
+      "llm_tldr_en": "TRNet fuses RGB and DEM modalities with separate encoders, using topography-guided frequency rectification and structure-aware decoding to segment paddy rice in mountainous regions, improving accuracy over unimodal and plain fusion baselines.",
+      "llm_tldr_cn": "针对山地丘陵地区水稻种植区受地形影响导致光学影像分类易混淆的问题，TRNet利用RGB与DEM双模态编码器，通过地形能量谱校正抑制陡坡噪声并增强缓坡水稻特征，结合结构感知解码器实现高分辨率水稻精细分割。在GaoJing-1与TanDEM-X数据上的实验表明，该方法相比单模态和普通融合方法有效提升了分割精度，为复杂地形下的多模态遥感农业制图提供了新思路。",
+      "llm_tldr": "针对山地丘陵地区水稻种植区受地形影响导致光学影像分类易混淆的问题，TRNet利用RGB与DEM双模态编码器，通过地形能量谱校正抑制陡坡噪声并增强缓坡水稻特征，结合结构感知解码器实现高分辨率水稻精细分割。在GaoJing-1与TanDEM-X数据上的实验表明，该方法相比单模态和普通融合方法有效提升了分割精度，为复杂地形下的多模态遥感农业制图提供了新思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.04175v1",
+      "source": "arxiv",
+      "title": "TriCLE: Tri-Modal Vision-Language Reasoning for Edge-Deployed Fine-Grained Clustering",
+      "abstract": "Edge platforms used for aerial observation must interpret aircraft imagery under limited memory, limited compute, and intermittent connectivity. This setting is difficult for standard RGB-only recognition models and general-purpose vision-language models, especially when calibrated thermal and LiDAR aircraft data are unavailable. We present TriCLE, an application-oriented tri-modal vision-language system for aircraft taxonomic grouping under edge constraints. From a single RGB aircraft image, TriCLE generates a structure-preserving FLIR-style thermal view and a pseudo-LiDAR depth projection, then fuses the aligned views with task instructions in a compact Qwen3-VL backbone. The model is aligned to an expert aircraft taxonomy based on propulsion, airframe family, size, design era, and configuration, so its outputs reflect engineering-relevant similarity rather than only surface appearance. We evaluate supervised fine-tuning, rotation-preserving SFT, and three policy-alignment strategies: GRPO, GSPO, and DAPO. Sequence-level GSPO gives the strongest validation performance, reaching 88.33\\% validation accuracy and 0.91 weighted F1 on valid aircraft outputs. On a held-out aircraft test partition, GSPO achieves 78.00\\% accuracy and 0.793 weighted F1 while preserving 94.00\\% parseable output formatting. After 4-bit quantization and attention-memory optimization, the aligned 4B model fits an 8GB deployment target and processes each tri-modal triplet in 1.48 seconds. These results support TriCLE as a practical prototype for interpretable, edge-feasible aircraft grouping, while emphasizing the need for further validation on real aligned thermal and LiDAR sensor streams.",
+      "authors": [
+        "Kishor Datta Gupta",
+        "Md. Mahfuzur Rahman",
+        "Fahad Rahman",
+        "Ahmed Rafi Hasan",
+        "Faysal Mehrab Chowdhury",
+        "Mohd Ariful Haque",
+        "Roy George"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-04T19:34:08+00:00",
+      "link": "https://arxiv.org/pdf/2608.04175v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "tri-modal RGB/thermal/pseudo-LiDAR aerial aircraft grouping, multimodal remote sensing classification",
+      "llm_evidence_cn": "RGB/热成像/伪LiDAR三模态航空器分类，属于多模态遥感图像分类",
+      "llm_evidence": "RGB/热成像/伪LiDAR三模态航空器分类，属于多模态遥感图像分类",
+      "canonical_evidence": "RGB/热成像/伪LiDAR三模态航空器分类，属于多模态遥感图像分类",
+      "llm_tldr_en": "TriCLE generates FLIR-style thermal and pseudo-LiDAR depth views from a single RGB image, then fuses them with vision-language instructions on a compact Qwen3-VL backbone for edge-deployed aircraft taxonomic grouping; direct multimodal remote sensing classification.",
+      "llm_tldr_cn": "边缘平台进行航空观测时需要在有限计算和内存下对飞行器图像进行细粒度分类，且通常缺乏配准的热成像与LiDAR数据。本文提出TriCLE，先从单张RGB图像生成保留结构的FLIR热成像视图和伪LiDAR深度投影，再在紧凑的Qwen3-VL骨干中与任务指令融合，实现三模态视觉-语言推理。系统按专家飞行器分类体系对齐，适合边缘部署。这为多模态遥感图像分类提供了一种无需真实LiDAR即可融合深度信息的可行途径。",
+      "llm_tldr": "边缘平台进行航空观测时需要在有限计算和内存下对飞行器图像进行细粒度分类，且通常缺乏配准的热成像与LiDAR数据。本文提出TriCLE，先从单张RGB图像生成保留结构的FLIR热成像视图和伪LiDAR深度投影，再在紧凑的Qwen3-VL骨干中与任务指令融合，实现三模态视觉-语言推理。系统按专家飞行器分类体系对齐，适合边缘部署。这为多模态遥感图像分类提供了一种无需真实LiDAR即可融合深度信息的可行途径。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.04833v1",
+      "source": "arxiv",
+      "title": "RegisterBridgeMM: A Register-Centric Framework for RGB-Infrared Object Detection",
+      "abstract": "RGB-infrared (RGB-IR) object detection benefits from complementary visible and thermal cues, but effective fusion remains challenging under illumination changes, weather variation, and cluttered scenes. Existing RGB-IR fusion methods often trade expressive patch-level interaction for lighter but more constrained adaptation mechanisms. We empirically observe that pretrained register tokens contain both modality-shared and modality-specific information on paired RGB-IR inputs, suggesting that they can serve as a compact substrate for cross-modal communication. Building on this observation, we propose RegisterBridgeMM, a register-mediated fusion framework organized as a three-stage register lifecycle. Aggregate preserves per-modality register summarization inherited from pretraining; Bridge performs bidirectional register-to-patch reading with consensus-residual regulation; and Project translates the resulting register summary into spatially adaptive calibration of patch features. This register pathway avoids dense patch-to-patch cross-modal interaction while preserving the pretrained patch representation. With both backbone streams frozen, RegisterBridgeMM achieves the highest mAP50-95 among the evaluated methods on all four benchmarks: LLVIP, M3FD, DroneVehicle, and FLIR-Aligned.",
+      "authors": [
+        "Zian Wang",
+        "Hangchuan Liang",
+        "Yuehua Chen",
+        "Changchun Li",
+        "Chaoyi Guo",
+        "Mingzhe Liu",
+        "Fangming Gu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-05T13:34:13+00:00",
+      "link": "https://arxiv.org/pdf/2608.04833v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "RGB-infrared fusion for object detection; cross-modal register fusion transferable to HSI/LiDAR target detection",
+      "llm_evidence_cn": "RGB-红外融合目标检测，其跨模态寄存器融合方法可迁移至高光谱/LiDAR目标检测",
+      "llm_evidence": "RGB-红外融合目标检测，其跨模态寄存器融合方法可迁移至高光谱/LiDAR目标检测",
+      "canonical_evidence": "RGB-红外融合目标检测，其跨模态寄存器融合方法可迁移至高光谱/LiDAR目标检测",
+      "llm_tldr_en": "Presents RegisterBridgeMM, a register-mediated fusion framework for RGB-infrared object detection that leverages pretrained register tokens containing shared and specific modality cues; methodological bridge to multimodal HSI/LiDAR target detection.",
+      "llm_tldr_cn": "RGB-红外目标检测依赖可见光与热成像的互补信息，但现有融合方法常因轻量化而损失表达力。作者观察到预训练寄存器token同时包含模态共享与模态特有信息，据此提出以寄存器为中心的三阶段融合框架RegisterBridgeMM，每个阶段分别进行聚合、交互与融合。该框架在光照、天气变化和杂乱场景下改善了RGB-红外检测性能。其跨模态融合思路可迁移到高光谱与LiDAR联合目标检测，提供方法学支撑。",
+      "llm_tldr": "RGB-红外目标检测依赖可见光与热成像的互补信息，但现有融合方法常因轻量化而损失表达力。作者观察到预训练寄存器token同时包含模态共享与模态特有信息，据此提出以寄存器为中心的三阶段融合框架RegisterBridgeMM，每个阶段分别进行聚合、交互与融合。该框架在光照、天气变化和杂乱场景下改善了RGB-红外检测性能。其跨模态融合思路可迁移到高光谱与LiDAR联合目标检测，提供方法学支撑。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral and LiDAR fusion for target detection",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

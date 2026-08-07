@@ -1,0 +1,1151 @@
+Title: TRNet: Topography-Guided Frequency Rectification and Structure-Aware Decoding for Multimodal Paddy Rice Segmentation
+
+URL Source: https://arxiv.org/pdf/2608.04154v1
+
+Published Time: Thu, 06 Aug 2026 00:10:11 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+> 1
+
+# TRNet: Topography-Guided Frequency Rectification and Structure-Aware Decoding for Multimodal Paddy Rice Segmentation 
+
+Kaiwen Xiao, Chunlong Fu, Liping Zheng, and Yanfeng Su 
+
+Abstract —Mapping paddy rice from very-high-resolution im-agery in mountainous and hilly regions is difficult because terrain alters optical appearance and increases confusion with visually similar vegetation. We present TRNet for 0.5-m GaoJing-1 red–green–blue (RGB) imagery, a 5-m TanDEM-X digital elevation model (DEM), and derived slope. Separate visual and terrain encoders preserve modality-specific features. At an early encoder stage, Topographic Energy-Spectral Recti-fication applies terrain-conditioned low-frequency modulation and asymmetric high-frequency regulation to suppress steep-slope clutter and conditionally enhance compatible low-slope rice cues. The Topography-guided Paddy Structure Decoder combines semantic, rice–background boundary, and interior cues, using coarse terrain as context. Experiments used an Area A internal test set and held-out Area B, which had steeper terrain and lower rice prevalence. TRNet achieved rice intersection-over-union (IoU) values of 85.10% and 80.68%, exceeding the original Dual-Encoder U-Net by 9.15 and 18.83 percentage points, re-spectively. Ablation and slope-stratified results linked these gains to frequency rectification, structure learning, and fewer steep-terrain false positives. The results support coarse topography as a contextual prior for very-high-resolution paddy rice mapping. 
+
+Index Terms —Paddy rice mapping, very-high-resolution im-agery, topography-guided learning, multimodal semantic segmen-tation. 
+
+I. I NTRODUCTION 
+
+Accurate paddy rice maps support agricultural management, irrigation planning, crop statistics, food-security assessment, and regional monitoring [1–4]. Remote sensing substantially advances paddy rice mapping by enabling efficient and in-creasingly accurate observation over large areas [5–8]. With the continued development of remote sensing technology, very-high-resolution (VHR) imagery further extends rice map-ping toward parcel-level analysis by resolving field margins, parcel geometry, and within-field texture that are obscured in coarser regional-scale observations [9]. The resulting fine-grained spatial information can be effectively learned by encoder–decoder segmentation networks [10, 11]. However, mapping paddy rice from VHR imagery remains challenging in mountainous and hilly regions, where small and fragmented rice fields are embedded in complex terrain and heterogeneous land-cover backgrounds [12]. One difficulty arises from topographic variation, which alters optical illumi-nation and land-cover appearance, while mountain shadows introduce strong radiometric discontinuities [13, 14]. Under 
+
+Kaiwen Xiao, Chunlong Fu, Liping Zheng, and Yanfeng Su are with the School of Computer Science, Sichuan University Jinjiang College, Meishan 620860, China. Corresponding author: Kaiwen Xiao. 
+
+VHR observation, these effects appear as salient local con-trasts and textures that can obscure or imitate vegetation and field structure [15]. Segmentation models may consequently respond strongly to steep non-rice terrain, making terrain-induced visual detail difficult to distinguish from genuine rice structure [16]. A separate difficulty concerns fragmented terraces and irregular field margins, which divide rice cover into small regions whose complex contours and narrow inte-riors are difficult to recover [17, 18]. Although multi-scale networks and edge-aware extraction improve cropland and field-boundary mapping, semantic predictions can still contain incomplete boundaries and inconsistent region interiors when these structures are not explicitly supervised [19]. To mitigate the confusion between terrain-induced visual detail and genuine rice structure, relevant approaches can be broadly grouped into two categories: multisource fusion and frequency-domain modeling. Multisource fusion intro-duces complementary observations and controls how they interact with optical features. The Gather-to-Guide Network aggregates multimodal features to guide RGB representations [20], whereas CMX rectifies modality-specific features be-fore Transformer-based cross-modal fusion [21]. For optical– topographic data, DMTFNet separately encodes Sentinel-2 and terrain features and combines them through multiscale Transformer decoding and adaptive fusion [22]; FCA-DeepLab instead integrates optical and DEM branches using spatial– channel attention [23]. These methods preserve complemen-tary modality information and regulate cross-modal interac-tion. However, when DEM and slope products are substantially coarser than VHR imagery, fusion cannot recover field-scale spatial detail absent from the topographic sources, leaving unresolved how coarse terrain cues can distinguish terrain-induced visual responses without being treated as fine spatial evidence. Frequency-domain modeling addresses spatial-scale variation within feature representations. SFFNet combines wavelet-derived frequency features with spatial features [24], while hierarchical wavelet feature enhancement decomposes features at multiple scales, strengthens high-frequency sub-bands, and feeds them back to the corresponding network stages [25]. Dual-domain processing further aligns wavelet features with spatial constraints [26], and learned frequency-domain fusion extends such interaction to heterogeneous remote-sensing modalities [27]. These methods make scale-specific feature regulation explicit. Nevertheless, frequency decomposition or high-frequency enhancement alone cannot determine whether fine detail represents genuine field structure arXiv:2608.04154v1 [cs.CV] 4 Aug 2026 2
+
+or terrain-induced texture, leaving the frequency components without an explicit topographic criterion for response regula-tion. The second challenge, incomplete boundaries and inconsis-tent interiors in fragmented rice regions, has mainly been ap-proached through explicit spatial structure supervision, which imposes geometric constraints beyond region-overlap objec-tives. E2EVAP combines semantic–contour interaction with a topological loss to vectorize smallholder parcel boundaries [28]. BsiNet jointly predicts parcel masks, boundaries, and distance maps [29]. BSNet fuses boundary and semantic representations for farmland parcel mapping [30]. A semantic edge-aware multitask network jointly learns region and edge representations while aggregating local and global edge se-mantics [31]. Boundary-specific losses further penalize con-tour displacement or progressively move predicted bound-aries toward their labels [32, 33]. Collectively, these meth-ods improve geometric delineation through complementary structural predictions or direct boundary constraints. However, structural supervision alone provides no explicit criterion for distinguishing genuine rice structure from visually ambiguous boundary and interior responses, especially when terrain-induced appearance variations obscure or imitate field patterns. Topographic context offers complementary evidence of rice– terrain compatibility, but how to couple it with boundary and interior cues for joint refinement remains underexplored. To address these challenges, we propose an asymmetric framework guided by topography, called the Topography-Regulated Network (TRNet). Its two components are To-pographic Energy-Spectral Rectification (TESR) and the Topography-guided Paddy Structure Decoder (TPSD). TESR supplies a topographic criterion for frequency-specific visual regulation, whereas TPSD couples boundary and interior cues with coarse topographic context. Its contributions are:  
+
+> •
+
+An asymmetric terrain-as-context design integrates VHR imagery with coarser topographic data. Separate visual and terrain encoders preserve modality-specific represen-tations: RGB provides the primary semantic and spatial evidence, while DEM and slope regulate visual interpre-tation.  
+
+> •
+
+TESR uses terrain-conditioned low-frequency modulation and asymmetric high-frequency regulation to suppress steep-slope clutter and conditionally enhance compatible low-slope rice cues. TPSD couples boundary and interior-depth cues with coarse topographic context, allowing visual and topographic residuals to jointly refine rice– background boundaries and region interiors. Both mod-ules are trained from binary rice masks.  
+
+> •
+
+Experiments on the Area A internal test set and geo-graphically held-out Area B yield Rice IoU values of 85.10% and 80.68%, outperforming Dual-Encoder U-Net by 9.15 and 18.83 percentage points, respectively. Component, frequency-path, decoder, and slope-stratified analyses further support the complementary roles of TESR and TPSD, including lower background false-positive and rice false-negative rates on steep terrain. II. S TUDY AREAS AND DATASETS 
+
+A. Study areas 
+
+The study was conducted in mountainous and hilly Hongya County, Meishan City, Sichuan Province, China. Two geo-graphically separate subareas were selected (Fig. 1). Area A supported training, validation, and internal testing, whereas Area B was reserved for held-out cross-area testing. Area A contains extensive agricultural land and frequent rice fields, with a mean slope of 8.28 ◦. Area B is steeper and rice-sparser, with a mean slope of 25 .90 ◦. Differences in terrain, land cover, and rice prevalence make Area B a combined cross-area shift rather than an isolated topographic test. 
+
+B. Data sources and preprocessing 
+
+The optical data comprised orthorectified, pan-sharpened 
+
+0.5-m GaoJing-1 (SuperView-1) RGB images acquired in July 2023. Terrain information came from the commercial 5-m TanDEM-X dataset acquired in July 2023 at its original spatial resolution. The TanDEM-X processing context followed Rossi et al. [34], and slope in degrees was calculated from the DEM in ArcGIS Pro. All layers used WGS 84/UTM Zone 48N (EPSG:32648). DEM and slope were bilinearly resampled to 
+
+0.5 m and co-registered with RGB for grid alignment without adding terrain detail beyond the source DEM resolution. The five-channel RGB–DEM–slope input was clipped for outliers and standardized with fixed training-set channel statis-tics. The same statistics recover slope in degrees for TESR, while the original degree-valued slope is retained for TPSD and the terrain-focused loss (Section III). 
+
+C. Dataset construction and split 
+
+Thirty annotators from an agricultural research institute interpreted the 0.5-m RGB imagery without terrain data, and the resulting annotations and co-registered layers were divided into 1,762 non-overlapping 512 × 512 -pixel patches. Each patch contained a five-channel GeoTIFF and PNG mask. The 1,462 Area A patches were split into 1,169 training, 146 validation, and 147 internal-test patches, with rice comprising 16.51%, 15.61%, and 17.25% of valid pixels, respectively. This fixed split was used in all experiments. Non-overlap prevents pixel duplication, although the random Area A split measures within-area rather than spatially independent trans-fer. The 300 geographically separate Area B test patches were excluded from model development and contained 4.80% rice. Rice pixels concentrate on flatter terrain: 68.6% occur below 2◦, and only 3.2% occur at slopes of at least 15 ◦
+
+(Fig. 2). Correspondingly, rice prevalence declines from 26.2% to 3.7% across these intervals. This strong but non-exclusive slope prior motivates terrain-aware modulation without treat-ing slope as a hard decision rule. III. M ETHODS 
+
+A. Overall architecture of TRNet 
+
+TRNet is inspired by the dual-encoder paradigm of Lu et al. [35]. Both architectures use modality-specific encoders and 30 3,000 1,500    
+
+> Kilometers
+> 0330 165
+> Kilometers
+> 090 45
+> Kilometers
+> 020 10
+> Kilometers
+
+# ±±±±
+
+> Elavation (m)
+> 3217
+> 1818
+> 1116
+> 556
+> 427
+> 30°N
+> 29°45'N
+> 29°30'N
+> 30°N
+> 29°45'N
+> 29°30'N
+> 103°45'E 103°30'E 103°15'E 103°E 102°45'E
+> 103°45'E 103°30'E 103°15'E 103°E 102°45'E
+> Area A
+> Area B
+
+(a) Geographic location and elevation of Hongya County  
+
+> Sichuan Province Meishan City
+
+Elevation of Hongya County 
+
+China  
+
+> 036 18
+> Kilometers
+
+# ±
+
+> Area A (mean slope: 8.28°)
+> Area B (mean slope: 25.90°)
+
+(b) Spatial distribution of the study areas in Hongya County 
+
+(c) Area A (gentle terrain, frequent rice fields)  (d) Area B (steep terrain, sparse rice fields)  
+
+> 01,000 500
+> Meters
+
+# ±± 
+
+> 01,000 500
+> Meters
+
+Fig. 1. Study areas in Hongya County, China: (a) county location and elevation, (b) Areas A and B, and representative GaoJing-1 imagery of (c) Area A and (d) Area B. 68.6            
+
+> 16.0
+> 8.2
+> 4.1 3.2
+> 38.3
+> 16.5 16.3
+> 12.5
+> 16.4
+> 0.0
+> 20.0
+> 40.0
+> 60.0
+> 80.0
+> 0-2 2-5 5-10 10-15 >=15
+> (a) Class -conditional slope distribution
+> Rice Background
+> 26.2
+> 16.0
+> 9.0
+> 6.0
+> 3.7
+> 0.0
+> 10.0
+> 20.0
+> 30.0
+> 0-2 2-5 5-10 10-15 >=15
+> (b) Rice prevalence by slope interval
+
+Fig. 2. Empirical relationship between slope and paddy occurrence in the Area A training split. (a) Class-conditional slope distributions, normalized separately for rice and background. (b) Fraction of rice pixels within each slope interval. Values are percentages over valid pixels. 
+
+asymmetric cross-modal interaction within a U-Net frame-work, but they assign different roles to the two modalities. In the original network, optical features enter the DEM com-panion encoder and the resulting companion features feed an attention-gated U-Net decoder. In TRNet, terrain features instead regulate the RGB pathway, allowing topography to provide contextual guidance while RGB remains the primary source of semantic and spatial evidence (Fig. 3). TRNet implements this role assignment across five resolution-aligned encoder stages. At stages other than E1, terrain and visual features are concatenated and projected into the RGB pathway. At E1, TESR replaces this interaction and sends its single rectified output to the next RGB stage and the corresponding decoder skip. Only the RGB pathway has a decoder, while the degree-valued slope map is retained outside the backbone for TESR, TPSD, and the terrain-aware training objectives. For controlled comparisons, we define TRNet-Base as the same asymmetric backbone and U-Net-style decoder without either proposed module. TRNet-Base restores the standard concatenation–projection interaction at E1 in place of TESR and maps the final decoder feature directly to semantic logits with a conventional 1 × 1 classifier in place of TPSD. It is therefore the ablation reference for TESR and TPSD, whereas the original Dual-Encoder U-Net is retained only as a prior-art comparison. For an input sample of spatial size H × W , let 
+
+I = [ Irgb , Ddem , Senc ] ∈ R5×H×W ,
+
+T = [ Ddem , Senc ] ∈ R2×H×W . (1) denote the five-channel input and its terrain subset. Here, 
+
+Irgb ∈ R3×H×W , whereas Ddem and Senc are the standard-ized DEM and slope channels. The degree-valued slope map 
+
+S◦ ∈ R1×H×W is retained separately for TESR, TPSD, and the terrain-focused loss. Let Rl and Tl denote the RGB and terrain encoder outputs at stage l, respectively, and let Fl denote the feature propagated 4R
+
+> G
+> B
+
+Input 
+
+(5 -channel) 
+
+> RGB (3ch)
+> DEM (1ch)
+> Slope (1ch)
+> Low
+> High
+> Flat
+> Steep
+
+TPSD Head 
+
+> Visual Structure Cues
+> (boundary / interior)
+> Paddy Rice
+> Segmentation
+
+Prediction 
+
+> Paddy Rice
+> Background
+> Coarse Topographic
+> Context
+
+RGB Encoder  RGB Decoder            
+
+> E0 1/1 RE1 1/2 E2 1/4 E3 1/8 E4 1/16 E0 1/1 D4 1/1 D0 1/16 D1 1/8 D2 1/4 D3 1/2
+> C
+> T4 1/16 T0 1/1 T1 1/2 T2 1/4 T3 1/8
+
+Terrain Encoder  Structure -
+
+> Aware
+> Refinement
+> 2) Semantic Segmentation Loss
+> Slope -Aware Asymmetric
+> Cross -Entropy Loss
+> Terrain -Weighted Rice
+> Dice Loss
+> 1) Structural Supervision Loss
+> Eroded -Interior
+> Smooth -L1 Loss
+> Boundary WBCE
+> + Dice Loss
+
+Loss 
+
+Functions 
+
+TESR  
+
+> Frequency
+> Decomposition
+> Energy -Gate
+> RGB Feature
+> TESR -Rectified
+> Feature (RE1)
+> Skip
+> Connection
+> Data Flow
+> Terrain Feature
+> CConcatenation
+> Encoder Flow
+> (Downsampling)
+> Decoder Flow
+> (Upsampling)
+> Decoder Feature
+> Bottleneck
+> Transition
+> Cross -Modal
+> Skip Feature
+> E1
+
+Fig. 3. TRNet architecture. RGB and DEM–slope streams feed five aligned encoder stages with 64, 128, 256, 512, and 1024 channels; degree-valued slope supports TESR, TPSD, and the terrain-aware loss. Terrain-to-RGB fusion operates at E0 and E2–E4. At E1, TESR uses T1 and degree-valued slope to produce E′ 
+
+> 1
+
+(shown as RE 1) for E2 and the decoder skip. The single RGB decoder combines the fused E4 bottleneck with skips from E3, E2, E′
+
+> 1
+
+, and 
+
+E0. TPSD refines the prediction using boundary, interior, and topographic cues. Training combines boundary WBCE + Dice, eroded-interior Smooth L1, slope-aware asymmetric cross-entropy, and foreground Dice losses. 
+
+along the RGB pathway after cross-modal interaction. At the full-resolution stage, 
+
+R0 = E0
+
+v (Irgb ) , T0 = E0
+
+t (T) . (2) 
+
+Pl is a 1 × 1 Conv–BatchNorm–ReLU projection that maps the concatenated 2Cl channels back to Cl channels. 
+
+F0 = P0 ([ R0 ∥ T0]) . (3) At the half-resolution stage, the two encoders first compute 
+
+R1 = E1
+
+v (F0) , T1 = E1
+
+t (T0) . (4) We identify R1 with the unrectified visual feature E1 in Fig. 3. TESR replaces the concatenation–projection operation at this stage and uses S◦ as an auxiliary physical anchor: 
+
+F1 = E′
+
+1 = TESR ( R1, T1; S◦) . (5) The output F1 is used directly, without concatenation with 
+
+R1 or T1. For the remaining stages, the terrain encoder continues independently, whereas each RGB stage receives the preceding cross-modal feature: 
+
+Rl = Elv (Fl−1) , Tl = Elt (Tl−1) , l ∈ { 2, 3, 4}. (6) These modality-specific outputs are concatenated and pro-jected to update the feature propagated along the RGB path-way: 
+
+Fl = Pl ([ Rl ∥ Tl]) , l ∈ { 2, 3, 4}. (7) The aligned encoder outputs and propagated features follow 
+
+Rl, Tl, Fl ∈ RCl×H/ 2l×W/ 2l
+
+,Cl = 2 l+6 , l ∈ { 0, . . . , 4}. (8) The features F0–F3 are retained as decoder skips, and F4
+
+is the fused bottleneck. The four-stage visual decoder starts from F4. We set FD0 =
+
+F4 and compute 
+
+FDl = ϕl
+
+  Up l
+
+ FDl−1
+
+ ∥ Kl
+
+ , l ∈ { 1, . . . , 4}. (9) where 
+
+(K1, K2, K3, K4) = ( F3, F2, F1, F0) . (10) 
+
+Up l denotes twofold bilinear interpolation followed by channel reduction, and ϕl fuses the upsampled feature with the same-resolution skip. The decoder outputs have 512, 256, 128, and 64 channels from FD1 to FD4 , respectively. TPSD takes the full-resolution feature FD4 and the degree-valued slope map S◦ and returns 5Topographic Energy-Spectral Rectification 
+
+RGB Encoder Feature E1 
+
+Terrain 
+
+Feature T1 
+
+> Channel-wise Haar DWT
+
+LL  LH 
+
+HL  HH 
+
+LL 
+
+LH 
+
+HL 
+
+HH 
+
+A. Low-Frequency Branch: Semantic Rectification   
+
+> LF FiLM
+> Generator Semantic Rectification (FiLM) 𝑳𝑳𝑳𝑳 ’
+> (Rectified LL)
+
+Rectified 
+
+Feature 
+
+> lnverse Haar iDWT
+
+B. High-Frequency Branch: Energy Gating               
+
+> Recovery & Resize
+> Dual Soft
+> Slope Priors
+> High-Slope Prior
+> LH ’
+> HL ’
+> HH ’
+> Wavelet-scale terrain alignment
+> Scale
+> 𝛄𝛄
+> Shift
+> 𝛃𝛃 𝑳𝑳𝑳𝑳𝑳 =𝟏𝟏 +𝒕𝒕𝒕𝒕𝒕𝒕𝒕𝒕 𝜸𝜸 𝑳𝑳𝑳𝑳 +𝜷𝜷
+> Legend
+> Visual Feature
+> Terrain Feature
+> Rectified Feature
+> Data Flow
+> Element-Wise Multiplication
+> Processing
+> Raw Slope
+> Low-Slope Prior
+> Signed Physical Energy
+> 𝐸𝐸 𝑝𝑝𝑝𝑝𝑝𝑝𝑝 =𝑎𝑎 𝑝 𝑃𝑃 𝑝 − 𝑎𝑎 𝑙𝑙 𝑃𝑃 𝑙𝑙 𝐶𝐶 𝑟𝑟
+> Learned Residual
+> Predictor
+> Bounded
+> Residual Anchor
+> (1 − 𝑃𝑃 𝑝 )𝑏𝑏 � 𝑡𝑡 𝑎𝑎 𝑡𝑡𝑡 (𝐸𝐸 𝑟𝑟 )𝐸𝐸 𝑟𝑟
+
++    
+
+> 𝐶𝐶 𝑟𝑟
+> 𝐸𝐸 𝑟𝑟
+> 𝑬𝑬 𝒑𝒑 𝒕𝒕 𝒑𝒑𝒑𝒑
+> Energy Map
+> 𝑮𝑮 =𝝈𝝈 (−𝑬𝑬 /𝑻𝑻 𝑬𝑬 )
+> 𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨
+> 𝑨𝑨 𝒕𝒕 𝒉𝒉
+
+LH 
+
+HL 
+
+HH 
+
+> Element-Wise Addition
+
++     
+
+> High
+> low
+> Enhance Suppress
+> Corresponding RGB Patch
+> Scene
+> Reference
+> For
+> Feature
+> Visualization
+> Rice Semantic
+> Compatibility
+> 𝑪𝑪 𝒓𝒓 =𝝈𝝈 𝒉𝒉 𝒄𝒄 𝑳𝑳𝑳𝑳
+
+Fig. 4. Topographic Energy-Spectral Rectification (TESR) at the E1/T 1 interaction point. Both feature inputs have shape 128 × h × w. Fixed Haar DWT decomposes E1 into LL , LH , HL , and HH , each of shape 128 × h/ 2 × w/ 2. A stride-2 terrain projection maps T1 to Tf . The low-frequency path predicts 
+
+γ and β for LL ′ = (1 + tanh γ) ⊙ LL + β. In the high-frequency path, high- and low-slope priors Ph and Pl are combined with visual compatibility 
+
+Cr and a high-slope-attenuated learned residual to form the terrain-guided energy E. The monotonically decreasing gate G = σ(−E/T E ) is smoothed by size-preserving 3 × 3 average pooling to obtain G, from which the centered gain Ahf = 1 + α(2 G − 1) is shared by LH , HL , and HH . Fixed Haar iDWT reconstructs the sole output E′
+
+> 1
+
+, which proceeds directly to the next RGB encoder stage and the corresponding decoder skip. 
+
+(Zseg , Zb, Zint ) = TPSD ( FD4 , S◦) . (11) All outputs are H × W . Zseg ∈ R2×H×W contains back-ground and rice logits, whereas Zb and Zint are one-channel auxiliary logits used during training. Inference exposes only the two-class segmentation output. 
+
+B. Topographic Energy-Spectral Rectification 
+
+TESR is motivated by two asymmetric terrain-related risks: texture-induced false responses on steep slopes and weak rice responses on flatter terrain. Accordingly, it suppresses terrain-inconsistent high-frequency responses at high slopes while permitting confidence-conditioned enhancement at low slopes; Fig. 4 summarizes this asymmetric rectification process. Existing remote-sensing segmentation methods use wavelet decomposition to combine spatial and frequency-domain rep-resentations or to reintroduce enhanced high-frequency sub-bands [24, 25], while cross-modal rectification methods use one modality to calibrate features from another [21]. TESR couples these two lines of work to an explicit physical anchor: terrain-conditioned FiLM modulates low-frequency visual re-sponses, whereas degree-valued slope drives an asymmetric terrain-guided gate that suppresses high-slope detail and per-mits only confidence-conditioned enhancement at low slopes. The inverse transform then reconstructs a single rectified feature for the visual pathway rather than treating the terrain stream as a second fine-resolution representation. TESR takes the aligned shallow features X = E1 ≡ R1 and 
+
+U = T1, where X, U ∈ R128 ×h×w, h = H/ 2, and w = W/ 2.The retained slope map S◦ provides an explicit physical anchor. A fixed Haar transform decomposes the visual feature into one low-frequency and three directional high-frequency subbands [36]. Terrain-conditioned FiLM rectifies the low-frequency subband, while terrain-guided energy controls the high-frequency subbands. TESR reconstructs the single recti-fied visual output E′
+
+1 ≡ F1.Formally, TESR first applies a fixed, channel-wise Haar discrete wavelet transform: 
+
+(XLL , XLH , XHL , XHH ) = DWT Haar (X) . (12) Each subband has shape 128 × h/ 2 × w/ 2. XLL carries coarse visual semantics, whereas XLH , XHL , and XHH 
+
+encode directional feature variations rather than image-space boundaries. We define the terrain projection as 
+
+Tf = ϕt (U) . (13) 
+
+ϕt is a stride-2 3 × 3 Conv–BatchNorm–ReLU block. Its output Tf has shape 64 × h/ 2 × w/ 2.
+
+Tf predicts spatially varying FiLM scale γ and bias β.FiLM applies a conditioning-dependent feature-wise affine transformation [37]: 
+
+[γ; β] = ϕlf (Tf ) . (14) 
+
+ϕlf uses 3 × 3 Conv–ReLU and 1 × 1 Conv, then splits its output into two 128-channel maps aligned with XLL .These parameters rectify the low-frequency subband as 6
+
+eXLL = (1 + tanh ( γ)) ⊙ XLL + β. (15) The componentwise multiplicative factor lies in (0 , 2) and therefore provides bounded suppression or amplification, while 
+
+β shifts the feature baseline. The high-frequency path first resizes the degree-valued slope map to the wavelet grid: 
+
+Sw = Resize h/ 2×w/ 2bilinear (S◦) . (16) High- and low-slope soft priors are defined by 
+
+Ph = σ
+
+ Sw − θh
+
+τh
+
+
+
+, θh = 10 ◦,
+
+Pl = σ
+
+ θl − Sw
+
+τl
+
+
+
+, θl = 5 ◦.
+
+(17) Here, σ(x) = (1 + exp( −x)) −1 denotes the sigmoid func-tion; θh and θl are the fixed high- and low-slope thresholds, respectively; and τh, τ l > 0 control their transition widths. Because low slope alone does not imply rice presence, a visual compatibility gate is predicted from the low-frequency feature: 
+
+Cr = σ (ϕc (XLL )) . (18) Let wh and wl be independent unconstrained learnable scalars for the high-slope suppression and low-slope enhance-ment branches, respectively. Their positive strengths are 
+
+ah = softplus ( wh) , al = softplus ( wl) . (19) Here, softplus( x) = log(1+exp( x)) , ensuring that ah, a l >
+
+0 throughout optimization. The physically interpretable signed energy is 
+
+Ephys = ahPh − alPl ⊙ Cr . (20) The positive high-slope term favors high-frequency suppres-sion, whereas the negative low-slope term permits enhance-ment only where the visual feature is compatible with rice. A learned terrain energy retains data-driven flexibility outside the high-slope regime: 
+
+Eraw = ϕhf (Tf ) , Eres = b (1 − Ph) ⊙ tanh ( Eraw ) ,
+
+(21) where b > 0 bounds the residual amplitude. Multiplication by 1 − Ph prevents the learned residual from overriding the high-slope anchor. The final energy is 
+
+E = Ephys + Eres . (22) It is first converted into a monotonically decreasing gate: 
+
+G = σ
+
+
+
+− E
+
+TE
+
+
+
+, TE = 0 .35 . (23) Here, TE is the energy-temperature parameter that controls the sensitivity of the mapping from E to the gate values G.A size-preserving local average pool suppresses isolated fluctuations in the gate map: 
+
+G = AvgPool s=1 ,p =1 3×3 (G) . (24) The smoothed gate is then mapped to a centered high-frequency gain: 
+
+Ahf = 1 + α  2G − 1 . (25) Here, α > 0 controls the modulation range. Positive, negative, and zero energy yield G < 0.5, G > 0.5, and 
+
+G = 0 .5, respectively, before local smoothing. Consequently, 
+
+Ahf < 1, Ahf > 1, and Ahf = 1 denote suppression, enhancement, and neutrality. The gain is shared across all three directional subbands: 
+
+eXLH = Ahf ⊙ XLH ,
+
+eXHL = Ahf ⊙ XHL ,
+
+eXHH = Ahf ⊙ XHH .
+
+(26) TESR reconstructs the rectified feature with the inverse Haar transform: 
+
+E′ 
+
+> 1
+
+= iDWT Haar 
+
+ eXLL , eXLH , eXHL , eXHH 
+
+
+
+. (27) The reconstructed E′ 
+
+> 1
+
+retains the 128 × h × w input shape. 
+
+C. Topography-guided Paddy Structure Decoder 
+
+TPSD is motivated by the need to refine rice–background boundaries without fragmenting internally coherent rice re-gions. It therefore combines boundary and interior cues with coarse topographic context, as summarized in Fig. 5. Existing agricultural-field decoders improve spatial geome-try through joint mask, boundary, and distance-map prediction or through boundary–semantic feature fusion [29–31]. TPSD builds on structure-aware decoding but couples a decoder-derived structural residual with an explicit topographic resid-ual: boundary and interior-depth predictions refine the shared decoder feature, while cross-scale consistency and predicted boundaries regulate the propagation of coarse slope context. The two residuals therefore jointly refine semantic structure without treating the coarse terrain map as fine boundary evidence. TPSD takes FD4 ∈ R64 ×H×W and degree-valued slope S◦.Here, paddy structure refers to rice–background boundaries and an erosion-derived measure of interior depth. It does not denote cadastral or instance boundaries, which are absent from the binary mask. A 3 × 3 Conv–SyncBN–ReLU block produces 
+
+F = ϕfcn (FD4 ) , (28) where F ∈ R64 ×H×W .TPSD contrasts fine local variation with broader context using stride-one, size-preserving pooling: 
+
+F5smooth = AvgPool s=1 5×5 (F) . (29) The broad-neighborhood context contrast and fine-detail contrast are then computed as 7Topography-guided Paddy-Structure Decoder 
+
+Decoder Feature 
+
+𝑺𝑺 °
+
+A. Visual Structure Representation 
+
+B. Coarse Topographic Context 
+
+> Normalize
+> Clip
+> Stopgrad
+> 𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨
+> Context -
+> Contrast
+
+Legend    
+
+> Visual Feature Terrain Feature Data Flow Element-Wise Multiplication
+> Processing
+> 𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨
+> 𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨
+
+1/8 
+
+> Element-Wise Addition
+
++
+
+High Low 
+
+> Corresponding RGB Patch
+> Scene
+> Reference
+> For
+> Feature
+> Visualization
+
+SyncBN 
+
+ReLu                   
+
+> 𝟓𝟓 ×𝟓𝟓
+> 𝑭𝑭 𝒉𝒉 𝑨𝑨𝑨𝑨 𝒉𝒉 =𝑭𝑭 −
+> 𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨 𝟑𝟑 ×𝟑𝟑
+> High -Detail
+> 𝑭𝑭 𝒉𝒉 𝑨𝑨𝑨𝑨 𝒉𝒉
+> 𝑭𝑭𝑭𝑭 𝑨𝑨 𝑭𝑭
+> 𝑭𝑭 𝒔𝒔𝒔𝒔 𝑨𝑨𝑨𝑨𝑨𝑨𝒉𝒉
+> 𝑭𝑭𝑭𝑭 𝑨𝑨 𝑭𝑭 =𝑭𝑭 𝒔𝒔𝒔𝒔 𝑨𝑨𝑨𝑨𝑨𝑨𝒉𝒉 −
+> F
+> Concat
+> 𝑭𝑭 ,𝑭𝑭 𝑭𝑭𝑨𝑨𝑭𝑭 ,𝑭𝑭 𝒉𝒉 𝑨𝑨𝑨𝑨 𝒉𝒉
+
+𝑭𝑭   
+
+> 𝑪𝑪 𝑨𝑨 𝑪𝑪𝑪𝑪
+> 𝑭𝑭 𝒔𝒔 ∅𝑨𝑨
+> ∅𝒃𝒃
+> 𝑨𝑨 𝑨𝑨 :Interior
+> 𝑨𝑨 𝒃𝒃 :Boundary
+> Visual Refinement
+> ∅𝑨𝑨
+
+∆𝑭𝑭 𝑨𝑨 
+
+Auxiliary Outputs 
+
+> 𝑨𝑨 𝒃𝒃
+> 𝑨𝑨 𝑨𝑨
+
+𝑺𝑺 𝑪𝑪 
+
+𝑹𝑹 𝑨𝑨𝒔𝒔𝑨𝑨 𝑹𝑹 𝑨𝑨 
+
+𝑩𝑩 𝑨𝑨𝑨𝑨𝑨𝑨𝑪𝑪𝑨𝑨𝑨𝑨 𝑩𝑩 
+
+𝑺𝑺𝑺 𝑪𝑪  
+
+> 丨𝑺𝑺 𝑪𝑪 − 𝑺𝑺𝑺 𝑪𝑪 丨
+
+D 𝑹𝑹 𝑭𝑭 
+
+> Stopgrad
+> exp -𝝉𝝉
+
+𝑺𝑺 𝑭𝑭 
+
+U
+
+∆𝑭𝑭 𝑨𝑨 
+
+𝑭𝑭 
+
+U
+
+C. Residual Fusion & 
+
+Prediction 
+
++ Refined 
+
+Feature 
+
+Dropout 
+
+p=0.1 
+
+𝒁𝒁 𝒔𝒔 𝑨𝑨𝑨𝑨 
+
+𝑺𝑺 𝑨𝑨𝑨𝑨𝒔𝒔𝑨𝑨𝑪𝑪𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑪𝑪  𝑳𝑳 𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝑨𝒔𝒔   
+
+> Refined Feature Upsample
+
+C Concat 
+
+Sobel  
+
+> Min -Max
+> 𝑵𝑵 𝑨𝑨𝑩𝑩𝒔𝒔𝑨𝑨𝑨𝑨𝑨𝑨𝑹𝑹𝑨𝑨
+> Gradient 𝑮𝑮 𝑭𝑭
+> ∅𝑭𝑭
+> 𝑪𝑪 𝑭𝑭
+> C
+
+𝑭𝑭 𝑩𝑩      
+
+> �𝑡𝑡𝑡𝑡𝑡𝑡 h𝛼𝛼 𝑡𝑡
+> �𝑡𝑡𝑡𝑡𝑡𝑡 h𝛼𝛼 s
+> 1− 𝑆𝑆𝑆𝑆 𝑃𝑃 𝑏𝑏
+
+𝟑𝟑 × 𝟑𝟑 𝑪𝑪 𝑨𝑨 𝑪𝑪 𝑨𝑨 
+
+> U
+
+𝟏𝟏 × 𝟏𝟏 𝑪𝑪 𝑨𝑨 𝑪𝑪 𝑨𝑨 
+
+64 
+
+ 2
+
+Fig. 5. Topography-guided Paddy Structure Decoder (TPSD). The full-resolution decoder feature is first transformed into the base feature F. (A) The visual branch derives contextual and high-detail contrasts from F to predict interior-depth and boundary maps, which are fed back through visual refinement to form ∆Fv. (B) The topographic branch combines coarse slope Sc, normalized Sobel magnitude Gc, and cross-scale consistency Rc to construct coarse context Cc. The context and consistency paths are upsampled separately and combined with the boundary-free propagation mask to form ∆Ft. (C) Learnable 
+
+tanh -scaled visual and topographic residuals are added to F before dropout and the final 1 × 1 two-class classifier. In the diagram, Pi and Pb denote the auxiliary interior-depth and boundary probabilities supervised during training. 
+
+Fctx = F5smooth − F,
+
+Fhigh = F − AvgPool s=1 3×3(F) . (30) 
+
+Fctx and Fhigh capture broad-context contrast and fine deviations. Together with F, they form a shared 64-channel feature: 
+
+Fs = ϕs ([ F, Fctx , Fhigh ]) . (31) 
+
+ϕs is a 3 × 3 Conv–BN–ReLU block followed by a 1 × 1
+
+convolution. This shared representation is used by both structural branches to predict the rice–background boundary and rice-region interior-depth maps: 
+
+Zb = ϕb (Fs) , Pb = σ (Zb) . (32) 
+
+ϕb and ϕint are independent heads; each uses 3 × 3 Conv– BN–ReLU to reduce 64 channels to 32 and a 1×1 convolution to produce one logit channel. 
+
+Zint = ϕint (Fs) , Pint = σ (Zint ) . (33) Their probabilities are fed back into visual refinement: 
+
+∆Fv = ϕv ([ F, Fs, Pb, Pint ]) . (34) 
+
+ϕv maps the concatenated inputs to a 64-channel residual. Thus, both structural branches affect the segmentation logits directly. The topographic path forms a detached, normalized slope reference that controls scaling rather than class suitability: 
+
+Sn = stopgrad 
+
+
+
+clip 
+
+ S◦
+
+30 ◦ , 0, 1
+
+ 
+
+. (35) Adaptive averaging produces the coarse slope map: 
+
+Sc = AAP H/ 8×W/ 8 (Sn) . (36) Resizing Sc permits a full-to-coarse consistency compari-son: 
+
+bSn = Resize H×W
+
+bilinear (Sc) . (37) The reconstruction discrepancy and its coarse-scale form are 
+
+∆s = Sn − bSn , ∆s,c = AAP H/ 8×W/ 8 (∆s) . (38) The cross-scale slope-consistency weight is defined as 
+
+Rc = stopgrad (exp ( −τ ∆s,c )) , τ = 6 . (39) 
+
+Rc is a deterministic slope-consistency weight, not a DEM-accuracy probability; larger values indicate closer reconstruc-tion. Per-sample normalized Sobel magnitude gives the coarse transition map: 8
+
+Gc = MinMax ( ∥∇ Sobel Sc∥2) . (40) 
+
+MinMax is numerically stabilized and maps constant inputs to zero. The three coarse maps form a 64-channel context feature: 
+
+Cc = ϕc ([ Sc, Gc, Rc]) . (41) 
+
+ϕc uses two 3 × 3 Conv–BN–ReLU blocks with 32 hidden channels and a 1 × 1 convolution. The context and consistency maps are resized to the full decoder resolution: 
+
+C = Resize H×W 
+
+> bilinear
+
+(Cc) ,
+
+Rtopo = Resize H×W 
+
+> bilinear
+
+(Rc) . (42) The transition information in Gc is already encoded in Cc
+
+and therefore reaches the full-resolution residual through C;
+
+Gc is not upsampled as a separate residual factor. The boundary-aware propagation mask is 
+
+Mp = 1 − stopgrad ( Pb) . (43) The topographic residual is defined by 
+
+∆Ft = C ⊙ Rtopo ⊙ Mp. (44) This suppresses topographic propagation at inconsistent slopes and predicted boundaries. Detaching Pb prevents seg-mentation gradients from shifting boundaries toward coarse context. The visual and topographic residuals are injected into the base feature through two learnable scalar parameters, αs and 
+
+αt, respectively: 
+
+Fr = F + tanh( αs) ∆ Fv + tanh( αt) ∆ Ft. (45) The classifier is 
+
+Zseg = Conv 1×1 (Dropout ( Fr)) . (46) 
+
+D. Training objectives 
+
+Let Y ∈ { 0, 1, 255 }H×W encode background, rice, and ignored pixels. The valid-pixel and rice masks are defined as 
+
+Mvalid = [ Y̸ = 255] , Mrice = [ Y = 1] . (47) Let Ωv be the set of valid pixels, and let yi ∈ { 0, 1} be the rice label at pixel i ∈ Ωv . The overall training objective is 
+
+L = LTCE + LDice + 0 .5Lboundary + 0 .2Linterior . (48) For degree-valued slope s◦ 
+
+> i
+
+and logits zi ∈ R2, high- and low-slope memberships with slope-sensitivity parameter k > 0
+
+are 
+
+hi = σ(k(s◦ 
+
+> i
+
+− θh)) , θh = 10 ◦. (49) The complementary membership assigns larger weights to pixels increasingly below the low-slope threshold: 
+
+li = σ(k(θl − s◦ 
+
+> i
+
+)) , θl = 5 ◦. (50) Both lie in (0 , 1) and provide overlapping soft pixel weights without affecting inference. The final configuration uses k =0.75 for both membership functions. The pixel weight is 
+
+wi = 1 + wfp (1 − yi)hi + wfn yili. (51) Here, wfp and wfn control the emphasis on high-slope back-ground and low-slope rice, respectively. The final configuration sets wfp = 1 .0 and wfn = 0 .25 . The resulting slope-aware asymmetric cross-entropy loss is 
+
+LTCE = 1
+
+|Ωv |
+
+X
+
+> i∈Ωv
+
+wi CE ( zi, y i) . (52) This weighting emphasizes high-slope background and low-slope rice independently of prediction errors. The Dice loss directly optimizes foreground overlap [38]. Let 
+
+pi = Softmax ( zi)1 , (53) denote rice probability. The final configuration disables low-slope positive weighting in the Dice term ( wlow ,pos = 0 ), so the model uses the standard foreground Dice loss: 
+
+LDice = 1 − 2 P 
+
+> i∈Ωv
+
+piyi + ϵ
+
+P 
+
+> i∈Ωv
+
+pi + P 
+
+> i∈Ωv
+
+yi + ϵ . (54) Multi-task agricultural field delineation has used boundary supervision alongside semantic prediction [29]. Here, the structural boundary target is generated from the binary rice mask using dilation and erosion: 
+
+Bgt = (Dilate r=2 (Mrice ) − Erode r=2 (Mrice )) ⊙ Mvalid .
+
+(55) This gives a finite-width semantic boundary without intro-ducing instance boundaries. Eight erosions define the interior target: 
+
+M(0) rice = Mrice ,
+
+M(k)rice = Erode 3×3
+
+
+
+M(k−1) rice 
+
+
+
+, k ∈ { 1, . . . , 8}. (56) Averaging these erosion-survival masks gives a truncated morphological depth proxy rather than a Euclidean distance or instance annotation: 
+
+Igt = 18
+
+> 8
+
+X
+
+> k=1
+
+M(k)rice . (57) For N+ boundary and N valid pixels, stabilized counts are 
+
+eN+ = max ( N+, 1) ,
+
+eN = max ( N, 1) ,
+
+eN− = max 
+
+ eN − eN+, 1
+
+
+
+.
+
+(58) 9
+
+The class-balanced boundary weight is 
+
+ωb,i = eN−
+
+eN Bgt  
+
+> i
+
++ eN+
+
+eN
+
+ 1 − Bgt 
+
+> i
+
+ . (59) The normalized weighted boundary loss is 
+
+LWBCE =
+
+P 
+
+> i∈Ωv
+
+ωb,i ℓBCE 
+
+ Bgt  
+
+> i
+
+, P b,i 
+
+
+
+max  P  
+
+> i∈Ωv
+
+ωb,i , 1 . (60) Here, ℓBCE (y, p ) denotes the standard binary cross-entropy; the denominator normalizes the boundary weights and remains finite for degenerate samples. The boundary Dice loss is 
+
+LbDice = 1 − 2 P 
+
+> i∈Ωv
+
+Pb,i Bgt  
+
+> i
+
++ ϵ
+
+P 
+
+> i∈Ωv
+
+Pb,i + P 
+
+> i∈Ωv
+
+Bgt  
+
+> i
+
++ ϵ . (61) The boundary objective is 
+
+Lboundary = 0 .5LWBCE + LbDice . (62) For interior probability Pint ,i , the pixel weight is 
+
+qi = Mvalid ,i (0 .25 + 0 .75 yi) . (63) For di = Pint ,i − Igt  
+
+> i
+
+, the Smooth L1 term is 
+
+ℓint ,i =
+
+( 12 d2 
+
+> i
+
+, |di| < 1,
+
+|di| − 12 , |di| ≥ 1. (64) The interior objective is 
+
+Linterior =
+
+P 
+
+> i
+
+qiℓint ,i 
+
+max ( P 
+
+> i
+
+qi, 1) . (65) The structural losses supervise predictions that also refine the final segmentation features. 
+
+E. Evaluation metrics 
+
+Paddy rice is the positive class; T P , F P , and F N are the corresponding confusion counts. Precision is the fraction of predicted rice pixels that are correct: 
+
+Precision = T P T P + F P , (66) Recall is the fraction of reference rice pixels that are recovered: 
+
+Recall = T P T P + F N , (67) The F1 score is the harmonic mean of precision and recall: 
+
+F1 = 2 × Precision × Recall Precision + Recall , (68) Rice IoU measures predicted–reference region overlap: 
+
+IoU = T P T P + F P + F N , (69) Mean IoU averages the rice and background IoU values: 
+
+mIoU = IoU rice + IoU background 
+
+2 . (70) For the complementary boundary metric, let Bp and Bg
+
+be the one-pixel rice–background contours extracted from the predicted and reference masks. With Euclidean distance d(·, B)
+
+to the nearest contour pixel and tolerance δ = 2 pixels, boundary precision and recall are 
+
+Pb =
+
+P 
+
+> x∈B p
+
+I[d(x, Bg ) ≤ δ]
+
+|B p| ,Rb =
+
+P 
+
+> x∈B g
+
+I[d(x, Bp) ≤ δ]
+
+|B g | .
+
+(71) The corresponding boundary score is 
+
+F boundary 1 = 2PbRb
+
+Pb + Rb
+
+. (72) For the terrain diagnostic, define the valid high-slope back-ground set as 
+
+Ω0,≥15 ◦ = {i ∈ Ωv : yi = 0 , s ◦ 
+
+> i
+
+≥ 15 ◦} . (73) The high-slope false-positive rate is 
+
+FPR ≥15 ◦ =
+
+P 
+
+> i∈Ω0,≥15 ◦
+
+I[byi = 1] 
+
+|Ω0,≥15 ◦ | , (74) where byi is the predicted class. This is the fraction of valid background pixels at slopes of at least 15 ◦ misclassified as rice. Confusion counts exclude label-255 pixels. Rice IoU is primary because it measures foreground overlap under class imbalance; the other metrics characterize commission, omis-sion, their balance, and class-average overlap. IV. E XPERIMENTS AND ANALYSIS 
+
+A. Experimental settings 
+
+All models use the splits in Section II-C. Training and validation-based checkpoint selection use Area A; evaluation uses its internal test set and held-out Area B. RGB-only and multimodal models use three and five channels, respectively. All models are trained from scratch under a common protocol and evaluated without post-processing. Dual-Encoder U-Net, TRNet-Base, and TRNet are each trained five times with independent random seeds; their Rice IoU values in both areas are reported as mean ± standard deviation. Training uses 512 × 512 patches with random scaling, cropping, and horizontal flipping. Stochastic gradient descent runs for 30,000 iterations with batch size 2, initial learning rate 0.003, momentum 0.9, and weight decay 0.0005. A polyno-mial schedule follows 1,000 warm-up iterations. Whole-image inference uses an NVIDIA GeForce RTX 3090. Decoder and objective ablations also report rice–background Boundary F1 with 2-pixel tolerance and high-slope FPR over background pixels with slope ≥ 15 ◦. Settings are fixed within each ablation group. Rice IoU uses the main semantic evalua-tor; the other metrics are complementary diagnostics from the same checkpoint. 10                                                                                                                                           
+
+> TABLE I AREA AINTERNAL -TEST COMPARISON . RGB+T DENOTES EARLY RGB–DEM– SLOPE CONCATENATION ; S EPARATE DENOTES MODALITY -SPECIFIC ENCODER STREAMS BEFORE CROSS -MODAL INTERACTION . R ICE IOUFOR DUAL -E NCODER U-N ET , TRN ET -B ASE ,AND TRN ET IS REPORTED AS MEAN
+> ±STANDARD DEVIATION OVER FIVE RUNS ;THE REMAINING VALUES ARE PERCENTAGES FROM A SINGLE RUN .
+> Method Input/fusion Rice IoU Rice F1 Rice Precision Rice Recall mIoU DeepLabV3+ RGB+T 62.35 76.81 81.52 72.62 76.86 DeepLabV3+ RGB 62.87 77.20 81.20 73.59 77.14 FADNet RGB 63.01 77.31 84.15 71.49 77.38 OCRNet RGB 63.65 77.79 83.44 72.86 77.72 SegMAN RGB+T 65.05 78.82 83.13 74.94 78.54 GloTS RGB+T 66.38 79.79 84.40 75.66 79.39 FADNet RGB+T 66.52 79.89 79.84 79.95 79.24 GloTS RGB 66.60 79.95 82.31 77.73 79.42 OCRNet RGB+T 67.05 80.28 77.45 83.32 79.40 SegFormer RGB+T 67.65 80.70 80.79 80.62 79.96 SegMAN RGB 68.07 81.01 82.48 79.58 80.31 SegFormer RGB 69.73 82.16 87.44 77.49 81.51 Samba RGB 73.75 84.89 81.42 88.68 83.66 U-Net RGB+T 74.33 85.27 85.96 84.59 84.21 Samba RGB+T 75.29 85.90 84.93 86.89 84.75 U-Net RGB 75.48 86.03 84.73 87.36 84.86 Dual-Encoder U-Net Separate 75.95 ±0.28 86.33 86.17 86.48 85.20 TRNet-Base Separate 75.99 ±0.11 86.36 82.50 90.60 85.07 TRNet Separate 85.10 ±0.26 91.95 89.59 94.43 90.85
+
+B. Comparison with baseline methods 
+
+The CNN baselines are U-Net [10], DeepLabV3+ [39], and OCRNet [40]. The Transformer baselines are SegFormer [41] and GloTS [42]. The state-space-based baselines are SegMAN [43], which combines sliding local attention with dynamic state-space modeling, and Samba [44]. We also evaluate the remote-sensing model FADNet [45]. All baseline methods are reproduced from their official code releases under the unified experimental protocol described above. RGB-only and early-concatenation RGB–DEM–slope variants isolate the effect of added terrain channels. The original Dual-Encoder U-Net serves as a prior-art comparison. TRNet-Base retains our redesigned asymmetric backbone and decoder but replaces TESR and TPSD with the standard interaction and semantic head defined in Section III-A; it serves as the controlled architectural baseline for all module ablations. On Area A, TRNet exceeds the original Dual-Encoder U-Net, TRNet-Base, and the strongest RGB-only baseline by 9.15, 9.11, and 9.62 Rice-IoU points, respectively (Table I). Relative to the original network, Rice precision and recall increase by 3.42 and 7.95 points, respectively. Relative to TRNet-Base, they increase by 7.09 and 3.83 points, indicating that TRNet improves both false-positive control and rice-region coverage. Figure 6 provides the corresponding quali-tative comparison on representative Area A scenes. Early terrain concatenation improves only three of eight architectures and changes mean Rice IoU by +0 .18 points. TRNet’s gain therefore reflects explicit terrain–visual interac-tion rather than additional channels alone. On Area B, TRNet exceeds the original Dual-Encoder U-Net and TRNet-Base by 18.83 and 16.30 Rice-IoU points, respectively (Table II). Relative to the original network, Rice precision and recall rise by 19.29 and 3.47 points. Relative to TRNet-Base, they rise by 15.66 and 4.53 points, showing that the complete model substantially improves false-positive control while further increasing rice coverage. Area B differs in terrain, land cover, and rice prevalence but shares Area A’s imagery source, preprocessing, and annotation protocol; it therefore measures cross-area transfer rather than independent external validation. Overall, TRNet consistently outperforms the single-stream methods, the original Dual-Encoder U-Net, and TRNet-Base in Areas A and B. TRNet-Base exceeds the original network by 0.04 and 2.53 Rice-IoU points in Areas A and B, respectively, which remains substantially smaller than the gains of the complete model. Redesigning the backbone alone therefore does not explain TRNet’s improvement. Instead, TRNet im-proves false-positive control while maintaining or increasing rice coverage, with fewer fragmented rice strips and isolated false positives. 
+
+C. Ablation studies 1) TESR encoder placement and frequency paths: Table III evaluates TESR placement across encoder stages E0–E4 and compares the complete module with its individual frequency paths on Area A. TPSD remains enabled in every row, so the table isolates changes to TESR. LF-only and HF-only retain only the low- and high-frequency paths, respectively. At E1, TESR improves Rice IoU by 8.31 points over no TESR; precision rises from 79.82% to 89.59% while recall changes from 95.30% to 94.43%, indicating fewer false positives. E1 reaches 85.10% Rice IoU and 90.85% mIoU, beating the next-best E0 placement by 4.91 and 3.08 points, whereas E2–E4 yield 77.16–77.51% Rice IoU. LF-only and HF-only reach 76.54% and 77.34% Rice IoU. Relative to them, E1 improves precision by 9.09 and 8.43 points and recall by 0.48 and 0.16 points, supporting complementary frequency paths. Figure 7 compares TRNet-Base with its TESR-equipped variant in three high-slope, rice-sparse scenes. The white-circled regions show that TESR attenuates terrain-inconsistent high-slope responses that become isolated false positives in the variant without TESR, while sparse rice 11 RGB synthesis  TRNet  TRNet-Base  U-Net RGB  Dual U-Net  Samba    
+
+> Ground Truth Overlap TP overlap FN missed FP wrong
+
+Fig. 6. Qualitative comparison on four representative Area A test scenes. Columns show the RGB image with ground-truth overlay, followed by error overlays for TRNet, TRNet-Base, RGB U-Net, the original Dual-Encoder U-Net, and Samba; colors denote true positives, false negatives, and false positives. 
+
+regions remain intact. The visualization therefore supports selective steep-terrain suppression rather than blanket removal. 
+
+2) TPSD and training objectives: Table IV compares full and reduced TPSD variants with TESR and the final objective fixed. Objective variants retain the complete architecture and cumulatively replace CE with TCE, add boundary and interior supervision, and apply the balanced weights in Eq. (48). Full TPSD exceeds the TESR-equipped decoder by 3.62 Rice-IoU and 15.06 Boundary-F1 points while reducing high-slope FPR from 3.11% to 1.35%. Against visual-structure TPSD, the stronger reduced variant, it adds 0.55 and 4.81 points and lowers FPR by 0.96 points. This supports com-
+
+TABLE II HELD -OUT AREA B COMPARISON . RGB+T DENOTES EARLY CONCATENATION ; S EPARATE DENOTES MODALITY -SPECIFIC ENCODER STREAMS BEFORE CROSS -MODAL INTERACTION . T HE TABLE INCLUDES ALL MULTIMODAL MODELS AND THE STRONGEST AREA A RGB-ONLY MODEL . R ICE IOU FOR 
+
+DUAL -E NCODER U-N ET , TRN ET -B ASE , AND TRN ET IS REPORTED AS MEAN ± STANDARD DEVIATION OVER FIVE RUNS ; THE REMAINING VALUES ARE PERCENTAGES FROM A SINGLE RUN .
+
+Method Input/fusion Rice IoU Rice F1 Rice Precision Rice Recall mIoU DeepLabV3+ RGB+T 51.26 67.78 66.39 69.23 74.00 SegFormer RGB+T 51.90 68.34 64.24 72.99 74.27 OCRNet RGB+T 53.05 69.33 63.94 75.70 74.86 GloTS RGB+T 53.24 69.49 61.66 79.58 74.88 SegMAN RGB+T 54.30 70.38 64.21 77.85 75.52 FADNet RGB+T 55.45 71.34 70.12 72.61 76.28 Samba RGB+T 56.51 72.21 64.92 81.36 76.69 U-Net RGB+T 57.08 72.68 62.70 86.44 76.92 U-Net RGB 57.75 73.22 61.11 91.32 77.20 Dual-Encoder U-Net Separate 61.85 ± 0.19 76.43 66.77 89.34 79.54 TRNet-Base Separate 64.38 ± 0.14 78.33 70.40 88.28 80.97 TRNet Separate 80.68 ± 0.24 89.31 86.06 92.81 89.78 12 
+
+TABLE III AREA A TESR ABLATION ACROSS ENCODER STAGES AND FREQUENCY PATHS WITH TPSD ENABLED IN ALL VARIANTS . LF-ONLY RETAINS LOW -FREQUENCY FILM; HF-ONLY RETAINS HIGH -FREQUENCY GATING .
+
+Variant Rice IoU Rice F1 Rice Precision Rice Recall mIoU Without TESR 76.79 86.87 79.82 95.30 85.42 TESR at E0 80.19 89.01 86.30 91.89 87.77 TESR at E1 85.10 91.95 89.59 94.43 90.85 
+
+TESR at E2 77.51 87.33 80.94 94.81 85.92 TESR at E3 77.42 87.27 80.58 95.18 85.84 TESR at E4 77.16 87.10 83.76 90.73 85.83 
+
+Frequency-path variants 
+
+LF-only 76.54 86.71 80.50 93.95 85.30 HF-only 77.34 87.22 81.16 94.27 85.83 
+
+TABLE IV AREA A TPSD AND OBJECTIVE ABLATIONS . B OUNDARY F1 USES 2-PIXEL TOLERANCE ; HIGH -SLOPE FPR USES BACKGROUND PIXELS AT ≥ 15 ◦ .
+
+Group Variant Rice IoU ↑ Boundary F1 ↑ High-slope FPR ↓
+
+TPSD TESR w/o TPSD 81.48 49.90 3.11 Boundary-only TPSD 82.36 55.80 2.77 Visual-structure TPSD 84.55 60.15 2.31 Full TPSD 85.10 64.96 1.35 
+
+Objective CE + Dice 76.58 50.72 2.95 TCE + Dice 78.23 51.67 1.83 + Boundary supervision 80.22 57.46 1.87 + Interior supervision 84.57 60.13 1.58 Final balanced objective 85.10 64.96 1.35 RGB synthesis  Slope  Energy Gate  TRNet-Base  TRNet-Base+TESR  Ground Truth      
+
+> Ground Truth Overlap Rice Field Background TP overlap FN missed FP wrong
+
+Fig. 7. TESR effects in three high-slope scenes. Columns show the RGB image with ground-truth overlay, slope, energy gate, error overlays for TRNet-Base and TRNet-Base + TESR, and ground truth. White circles link suppressed gate responses to removed baseline false positives. 
+
+plementary visual structure and topographic context. Figure 8 compares TRNet-Base with its TPSD-equipped variant. The red-circled crops show that TPSD restores more con-tinuous rice–background contours and closes internal breaks, yielding regions closer to the reference. These comparisons concern semantic structure rather than instance or cadastral delineation. Replacing CE with TCE raises Rice IoU and Boundary F1 from 76.58% and 50.72% to 78.23% and 51.67%; Dice remains standard because wlow ,pos = 0 . Boundary and interior supervision raise them to 84.57% and 60.13%. High-slope FPR declines overall despite an increase from 1.83% to 1.87% after boundary supervision. The final balanced objective reaches 85.10% Rice IoU, 64.96% Boundary F1, and 1.35% FPR. Over the strongest intermediate variant, gains are 0.53 and 4.83 points, with 0.23-point lower FPR. 
+
+3) Overall component ablation: Table V summarizes the overall component ablation. Adding TESR to TRNet-Base im-proves Rice IoU by 5.49 points, whereas adding TPSD alone yields a 0.80-point gain. Enabling both modules improves TRNet-Base by 9.11 points and exceeds the single-module variants by 3.62 and 8.31 points, respectively, supporting their complementary use. 
+
+D. Terrain-stratified and cross-area analysis 
+
+We pool valid pixels from 147 Area A and 300 Area B test patches into [0 , 2) , [2 , 5) , [5 , 10) , [10 , 15) , and [15 , ∞)
+
+degree intervals. Aggregated confusion counts yield Rice IoU, background FPR, and rice FNR for RGB U-Net, RGB+T RGB synthesis  Slope  Ground Truth  TRNet-Base  TRNet-Base+TPSD  Details    
+
+> Ground Truth Overlap Rice Field Background
+> TRNet-Base +TPSD
+
+Fig. 8. Qualitative comparison of TRNet-Base and TRNet-Base + TPSD. Columns show the RGB image with ground-truth overlay, slope, ground truth, the two predictions, and paired detail crops. Red circles highlight boundary and interior differences; white and black indicate rice and background. 13 U-Net (RGB)  U-Net (RGB+DEM+Slope)  TRNet-Base  TRNet                 
+
+> Area A
+> Metric value (%)
+> Area B
+> Metric value (%)
+> Rice IoU Background FPR Rice FNR
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> (a)
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> (b)
+> 0
+> 5
+> 10
+> 15
+> 20
+> 25
+> 30
+> (c)
+> 30
+> 40
+> 50
+> 60
+> 70
+> 80
+> 90
+> [0, 2) [2, 5) [5, 10) [10, 15) [15, ∞)
+> (d)
+> 0
+> 1
+> 2
+> 3
+> 4
+> 5
+> [0, 2) [2, 5) [5, 10) [10, 15) [15, ∞)
+> (e)
+> 0
+> 10
+> 20
+> 30
+> 40
+> [0, 2) [2, 5) [5, 10) [10, 15) [15, ∞)
+> (f)
+> Slope interval (degrees) Slope interval (degrees) Slope interval (degrees)
+> Dual-Encoder U-Net
+
+Fig. 9. Terrain-stratified performance in Area A (a–c) and Area B (d–f). Curves show Rice IoU, background FPR, and rice FNR for five models across five slope intervals using pooled valid pixels; label-255 pixels are excluded. 
+
+U-Net, TRNet-Base, the original Dual-Encoder U-Net, and TRNet (Fig. 9). Steep-terrain FPR evaluates TESR suppression, while low-slope Rice IoU and FNR test whether confidence-conditioned enhancement preserves rice coverage. In the lowest-slope interval, the FNR curves of TRNet are the lowest in both areas, consistent with the confidence-conditioned low-slope path of TESR. TRNet has the highest Rice IoU in every interval. Its margin over the strongest comparator grows from 7.23 to 11.76 points from the lowest to highest slopes in Area A and from 8.54 to 22.25 points in Area B. At ≥ 15 ◦, its background FPR is 1.35% and 0.58%, below the baseline ranges of 2.02–2.84% in Area A and 1.51–2.49% in Area B. Rice FNR is 9.45% and 8.80%, also below all baselines in the two areas. The joint reductions in false positives and false negatives support improved steep-terrain discrimination rather than a trade-off between suppression and rice coverage. The same ranking holds at 10 ◦ and 15 ◦ cutoffs. TRNet FPR 
+
+TABLE V OVERALL COMPONENT ABLATION ON AREA A. A CHECK MARK DENOTES AN ENABLED MODULE ; ∆ IS THE RICE IOU CHANGE FROM TRN ET -B ASE .VALUES ARE PERCENTAGE POINTS .                    
+
+> Variant TESR TPSD Rice IoU ∆
+> TRNet-Base ––75.99 –TRNet-Base + TESR ✓–81.48 +5.49 TRNet-Base + TPSD –✓76.79 +0.80 Full TRNet ✓✓85.10 +9.11
+
+is 1.15% and 1.35% in Area A and 0.64% and 0.58% in Area B, below the best baseline ranges of 1.83–2.02% and 1.51– 1.61%, respectively. Rice FNR remains within 9.45–10.03% and 8.80–9.22%, and is lower than the corresponding baselines at both cutoffs. The joint reduction is therefore not tied to a single slope threshold. Lower steep-terrain FPR with preserved coverage supports TESR’s asymmetric operation in both areas. 
+
+E. Integrated analysis 
+
+In the evaluated setting, the results support using topography to regulate visual features rather than simply treating DEM and slope as additional input channels. Early concatenation of DEM and slope changed the mean Rice IoU of eight architectures by only +0 .18 points, whereas TRNet produced consistent gains over the RGB-only baselines, the original Dual-Encoder U-Net, and TRNet-Base. Within the TESR ablation, the advantage was concentrated at E1; applying the same operation at deeper stages yielded substantially smaller gains. This pattern suggests that terrain-conditioned frequency rectification is most useful while the visual representation still retains field-scale spatial detail. The interpretation remains architectural rather than causal, but it agrees with the intended division of roles: RGB supplies the fine geometry, while terrain modifies responses that are less compatible with the local topographic context. The structure and terrain diagnostics further clarify the source of the improvement. Relative to the TESR-equipped decoder, full TPSD increased Boundary F1 by 15.06 points and 14 
+
+reduced high-slope FPR from 3.11% to 1.35%. The complete model also retained low rice omission rates in the steepest interval while suppressing background responses in both test areas. These results do not imply that the upsampled 5-m DEM delineates 0.5-m field boundaries. Rather, they support a complementary mechanism in which predicted visual structure limits the propagation of coarse topographic context. This distinction is important in fragmented mountain agriculture, where elevation data can indicate implausible rice locations but cannot replace the spatial detail of VHR imagery. Area B provides a demanding held-out cross-area test, but it is not independent external validation. It shares the sensor, acquisition period, preprocessing, and annotation protocol of Area A, while terrain, land cover, and rice prevalence change together. The current evidence is also limited to one county, one growing season, and binary semantic masks. Conse-quently, the results do not establish multi-season or cross-sensor transfer, cadastral parcel delineation, or sensitivity to DEM source and resolution. Future work should prioritize evaluation in geographically independent regions across ac-quisition dates and sensors, systematically examine sensitivity to the source, resolution, and noise of the DEM, and quantify variation across repeated training runs and computational cost. Instance-aware assessment would additionally require field-level annotations that are not available in the present dataset. V. C ONCLUSION 
+
+TRNet shows that coarse topographic data can improve VHR paddy rice segmentation when they are used to regu-late visual interpretation rather than to supply fine boundary evidence. The model achieved Rice IoU values of 85.10% on the Area A internal test set and 80.68% on held-out Area B, exceeding the original Dual-Encoder U-Net by 9.15 and 18.83 percentage points, respectively. These improvements were accompanied by better boundary delineation and fewer false positives on steep slopes, supporting the complemen-tary roles of terrain-conditioned frequency rectification and structure-aware decoding. More broadly, the results indicate that addressing the scale mismatch between modalities can be more effective than directly fusing upsampled terrain with optical features in fragmented mountainous landscapes. Be-cause both test areas share the same sensor, acquisition period, and annotation protocol, however, the current evidence does not establish operational generalization. Future work should prioritize evaluation in independent regions across seasons and sensors and systematically examine sensitivity to the source, resolution, and noise of the DEM. REFERENCES 
+
+[1] Z. Yu, L. Di, S. Shrestha, C. Zhang, L. Guo, F. Qamar, and T. J. Mayer, “RiceMapEngine: A Google Earth Engine-based web application for fast paddy rice map-ping,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 16, pp. 7264– 7275, 2023. [2] S. Zhang, P. Li, Y. Xie, W. Shao, and X. Tian, “Classifica-tion of paddy rice planting area through feature selection method using Sentinel-1/2 time series images,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 18, pp. 8747–8762, 2025. [3] J. Xu, H. Wang, L. Qiu, H. Wang, and Y. Mu, “Mapping county-level rice planting areas by joint use of high-resolution optical and time series SAR imagery,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing , vol. 18, pp. 10 547–10 561, 2025. [4] P. Wei, D. Chai, R. Huang, D. Peng, T. Lin, J. Sha, W. Sun, and J. Huang, “Rice mapping based on Sentinel-1 images using the coupling of prior knowledge and deep semantic segmentation network: A case study in north-east china from 2019 to 2021,” International Journal of Applied Earth Observation and Geoinformation , vol. 112, p. 102948, 2022. [5] S. Jeong, S. Kang, K. Jang, H. Lee, S. Hong, and D. Ko, “Development of variable threshold models for detection of irrigated paddy rice fields and irrigation timing in heterogeneous land cover,” Agricultural Water Management , vol. 115, pp. 83–91, 2012. [6] Y. Gao, Y. Pan, X. Zhu, L. Li, S. Ren, C. Zhao, and X. Zheng, “FARM: A fully automated rice mapping framework combining Sentinel-1 SAR and Sentinel-2 multi-temporal imagery,” Computers and Electronics in Agriculture , vol. 213, p. 108262, 2023. [7] R. Ni, J. Tian, X. Li, D. Yin, J. Li, H. Gong, J. Zhang, L. Zhu, and D. Wu, “An enhanced pixel-based pheno-logical feature for accurate paddy rice mapping with Sentinel-2 imagery in Google Earth Engine,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 178, pp. 282–296, 2021. [8] X. Pan, J. Xu, X. Li, and J. Zhao, “Highly transferable paddy field identification model based on SAR index and transformer,” Computers and Electronics in Agriculture ,vol. 237, p. 110790, 2025. [9] P. Zhang, S. Hu, W. Li, and C. Zhang, “Parcel-level mapping of crops in a smallholder agricultural area: A case of central china using single-temporal VHSR imagery,” Computers and Electronics in Agriculture , vol. 175, p. 105581, 2020. [10] O. Ronneberger, P. Fischer, and T. Brox, “U-Net: Con-volutional networks for biomedical image segmentation,” in Medical Image Computing and Computer-Assisted Intervention – MICCAI 2015 . Springer International Publishing, 2015, pp. 234–241. [11] F. I. Diakogiannis, F. Waldner, P. Caccetta, and C. Wu, “ResUNet-a: A deep learning framework for semantic segmentation of remotely sensed data,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 162, pp. 94–114, 2020. [12] L. Wang, H. Ma, J. Li, Y. Gao, L. Fan, Z. Yang, Y. Yang, and C. Wang, “An automated extraction of small- and middle-sized rice fields under complex terrain based on SAR time series: A case study of chongqing,” Computers and Electronics in Agriculture , vol. 200, p. 107232, 2022. [13] R. Chen, G. Yin, W. Zhao, K. Yan, S. Wu, D. Hao, and G. Liu, “Topographic correction of optical remote sens-ing images in mountainous areas: A systematic review,” 15 
+
+IEEE Geoscience and Remote Sensing Magazine , vol. 11, no. 4, pp. 125–145, 2023. [14] Z. Song, J. Lu, Y. Yue, X. Tong, and K. Wang, “A GAN-based method for mountain shadow restoration in optical remote sensing image,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing ,vol. 19, pp. 21 245–21 254, 2026. [15] S. Cui, W. Chen, W. Gu, L. Yang, and X. Shi, “SiamC Transformer: Siamese coupling Swin Transformer multi-scale semantic segmentation network for vegetation ex-traction under shadow conditions,” Computers and Elec-tronics in Agriculture , vol. 213, p. 108245, 2023. [16] Y. Zhao, H. Cheng, S. Peng, S. Liu, Y. Xie, and B. Liu, “High-resolution (0.9 m) terrace mapping in low-latitude hilly regions using deep learning and area–slope de-noising: A case study from guangdong province, china,” 
+
+International Journal of Applied Earth Observation and Geoinformation , vol. 146, p. 105126, 2026. [17] Z. Liu, G. Chen, B. Tang, Q. Wen, R. Tan, and Y. Huang, “Regional scale terrace mapping in fragmented moun-tainous areas using multi-source remote sensing data and sample purification strategy,” Science of the Total Environment , vol. 925, p. 171366, 2024. [18] L. Wang, H. Ma, Y. Gao, S. Chen, S. Yang, P. Lu, L. Fan, and Y. Wang, “Small- and medium-sized rice fields identification in hilly areas using all available Sentinel-1/2 images,” Plant Methods , vol. 20, no. 1, p. 25, 2024. [19] F. Waldner and F. I. Diakogiannis, “Deep learning on edge: Extracting field boundaries from satellite images with a convolutional neural network,” Remote Sensing of Environment , vol. 245, p. 111741, 2020. [20] X. Zheng, X. Wu, L. Huan, W. He, and H. Zhang, “A gather-to-guide network for remote sensing semantic segmentation of RGB and auxiliary image,” IEEE Trans-actions on Geoscience and Remote Sensing , vol. 60, pp. 1–15, 2022. [21] J. Zhang, H. Liu, K. Yang, X. Hu, R. Liu, and R. Stiefel-hagen, “CMX: Cross-modal fusion for RGB-X semantic segmentation with transformers,” IEEE Transactions on Intelligent Transportation Systems , vol. 24, no. 12, pp. 14 679–14 694, 2023. [22] X. Gao and P. Lu, “Dual-encoder multiscale trans-former fusion network for landslide detection integrating Sentinel-2 spectral and topographic clues,” Landslides ,2026. [23] W. Tuo, J. Zeng, F. Wu, W. Wu, X. Wang, and X. Zhao, “Landslide detection using multimodal data fusion and an improved DeepLabV3+ model,” Scientific Reports ,vol. 16, no. 1, p. 1383, 2026. [24] Y. Yang, G. Yuan, and J. Li, “SFFNet: A wavelet-based spatial and frequency domain fusion network for remote sensing segmentation,” IEEE Transactions on Geoscience and Remote Sensing , vol. 62, pp. 1–17, 2024. [25] Y. Li, Z. Liu, J. Yang, and H. Zhang, “Wavelet trans-form feature enhancement for semantic segmentation of remote sensing images,” Remote Sensing , vol. 15, no. 24, p. 5644, 2023. [26] G. Wei, J. Xu, W. Yan, Q. Chong, H. Xing, and M. Ni, “Dual-domain fusion network based on wavelet frequency decomposition and fuzzy spatial constraint for remote sensing image segmentation,” Remote Sensing ,vol. 16, no. 19, p. 3594, 2024. [27] G. Chen, F. Sun, W. Jing, W. Zou, D. Di, Y. Song, and L. Fan, “Learning frequency-domain fusion for mul-timodal remote sensing semantic segmentation,” IEEE Transactions on Geoscience and Remote Sensing , vol. 63, pp. 1–16, 2025. [28] Y. Pan, X. Wang, L. Zhang, and Y. Zhong, “E2EVAP: End-to-end vectorization of smallholder agricultural par-cel boundaries from high-resolution remote sensing im-agery,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 203, pp. 246–264, 2023. [29] J. Long, M. Li, X. Wang, and A. Stein, “Delineation of agricultural fields using multi-task BsiNet from high-resolution satellite images,” International Journal of Ap-plied Earth Observation and Geoinformation , vol. 112, p. 102871, 2022. [30] S. Wang, Y. Zhou, X. Yang, L. Feng, T. Wu, and J. Luo, “BSNet: Boundary-semantic-fusion network for farm-land parcel mapping in high-resolution satellite images,” 
+
+Computers and Electronics in Agriculture , vol. 206, p. 107683, 2023. [31] M. Li, J. Long, A. Stein, and X. Wang, “Using a se-mantic edge-aware multi-task neural network to delineate agricultural parcels from remote sensing images,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 200, pp. 24–40, 2023. [32] H. Kervadec, J. Bouchtiba, C. Desrosiers, E. Granger, J. Dolz, and I. Ben Ayed, “Boundary loss for highly un-balanced segmentation,” Medical Image Analysis , vol. 67, p. 101851, 2021. [33] C. Wang, Y. Zhang, M. Cui, P. Ren, Y. Yang, X. Xie, X.-S. Hua, H. Bao, and W. Xu, “Active boundary loss for semantic segmentation,” Proceedings of the AAAI Conference on Artificial Intelligence , vol. 36, no. 2, pp. 2397–2405, 2022. [34] C. Rossi, F. Rodriguez Gonzalez, T. Fritz, N. Yague-Martinez, and M. Eineder, “TanDEM-X calibrated raw DEM generation,” ISPRS Journal of Photogrammetry and Remote Sensing , vol. 73, pp. 12–20, 2012. [35] W. Lu, Y. Hu, Z. Zhang, and W. Cao, “A dual-encoder U-Net for landslide detection using Sentinel-2 and DEM data,” Landslides , vol. 20, pp. 1975–1987, 2023. [36] S. G. Mallat, “A theory for multiresolution signal decom-position: The wavelet representation,” IEEE Transactions on Pattern Analysis and Machine Intelligence , vol. 11, no. 7, pp. 674–693, 1989. [37] E. Perez, F. Strub, H. de Vries, V. Dumoulin, and A. Courville, “FiLM: Visual reasoning with a general conditioning layer,” Proceedings of the AAAI Conference on Artificial Intelligence , vol. 32, no. 1, pp. 3942–3951, 2018. [38] F. Milletari, N. Navab, and S.-A. Ahmadi, “V-Net: Fully convolutional neural networks for volumetric medical image segmentation,” in 2016 Fourth International Con-ference on 3D Vision (3DV) . IEEE, 2016, pp. 565–571. 16 
+
+[39] L.-C. Chen, Y. Zhu, G. Papandreou, F. Schroff, and H. Adam, “Encoder–decoder with atrous separable con-volution for semantic image segmentation,” in Computer Vision – ECCV 2018 . Springer, 2018, pp. 833–851. [40] Y. Yuan, X. Chen, and J. Wang, “Object-contextual representations for semantic segmentation,” in European conference on computer vision . Springer, 2020, pp. 173– 190. [41] E. Xie, W. Wang, Z. Yu, A. Anandkumar, J. M. Alvarez, and P. Luo, “Segformer: Simple and efficient design for semantic segmentation with transformers,” Advances in neural information processing systems , vol. 34, pp. 12 077–12 090, 2021. [42] Y. Liu, Y. Zhang, Y. Wang, and S. Mei, “Rethink-ing transformers for semantic segmentation of remote sensing images,” IEEE Transactions on Geoscience and Remote Sensing , vol. 61, pp. 1–15, 2023. [43] Y. Fu, M. Lou, and Y. Yu, “SegMAN: Omni-scale context modeling with state space models and local attention for semantic segmentation,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition ,2025, pp. 19 077–19 087. [44] Q. Zhu, Y. Cai, Y. Fang, Y. Yang, C. Chen, L. Fan, and A. Nguyen, “Samba: Semantic segmentation of remotely sensed images with state space model,” Heliyon , vol. 10, no. 19, 2024. [45] J. Liu, X. Xu, M. Bilal, and J. Jiang, “FADNet: Green-house identification with fusion attention mechanism and deformable convolution,” IEEE Journal of Selected Top-ics in Applied Earth Observations and Remote Sensing ,vol. 17, pp. 7170–7178, 2024.

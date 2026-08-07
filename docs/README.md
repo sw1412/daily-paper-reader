@@ -6,29 +6,29 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-05
-- 运行时间：2026-08-05 20:27:30 UTC
+- 最新运行日期：2026-08-07
+- 运行时间：2026-08-07 02:14:11 UTC
 - 运行状态：成功
 - 本次总论文数：3
 - 精读区：1
 - 速读区：2
 
 ### 今日简报（AI）
-今日精读聚焦肯尼亚蜜源树种高光谱遥感识别，另速读高光谱解混误差建模与RGB-T融合检测两篇。最值得关注的是利用单类分类与无监督域适应提升树种分类精度（8.0分），以及高光谱解混中乘性误差变量的修正思路（7.0分）。后续可结合本地树种光谱库，尝试将域适应方法迁移到区域生态监测场景。
-- 详情：[/202608/05/README](/202608/05/README)
+今日精读3篇，聚焦多模态农业遥感与视觉推理，其中水稻分割模型TRNet评分最高（8.0/10）。最值得关注的方向是结合地形引导的频域校正与结构感知解码，以及三模态边缘聚类推理。建议普通读者优先关注TRNet的高效分割思路，可拓展至其他作物监测场景。
+- 详情：[/202608/07/README](/202608/07/README)
 
 ### 精读区论文标签
-1. [Mapping melliferous tree species in Kenya via one-class classification with hyperspectral unsupervised domain adaptation](/202608/05/2608.02045v1-mapping-melliferous-tree-species-in-kenya-via-one-class-classification-with-hyperspectral-unsupervised-domain-adaptation)  
-   标签：评分：8.0/10、query:hsi
-   evidence：高光谱单类分类结合无监督域自适应用于树种制图
+1. [TRNet: Topography-Guided Frequency Rectification and Structure-Aware Decoding for Multimodal Paddy Rice Segmentation](/202608/07/2608.04154v1-trnet-topography-guided-frequency-rectification-and-structure-aware-decoding-for-multimodal-paddy-rice-segmentation)  
+   标签：评分：8.0/10、query:hsi-lidar
+   evidence：结合光学与DEM数据的多模态遥感分割
 
 ### 速读区论文标签
-1. [Multiplicative Errors-in-Variables Models for Hyperspectral Unmixing](/202608/05/2607.28743v1-multiplicative-errors-in-variables-models-for-hyperspectral-unmixing)  
-   标签：评分：7.0/10、query:hsi
-   evidence：高光谱解混用于光谱丰度估计
-2. [DRPFNet: Dual-domain Residual Progressive Fusion Network for RGB-Thermal Object Detection](/202608/05/2608.03370v1-drpfnet-dual-domain-residual-progressive-fusion-network-for-rgb-thermal-object-detection)  
+1. [TriCLE: Tri-Modal Vision-Language Reasoning for Edge-Deployed Fine-Grained Clustering](/202608/07/2608.04175v1-tricle-tri-modal-vision-language-reasoning-for-edge-deployed-fine-grained-clustering)  
+   标签：评分：7.0/10、query:hsi-lidar
+   evidence：RGB/热成像/伪LiDAR三模态航空器分类，属于多模态遥感图像分类
+2. [RegisterBridgeMM: A Register-Centric Framework for RGB-Infrared Object Detection](/202608/07/2608.04833v1-registerbridgemm-a-register-centric-framework-for-rgb-infrared-object-detection)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：多模态融合目标检测；双域残差渐进融合方法可迁移至高光谱与LiDAR融合
+   evidence：RGB-红外融合目标检测，其跨模态寄存器融合方法可迁移至高光谱/LiDAR目标检测
 
 
 <div class="dpr-home-promo-card">
