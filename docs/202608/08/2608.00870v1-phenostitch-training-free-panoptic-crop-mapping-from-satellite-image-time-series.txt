@@ -1,0 +1,274 @@
+Title: PhenoStitch: Training-Free Panoptic Crop Mapping from Satellite Image Time Series
+
+URL Source: https://arxiv.org/pdf/2608.00870v1
+
+Published Time: Tue, 04 Aug 2026 00:55:37 GMT
+
+Number of Pages: 9
+
+Markdown Content:
+# PhenoStitch: Training-Free Panoptic Crop Mapping from Satellite Image Time Series 
+
+# Xuechen Li 
+
+University of Minnesota Minneapolis, MN, USA li003487@umn.edu 
+
+Abstract 
+
+Panoptic crop mapping requires both delineating individual agricultural parcels and assigning a crop type to each parcel from satellite image time series. Existing approaches typi-cally rely on dense parcel-level annotations and task-specific model training, which limits their applicability to new regions and growing seasons. We introduce PhenoStitch , a panoptic crop-mapping pipeline that requires no task-specific gradient-based training. A frozen Segment Anything model first over-segments each patch into class-agnostic regions. For each re-gion, optical NDVI and Sentinel-1 backscatter series are sum-marized by an analytic double-harmonic phenological signa-ture. Adjacent regions are then merged into parcels by min-imizing a Potts graph energy, and each parcel is classified by nearest-prototype matching using only k labeled parcels per class. A final topology-closure step produces the panoptic map. Under a matched budget of k=20 parcels per class, cor-responding to less than 1% of the available labels, PhenoStitch achieves 20 .0 crop mIoU, 76 .2 segmentation quality, and 6.2
+
+panoptic quality on PASTIS-R under 5-fold, 3-seed evalua-tion. It outperforms the evaluated frozen foundation-model, few-shot, and matched-budget supervised baselines under the same protocol. A consistent ranking is observed on ZueriCrop. Ablations show that radar observations contribute the largest gain, with the graph-energy merge and a compact phenolog-ical signature helping further. The results demonstrate the effectiveness of combining label-free parcel delineation with few-shot phenological recognition for panoptic crop mapping under limited supervision. 
+
+# Introduction 
+
+Turning a stack of satellite images into a crop map means an-swering two questions at once: where is each field, and what 
+
+grows in it. In panoptic terms, the first is instance segmen-tation of parcels and the second is semantic labeling of crop type, and a useful map needs both. The dominant approach trains deep spatio-temporal networks end-to-end on densely annotated satellite image time series (SITS) (Sainte Fare Gar-not and Landrieu 2021; Tarasiou, Chavez, and Zafeiriou 2023). These models are strong, but only where dense la-bels exist. Such labels are missing exactly where mapping matters most: new countries, new years, minor crops, and smallholder landscapes (Rustowicz et al. 2019). Parcel-level ground truth must be re-collected whenever the region or season changes. A method that collapses without thousands 64 66 68 70 72 74 76 78 SQ (parcel-delineation quality, %) 0510 15 20 Crop mIoU (typing accuracy, %)   
+
+> PhenoStitch (ours)
+> Presto SimpleShot ProtoNet α-TIM U-TAE SAM-Aug
+> bubble area = PQ
+> 0.3 3.0 6.0
+
+Figure 1: Comparison under a matched label-scarce pro-tocol on PASTIS-R. Each bubble represents one method at k=20 using 5-fold ×3-seed cross-validation. The hori-zontal axis reports segmentation quality (SQ), the vertical axis reports crop mIoU, and bubble area represents panop-tic quality (PQ). For semantic baselines, parcel instances are obtained using the same class-wise connected-component post-processing. PhenoStitch achieves the highest SQ, crop mIoU, and PQ among the compared methods. TSViT is omit-ted for visual clarity because its SQ is approximately 4.of labeled parcels therefore cannot map the places that need it most. This motivates the label-scarce regime: at most a handful of labeled parcels per crop class, with no chance to train a large model. Existing options degrade sharply here. Deep SITS networks trained on the same tiny budget overfit and lose most of their accuracy. Few-shot classifiers and frozen remote-sensing foundation models keep more accuracy, but they classify pixels, not parcels. Their maps can be turned into instances by connected components, the usual stand-in for a learned parcel detector. Even then, the resulting regions rarely match true parcels. The panoptic quality (PQ) of every baseline we test therefore stays near zero, whatever its semantic accuracy. arXiv:2608.00870v1 [cs.CV] 1 Aug 2026 Our starting point is that the two hard parts of crop mapping are each solvable without any training. Bound-aries are a generic vision primitive: a frozen promptable segmenter splits a field patch into coherent regions from appearance alone, with no crop labels. Crop identity, in turn, is written into phenology , the seasonal trajectory of growth, senescence, and moisture that separates wheat from maize (Turkoglu et al. 2021; Veloso et al. 2017). This tra-jectory is directly observable: an optical vegetation index and a radar backscatter series, fit by a low-order harmonic model, give each region a compact, calibration-free seasonal signature. Neither step needs gradient training, and both are exactly what a panoptic map requires. We turn this observation into PhenoStitch , a fully training-free pipeline for panoptic crop mapping (Figure 2). A frozen Segment Anything model first over-segments each patch. Ev-ery region is then described by an analytic double-harmonic phenological signature of its NDVI and Sentinel-1 backscat-ter. Regions are merged into field parcels by minimizing a Potts graph energy on these signatures. Each parcel is typed by nearest-prototype matching to only k labeled parcels per class, and a topology-closure step produces the panoptic map. No component is trained by gradient descent. Our contribu-tions are: (i) a training-free formulation of panoptic crop mapping that decouples label-free delineation from few-shot typing; (ii) a phenological signature and graph-energy merge that turn generic over-segmentation into agronomically co-herent parcels; and (iii) a rigorous label-scarce evaluation, us-ing 5-fold × 3-seed cross-validation on PASTIS-R and a sec-ond dataset, ZueriCrop. This evaluation shows that PhenoS-titch is state-of-the-art on every panoptic metric at ∼ 1% 
+
+labels (Figure 1), while remaining explicit about where its accuracy is capped. 
+
+# Related Work 
+
+Supervised crop mapping from SITS. Crop mapping from SITS is dominated by supervised temporal and spatio-temporal encoders: recurrent encoders (Rußwurm and Körner 2018), temporal convolutions (TempCNN) (Pel-letier, Webb, and Petitjean 2019), multi-source optical– radar fusion (Ienco et al. 2019), raw-series self-attention (Rußwurm and Körner 2020) on datasets such as BreizhCrops (Rußwurm et al. 2020) and Sen4AgriNet (Sykas, Papoutsis, and Zografakis 2021), pixel-set encoders with lightweight temporal attention (Sainte Fare Garnot et al. 2020), U-TAE (Sainte Fare Garnot and Landrieu 2021), and time-first vision transformers (TSViT) (Tarasiou, Chavez, and Zafeiriou 2023). For the 
+
+panoptic variant, U-TAE is paired with a parcel detector (PaPs) on PASTIS (Sainte Fare Garnot and Landrieu 2021), and label hierarchies are exploited on ZueriCrop (Turkoglu et al. 2021). These methods set the state of the art when 
+
+dense labels are available; on a matched few-label budget they overfit, as our experiments confirm. 
+
+Label-efficient methods and panoptic evaluation. Two routes reduce label cost, but both stop at semantics. Self-supervised remote-sensing foundation models pre-train on unlabeled imagery and transfer: seasonal con-trast (SeCo) (Mañas et al. 2021), SatMAE (Cong et al. 2022), Prithvi (Jakubik et al. 2023), Scale-MAE (Reed et al. 2023), the optical–radar model CROMA (Fuller, Mil-lard, and Green 2023), DOFA (Xiong et al. 2024), and the pixel-timeseries model Presto (Tseng et al. 2023), with cross-region temporal adaptation easing domain shift (Ny-borg et al. 2022). Orthogonally, few-shot learners clas-sify from a handful of exemplars: matching and prototyp-ical networks (Vinyals et al. 2016; Snell, Swersky, and Zemel 2017), gradient-based meta-learning (Finn, Abbeel, and Levine 2017), strong nearest-neighbor baselines (Wang et al. 2019b; Chen et al. 2019), prototype-aligned few-shot segmentation (PANet) (Wang et al. 2019a), and transductive information maximization ( α-TIM) (Veilleux et al. 2021). Both are per-pixel semantic classifiers that yield no par-cel instances, and they are our strongest baselines. Panop-tic segmentation instead scores instances-with-types through 
+
+PQ = SQ × RQ (Kirillov et al. 2019), with architectures such as Panoptic-DeepLab (Cheng et al. 2020) and mask transformers (Cheng, Schwing, and Kirillov 2021; Cheng et al. 2022) built for label-rich natural images. Converting a semantic map to instances by connected components leaves 
+
+RQ ≈ 0 whenever those regions do not match true parcels, the regime every semantic baseline falls into. 
+
+Object-based delineation and phenology. PhenoStitch instead assembles training-free ingredients that already exist separately. Object-based image analysis has long segmented imagery into objects and then classified them (Blaschke 2010), and field-boundary delineation recovers parcel in-stances but not crop type (Waldner et al. 2021). Prompt-able segmenters supply such objects from appearance alone: Segment Anything (SAM) (Kirillov et al. 2023) and higher-quality variants (Ke et al. 2023), adapted to overhead imagery through large mask datasets (Wang et al. 2023), learned prompting (Chen et al. 2024), or mask-augmented train-ing (Hu et al. 2026), while open-vocabulary segmenters built on CLIP (Radford et al. 2021) add zero-shot semantics, from dense CLIP labels (Zhou, Loy, and Dai 2022) and LSeg (Li et al. 2022) to remote-sensing SegEarth-OV (Li et al. 2025). None of these assign crop type. Crop identity instead lives in phenology, which harmonic and change-detection models read from vegetation time series: CCDC (Zhu and Woodcock 2014), BFAST (Verbesselt et al. 2010), and joint optical– radar crop dynamics (Veloso et al. 2017). PhenoStitch is the first to combine a frozen SAM over-segmentation with an analytic phenological signature and few-shot typing, so that parcels and their crop types fall out of a single training-free panoptic pipeline. 
+
+# Method 
+
+Task and notation. The input is a co-registered SITS 
+
+X = {(It, τ t)}Tt=1 over one patch, where It stacks Sentinel-2 (optical) and Sentinel-1 (SAR) channels acquired at day-of-year τt. The output is a panoptic map assigning every pixel a parcel instance and a crop class c ∈ { 1, . . . , C }. The only supervision is a small support set of k labeled parcels per class ( k-shot); delineation uses zero labels. Figure 2 shows the five stages. Figure 2: The PhenoStitch pipeline is training-free. From a Sentinel-2 optical and Sentinel-1 SAR image time series ( Input ): a frozen SAM over-segments each patch into candidate regions ( label-free over-segmentation ); each region’s NDVI and SAR (VV/VH) series are summarized by an analytic double-harmonic signature ( harmonic phenological signature ); adjacent regions with similar signatures are merged into parcels by a Potts graph energy ( graph-energy merge into parcels ); and each parcel is typed by nearest-prototype matching to k labels per class, the only labels used ( few-shot prototype typing ), yielding the panoptic 
+
+crop map of parcel instances and crop types. No network is trained end-to-end. 
+
+Design rationale. The pipeline is organized around one observation: the two questions of panoptic crop mapping draw on different information. Where a field lies depends on appearance and geometry, which a promptable segmenter captures with no crop labels. What grows there depends on temporal phenology, which a compact harmonic descriptor captures with no trained classifier. Keeping the two legs sep-arate is what makes the method training-free. Neither leg needs gradient supervision, and each can be validated on its own, delineation by SQ and typing by mIoU. The split also shapes the error profile reported later: delineation is stable because appearance is easy, whereas typing is bounded by crops whose phenology genuinely overlaps. 
+
+(A) Label-free over-segmentation. A crop parcel is ho-mogeneous in appearance, so its boundary is a generic sig-nal rather than a crop-specific one. Unlike classical unsu-pervised over-segmentation such as graph-based segmenta-tion (Felzenszwalb and Huttenlocher 2004) or SLIC super-pixels (Achanta et al. 2012), a frozen SAM produces bound-aries that already respect object structure. We run a frozen SAM (Kirillov et al. 2023) on a temporal composite of the patch and obtain a set of class-agnostic regions {si} that over-segment the scene. The composite is a phenology-aware re-coloring: a per-pixel first-harmonic NDVI fit mapped to HSV color (hue from seasonal phase, saturation from amplitude, value from mean NDVI), so phenologically distinct fields take on separable colors. The region boundaries are trustwor-thy, but a single parcel is usually split into several regions. This deliberately trades recall for boundary precision, and defers the “how many parcels” decision to the crop-aware merge in (C) rather than to SAM. 
+
+(B) Harmonic phenological signature. For each region 
+
+si we form two temporal series, the optical NDVI (Tucker 1979) and the SAR backscatter, each averaged over the re-gion’s pixels at every acquisition. We fit a low-order (double) harmonic model to each series, 
+
+f (τ ) = a0 +
+
+> 2
+
+X
+
+> h=1
+
+ah cos(2 πhτ /P ) + bh sin(2 πhτ /P ),
+
+with P the season length. From both NDVI and SAR we read off the interpretable coefficients: the seasonal mean, the first- and second-harmonic amplitudes, and their phases. Their concatenation is the region’s phenological signature 
+
+ϕ(si). The fit is analytic least squares, robust to irregular revisit and missing dates, and needs no training. Its ampli-tudes and phases encode when a region greens up and dries down, which is what separates crops. Fitting on NDVI + SAR rather than raw reflectance keeps the signature calibration-independent, and the ablation shows that radar is what most lifts typing accuracy. 
+
+(C) Graph-energy merge into parcels. To recover parcels from over-segmentation, we build an adjacency graph G =(V, E ) over regions and seek a labeling ℓ that groups phe-nologically similar neighbors while respecting SAM bound-aries. We minimize a Potts energy 
+
+E(ℓ) = X
+
+> i
+
+Di(ℓi) + λ X
+
+> (i,j )∈E
+
+wij [ℓi̸ = ℓj ],
+
+with edge weight wij = exp( −∥ ϕ(si) − ϕ(sj )∥2/σ 2). We solve it with standard graph-cut moves (Boykov, Veksler, and Zabih 2001), and the connected components of the resulting labeling are the merged parcels. The pairwise term fuses regions with close signatures, while the boundary weight Algorithm 1 PhenoStitch (training-free, one patch) 
+
+Input : SITS X = {(It, τ t)}Tt=1 ; class prototypes {pc}Cc=1 
+
+built once from k labeled parcels/class. 
+
+Output : panoptic map (a crop class and a parcel instance per pixel).  
+
+> 1:
+
+{si} ← SAM (Composite (X)) {(A) label-free over-seg.}  
+
+> 2:
+
+for each region si do  
+
+> 3:
+
+ϕ(si) ← HarmonicFit (NDVI( si), SAR( si)) {(B) signature}  
+
+> 4:
+
+end for  
+
+> 5:
+
+build region graph G with weights wij =
+
+e−∥ ϕ(si)−ϕ(sj )∥2/σ 2 
+
+> 6:
+
+ℓ ← arg min ℓ E(ℓ) by graph cuts {(C) graph-energy merge}  
+
+> 7:
+
+P ← connected components of ℓ {parcels}  
+
+> 8:
+
+for each parcel P ∈ P do  
+
+> 9:
+
+ˆc(P ) ← arg min c ∥ϕ(P )−pc∥ {(D) few-shot typing}  
+
+> 10:
+
+end for  
+
+> 11:
+
+return TopologyClosure (P, ˆc) {(E) clean panoptic map} 
+
+wij makes a merge cheap across a weak, phenologically consistent seam and expensive across a strong one. In the ablation, this energy-based merge is both more accurate and less fragmented than an appearance-only IoU-NMS merge at identical inputs. 
+
+(D) Few-shot prototype typing. Only now do labels enter, and only k per class. For class c we average the signatures of its k labeled parcels into a prototype pc. Each merged parcel 
+
+P is then typed by its nearest prototype under a standardized Euclidean metric, ˆc(P ) = arg min c ∥ϕ(P ) − pc∥, with fea-tures z-scored so that each signature dimension contributes comparably. Because ϕ is a compact phenological descriptor, a handful of exemplars suffices. In the label-free ( k=0 ) limit we replace prototypes by an agronomic calendar and switch to cosine similarity over an informative subset of the sig-nature (the seasonal mean and first-harmonic phase), which already exceeds an open-vocabulary zero-shot segmenter. 
+
+(E) Topology closure. A final closure step fills small gaps left by over-segmentation, removes slivers, and enforces par-cel connectivity, producing a clean panoptic map in which each field is a single typed instance. 
+
+Why training-free. Every stage is either a frozen model (A), an analytic fit (B), a combinatorial optimization (C, E), or nearest-prototype matching from k labels (D). No gradi-ents are computed on crop labels, so PhenoStitch operates directly in the label-scarce regime and applies to a new do-main without any architecture retraining. Only a few labeled parcels per class in that domain are needed to build proto-types. Algorithm 1 summarizes the full procedure. 
+
+Complexity and cost. PhenoStitch has no training phase and no learned weights beyond the frozen SAM backbone. Per patch, the cost is a single SAM forward pass, one closed-form harmonic fit per region (linear least squares over the available acquisitions), one graph cut on the region-adjacency graph, and a nearest-prototype lookup per parcel; each step is linear or near-linear in the number of regions and pixels. Prototypes are built once from the k labels and reused, so adapting to a new region or year costs only proto-type construction, not retraining or backpropagation. 
+
+# Experiments 
+
+Datasets. PASTIS-R (Sainte Fare Garnot and Landrieu 2021) provides 128 ×128 Sentinel-2 + Sentinel-1 SITS with panoptic (parcel + 18 -class) annotations over France. Zueri-Crop (Turkoglu et al. 2021) provides Sentinel-2 SITS over Switzerland with a 4-level crop hierarchy; we use it as an independent second benchmark (S2-only, finer taxonomy). 
+
+Protocol. We evaluate in the label-scarce regime: k labeled parcels per class and no model training. Our headline is k=20 
+
+(≈ 342 parcels, < 1% of labels) on PASTIS-R under 5-fold 
+
+× 3-seed cross-validation (15 runs; each test fold uses a disjoint support fold, over 3 support-sampling seeds); we report mean ± std. Delineation uses zero labels throughout. 
+
+Metrics. We report crop mIoU over the fine ( 18 -class) taxonomy and a coarse (agronomic family) re-aggregation, plus the panoptic triplet SQ (parcel-delineation quality), RQ 
+
+(recognition), and PQ =SQ ×RQ (Kirillov et al. 2019). For methods that output only a semantic map, instances are taken as connected components per class (a PaPs (Sainte Fare Gar-not and Landrieu 2021) stand-in), so every method, ours and all baselines, receives a well-defined PQ under identi-cal instancing. Coarse mIoU is re-aggregated from the saved confusion matrix, not a re-run. 
+
+Baselines. Matched to the same k-label budget: a frozen foundation model (Presto (Tseng et al. 2023)); prototypi-cal (Snell, Swersky, and Zemel 2017), SimpleShot (Wang et al. 2019b), and transductive α-TIM (Veilleux et al. 2021) few-shot classifiers; official U-TAE (Sainte Fare Garnot and Landrieu 2021) and TSViT (Tarasiou, Chavez, and Zafeiriou 2023) trained on the same tiny budget; SAM-augmented training (Hu et al. 2026); and zero-shot references (PhenoStitch-0shot; SegEarth-OV (Li et al. 2025)). Trained baselines use the official architectures with standard aug-mentation and early stopping at the matched k-label budget; their low scores reflect the difficulty of fitting high-capacity temporal models to ∼ 1% of labels, not a handicapped con-figuration. 
+
+Implementation details. SAM uses a frozen ViT-B back-bone. Each region’s NDVI and Sentinel-1 series are fit with two harmonics by least squares; the graph-energy merge uses smoothness weight λ=4 and a signature bandwidth σ tuned once on a held-out patch; few-shot typing uses a standardized Euclidean nearest-prototype rule, while the zero-shot calen-dar variant uses cosine similarity on an informative subset of signature dimensions (seasonal mean and first-harmonic phase). Topology closure fills gaps below a small area thresh-old and assigns orphan pixels to the nearest parcel. All hyper-parameters are shared across folds, seeds, and both datasets, and were fixed once on a single held-out patch by held-out Figure 3: Qualitative comparison on PASTIS-R (fold 4, k=20 ; same crop = same color, white background). Columns: input RGB, ground truth, PhenoStitch (ours), and the strongest baselines. PhenoStitch recovers clean, correctly typed parcels matching the ground truth; the per-pixel baselines (Presto, ProtoNet) are fragmented and mis-type whole fields, and the matched-budget U-TAE collapses onto a few dominant classes. crop mIoU; Table 3 reports the ranges swept for the main choices (graph-energy weight λ ∈ { 1.5, 4, 8}, harmonic or-der 1–3, Euclidean versus cosine typing, and the signature band set). Code and configurations will be released. All ex-periments run on a single NVIDIA RTX 3090 ( 24 GB) under Windows 11, with Python 3.12, PyTorch 2.2 (CUDA 12.1), NumPy 1.26, SciPy 1.17, and scikit-image 0.22: PhenoStitch performs no gradient updates and needs only the frozen SAM forward pass, while the trained baselines are optimized on the same hardware under the matched label budget. 
+
+Main result: SOTA in the label-scarce regime 
+
+Table 1 and Figure 1 report the headline comparison. PhenoStitch reaches 20 .0 crop mIoU, 31 .5 coarse mIoU, 76 .2
+
+SQ, and 6.2 PQ, and is best on every metric. It beats the frozen foundation model Presto ( 11 .7 mIoU) by ∼ 1.7×, the few-shot classifiers ( 9.0–9.1) by ∼ 2.2×, and the matched-budget trained networks (U-TAE 5.3, SAM-Aug 4.5, TSViT 0.5) by 
+
+∼ 4–40 ×. The margin is not a sampling artifact: PhenoStitch wins on all 15 CV runs against every baseline, and against the strongest baseline, Presto, the paired difference is 8.3 mIoU (Wilcoxon signed-rank p < 10 −4; paired t-test p < 10 −10 ). The panoptic gap is starker still. Because the semantic                                                                 
+
+> Method Sup. mIoU coarse SQ PQ
+> PhenoStitch (ours) free 20.0 ±1.1 31.5 76.2 6.2
+> Presto FM 11.7 ±1.7 26.5 67.8 0.4 SimpleShot FS 9.1 ±1.8 19.3 65.0 0.3 ProtoNet FS 9.0 ±1.8 19.3 64.7 0.3
+> α-TIM FS 6.7 ±1.1 15.3 63.8 0.2 U-TAE train 5.3 ±1.6 15.3 65.0 0.4 SAM-Aug train 4.5 ±1.5 15.5 66.5 0.3 TSViT train 0.5 ±0.3 4.3 ∼40.0 PhenoStitch-0shot zero 3.8 ±0.2 10.3 70.9 1.7 SegEarth-OV zero 3.9 –––
+
+Table 1: PASTIS-R, 5-fold ×3-seed CV, k=20 (< 1% 
+
+labels). Crop mIoU (fine 18-class) / coarse (family) / SQ / PQ. Sup.: free=training-free, FM=frozen foundation model, FS=few-shot, train=trained on the matched budget. Full-supervision literature anchors (100% labels): U-TAE 
+
+63 .1, TSViT 65 .4 mIoU, and the purpose-built panoptic U-TAE+PaPs at PQ = 40 .4.baselines emit no instances, their RQ ≈ 0 and thus PQ ≈ 0
+
+regardless of mIoU. This is not a definitional artifact. Every k=1 k=3 k=5 k=10 k=20     
+
+> 18 53 87 172 342 Labeled parcels (log scale) 0.0 2.5 5.0 7.5 10.0 12.5 15.0 17.5 20.0 Crop mIoU (%)
+> PhenoStitch 0-shot SegEarth-OV 0-shot
+> PhenoStitch (ours)
+> PASTIS-R fold-4 · mean±std, 3 seeds headline: 5-fold CV 20.0±1.1 (k=20)
+> PhenoStitch (ours) Presto [pretrained FM] SimpleShot [few-shot] ProtoNet [few-shot] SAM-Aug [trained] U-TAE [trained] TSViT [trained]
+
+(a) crop mIoU vs. label budget (b) PhenoStitch confusion matrix ( k=20 )
+
+Figure 4: Label-scarce results and error analysis. (a) PhenoStitch (blue) leads at every budget k ∈ { 1, 3, 5, 10 , 20 } (full fold-4, mean ±std over 3 seeds; the headline is the 5-fold CV 20 .0±1.1 at k=20 ); dashed lines are zero-shot references. (b) Row-normalized confusion: phenologically distinct crops (rapeseed, beet, soybean, corn, potato, orchard) are typed almost perfectly, while residual error concentrates among near-identical winter cereals (soft wheat, winter barley, triticale, mixed cereal), which sets the fine-grained ceiling. method is instanced by the same per-class connected com-ponents, yet the baselines’ noisy maps still give PQ ≤ 0.4,because their regions rarely match true parcels at IoU > 0.5.PhenoStitch’s coherent parcels instead reach PQ = 6 .2.To confirm that connected components do not handicap the baselines, we also trained a learned parcel detector at the same k=20 budget: a U-TAE with an auxiliary parcel-boundary head, instanced by seeded watershed (a lightweight PaPs (Sainte Fare Garnot and Landrieu 2021)). It reaches only PQ = 0 .5, about 12 × below PhenoStitch and indistin-guishable to two decimals from connected-components in-stancing on the same backbone. At ∼ 1% labels the boundary head learns almost no boundaries and the watershed degen-erates to connected components, so the panoptic gap does not depend on how baselines are instanced. Qualitatively (Figure 3), PhenoStitch produces clean, parcel-coherent maps that track the ground truth, whereas the per-pixel baselines are fragmented and mis-type en-tire fields. Delineation is strong and stable across folds (SQ = 76 .2 ± 0.4), confirming that the label-free bound-ary leg is not the bottleneck. 
+
+Family-level accuracy. Grouping the 18 classes into 7
+
+agronomic families roughly doubles every method’s mIoU (Table 1, coarse column). PhenoStitch reaches 31 .5 coarse mIoU, still well ahead of Presto ( 26 .5) and the few-shot clas-sifiers (about 19 ). The near-2× fine-to-coarse gap, shared by all methods, indicates that most fine-grained errors are con-fusions within a family, such as among winter cereals, rather than gross mistakes across unrelated crops. For applications that need crop groups rather than exact species, PhenoStitch already yields usable maps at ∼ 1% labels. 
+
+Label-budget curve 
+
+Figure 4(a) sweeps the budget k ∈ { 1, 3, 5, 10 , 20 } (3 seeds each). PhenoStitch dominates at every budget, from 11 .7
+
+mIoU at k=1 (18 parcels) to 18 .8 at k=20 on the single fold, and its error bars are tight. Even at k=1 it exceeds every baseline’s k=20 accuracy, and its zero-shot variant already surpasses the SegEarth-OV open-vocabulary reference. The trained networks stay near or below the zero-shot line across the whole scarce range, i.e. the matched-budget supervised regime never leaves the floor. 
+
+Second dataset: ZueriCrop 
+
+Table 2 repeats the comparison on ZueriCrop ( k=5 , S2-only, 76 fine classes; 500 evaluation tiles). The absolute numbers are lower (finer taxonomy, no radar), but the ranking is iden-tical to PASTIS-R and PhenoStitch again leads on every metric, with SQ = 76 .2, as high as on PASTIS-R, showing the delineation leg is not dataset-specific. Consistent behav-ior on a second, independently collected dataset (a different country and taxonomy) is what a training-free method should deliver, though we note this is in-domain evaluation on each dataset rather than a direct cross-region transfer test. 
+
+Ablations 
+
+Table 3 ablates every design choice at full fold-4, k=20 ,reporting the change from our full pipeline. Radar matters most : removing Sentinel-1 and typing on optical NDVI alone costs 9.3 fine mIoU while leaving SQ essentially unchanged (−0.7), so SAR drives typing , not delineation, and the two legs are decoupled. Keeping the signature compact is next: adding red-edge and SWIR harmonics costs 6.9 mIoU and a third harmonic 1.6, both curse-of-dimensionality effects in Method mIoU (76) coarse (16) SQ                         
+
+> PhenoStitch 2.68 10.82 76.2
+> Presto 1.83 6.20 67.4 ProtoNet 1.27 5.96 65.3 SimpleShot 1.13 5.06 65.7
+> α-TIM 0.53 3.17 66.5 U-TAE 0.16 1.66 ∼0SAM-Aug 0.05 1.32 ∼0TSViT 0.00 0.00 ∼0
+
+Table 2: ZueriCrop , k=5 , S2-only. Same ranking as PASTIS-R; delineation (SQ) transfers unchanged.                                         
+
+> Configuration mIoU coarse SQ
+> Ours (full pipeline) 13.6 23.1 75.1
+> change ( ∆) from ours:
+> −Sentinel-1 (S2-only) −9.3−12 .4−0.7
+> merge: IoU-NMS −1.5−1.5+0 .1
+> typing: cosine −1.9+0 .7−2.2+red-edge/SWIR bands −6.9−10 .0+0 .2
+> harmonic order 1 +0 .2−2.0+0 .7
+> harmonic order 3 −1.6−6.1+0 .1
+> merge λ= 1 .50.00.0−0.2
+> merge λ= 8 −0.10.00.0
+> no detrend +0 .4+0 .6−0.1
+
+Table 3: Ablations (PASTIS-R, fold-4, k=20 ). The first row is our full pipeline (S2 +S1, energy merge, 2 harmonics, stan-dardized Euclidean typing, λ=4 ); every other row reports the 
+
+change (∆) from it. Radar drives typing; a compact signa-ture, the graph-energy merge, and Euclidean typing all help, while λ and detrending are robust. For efficiency, ablations use a fixed 120 -patch support pool, so absolute numbers are below the full-support headline (Table 1); the ∆ comparisons hold within this setup. the few-shot regime; a single harmonic is statistically tied (+0 .2), and we keep the double harmonic because it also captures double-cropping. The graph-energy merge beats an appearance-only IoU-NMS merge by 1.5 mIoU at identi-cal prototypes and proposals, with lower fragmentation. The standardized Euclidean nearest-prototype rule beats cosine by 1.9, which is why the main results use it. The pipeline is otherwise robust : the merge weight λ is flat over 1.5–8, and detrending is within run-to-run noise. 
+
+Analysis and failure modes 
+
+The confusion matrix (Figure 4b) shows that PhenoStitch’s residual errors are concentrated among phenologically near-identical winter-cereal sub-types (soft wheat, winter barley, triticale, mixed cereal) and among rare crops with few pixels, not spread uniformly. Phenologically distinct crops (rape-seed, beet, soybean, corn, potato) are typed almost perfectly. Because these confusions stay within a family, the ceiling on fine accuracy is set by classes that are genuinely hard to separate from seasonal signal alone, not by the pipeline: adding red-edge/SWIR harmonics did not help and mildly hurt few-shot typing (curse of dimensionality). Delineation, by contrast, stays near its ceiling on both datasets. Absolute accuracy in this regime is modest by design: 20 mIoU is far below the full-supervision ceiling near 65 . But in a tar-get region without dense labels, the operative alternative is not a supervised network; it is no map at all. Label-scarce accuracy is therefore the quantity that matters there. These are the boundaries of the method: it delivers panoptic maps and label-scarce SOTA, but not full-supervision accuracy on visually indistinct sub-types. 
+
+# Limitations and Future Work 
+
+PhenoStitch has clear boundaries. First, its fine-grained ceil-ing is set by crops whose seasonal signal is nearly identical, such as the winter cereals soft wheat, barley, and triticale, and by rare classes with few pixels; separating these likely needs discriminative cues beyond a low-order harmonic fit. Second, absolute accuracy in the label-scarce regime is mod-est, and the method does not replace full supervision where dense labels already exist. Third, our evaluation is in-domain on each dataset. Although nothing is trained on crop labels, a direct cross-region or cross-year study, in which prototypes built in one country are applied to another, remains future work. Fourth, delineation inherits the quality and biases of the frozen segmenter, and typing benefits from radar, so ac-curacy may drop where Sentinel-1 is unavailable or where fields are too small for the segmenter to resolve. These boundaries point to concrete next steps. A label-efficient learned signature or merge could sharpen the winter-cereal distinctions without reintroducing dense supervision. A formal cross-region transfer protocol would test the gen-eralization that the training-free design implies. Finally, ex-tending the pipeline to smallholder and tropical systems, where labels are scarcest and fields are smallest, is where a training-free method should matter most. 
+
+# Conclusion 
+
+We recast panoptic crop mapping from a fully supervised task into a training-free, label-scarce one. PhenoStitch de-couples label-free parcel delineation (frozen SAM + graph-energy merge) from few-shot crop typing (phenological sig-natures + prototypes). On 5-fold ×3-seed cross-validation over PASTIS-R and ZueriCrop, it is state-of-the-art on every panoptic metric at ∼ 1% labels, beating foundation-model, few-shot, and matched-budget trained baselines. It is also the only method to attain non-trivial panoptic quality. The evi-dence is bounded: fine-grained accuracy is capped by pheno-logically near-identical crop sub-types rather than by delin-eation, which stays stable at 76 SQ across datasets. Because nothing is trained on crop labels, PhenoStitch offers a practi-cal route to panoptic mapping in the regions and years where dense labels do not exist. 
+
+# References 
+
+Achanta, R.; Shaji, A.; Smith, K.; Lucchi, A.; Fua, P.; and Süsstrunk, S. 2012. SLIC Superpixels Compared to State-of-the-Art Superpixel Methods. IEEE Transactions on Pattern Analysis and Machine Intelligence , 34(11): 2274–2282. Blaschke, T. 2010. Object based image analysis for remote sensing. ISPRS Journal of Photogrammetry and Remote Sensing , 65(1): 2–16. Boykov, Y.; Veksler, O.; and Zabih, R. 2001. Fast Approxi-mate Energy Minimization via Graph Cuts. IEEE Transac-tions on Pattern Analysis and Machine Intelligence , 23(11): 1222–1239. Chen, K.; Liu, C.; Chen, H.; Zhang, H.; Li, W.; Zou, Z.; and Shi, Z. 2024. RSPrompter: Learning to Prompt for Remote Sensing Instance Segmentation Based on Visual Foundation Model. IEEE Transactions on Geoscience and Remote Sens-ing , 62. Chen, W.-Y.; Liu, Y.-C.; Kira, Z.; Wang, Y.-C. F.; and Huang, J.-B. 2019. A Closer Look at Few-shot Classification. In In-ternational Conference on Learning Representations (ICLR) .Cheng, B.; Collins, M. D.; Zhu, Y.; Liu, T.; Huang, T. S.; Adam, H.; and Chen, L.-C. 2020. Panoptic-DeepLab: A Simple, Strong, and Fast Baseline for Bottom-Up Panoptic Segmentation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) .Cheng, B.; Misra, I.; Schwing, A. G.; Kirillov, A.; and Gird-har, R. 2022. Masked-attention Mask Transformer for Uni-versal Image Segmentation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) .Cheng, B.; Schwing, A. G.; and Kirillov, A. 2021. Per-Pixel Classification is Not All You Need for Semantic Segmenta-tion. In Advances in Neural Information Processing Systems (NeurIPS) .Cong, Y.; Khanna, S.; Meng, C.; Liu, P.; Rozi, E.; He, Y.; Burke, M.; Lobell, D. B.; and Ermon, S. 2022. SatMAE: Pre-training Transformers for Temporal and Multi-Spectral Satellite Imagery. In Advances in Neural Information Pro-cessing Systems (NeurIPS) .Felzenszwalb, P. F.; and Huttenlocher, D. P. 2004. Efficient Graph-Based Image Segmentation. International Journal of Computer Vision , 59(2): 167–181. Finn, C.; Abbeel, P.; and Levine, S. 2017. Model-Agnostic Meta-Learning for Fast Adaptation of Deep Networks. In 
+
+International Conference on Machine Learning (ICML) .Fuller, A.; Millard, K.; and Green, J. R. 2023. CROMA: Remote Sensing Representations with Contrastive Radar-Optical Masked Autoencoders. In Advances in Neural In-formation Processing Systems (NeurIPS) .Hu, K.; Feng, Y.; Lysenko, V.; Guo, Y.; and Wu, H. 2026. SAM-Aug: Leveraging SAM Priors for Few-Shot Parcel Segmentation in Satellite Time Series. arXiv preprint arXiv:2601.09110 .Ienco, D.; Interdonato, R.; Gaetano, R.; and Ho Tong Minh, D. 2019. Combining Sentinel-1 and Sentinel-2 Satellite Im-age Time Series for Land Cover Mapping via a Multi-Source Deep Learning Architecture. ISPRS Journal of Photogram-metry and Remote Sensing , 158: 11–22. Jakubik, J.; Roy, S.; Phillips, C. E.; Fraccaro, P.; God-win, D.; Zadrozny, B.; Szwarcman, D.; Gomes, C.; Nyir-jesy, G.; Edwards, B.; et al. 2023. Foundation Models for Generalist Geospatial Artificial Intelligence. arXiv preprint arXiv:2310.18660 .Ke, L.; Ye, M.; Danelljan, M.; Liu, Y.; Tai, Y.-W.; Tang, C.-K.; and Yu, F. 2023. Segment Anything in High Qual-ity. In Advances in Neural Information Processing Systems (NeurIPS) .Kirillov, A.; He, K.; Girshick, R.; Rother, C.; and Dol-lár, P. 2019. Panoptic Segmentation. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) .Kirillov, A.; Mintun, E.; Ravi, N.; Mao, H.; Rolland, C.; Gustafson, L.; Xiao, T.; Whitehead, S.; Berg, A. C.; Lo, W.-Y.; Dollár, P.; and Girshick, R. 2023. Segment Anything. In 
+
+Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) .Li, B.; Weinberger, K. Q.; Belongie, S.; Koltun, V.; and Ranftl, R. 2022. Language-driven Semantic Segmentation. In International Conference on Learning Representations (ICLR) .Li, K.; Liu, R.; Cao, X.; Bai, X.; Zhou, F.; Meng, D.; and Wang, Z. 2025. SegEarth-OV: Towards Training-Free Open-Vocabulary Segmentation for Remote Sensing Images. In 
+
+Proceedings of the IEEE/CVF Conference on Computer Vi-sion and Pattern Recognition (CVPR) .Mañas, O.; Lacoste, A.; Giró-i Nieto, X.; Vázquez, D.; and Rodríguez, P. 2021. Seasonal Contrast: Unsupervised Pre-Training from Uncurated Remote Sensing Data. In Proceed-ings of the IEEE/CVF International Conference on Computer Vision (ICCV) .Nyborg, J.; Pelletier, C.; Lefèvre, S.; and Assent, I. 2022. TimeMatch: Unsupervised Cross-Region Adaptation by Temporal Shift Estimation. ISPRS Journal of Photogram-metry and Remote Sensing , 188: 301–313. Pelletier, C.; Webb, G. I.; and Petitjean, F. 2019. Tempo-ral Convolutional Neural Network for the Classification of Satellite Image Time Series. Remote Sensing , 11(5): 523. Radford, A.; Kim, J. W.; Hallacy, C.; Ramesh, A.; Goh, G.; Agarwal, S.; Sastry, G.; Askell, A.; Mishkin, P.; Clark, J.; Krueger, G.; and Sutskever, I. 2021. Learning Transferable Visual Models From Natural Language Supervision. In In-ternational Conference on Machine Learning (ICML) .Reed, C. J.; Gupta, R.; Li, S.; Brockman, S.; Funk, C.; Clipp, B.; Keutzer, K.; Candido, S.; Uyttendaele, M.; and Darrell, T. 2023. Scale-MAE: A Scale-Aware Masked Autoencoder for Multiscale Geospatial Representation Learning. In Proceed-ings of the IEEE/CVF International Conference on Computer Vision (ICCV) .Rußwurm, M.; and Körner, M. 2018. Multi-Temporal Land Cover Classification with Sequential Recurrent Encoders. 
+
+ISPRS International Journal of Geo-Information , 7(4): 129. Rußwurm, M.; and Körner, M. 2020. Self-attention for Raw Optical Satellite Time Series Classification. ISPRS Journal of Photogrammetry and Remote Sensing , 169: 421–435. Rußwurm, M.; Pelletier, C.; Zollner, M.; Lefèvre, S.; and Körner, M. 2020. BreizhCrops: A Time Series Dataset for Crop Type Mapping. In ISPRS Archives / International Congress on Photogrammetry and Remote Sensing .Rustowicz, R.; Cheong, R.; Wang, L.; Ermon, S.; Burke, M.; and Lobell, D. 2019. Semantic Segmentation of Crop Type in Africa: A Novel Dataset and Analysis of Deep Learn-ing Methods. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Work-shops .Sainte Fare Garnot, V.; and Landrieu, L. 2021. Panoptic Segmentation of Satellite Image Time Series with Convo-lutional Temporal Attention Networks. In Proceedings of the IEEE/CVF International Conference on Computer Vi-sion (ICCV) .Sainte Fare Garnot, V.; Landrieu, L.; Giordano, S.; and Chehata, N. 2020. Satellite Image Time Series Classifica-tion with Pixel-Set Encoders and Temporal Self-Attention. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) .Snell, J.; Swersky, K.; and Zemel, R. 2017. Prototypical Networks for Few-shot Learning. In Advances in Neural Information Processing Systems (NeurIPS) .Sykas, D.; Papoutsis, I.; and Zografakis, D. 2021. Sen4AgriNet: A Harmonized Multi-Country, Multi-Temporal Benchmark Dataset for Agricultural Earth Ob-servation Machine Learning Applications. In IEEE In-ternational Geoscience and Remote Sensing Symposium (IGARSS) .Tarasiou, M.; Chavez, E.; and Zafeiriou, S. 2023. ViTs for SITS: Vision Transformers for Satellite Image Time Series. In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) .Tseng, G.; Cartuyvels, R.; Zvonkov, I.; Purohit, M.; Rolnick, D.; and Kerner, H. 2023. Lightweight, Pre-trained Trans-formers for Remote Sensing Timeseries. In arXiv preprint arXiv:2304.14065 .Tucker, C. J. 1979. Red and Photographic Infrared Linear Combinations for Monitoring Vegetation. Remote Sensing of Environment , 8(2): 127–150. Turkoglu, M. O.; D’Aronco, S.; Perich, G.; Liebisch, F.; Streit, C.; Schindler, K.; and Wegner, J. D. 2021. Crop Map-ping from Image Time Series: Deep Learning with Multi-scale Label Hierarchies. Remote Sensing of Environment ,264: 112603. Veilleux, O.; Boudiaf, M.; Piantanida, P.; and Ben Ayed, I. 2021. Realistic Evaluation of Transductive Few-Shot Learn-ing. In Advances in Neural Information Processing Systems (NeurIPS) .Veloso, A.; Mermoz, S.; Bouvet, A.; Le Toan, T.; Planells, M.; Dejoux, J.-F.; and Ceschia, E. 2017. Understanding the Temporal Behavior of Crops Using Sentinel-1 and Sentinel-2-like Data for Agricultural Applications. Remote Sensing of Environment , 199: 415–426. Verbesselt, J.; Hyndman, R.; Newnham, G.; and Culvenor, D. 2010. Detecting Trend and Seasonal Changes in Satellite Image Time Series. Remote Sensing of Environment , 114(1): 106–115. Vinyals, O.; Blundell, C.; Lillicrap, T.; Kavukcuoglu, K.; and Wierstra, D. 2016. Matching Networks for One Shot Learning. In Advances in Neural Information Processing Systems (NeurIPS) .Waldner, F.; Diakogiannis, F. I.; Batchelor, K.; Ciccotosto-Camp, M.; Cooper-Williams, E.; Herrmann, C.; Mata, G.; and Toovey, A. 2021. Detect, Consolidate, Delineate: Scal-able Mapping of Field Boundaries Using Satellite Images. 
+
+Remote Sensing , 13(11): 2197. Wang, D.; Zhang, J.; Du, B.; Xu, M.; Liu, L.; Tao, D.; and Zhang, L. 2023. SAMRS: Scaling-up Remote Sensing Seg-mentation Dataset with Segment Anything Model. In Ad-vances in Neural Information Processing Systems (NeurIPS) Datasets and Benchmarks Track .Wang, K.; Liew, J. H.; Zou, Y.; Zhou, D.; and Feng, J. 2019a. PANet: Few-Shot Image Semantic Segmentation with Proto-type Alignment. In Proceedings of the IEEE/CVF Interna-tional Conference on Computer Vision (ICCV) .Wang, Y.; Chao, W.-L.; Weinberger, K. Q.; and van der Maaten, L. 2019b. SimpleShot: Revisiting Nearest-Neighbor Classification for Few-Shot Learning. arXiv preprint arXiv:1911.04623 .Xiong, Z.; Wang, Y.; Zhang, F.; Stewart, A. J.; Hanna, J.; Borth, D.; Papoutsis, I.; Le Saux, B.; Camps-Valls, G.; and Zhu, X. X. 2024. Neural Plasticity-Inspired Multimodal Foundation Model for Earth Observation. arXiv preprint arXiv:2403.15356 .Zhou, C.; Loy, C. C.; and Dai, B. 2022. Extract Free Dense Labels from CLIP. In European Conference on Computer Vision (ECCV) .Zhu, Z.; and Woodcock, C. E. 2014. Continuous Change Detection and Classification of Land Cover Using All Avail-able Landsat Data. Remote Sensing of Environment , 144: 152–171.

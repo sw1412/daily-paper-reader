@@ -1,0 +1,221 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-08T20:45:03.852294+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 4,
+    "quick_skim_target": 12,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2608.01751v1",
+      "source": "arxiv",
+      "title": "SPECTRA: Band-Routed Embedding and Stage-Wise LoRA for Cross-Sensor Fine-Tuning of Geospatial Foundation Models",
+      "abstract": "Geospatial foundation models (GeoFMs), pretrained on large-scale geospatial data such as Earth observation (EO), climate, and weather data, have shown promising performance when fine-tuned on diverse downstream tasks. However, there are two challenges of adapting EO-pretrained GeoFMs to practical downstream datasets. The first challenge is how to handle spectral mismatch: pretrained patch embeddings expect a fixed set of input bands, whereas downstream sensors may provide different channels. The second challenge is how to reduce fine-tuning cost and make it efficient. While existing work has made efforts on these challenges individually, jointly improving fine-tuning performance under spectral mismatch while reducing adaptation cost remains underexplored. We propose SPECTRA, a parameter-efficient fine-tuning framework that addresses both spectral mismatch and adaptation cost. To handle spectral mismatch, SPECTRA introduces Band-Routed Embedding (BRE), which maps all available downstream bands into the band space expected by the pretrained GeoFM. By using BRE, all available bands in the downstream dataset are utilized to improve the selected-band input without changing the pretrained patch embedding interface. To reduce adaptation cost, SPECTRA further introduces a Stage-wise Transferability-aware LoRA (ST-LoRA) fine-tuning. ST-LoRA estimates stage-wise transferability before fine-tuning and assigns stage-specific LoRA ranks, concentrating trainable parameters on the stages with high transferability for the target task. Across three EO-pretrained GeoFMs and four downstream segmentation datasets, experiments show that BRE improves performance by utilizing all spectral bands, while ST-LoRA reduces trainable parameters compared with full fine-tuning and standard LoRA. Code is available at https://github.com/big-data-lab-umbc/SPECTRA.",
+      "authors": [
+        "Xingyan Li",
+        "Jordan A. Caraballo-Vega",
+        "Jie Gong",
+        "Mark L. Carroll",
+        "Jianwu Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-03T06:18:12+00:00",
+      "link": "https://arxiv.org/pdf/2608.01751v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Cross-sensor fine-tuning of geospatial foundation models handling spectral mismatch; supports multimodal remote sensing classification",
+      "llm_evidence_cn": "跨传感器地理空间基础模型微调，处理光谱失配，支撑多模态遥感分类",
+      "llm_evidence": "跨传感器地理空间基础模型微调，处理光谱失配，支撑多模态遥感分类",
+      "canonical_evidence": "跨传感器地理空间基础模型微调，处理光谱失配，支撑多模态遥感分类",
+      "llm_tldr_en": "SPECTRA adapts geospatial foundation models to new sensors with different bands via band-routed embeddings and stage-wise LoRA, improving fine-tuning under spectral mismatch efficiently.",
+      "llm_tldr_cn": "实际下游遥感数据往往与预训练模型输入波段不一致，现有方法未同时解决光谱失配与微调成本问题。SPECTRA提出波段路由嵌入以将任意输入波段映射到预训练patch嵌入，并采用分阶段LoRA降低微调开销。实验表明该方法在跨传感器场景下显著提升下游任务性能。这为高光谱及多模态遥感分类提供了通用的跨传感器适配基础。",
+      "llm_tldr": "实际下游遥感数据往往与预训练模型输入波段不一致，现有方法未同时解决光谱失配与微调成本问题。SPECTRA提出波段路由嵌入以将任意输入波段映射到预训练patch嵌入，并采用分阶段LoRA降低微调开销。实验表明该方法在跨传感器场景下显著提升下游任务性能。这为高光谱及多模态遥感分类提供了通用的跨传感器适配基础。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.04175v1",
+      "source": "arxiv",
+      "title": "TriCLE: Tri-Modal Vision-Language Reasoning for Edge-Deployed Fine-Grained Clustering",
+      "abstract": "Edge platforms used for aerial observation must interpret aircraft imagery under limited memory, limited compute, and intermittent connectivity. This setting is difficult for standard RGB-only recognition models and general-purpose vision-language models, especially when calibrated thermal and LiDAR aircraft data are unavailable. We present TriCLE, an application-oriented tri-modal vision-language system for aircraft taxonomic grouping under edge constraints. From a single RGB aircraft image, TriCLE generates a structure-preserving FLIR-style thermal view and a pseudo-LiDAR depth projection, then fuses the aligned views with task instructions in a compact Qwen3-VL backbone. The model is aligned to an expert aircraft taxonomy based on propulsion, airframe family, size, design era, and configuration, so its outputs reflect engineering-relevant similarity rather than only surface appearance. We evaluate supervised fine-tuning, rotation-preserving SFT, and three policy-alignment strategies: GRPO, GSPO, and DAPO. Sequence-level GSPO gives the strongest validation performance, reaching 88.33\\% validation accuracy and 0.91 weighted F1 on valid aircraft outputs. On a held-out aircraft test partition, GSPO achieves 78.00\\% accuracy and 0.793 weighted F1 while preserving 94.00\\% parseable output formatting. After 4-bit quantization and attention-memory optimization, the aligned 4B model fits an 8GB deployment target and processes each tri-modal triplet in 1.48 seconds. These results support TriCLE as a practical prototype for interpretable, edge-feasible aircraft grouping, while emphasizing the need for further validation on real aligned thermal and LiDAR sensor streams.",
+      "authors": [
+        "Kishor Datta Gupta",
+        "Md. Mahfuzur Rahman",
+        "Fahad Rahman",
+        "Ahmed Rafi Hasan",
+        "Faysal Mehrab Chowdhury",
+        "Mohd Ariful Haque",
+        "Roy George"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-04T19:34:08+00:00",
+      "link": "https://arxiv.org/pdf/2608.04175v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Tri-modal (RGB, thermal, pseudo-LiDAR) remote sensing classification for aircraft; LiDAR modality used in classification",
+      "llm_evidence_cn": "采用RGB、热红外与伪LiDAR三模态进行航空器分类，涉及LiDAR模态分类",
+      "llm_evidence": "采用RGB、热红外与伪LiDAR三模态进行航空器分类，涉及LiDAR模态分类",
+      "canonical_evidence": "采用RGB、热红外与伪LiDAR三模态进行航空器分类，涉及LiDAR模态分类",
+      "llm_tldr_en": "TriCLE generates pseudo-LiDAR depth and thermal views from a single RGB image and fuses them with task instructions in a compact VLM for fine-grained aircraft clustering under edge constraints.",
+      "llm_tldr_cn": "边缘平台进行航空器观测时缺少实测热红与LiDAR数据，且计算资源受限。TriCLE从单张RGB图像生成结构保持的FLIR风格热力图与伪LiDAR深度图，并在紧凑的Qwen3-VL骨干中融合对齐视图完成细粒度分类。实验显示其能在边缘部署约束下取得较好的航空器分类性能。该方法为多模态遥感分类中缺失模态的补偿提供了一条可行路径。",
+      "llm_tldr": "边缘平台进行航空器观测时缺少实测热红与LiDAR数据，且计算资源受限。TriCLE从单张RGB图像生成结构保持的FLIR风格热力图与伪LiDAR深度图，并在紧凑的Qwen3-VL骨干中融合对齐视图完成细粒度分类。实验显示其能在边缘部署约束下取得较好的航空器分类性能。该方法为多模态遥感分类中缺失模态的补偿提供了一条可行路径。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2607.29278v1",
+      "source": "arxiv",
+      "title": "Training-Free Entity-Level Few-Shot Segmentation of Remote Sensing Images with Advection Refinement",
+      "abstract": "Existing cross-domain few-shot segmentation approaches suffer from high training costs due to source-domain episodic training and pixel-wise dense prediction, while often producing fragmented and noisy predictions. To overcome these issues, we propose a training-free entity-level few-shot segmentation framework for remote sensing images with advection refinement. Specifically, we first leverage SAM3's generic geometric priors to generate category-agnostic entity primitives. By reformulating few-shot inference from pixel-level prediction to entity-level reasoning, foreground and background prototypes are constructed and combined with dense textual semantic responses from SAM3 to build a multi-modal semantic potential field. Furthermore, an advection equation-based semantic refinement mechanism is introduced to propagate category-aware information across both feature and similarity spaces, enhancing semantic continuity and suppressing local texture noise. Extensive experiments on multiple remote sensing datasets demonstrate that the proposed framework effectively mitigates domain shift and local noise, substantially improving SAM3's adaptation capability for remote sensing few-shot segmentation without additional training. Our code will be publicly available at https://github.com/yu-ni1989/ELFSS-AR.",
+      "authors": [
+        "Xueting Bai",
+        "Huan Ni"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-07-31T10:49:16+00:00",
+      "link": "https://arxiv.org/pdf/2607.29278v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Remote sensing multimodal segmentation; methodological bridge to multimodal remote sensing classification",
+      "llm_evidence_cn": "遥感多模态分割；对多模态遥感图像分类具有方法移植性",
+      "llm_evidence": "遥感多模态分割；对多模态遥感图像分类具有方法移植性",
+      "canonical_evidence": "遥感多模态分割；对多模态遥感图像分类具有方法移植性",
+      "llm_tldr_en": "A training-free entity-level few-shot segmentation framework for remote sensing images using SAM3 geometric priors and multimodal semantic potential with advection refinement, avoiding source-domain training.",
+      "llm_tldr_cn": "针对现有跨域小样本分割方法训练成本高、预测碎片化的问题，论文提出免训练的实体级小样本分割框架。它利用SAM3的通用几何先验生成类别无关实体基元，将推理从像素级转为实体级，并结合文本语义响应构建多模态语义势场，再通过对流细化改善预测。该方法避免了源域情景训练和密集逐像素预测，为遥感图像的分割与分类提供了一种高效的新思路。虽然未使用高光谱或激光雷达数据，但其多模态推理与实体级细化思路可迁移到相关任务。",
+      "llm_tldr": "针对现有跨域小样本分割方法训练成本高、预测碎片化的问题，论文提出免训练的实体级小样本分割框架。它利用SAM3的通用几何先验生成类别无关实体基元，将推理从像素级转为实体级，并结合文本语义响应构建多模态语义势场，再通过对流细化改善预测。该方法避免了源域情景训练和密集逐像素预测，为遥感图像的分割与分类提供了一种高效的新思路。虽然未使用高光谱或激光雷达数据，但其多模态推理与实体级细化思路可迁移到相关任务。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.04833v1",
+      "source": "arxiv",
+      "title": "RegisterBridgeMM: A Register-Centric Framework for RGB-Infrared Object Detection",
+      "abstract": "RGB-infrared (RGB-IR) object detection benefits from complementary visible and thermal cues, but effective fusion remains challenging under illumination changes, weather variation, and cluttered scenes. Existing RGB-IR fusion methods often trade expressive patch-level interaction for lighter but more constrained adaptation mechanisms. We empirically observe that pretrained register tokens contain both modality-shared and modality-specific information on paired RGB-IR inputs, suggesting that they can serve as a compact substrate for cross-modal communication. Building on this observation, we propose RegisterBridgeMM, a register-mediated fusion framework organized as a three-stage register lifecycle. Aggregate preserves per-modality register summarization inherited from pretraining; Bridge performs bidirectional register-to-patch reading with consensus-residual regulation; and Project translates the resulting register summary into spatially adaptive calibration of patch features. This register pathway avoids dense patch-to-patch cross-modal interaction while preserving the pretrained patch representation. With both backbone streams frozen, RegisterBridgeMM achieves the highest mAP50-95 among the evaluated methods on all four benchmarks: LLVIP, M3FD, DroneVehicle, and FLIR-Aligned.",
+      "authors": [
+        "Zian Wang",
+        "Hangchuan Liang",
+        "Yuehua Chen",
+        "Changchun Li",
+        "Chaoyi Guo",
+        "Mingzhe Liu",
+        "Fangming Gu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-05T13:34:13+00:00",
+      "link": "https://arxiv.org/pdf/2608.04833v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "RGB-infrared fusion for object detection; cross-modal register mechanism transferable to HSI-LiDAR fusion",
+      "llm_evidence_cn": "RGB与红外融合目标检测，其跨模态寄存器机制可迁移至HSI-LiDAR融合",
+      "llm_evidence": "RGB与红外融合目标检测，其跨模态寄存器机制可迁移至HSI-LiDAR融合",
+      "canonical_evidence": "RGB与红外融合目标检测，其跨模态寄存器机制可迁移至HSI-LiDAR融合",
+      "llm_tldr_en": "RegisterBridgeMM uses register tokens as compact cross-modal substrate for RGB-infrared object detection, with a three-stage register lifecycle preserving modality-specific information, improving fusion accuracy under challenging conditions.",
+      "llm_tldr_cn": "RGB-红外目标检测中可见光与热辐射互补，但现有融合方法在细粒度交互与轻量化适配之间难以平衡。RegisterBridgeMM观察到预训练寄存器令牌同时包含模态共享与特有信息，因而提出三阶段寄存器生命周期来聚合与传递跨模态信息。实验在复杂光照天气场景下验证了融合检测的改善。该跨模态融合范式可为高光谱与LiDAR联合目标检测提供借鉴。",
+      "llm_tldr": "RGB-红外目标检测中可见光与热辐射互补，但现有融合方法在细粒度交互与轻量化适配之间难以平衡。RegisterBridgeMM观察到预训练寄存器令牌同时包含模态共享与特有信息，因而提出三阶段寄存器生命周期来聚合与传递跨模态信息。实验在复杂光照天气场景下验证了融合检测的改善。该跨模态融合范式可为高光谱与LiDAR联合目标检测提供借鉴。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral and LiDAR fusion for target detection",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.00870v1",
+      "source": "arxiv",
+      "title": "PhenoStitch: Training-Free Panoptic Crop Mapping from Satellite Image Time Series",
+      "abstract": "Panoptic crop mapping requires both delineating individual agricultural parcels and assigning a crop type to each parcel from satellite image time series. Existing approaches typically rely on dense parcel-level annotations and task-specific model training, which limits their applicability to new regions and growing seasons. We introduce PhenoStitch, a panoptic crop-mapping pipeline that requires no task-specific gradient-based training. A frozen Segment Anything model first oversegments each patch into class-agnostic regions. For each region, optical NDVI and Sentinel-1 backscatter series are summarized by an analytic double-harmonic phenological signature. Adjacent regions are then merged into parcels by minimizing a Potts graph energy, and each parcel is classified by nearest-prototype matching using only (k) labeled parcels per class. A final topology-closure step produces the panoptic map. Under a matched budget of (k=20) parcels per class, corresponding to less than 1% of the available labels, PhenoStitch achieves 20.0 crop mIoU, 76.2 segmentation quality, and 6.2 panoptic quality on PASTIS-R under a 5-fold, 3-seed evaluation. It outperforms the evaluated frozen foundation-model, few-shot, and matched-budget supervised baselines under the same protocol, with a consistent ranking also observed on ZueriCrop. Ablation studies show that radar observations contribute the largest performance gain, while the graph-energy merge and compact phenological signature provide further improvements. These results demonstrate the effectiveness of combining label-free parcel delineation with few-shot phenological recognition for panoptic crop mapping under limited supervision.",
+      "authors": [
+        "Xuechen Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.LG"
+      ],
+      "published": "2026-08-01T21:11:01+00:00",
+      "link": "https://arxiv.org/pdf/2608.00870v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Training-free panoptic crop mapping from multimodal satellite time series; relevant to multimodal RS classification",
+      "llm_evidence_cn": "基于多模态卫星时间序列的免训练全景作物制图，与多模态遥感分类相关",
+      "llm_evidence": "基于多模态卫星时间序列的免训练全景作物制图，与多模态遥感分类相关",
+      "canonical_evidence": "基于多模态卫星时间序列的免训练全景作物制图，与多模态遥感分类相关",
+      "llm_tldr_en": "PhenoStitch performs panoptic crop mapping without task-specific training by combining frozen SAM oversegmentation, analytic phenological signatures from optical and SAR time series, and Potts graph energy merging.",
+      "llm_tldr_cn": "全景作物制图需要同时提取农田地块并分配作物类型，现有方法通常依赖密集地块标注和任务特定训练，限制其对新区域和生长季的泛化。PhenoStitch使用冻结的SAM生成初始区域，以NDVI和Sentinel-1后向散射序列的双谐波物候签名描述区域，并通过最小化Potts图能量合并相邻区域，实现免训练的全景作物制图。该方法无需任务特定梯度训练即可输出地块与作物类型，为卫星时间序列作物分类提供了高效可行的新方案。",
+      "llm_tldr": "全景作物制图需要同时提取农田地块并分配作物类型，现有方法通常依赖密集地块标注和任务特定训练，限制其对新区域和生长季的泛化。PhenoStitch使用冻结的SAM生成初始区域，以NDVI和Sentinel-1后向散射序列的双谐波物候签名描述区域，并通过最小化Potts图能量合并相邻区域，实现免训练的全景作物制图。该方法无需任务特定梯度训练即可输出地块与作物类型，为卫星时间序列作物分类提供了高效可行的新方案。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
