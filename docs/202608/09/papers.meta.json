@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-09",
+  "date": "2026-08-09",
+  "generated_at": "2026-08-09T20:50:58",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/09/2608.05671v1-urnet-a-unified-reparameterized-network-for-efficient-rgb-d-semantic-segmentation",
+      "section": "quick",
+      "title_en": "URNet: A Unified Reparameterized Network for Efficient RGB-D Semantic Segmentation",
+      "authors": "Guoan Xu, Zhengxue Wang, Yang Xiao, Ligeng Chen, Guangwei Gao, Dongchen Zhu",
+      "date": "2026-08-06",
+      "pdf": "https://arxiv.org/pdf/2608.05671v1",
+      "score": "7.0",
+      "evidence": "面向语义分割的高效单编码器RGB-D融合方法，可迁移至高光谱+激光雷达多模态融合",
+      "tldr": "现有RGB-D语义分割多采用双编码器结构分别处理RGB与深度，但存在深度特征学习不充分、跨模态融合受限以及额外分支带来的计算冗余等问题。为此，URNet提出统一重参数化网络，在单一编码器内同时进行多模态特征提取与融合，通过LGA模块利用线性门控注意力增强RGB和深度互补信息的建模，并设计简洁高效的PMD解码器。在多个基准上取得SOTA性能，同时保持高推理效率，为轻量级RGB-D分割提供了新思路。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Previous RGB-D semantic segmentation methods commonly employ dual encoders to separately process RGB and depth inputs, followed by dedicated modules for cross-modal feature fusion. However, such designs often inadequately capture depth representations and consequently limit effective cross-modal interaction, while the additional encoder branch introduces redundant computation that hinders lightweight execution. To tackle these challenges, we propose URNet, a Unified Reparameterized RGB-D Network that performs simultaneous multi-modal feature extraction and cross-modal fusion within a single encoder. Specifically, we adopt a reparameterization strategy to compact the network architecture and facilitate fast inference. Within each Reparameterized Block (RepBlock), a Linear Gated Attention (LGA) module is introduced to fully exploit complementary RGB and depth cues across different feature scales. Furthermore, considering that decoder design has been relatively underexplored in existing RGB-D segmentation models, we develop a concise yet effective universal decoder, termed the Pyramid Merging Decoder (PMD). Extensive experiments on multiple RGB-D segmentation benchmarks demonstrate that URNet achieves state-of-the-art performance while maintaining high efficiency. Code will be available at https://github.com/Wild-Stephen/URNet.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/09/2608.03023v1-standalone-dinov3-for-training-free-open-vocabulary-semantic-segmentation-in-remote-sensing",
+      "section": "quick",
+      "title_en": "Standalone DINOv3 for Training-Free Open-Vocabulary Semantic Segmentation in Remote Sensing",
+      "authors": "Changhao Zhao, Haoxiang Li, Yuke Li, Hai Liu, LingLin Zeng",
+      "date": "2026-08-04",
+      "pdf": "https://arxiv.org/pdf/2608.03023v1",
+      "score": "6.0",
+      "evidence": "面向遥感的免训练开放词汇语义分割方法，可迁移至高光谱图像分类。",
+      "tldr": "遥感语义分割常受限于昂贵的像素级标注，促使无需训练的开集方法发展。新发布的DINOv3通过DINO.txt赋予主干网络图文对比能力，为开集分割带来可能。本文提出DinoSplat-OV，无需微调或额外预训练即可适配遥感影像，针对其密集分布、多尺度和大尺寸特点设计文本感知拉普拉斯传播模块与高斯泼溅上采样模块，配合全局锚点滑动窗口策略。在UDD5、DOTA和LoveDA上取得有竞争力或更优性能，填补了DINO系列在免训练开集分割中的空白。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Remote sensing semantic segmentation is hindered by costly pixel-level annotations, motivating training-free open-vocabulary methods. Recently, the recent release of DINOv3 brings DINO.txt, which equips the standalone DINO backbone with image-text contrastive learning and thus opens up the possibility of open-vocabulary segmentation. We propose DinoSplat-OV, a training-free framework that adapts DINOv3 to remote sensing without fine-tuning or additional pretraining. Targeting the dense distribution, multi-scale nature, and large size of remote sensing imagery, we design two core modules. Its Text-aware Laplacian Propagation module de-noises patch-level predictions by combining textual semantic affinities with local visual similarity, improving regional consistency while preserving boundaries. Its Gaussian Splatting Upsampling module reconstructs pixel-level features through RGB-guided anisotropic aggregation and test-time optimization. A global-anchor sliding-window strategy further supports large-scale imagery. Experiments on UDD5, DOTA, and LoveDA demonstrate competitive or superior performance over existing training-free methods, effectively filling the gap of DINO-series models in training-free open-vocabulary segmentation and providing a viable new path for further advances in this direction.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

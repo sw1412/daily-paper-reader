@@ -1,0 +1,101 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-09T20:49:53.981699+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 2,
+    "quick_skim_target": 12,
+    "quick_selected": 2
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.05671v1",
+      "source": "arxiv",
+      "title": "URNet: A Unified Reparameterized Network for Efficient RGB-D Semantic Segmentation",
+      "abstract": "Previous RGB-D semantic segmentation methods commonly employ dual encoders to separately process RGB and depth inputs, followed by dedicated modules for cross-modal feature fusion. However, such designs often inadequately capture depth representations and consequently limit effective cross-modal interaction, while the additional encoder branch introduces redundant computation that hinders lightweight execution. To tackle these challenges, we propose URNet, a Unified Reparameterized RGB-D Network that performs simultaneous multi-modal feature extraction and cross-modal fusion within a single encoder. Specifically, we adopt a reparameterization strategy to compact the network architecture and facilitate fast inference. Within each Reparameterized Block (RepBlock), a Linear Gated Attention (LGA) module is introduced to fully exploit complementary RGB and depth cues across different feature scales. Furthermore, considering that decoder design has been relatively underexplored in existing RGB-D segmentation models, we develop a concise yet effective universal decoder, termed the Pyramid Merging Decoder (PMD). Extensive experiments on multiple RGB-D segmentation benchmarks demonstrate that URNet achieves state-of-the-art performance while maintaining high efficiency. Code will be available at https://github.com/Wild-Stephen/URNet.",
+      "authors": [
+        "Guoan Xu",
+        "Zhengxue Wang",
+        "Yang Xiao",
+        "Ligeng Chen",
+        "Guangwei Gao",
+        "Dongchen Zhu"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-06T07:08:15+00:00",
+      "link": "https://arxiv.org/pdf/2608.05671v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Efficient single-encoder RGB-D fusion for semantic segmentation, transferable to HSI+LiDAR multimodal fusion",
+      "llm_evidence_cn": "面向语义分割的高效单编码器RGB-D融合方法，可迁移至高光谱+激光雷达多模态融合",
+      "llm_evidence": "面向语义分割的高效单编码器RGB-D融合方法，可迁移至高光谱+激光雷达多模态融合",
+      "canonical_evidence": "面向语义分割的高效单编码器RGB-D融合方法，可迁移至高光谱+激光雷达多模态融合",
+      "llm_tldr_en": "URNet unifies multi-modal feature extraction and cross-modal fusion in a single reparameterized encoder for efficient RGB-D semantic segmentation. It avoids redundant computation and improves depth representation, enabling fast inference while maintaining accuracy.",
+      "llm_tldr_cn": "现有RGB-D语义分割通常使用双编码器分别处理RGB和深度，再设计融合模块，导致计算冗余且深度表示不足。URNet提出统一重参数化网络，在单一编码器内同时完成多模态特征提取与跨模态融合，并利用重参数化压缩网络以加速推理。在保持分割精度的同时大幅降低计算开销，其思想可迁移到高光谱与LiDAR数据的联合分类任务中。",
+      "llm_tldr": "现有RGB-D语义分割通常使用双编码器分别处理RGB和深度，再设计融合模块，导致计算冗余且深度表示不足。URNet提出统一重参数化网络，在单一编码器内同时完成多模态特征提取与跨模态融合，并利用重参数化压缩网络以加速推理。在保持分割精度的同时大幅降低计算开销，其思想可迁移到高光谱与LiDAR数据的联合分类任务中。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.03023v1",
+      "source": "arxiv",
+      "title": "Standalone DINOv3 for Training-Free Open-Vocabulary Semantic Segmentation in Remote Sensing",
+      "abstract": "Remote sensing semantic segmentation is hindered by costly pixel-level annotations, motivating training-free open-vocabulary methods. Recently, the recent release of DINOv3 brings DINO.txt, which equips the standalone DINO backbone with image-text contrastive learning and thus opens up the possibility of open-vocabulary segmentation. We propose DinoSplat-OV, a training-free framework that adapts DINOv3 to remote sensing without fine-tuning or additional pretraining. Targeting the dense distribution, multi-scale nature, and large size of remote sensing imagery, we design two core modules. Its Text-aware Laplacian Propagation module de-noises patch-level predictions by combining textual semantic affinities with local visual similarity, improving regional consistency while preserving boundaries. Its Gaussian Splatting Upsampling module reconstructs pixel-level features through RGB-guided anisotropic aggregation and test-time optimization. A global-anchor sliding-window strategy further supports large-scale imagery. Experiments on UDD5, DOTA, and LoveDA demonstrate competitive or superior performance over existing training-free methods, effectively filling the gap of DINO-series models in training-free open-vocabulary segmentation and providing a viable new path for further advances in this direction.",
+      "authors": [
+        "Changhao Zhao",
+        "Haoxiang Li",
+        "Yuke Li",
+        "Hai Liu",
+        "LingLin Zeng"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI"
+      ],
+      "published": "2026-08-04T02:12:39+00:00",
+      "link": "https://arxiv.org/pdf/2608.03023v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Training-free open-vocabulary semantic segmentation for remote sensing, a method transferable to hyperspectral image classification.",
+      "llm_evidence_cn": "面向遥感的免训练开放词汇语义分割方法，可迁移至高光谱图像分类。",
+      "llm_evidence": "面向遥感的免训练开放词汇语义分割方法，可迁移至高光谱图像分类。",
+      "canonical_evidence": "面向遥感的免训练开放词汇语义分割方法，可迁移至高光谱图像分类。",
+      "llm_tldr_en": "Remote sensing semantic segmentation often lacks pixel-level labels. DinoSplat-OV adapts standalone DINOv3 with text-aware Laplacian propagation for training-free open-vocabulary segmentation, effectively handling dense multi-scale and large-size remote sensing imagery.",
+      "llm_tldr_cn": "遥感语义分割受限于昂贵的像素级标注，免训练的开放词汇方法因而受到关注。本文提出DinoSplat-OV，将独立DINOv3模型适配到遥感图像，无需微调即可进行开放词汇分割。针对遥感图像的密集分布、多尺度与大尺寸特点，设计文本感知拉普拉斯传播模块对patch级预测去噪。实验验证了该框架在遥感分割任务上的有效性，展示了大模型用于遥感分类的潜力并降低了对标注的依赖。",
+      "llm_tldr": "遥感语义分割受限于昂贵的像素级标注，免训练的开放词汇方法因而受到关注。本文提出DinoSplat-OV，将独立DINOv3模型适配到遥感图像，无需微调即可进行开放词汇分割。针对遥感图像的密集分布、多尺度与大尺寸特点，设计文本感知拉普拉斯传播模块对patch级预测去噪。实验验证了该框架在遥感分割任务上的有效性，展示了大模型用于遥感分类的潜力并降低了对标注的依赖。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

@@ -6,35 +6,27 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-08
-- 运行时间：2026-08-08 20:49:24 UTC
+- 最新运行日期：2026-08-09
+- 运行时间：2026-08-09 20:50:52 UTC
 - 运行状态：成功
-- 本次总论文数：5
-- 精读区：1
-- 速读区：4
+- 本次总论文数：2
+- 精读区：0
+- 速读区：2
 
 ### 今日简报（AI）
-今日5篇遥感与多模态论文，精读1篇、速读4篇，覆盖跨传感器微调、三模态聚类与红外-可见光检测。最值得关注SPECTRA（8.0分）的“波段路由嵌入+分阶段LoRA”方案，可有效提升地理空间基础模型的跨传感器微调性能；TriCLE的边端三模态聚类也具潜力。建议普通读者优先精读SPECTRA原文，并速览TriCLE与RegisterBridgeMM以了解多模态融合最新思路。
-- 详情：[/202608/08/README](/202608/08/README)
+今日速读2篇论文，聚焦高效RGB-D语义分割与遥感开放词汇分割两大方向。最值得关注的是URNet（7.0分）提出的统一重参数化网络，在精度与效率间取得平衡；DINOv3（6.0分）则展示了免训练开放词汇分割在遥感场景的潜力。建议后续深入对比这两类方法在真实数据集上的泛化能力，并关注URNet的重参数化设计细节。
+- 详情：[/202608/09/README](/202608/09/README)
 
 ### 精读区论文标签
-1. [SPECTRA: Band-Routed Embedding and Stage-Wise LoRA for Cross-Sensor Fine-Tuning of Geospatial Foundation Models](/202608/08/2608.01751v1-spectra-band-routed-embedding-and-stage-wise-lora-for-cross-sensor-fine-tuning-of-geospatial-foundation-models)  
-   标签：评分：8.0/10、query:hsi-lidar
-   evidence：跨传感器地理空间基础模型微调，处理光谱失配，支撑多模态遥感分类
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [TriCLE: Tri-Modal Vision-Language Reasoning for Edge-Deployed Fine-Grained Clustering](/202608/08/2608.04175v1-tricle-tri-modal-vision-language-reasoning-for-edge-deployed-fine-grained-clustering)  
+1. [URNet: A Unified Reparameterized Network for Efficient RGB-D Semantic Segmentation](/202608/09/2608.05671v1-urnet-a-unified-reparameterized-network-for-efficient-rgb-d-semantic-segmentation)  
    标签：评分：7.0/10、query:hsi-lidar
-   evidence：采用RGB、热红外与伪LiDAR三模态进行航空器分类，涉及LiDAR模态分类
-2. [RegisterBridgeMM: A Register-Centric Framework for RGB-Infrared Object Detection](/202608/08/2608.04833v1-registerbridgemm-a-register-centric-framework-for-rgb-infrared-object-detection)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：RGB与红外融合目标检测，其跨模态寄存器机制可迁移至HSI-LiDAR融合
-3. [Training-Free Entity-Level Few-Shot Segmentation of Remote Sensing Images with Advection Refinement](/202608/08/2607.29278v1-training-free-entity-level-few-shot-segmentation-of-remote-sensing-images-with-advection-refinement)  
+   evidence：面向语义分割的高效单编码器RGB-D融合方法，可迁移至高光谱+激光雷达多模态融合
+2. [Standalone DINOv3 for Training-Free Open-Vocabulary Semantic Segmentation in Remote Sensing](/202608/09/2608.03023v1-standalone-dinov3-for-training-free-open-vocabulary-semantic-segmentation-in-remote-sensing)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：遥感多模态分割；对多模态遥感图像分类具有方法移植性
-4. [PhenoStitch: Training-Free Panoptic Crop Mapping from Satellite Image Time Series](/202608/08/2608.00870v1-phenostitch-training-free-panoptic-crop-mapping-from-satellite-image-time-series)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：基于多模态卫星时间序列的免训练全景作物制图，与多模态遥感分类相关
+   evidence：面向遥感的免训练开放词汇语义分割方法，可迁移至高光谱图像分类。
 
 
 <div class="dpr-home-promo-card">
