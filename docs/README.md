@@ -6,27 +6,31 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-09
-- 运行时间：2026-08-09 20:50:52 UTC
+- 最新运行日期：2026-08-10
+- 运行时间：2026-08-10 21:16:36 UTC
 - 运行状态：成功
-- 本次总论文数：2
-- 精读区：0
+- 本次总论文数：3
+- 精读区：1
 - 速读区：2
 
 ### 今日简报（AI）
-今日速读2篇论文，聚焦高效RGB-D语义分割与遥感开放词汇分割两大方向。最值得关注的是URNet（7.0分）提出的统一重参数化网络，在精度与效率间取得平衡；DINOv3（6.0分）则展示了免训练开放词汇分割在遥感场景的潜力。建议后续深入对比这两类方法在真实数据集上的泛化能力，并关注URNet的重参数化设计细节。
-- 详情：[/202608/09/README](/202608/09/README)
+今日聚焦3篇论文，主攻LiDAR点云处理，涵盖合成数据生成、自监督表示学习及高光谱变化检测。  
+最值得关注的是精读文章《Synthetic LiDAR Data Generation and Deterministic Downsampling for Point Cloud Classification on the Edge》（8.0分），其在边缘场景下用合成数据+确定性降采样提升分类效率，另两篇速读也涉及点云自监督与高光谱无监督标签。  
+建议优先复现该精读方法的降采样策略，并留意速读中自监督表示学习对标注成本降低的潜在帮助。
+- 详情：[/202608/10/README](/202608/10/README)
 
 ### 精读区论文标签
-- 本次无精读推荐。
+1. [Synthetic LiDAR Data Generation and Deterministic Downsampling for Point Cloud Classification on the Edge](/202608/10/2608.07106v1-synthetic-lidar-data-generation-and-deterministic-downsampling-for-point-cloud-classification-on-the-edge)  
+   标签：评分：8.0/10、query:hsi-lidar
+   evidence：结合合成LiDAR数据的点云分类与边缘降采样方案
 
 ### 速读区论文标签
-1. [URNet: A Unified Reparameterized Network for Efficient RGB-D Semantic Segmentation](/202608/09/2608.05671v1-urnet-a-unified-reparameterized-network-for-efficient-rgb-d-semantic-segmentation)  
+1. [Hyperspectral Calibration Detection: A Novel Concept For Change Detection With Unsupervised Incremental Safe Pseudo-Labeling Implementation](/202608/10/2608.06028v1-hyperspectral-calibration-detection-a-novel-concept-for-change-detection-with-unsupervised-incremental-safe-pseudo-labeling-implementation)  
+   标签：评分：7.0/10、query:hsi
+   evidence：高光谱变化检测与无监督伪标记
+2. [Vernata: Self-Supervised Learning of LiDAR Point Representations](/202608/10/2608.06919v1-vernata-self-supervised-learning-of-lidar-point-representations)  
    标签：评分：7.0/10、query:hsi-lidar
-   evidence：面向语义分割的高效单编码器RGB-D融合方法，可迁移至高光谱+激光雷达多模态融合
-2. [Standalone DINOv3 for Training-Free Open-Vocabulary Semantic Segmentation in Remote Sensing](/202608/09/2608.03023v1-standalone-dinov3-for-training-free-open-vocabulary-semantic-segmentation-in-remote-sensing)  
-   标签：评分：6.0/10、query:hsi-lidar
-   evidence：面向遥感的免训练开放词汇语义分割方法，可迁移至高光谱图像分类。
+   evidence：面向LiDAR点云的自监督表征学习，支持后续分类任务
 
 
 <div class="dpr-home-promo-card">

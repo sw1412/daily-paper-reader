@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-10",
+  "date": "2026-08-10",
+  "generated_at": "2026-08-10T21:16:43",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/10/2608.07106v1-synthetic-lidar-data-generation-and-deterministic-downsampling-for-point-cloud-classification-on-the-edge",
+      "section": "deep",
+      "title_en": "Synthetic LiDAR Data Generation and Deterministic Downsampling for Point Cloud Classification on the Edge",
+      "authors": "Niclas Meyer, Stefan Reitmann",
+      "date": "2026-08-07",
+      "pdf": "https://arxiv.org/pdf/2608.07106v1",
+      "score": "8.0",
+      "evidence": "结合合成LiDAR数据的点云分类与边缘降采样方案",
+      "tldr": "针对三维深度学习在低功耗边缘设备上部署受限于数据非结构化与排序预处理开销的问题，提出面向树莓派5优化的硬件约束流程。利用物理仿真构建合成LiDAR数据集，弥补CAD干净数据与真实传感器差距，并引入特征驱动的关键点层实现确定性压缩。完整流程在ARM处理器上达约50FPS吞吐与88.36%分类精度，验证实时边缘3D感知可行性。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Deploying three-dimensional deep learning frameworks to low-power embedded processors is bottlenecked by the unstructured nature of spatial data and the resource-intensive distance sorting algorithms often used before neural network inference. To address this gap, this paper presents a hardware-constrained workflow optimized for native execution on the Raspberry Pi 5. To account for the reality gap between noiseless, clean computer-aided design (CAD) datasets and real-world sensor data, we use physics-based simulation to construct a synthetic LiDAR dataset. Cross-dataset evaluations demonstrate a substantial drop in classification accuracy when networks trained on clean CAD data are evaluated on synthetic LiDAR sensor data, highlighting the critical need for sensor-aware training. To address the latency bottleneck of traditional geometric preprocessing on edge CPUs, we integrate an isolated, feature-driven Critical Points Layer (CPL) as a frontend filter. Our results show that the pretrained CPL deterministically compresses raw 1024-point clouds to a subset of 40 to 60 unique coordinates. When profiled on the ARM Cortex-A76 processor, the complete pipeline achieves an inference throughput of approximately 50 FPS while maintaining an instance classification accuracy of 88.36%, demonstrating the viability of deterministic real-time 3D perception at the edge.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/10/2608.06028v1-hyperspectral-calibration-detection-a-novel-concept-for-change-detection-with-unsupervised-incremental-safe-pseudo-labeling-implementation",
+      "section": "quick",
+      "title_en": "Hyperspectral Calibration Detection: A Novel Concept For Change Detection With Unsupervised Incremental Safe Pseudo-Labeling Implementation",
+      "authors": "Chia-Hsiang Lin, Shih-Min Hsu, Ching-Yun Liang, Jocelyn Chanussot, Jhih-Yan Chen",
+      "date": "2026-08-06",
+      "pdf": "https://arxiv.org/pdf/2608.06028v1",
+      "score": "7.0",
+      "evidence": "高光谱变化检测与无监督伪标记",
+      "tldr": "高光谱变化检测在土地覆盖监测中应用广泛，但多依赖半监督标注，难以满足机载边缘计算零标签即时检测需求。HyperLUCID提出迭代安全伪标签机制，通过收集未变化像素增量训练光谱校准函数，补偿双时相采集条件差异，进而无监督检测变化。该算法在多个真实基准数据集上取得93.6%至97.9%的总体精度，且比主流方法快约1至2个数量级。它为星载/机载实时监测提供了一种高效轻量级且完全免标注的自动化方案。",
+      "tags": "query:hsi",
+      "abstract_en": "Hyperspectral change detection (HCD) has found numerous key applications, such as land cover monitoring. The majority of benchmark HCD algorithms are semi-supervised methods, and some of them can even achieve very low sample labeling rates. However, in some practical scenarios, such as those requiring immediate detection responses for onboard edge computing, we need to achieve the zero-label requirement as ground-truth labeling would not be available onboard for newly acquired images. In this work, we propose a fully unsupervised HCD algorithm, together with a lightweight model, quite suitable for onboard detection missions. Based on an iteratively augmented training set that safely collects some unchanged pixel samples, we learn an iteratively refined spectrum calibration function that eventually compensates the variability of acquisition conditions (often observed in bitemporal images), thereby making the changed pixels easily detectable by analyzing the calibrated spectra. The proposed hyperspectral looping unsupervised calibration and incremental detection (HyperLUCID) algorithm is not only computationally efficient (around 1 to 2 orders of magnitude faster than most benchmark HCD methods), but has also achieved state-of-the-art results (around 93.6% to 97.9% overall accuracy) on several real benchmark HCD datasets. Source codes: https://github.com/IHCLab/HyperLUCID.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/10/2608.06919v1-vernata-self-supervised-learning-of-lidar-point-representations",
+      "section": "quick",
+      "title_en": "Vernata: Self-Supervised Learning of LiDAR Point Representations",
+      "authors": "Oliver Lemke, Alexander Liniger, Abel Gawel, Marco Hutter",
+      "date": "2026-08-07",
+      "pdf": "https://arxiv.org/pdf/2608.06919v1",
+      "score": "7.0",
+      "evidence": "面向LiDAR点云的自监督表征学习，支持后续分类任务",
+      "tldr": "LiDAR是户外机器人不可或缺的感知模态，但3D点云标注成本高昂，导致标注数据稀缺，制约了深度学习模型性能。为此，本文提出Vernata，一个基于Sonata架构的多模态多教师蒸馏自监督学习框架，包含三项关键扩展：稀疏视图增强提升对不同点密度的鲁棒性，记忆库机制稳定资源受限下的训练，跨模态蒸馏利用高分辨率2D图像特征提供细粒度语义指导。在TartanGround和Waymo数据集上，mIoU分别达到54.7和57.1，较Sonata基线大幅提升12.1%和14.7%。即使在缺乏颜色或法线的降模态场景下，仍取得49.4和50.2的竞争性能，充分验证了自监督学习的有效性和泛化能力。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "LiDAR serves as a primary sensing modality for robots operating in outdoor environments. However, the performance of deep learning models in this domain is severely limited by the scarcity of labeled data, a direct result of the high cost of 3D annotation. Self-supervised learning addresses this scarcity by learning general-purpose features from unlabeled data. In this work, we present a multi-modal, multi-teacher distillation framework for self-supervised learning on outdoor LiDAR point clouds. Building upon the Sonata architecture, we introduce Vernata, consisting of three extensions: sparse view augmentation to improve robustness against varying point densities, a memory bank mechanism to stabilize resource-constrained training, and cross-modal distillation utilizing dense, high-resolution 2D image features to enable fine-grained semantic guidance. We evaluate our method on the GrandTour, TartanGround, and Waymo datasets, as well as data collected from our own robotic platforms. Our experiments demonstrate a significant performance improvement over Sonata baselines, yielding mIoU scores of 54.7 on TartanGround (+5.9 points, +12.1%) and 57.1 on Waymo (+7.3 points, +14.7%). Finally, we show that the self-supervised approach maintains strong performance even in reduced-modality settings (lacking color or normals), achieving competitive mIoU scores of 49.4 and 50.2 on the respective datasets.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}

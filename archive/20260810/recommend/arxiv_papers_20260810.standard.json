@@ -1,0 +1,138 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-10T21:13:42.487849+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 1,
+    "deep_cap": 7,
+    "deep_selected": 1,
+    "quick_candidates": 2,
+    "quick_skim_target": 12,
+    "quick_selected": 2
+  },
+  "deep_dive": [
+    {
+      "id": "2608.07106v1",
+      "source": "arxiv",
+      "title": "Synthetic LiDAR Data Generation and Deterministic Downsampling for Point Cloud Classification on the Edge",
+      "abstract": "Deploying three-dimensional deep learning frameworks to low-power embedded processors is bottlenecked by the unstructured nature of spatial data and the resource-intensive distance sorting algorithms often used before neural network inference. To address this gap, this paper presents a hardware-constrained workflow optimized for native execution on the Raspberry Pi 5. To account for the reality gap between noiseless, clean computer-aided design (CAD) datasets and real-world sensor data, we use physics-based simulation to construct a synthetic LiDAR dataset. Cross-dataset evaluations demonstrate a substantial drop in classification accuracy when networks trained on clean CAD data are evaluated on synthetic LiDAR sensor data, highlighting the critical need for sensor-aware training. To address the latency bottleneck of traditional geometric preprocessing on edge CPUs, we integrate an isolated, feature-driven Critical Points Layer (CPL) as a frontend filter. Our results show that the pretrained CPL deterministically compresses raw 1024-point clouds to a subset of 40 to 60 unique coordinates. When profiled on the ARM Cortex-A76 processor, the complete pipeline achieves an inference throughput of approximately 50 FPS while maintaining an instance classification accuracy of 88.36%, demonstrating the viability of deterministic real-time 3D perception at the edge.",
+      "authors": [
+        "Niclas Meyer",
+        "Stefan Reitmann"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.RO"
+      ],
+      "published": "2026-08-07T11:02:55+00:00",
+      "link": "https://arxiv.org/pdf/2608.07106v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "point cloud classification with synthetic LiDAR data and edge downsampling",
+      "llm_evidence_cn": "结合合成LiDAR数据的点云分类与边缘降采样方案",
+      "llm_evidence": "结合合成LiDAR数据的点云分类与边缘降采样方案",
+      "canonical_evidence": "结合合成LiDAR数据的点云分类与边缘降采样方案",
+      "llm_tldr_en": "This paper presents a hardware-constrained workflow for LiDAR point cloud classification on edge devices, using synthetic LiDAR data generation and deterministic downsampling to bridge the reality gap and enable efficient deployment.",
+      "llm_tldr_cn": "针对LiDAR点云分类在低功耗边缘设备上部署受限的问题，提出面向树莓派5的硬件约束工作流。利用物理仿真生成合成LiDAR数据集以弥合真实传感器与CAD数据之间的差异，并设计确定性降采样方法适配边缘计算。跨数据集评估显示训练与测试域差异的影响，为边缘端LiDAR分类提供了实用方案。",
+      "llm_tldr": "针对LiDAR点云分类在低功耗边缘设备上部署受限的问题，提出面向树莓派5的硬件约束工作流。利用物理仿真生成合成LiDAR数据集以弥合真实传感器与CAD数据之间的差异，并设计确定性降采样方法适配边缘计算。跨数据集评估显示训练与测试域差异的影响，为边缘端LiDAR分类提供了实用方案。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.06028v1",
+      "source": "arxiv",
+      "title": "Hyperspectral Calibration Detection: A Novel Concept For Change Detection With Unsupervised Incremental Safe Pseudo-Labeling Implementation",
+      "abstract": "Hyperspectral change detection (HCD) has found numerous key applications, such as land cover monitoring. The majority of benchmark HCD algorithms are semi-supervised methods, and some of them can even achieve very low sample labeling rates. However, in some practical scenarios, such as those requiring immediate detection responses for onboard edge computing, we need to achieve the zero-label requirement as ground-truth labeling would not be available onboard for newly acquired images. In this work, we propose a fully unsupervised HCD algorithm, together with a lightweight model, quite suitable for onboard detection missions. Based on an iteratively augmented training set that safely collects some unchanged pixel samples, we learn an iteratively refined spectrum calibration function that eventually compensates the variability of acquisition conditions (often observed in bitemporal images), thereby making the changed pixels easily detectable by analyzing the calibrated spectra. The proposed hyperspectral looping unsupervised calibration and incremental detection (HyperLUCID) algorithm is not only computationally efficient (around 1 to 2 orders of magnitude faster than most benchmark HCD methods), but has also achieved state-of-the-art results (around 93.6% to 97.9% overall accuracy) on several real benchmark HCD datasets. Source codes: https://github.com/IHCLab/HyperLUCID.",
+      "authors": [
+        "Chia-Hsiang Lin",
+        "Shih-Min Hsu",
+        "Ching-Yun Liang",
+        "Jocelyn Chanussot",
+        "Jhih-Yan Chen"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV"
+      ],
+      "published": "2026-08-06T13:35:33+00:00",
+      "link": "https://arxiv.org/pdf/2608.06028v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Hyperspectral change detection with unsupervised pseudo-labeling",
+      "llm_evidence_cn": "高光谱变化检测与无监督伪标记",
+      "llm_evidence": "高光谱变化检测与无监督伪标记",
+      "canonical_evidence": "高光谱变化检测与无监督伪标记",
+      "llm_tldr_en": "Proposes a fully unsupervised hyperspectral change detection algorithm with safe pseudo-labeling and a lightweight model, targeting zero-label onboard edge computing scenarios.",
+      "llm_tldr_cn": "现有高光谱变化检测多依赖半监督标注，但在轨边缘计算场景中无法获取地面真值的标签。为此提出一种完全无监督的高光谱变化检测算法，通过安全伪标记迭代扩充训练集，并采用轻量模型适应机载任务。实验证明该方法在零标签条件下仍能有效检测地物变化，适合星上即时处理。该工作拓展了高光谱变化检测在零标签与边缘计算环境下的适用性。",
+      "llm_tldr": "现有高光谱变化检测多依赖半监督标注，但在轨边缘计算场景中无法获取地面真值的标签。为此提出一种完全无监督的高光谱变化检测算法，通过安全伪标记迭代扩充训练集，并采用轻量模型适应机载任务。实验证明该方法在零标签条件下仍能有效检测地物变化，适合星上即时处理。该工作拓展了高光谱变化检测在零标签与边缘计算环境下的适用性。",
+      "llm_tags": [
+        "query:hsi:composite"
+      ],
+      "matched_query_tag": "query:hsi:composite",
+      "matched_query_text": "Papers central to 高光谱图像目标检测与分类, especially work that connects or combines: hyperspectral image classification methods; hyperspectral target detection algorithms; hyperspectral anomaly detection techniques; spectral-spatial feature extraction for hyperspectral data; hyperspectral image target detection.",
+      "matched_requirement_id": "req-composite-hsi",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.06919v1",
+      "source": "arxiv",
+      "title": "Vernata: Self-Supervised Learning of LiDAR Point Representations",
+      "abstract": "LiDAR serves as a primary sensing modality for robots operating in outdoor environments. However, the performance of deep learning models in this domain is severely limited by the scarcity of labeled data, a direct result of the high cost of 3D annotation. Self-supervised learning addresses this scarcity by learning general-purpose features from unlabeled data. In this work, we present a multi-modal, multi-teacher distillation framework for self-supervised learning on outdoor LiDAR point clouds. Building upon the Sonata architecture, we introduce Vernata, consisting of three extensions: sparse view augmentation to improve robustness against varying point densities, a memory bank mechanism to stabilize resource-constrained training, and cross-modal distillation utilizing dense, high-resolution 2D image features to enable fine-grained semantic guidance. We evaluate our method on the GrandTour, TartanGround, and Waymo datasets, as well as data collected from our own robotic platforms. Our experiments demonstrate a significant performance improvement over Sonata baselines, yielding mIoU scores of 54.7 on TartanGround (+5.9 points, +12.1%) and 57.1 on Waymo (+7.3 points, +14.7%). Finally, we show that the self-supervised approach maintains strong performance even in reduced-modality settings (lacking color or normals), achieving competitive mIoU scores of 49.4 and 50.2 on the respective datasets.",
+      "authors": [
+        "Oliver Lemke",
+        "Alexander Liniger",
+        "Abel Gawel",
+        "Marco Hutter"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-08-07T07:51:39+00:00",
+      "link": "https://arxiv.org/pdf/2608.06919v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "self-supervised representation learning for LiDAR point clouds",
+      "llm_evidence_cn": "面向LiDAR点云的自监督表征学习，支持后续分类任务",
+      "llm_evidence": "面向LiDAR点云的自监督表征学习，支持后续分类任务",
+      "canonical_evidence": "面向LiDAR点云的自监督表征学习，支持后续分类任务",
+      "llm_tldr_en": "Vernata learns self-supervised representations for outdoor LiDAR point clouds via multi-modal multi-teacher distillation, with sparse view augmentation, memory bank stabilization, and cross-modal distillation to combat label scarcity.",
+      "llm_tldr_cn": "针对户外LiDAR点云标注成本高、数据稀缺的问题，提出Vernata自监督学习框架，基于多模态多教师蒸馏从无标注数据学习通用点云表征。结合稀疏视图增强、记忆库机制和跨模态蒸馏，提升不同点密度下的鲁棒性和训练稳定性。该方法缓解了LiDAR深度学习依赖人工标注的问题，为LiDAR分类等下游任务提供了有效预训练模型。",
+      "llm_tldr": "针对户外LiDAR点云标注成本高、数据稀缺的问题，提出Vernata自监督学习框架，基于多模态多教师蒸馏从无标注数据学习通用点云表征。结合稀疏视图增强、记忆库机制和跨模态蒸馏，提升不同点密度下的鲁棒性和训练稳定性。该方法缓解了LiDAR深度学习依赖人工标注的问题，为LiDAR分类等下游任务提供了有效预训练模型。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "LiDAR image classification",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
