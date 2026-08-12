@@ -6,31 +6,31 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-10
-- 运行时间：2026-08-10 21:16:36 UTC
+- 最新运行日期：2026-08-12
+- 运行时间：2026-08-12 21:23:15 UTC
 - 运行状态：成功
 - 本次总论文数：3
 - 精读区：1
 - 速读区：2
 
 ### 今日简报（AI）
-今日聚焦3篇论文，主攻LiDAR点云处理，涵盖合成数据生成、自监督表示学习及高光谱变化检测。  
-最值得关注的是精读文章《Synthetic LiDAR Data Generation and Deterministic Downsampling for Point Cloud Classification on the Edge》（8.0分），其在边缘场景下用合成数据+确定性降采样提升分类效率，另两篇速读也涉及点云自监督与高光谱无监督标签。  
-建议优先复现该精读方法的降采样策略，并留意速读中自监督表示学习对标注成本降低的潜在帮助。
-- 详情：[/202608/10/README](/202608/10/README)
+今日精读高光谱目标跟踪新方法，并速读3D分割与可见光-红外检测两篇。  
+最值得看的是MSP-Net（8.0分），用流形引导的光谱提示提升跟踪性能；跨模态检测则通过显式特征域仿射配准应对严重错位。  
+建议优先回顾高光谱跟踪的思路，若关注应用可进一步了解跨模态检测中的对齐策略。
+- 详情：[/202608/12/README](/202608/12/README)
 
 ### 精读区论文标签
-1. [Synthetic LiDAR Data Generation and Deterministic Downsampling for Point Cloud Classification on the Edge](/202608/10/2608.07106v1-synthetic-lidar-data-generation-and-deterministic-downsampling-for-point-cloud-classification-on-the-edge)  
+1. [MSP-Net: Manifold-Guided Spectral Prompt Network for Hyperspectral Object Tracking](/202608/12/2608.09575v1-msp-net-manifold-guided-spectral-prompt-network-for-hyperspectral-object-tracking)  
    标签：评分：8.0/10、query:hsi-lidar
-   evidence：结合合成LiDAR数据的点云分类与边缘降采样方案
+   evidence：高光谱目标跟踪，接近高光谱图像目标检测
 
 ### 速读区论文标签
-1. [Hyperspectral Calibration Detection: A Novel Concept For Change Detection With Unsupervised Incremental Safe Pseudo-Labeling Implementation](/202608/10/2608.06028v1-hyperspectral-calibration-detection-a-novel-concept-for-change-detection-with-unsupervised-incremental-safe-pseudo-labeling-implementation)  
-   标签：评分：7.0/10、query:hsi
-   evidence：高光谱变化检测与无监督伪标记
-2. [Vernata: Self-Supervised Learning of LiDAR Point Representations](/202608/10/2608.06919v1-vernata-self-supervised-learning-of-lidar-point-representations)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：面向LiDAR点云的自监督表征学习，支持后续分类任务
+1. [Rethinking 3D Segmentation from Individual LiDAR Scans: Incidence-Aware Sampling on the SIP Benchmark](/202608/12/2608.07757v1-rethinking-3d-segmentation-from-individual-lidar-scans-incidence-aware-sampling-on-the-sip-benchmark)  
+   标签：评分：6.0/10、query:hsi-lidar
+   evidence：激光雷达点云分割/分类；与激光雷达图像分类任务相关
+2. [Bridging Severe Cross-Modal Misalignment: End-to-End Visible-Infrared Object Detection via Explicit Feature-Domain Affine Registration](/202608/12/2608.10680v1-bridging-severe-cross-modal-misalignment-end-to-end-visible-infrared-object-detection-via-explicit-feature-domain-affine-registration)  
+   标签：评分：6.0/10、query:hsi-lidar
+   evidence：面向目标检测的跨模态融合与显式对齐，可迁移至高光谱-激光雷达融合
 
 
 <div class="dpr-home-promo-card">

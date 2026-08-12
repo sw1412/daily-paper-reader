@@ -1,0 +1,54 @@
+{
+  "label": "2026-08-12",
+  "date": "2026-08-12",
+  "generated_at": "2026-08-12T21:23:25",
+  "count": 3,
+  "papers": [
+    {
+      "paper_id": "202608/12/2608.09575v1-msp-net-manifold-guided-spectral-prompt-network-for-hyperspectral-object-tracking",
+      "section": "deep",
+      "title_en": "MSP-Net: Manifold-Guided Spectral Prompt Network for Hyperspectral Object Tracking",
+      "authors": "Juliu Li, Hanlin Qin, Shuowen Yang, Jingjing Li, Yuedong Tan, Shuai Yuan, Huixin Zhou",
+      "date": "2026-08-10",
+      "pdf": "https://arxiv.org/pdf/2608.09575v1",
+      "score": "8.0",
+      "evidence": "高光谱目标跟踪，接近高光谱图像目标检测",
+      "tldr": "高光谱目标跟踪常将图像视为多通道RGB扩展，按固定波段顺序融合，导致模型依赖特定传感器且忽略波段间流形关系，泛化性差。同时波段判别贡献随目标与场景动态变化，静态融合表达受限。为此提出MSP-Net，通过图驱动流形路由重构波段关系并形成自适应光谱分组，结合分组统计与模板外观构建动态条件提示，增强目标抑制背景。随跟踪进行，光谱条件基于中间表示持续演化，并用可靠历史状态约束定位与尺度，提升跨传感器稳定性。在HOT2020和HOT2023上AUC超0.80、Precision超0.96，鲁棒性优异。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Hyperspectral object tracking leverages abundant spectral information to provide unique advantages for target discrimination in complex scenes. However, existing methods typically treat hyperspectral images as multi-channel extensions of RGB images, performing feature fusion in fixed band order. This approach leads to models dependent on specific sensor configurations while neglecting manifold relationships between bands, making generalization to heterogeneous sensors difficult. Moreover, the discriminative contribution of bands dynamically changes with target attributes and scene variations, further limiting the representational capacity of static fusion strategies. To address this, we propose the Manifold-Guided Spectral Prompt Network (MSP-Net). This network first reconstructs band relationships and forms adaptive spectral grouping through graph-driven manifold routing, then jointly integrates grouped spectral statistics with template appearance to construct target-related dynamic conditional prompts, enhancing target features while suppressing background interference. Furthermore, as tracking progresses, spectral conditions continuously evolve based on intermediate target representations, enabling target prompts to adapt in real-time to appearance and scene changes. Meanwhile, reliable historical states are used to constrain target localization and scale fluctuations, significantly improving temporal stability in cross-sensor tracking. Experiments on HOT2020 and HOT2023 demonstrate that MSP-Net achieves AUC and Precision exceeding 0.80 and 0.96, respectively, exhibiting exceptional robustness under heterogeneous sensors, target deformation, and complex background conditions. The code will be released at https://github.com/GGML668897/MSP-Net.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/12/2608.07757v1-rethinking-3d-segmentation-from-individual-lidar-scans-incidence-aware-sampling-on-the-sip-benchmark",
+      "section": "quick",
+      "title_en": "Rethinking 3D Segmentation from Individual LiDAR Scans: Incidence-Aware Sampling on the SIP Benchmark",
+      "authors": "Seongyong Kim, Jingdao Chen, Yong Kwon Cho",
+      "date": "2026-08-07",
+      "pdf": "https://arxiv.org/pdf/2608.07757v1",
+      "score": "6.0",
+      "evidence": "激光雷达点云分割/分类；与激光雷达图像分类任务相关",
+      "tldr": "个体LiDAR扫描带来覆盖不全与密度不均，下采样方式影响分割质量。本文提出入射感知采样，将点映射到几何归一化流形进行体素选择，保留原始坐标，无需修改骨干。在SIP基准上，该方法提升了分辨率平均分割精度，尤其对非平面和梯子，且降低对采样分辨率的敏感度，表明采样应作为分割的主动环节。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "3D scene understanding is increasingly important in construction, yet most methods are developed on curated datasets that do not fully reflect real site sensing conditions. In many workflows, individual LiDAR scans provide rapid local updates rather than complete scene representations, producing limited surface coverage, acquisition-driven density variation, and severe imbalance between dominant planar surfaces and sparse construction elements. Because large point clouds must be downsampled, sampling resolution and point allocation directly affect the balance between geometric detail and spatial context. This study evaluates these effects under a fixed per-fragment point budget and introduces an incidence-aware sampling strategy for individual LiDAR scans. The method maps points to a geometry-normalized manifold space for voxel-based selection while preserving original Euclidean coordinates for downstream learning. It requires only point coordinates and normals and no backbone modification. Using the Site in Pieces (SIP) benchmark, experiments with Point Transformer and PointNeXt show improved resolution-averaged segmentation performance, especially for non-planar elements and ladders, while reducing sensitivity to sampling resolution. The results show that acquisition-aware sampling can provide a more stable geometric representation and should be treated as an active component of individual-scan 3D segmentation rather than generic preprocessing.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/12/2608.10680v1-bridging-severe-cross-modal-misalignment-end-to-end-visible-infrared-object-detection-via-explicit-feature-domain-affine-registration",
+      "section": "quick",
+      "title_en": "Bridging Severe Cross-Modal Misalignment: End-to-End Visible-Infrared Object Detection via Explicit Feature-Domain Affine Registration",
+      "authors": "Qi Ming, Yuyang Wang, Mingjing Zhao, Yifan Xiao, Zhixin Guo, Zhiqiang Zhou, Peng Sun, Juan Fang, Fuqiang Yang, Xudong Zhao",
+      "date": "2026-08-11",
+      "pdf": "https://arxiv.org/pdf/2608.10680v1",
+      "score": "6.0",
+      "evidence": "面向目标检测的跨模态融合与显式对齐，可迁移至高光谱-激光雷达融合",
+      "tldr": "可见光-红外目标检测常因跨模态空间错位而性能下降，现有方法多采用隐式特征适应，难以应对大偏移。为此提出联合特征域配准与检测网络JFRDet，通过显式仿射对齐模块估计图像级变换实现多级特征对齐，并引入光照引导互补融合与对齐质量一致性门控，稳定联合优化。在自建的严重错位基准DVMA上取得69.7% mAP50，达到SOTA。代码与数据集将开源，为多模态检测提供新基准与强基线。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Visible-infrared object detection relies on complementary RGB and thermal cues, but its performance is often degraded by cross-modal spatial misalignment. Most existing methods rely on implicit feature adaptation to handle weakly misaligned scenarios, while large-offset geometric discrepancies remain insufficiently addressed. In this paper, we propose a Joint Feature-domain Registration and Detection network (JFRDet), an end-to-end visible-infrared oriented object detector tailored for severely cross-modal geometric discrepancies. JFRDet introduces a Cross-Modal Affine Alignment (CMAA) module to estimate an image-level affine transformation for explicit multi-level feature alignment. Note that illumination changes directly affect the reliability of RGB cues, an Illumination-Guided Complementary Fusion (IGCF) module adaptively exploits modality reliability under varying illumination conditions for cross-modal fusion. Then, an Alignment Quality-Consistency Gating (AQCG) strategy stabilizes joint optimization by modulating detection supervision according to alignment reliability and gradient consistency. We further construct DroneVehicle Misaligned (DVMA), a benchmark for evaluating visible-infrared oriented object detection under severe cross-modal geometric misalignment. The proposed JFRDet achieves 69.7\\% $\\mathrm{mAP}_{50}$ on DVMA, which represents state-of-the-art (SOTA) performance. The code and dataset will be available on GitHub.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
