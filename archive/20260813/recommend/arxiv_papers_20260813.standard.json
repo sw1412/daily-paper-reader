@@ -1,0 +1,268 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-13T21:10:33.295320+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 2,
+    "deep_cap": 7,
+    "deep_selected": 2,
+    "quick_candidates": 4,
+    "quick_skim_target": 12,
+    "quick_selected": 4
+  },
+  "deep_dive": [
+    {
+      "id": "2608.12227v1",
+      "source": "arxiv",
+      "title": "Domain-Aware Lightweight Spectral-Grouped Convolutions for Hyperspectral Fish Freshness Classification",
+      "abstract": "Hyperspectral imaging (HSI) offers nondestructive assessment of fish freshness by detecting biochemical alterations across spectral bands. However, conventional deep learning approaches do not fully address the particular characteristics of HSI data, such as spectral dominance over spatial textures, ordinal label structure, and a small number of training samples. We propose SGNet (Spectral-Grouped Network), a lightweight architecture that separates spectral and spatial feature extraction using grouped convolutions and a depthwise spatial pathway. A dual attention mechanism that couples channel-wise squeeze-and-excitation with spatial gating adaptively highlights informative features. SGNet achieves 97.8% classification accuracy and 0.64 days mean absolute error (MAE) with just 4.75M parameters when tested on our newly developed 16-day refrigerator-stored salmon fillet dataset. Ablation studies validate the contribution of each component, while comparisons demonstrate a five- to eighteen-fold parameter reduction relative to ResNet-50 and Vision Transformers. Our findings indicate that domain-aware design supports precise, real-time freshness prediction for industrial implementation.",
+      "authors": [
+        "Kazi Nabiul Alam",
+        "Pooneh Bagheri Zadeh",
+        "Akbar Sheikh-Akbari"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV",
+        "cs.AI",
+        "cs.CV",
+        "eess.SP"
+      ],
+      "published": "2026-08-12T16:25:19+00:00",
+      "link": "https://arxiv.org/pdf/2608.12227v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "hyperspectral image classification via spectral-grouped convolutions and dual attention",
+      "llm_evidence_cn": "采用谱分组卷积与双注意力进行高光谱图像分类",
+      "llm_evidence": "采用谱分组卷积与双注意力进行高光谱图像分类",
+      "canonical_evidence": "采用谱分组卷积与双注意力进行高光谱图像分类",
+      "llm_tldr_en": "Proposes SGNet, a lightweight spectral-grouped convolutional network with channel-spatial dual attention for hyperspectral fish freshness classification, achieving 97.8% accuracy.",
+      "llm_tldr_cn": "高光谱成像可通过光谱生化变化无损评估鱼类新鲜度，但常规深度学习方法未充分适配光谱主导、小样本等特性。本文提出轻量级SGNet，使用分组卷积分离光谱与空间特征提取，并引入通道与空间双注意力突出有效信息。实验表明该方法在鱼类新鲜度分级上达到97.8%的准确率，为高光谱图像分类提供了兼顾效率与精度的新思路。",
+      "llm_tldr": "高光谱成像可通过光谱生化变化无损评估鱼类新鲜度，但常规深度学习方法未充分适配光谱主导、小样本等特性。本文提出轻量级SGNet，使用分组卷积分离光谱与空间特征提取，并引入通道与空间双注意力突出有效信息。实验表明该方法在鱼类新鲜度分级上达到97.8%的准确率，为高光谱图像分类提供了兼顾效率与精度的新思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral image classification",
+      "matched_requirement_id": "req-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2608.12230v1",
+      "source": "arxiv",
+      "title": "Few-Shot Ordinal Learning for Day-Wise Freshness Estimation with Hyperspectral Fish Images",
+      "abstract": "Non-destructive food quality assessment has increasingly benefited from hyperspectral imaging (HSI), which captures spectral signatures linked to biochemical changes during storage. Estimating day-wise freshness, however, remains challenging owing to strong inter-fillet variability and scarce labelled data per product. All existing deep learning approaches for HSI-based freshness prediction operate under full supervision, requiring densely annotated training sets that are costly to obtain at the individual-product level. We introduce, to the best of our knowledge, the first few-shot learning framework for HSI-based food quality estimation. Each fillet defines a distinct episodic task, and a CORAL-style ordinal prediction head captures the ranked nature of freshness progression through cumulative threshold modelling. Biologically grounded monotonicity and embedding smoothness constraints further guide predictions toward plausible trajectories. On a 16-day salmon HSI dataset under a strict unseen-fillet protocol, our method achieves a mean absolute error of 1.58 days and 2-day accuracy of 72.3% with only three labelled days per fillet, substantially outperforming scalar regression and label-distribution baselines under an identical unseen-fillet protocol.",
+      "authors": [
+        "Kazi Nabiul Alam",
+        "Pooneh Bagheri Zadeh",
+        "Akbar Sheikh-Akbari"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.AI",
+        "eess.IV",
+        "eess.SP"
+      ],
+      "published": "2026-08-12T16:28:01+00:00",
+      "link": "https://arxiv.org/pdf/2608.12230v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "hyperspectral image classification with few-shot ordinal learning",
+      "llm_evidence_cn": "基于少样本排序学习的高光谱图像分类",
+      "llm_evidence": "基于少样本排序学习的高光谱图像分类",
+      "canonical_evidence": "基于少样本排序学习的高光谱图像分类",
+      "llm_tldr_en": "A first few-shot learning framework for HSI food quality estimation uses episodic tasks and CORAL-style ordinal heads to predict day-wise freshness, reducing annotation cost while handling fish fillet variability.",
+      "llm_tldr_cn": "高光谱图像在食品新鲜度估计中具有重要意义，但现有深度学习方法需要大量逐产品标注，且鱼类个体差异大、标注成本高。为此，本文提出首个面向高光谱图像的少样本排序学习框架，将每个鱼片作为一个独立情节任务，并采用CORAL风格的排序预测头来捕捉逐日新鲜度的顺序信息。在鱼类高光谱图像上的实验结果验证了该方法在少标注条件下的有效性，能够显著降低对密集人工标注的依赖。该框架为高光谱图像分类在精细化质量评估中的应用提供了新的技术路径。",
+      "llm_tldr": "高光谱图像在食品新鲜度估计中具有重要意义，但现有深度学习方法需要大量逐产品标注，且鱼类个体差异大、标注成本高。为此，本文提出首个面向高光谱图像的少样本排序学习框架，将每个鱼片作为一个独立情节任务，并采用CORAL风格的排序预测头来捕捉逐日新鲜度的顺序信息。在鱼类高光谱图像上的实验结果验证了该方法在少标注条件下的有效性，能够显著降低对密集人工标注的依赖。该框架为高光谱图像分类在精细化质量评估中的应用提供了新的技术路径。",
+      "llm_tags": [
+        "query:hsi"
+      ],
+      "matched_query_tag": "query:hsi",
+      "matched_query_text": "hyperspectral image classification methods",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2608.11685v1",
+      "source": "arxiv",
+      "title": "EGM-Det: Entropy-Guided Multimodal Adaptive Fusion for UAV RGB-IR Object Detection",
+      "abstract": "Joint use of RGB and infrared (IR) imagery can improve UAV-view object detection, but most existing methods fuse multimodal features with static or fixed weights and therefore overlook spatially varying modality reliability. We propose EGM-Det, an entropy-guided multimodal adaptive fusion framework for RGB-IR object detection. EGM-Det employs a dual-stream architecture to preserve modality-specific representations and introduces an Entropy Offset Gate Fusion module for adaptive multi-scale fusion. The module derives shallow entropy priors from input intensity, local entropy, and cross-modal discrepancy, and uses them to guide local offset alignment and spatial-channel gated fusion. It therefore selectively aggregates reliable RGB and infrared cues instead of uniformly combining heterogeneous features. We further introduce cross-modal distillation to regularize the learned fusion gates and reduce fusion degradation. Each student branch extracts complementary knowledge from the cross-modality teacher branch matched to the main branch, while entropy-adaptive supervision emphasizes uncertain modality decisions. Experiments on DroneVehicle, LLVIP, and VEDAI demonstrate state-of-the-art performance across all three benchmarks; in particular, EGM-Det outperforms prior approaches by more than 10 percentage points on VEDAI.",
+      "authors": [
+        "Cunzheng Fan",
+        "Dawei Yan",
+        "Guanlin Wang",
+        "Xingshuo Yang",
+        "Yupeng Jia",
+        "Jing Yang",
+        "Haokui Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-12T05:51:48+00:00",
+      "link": "https://arxiv.org/pdf/2608.11685v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Multimodal adaptive fusion for object detection, transferable to HSI-LiDAR target detection",
+      "llm_evidence_cn": "多模态自适应融合目标检测，可迁移至高光谱与LiDAR联合目标检测",
+      "llm_evidence": "多模态自适应融合目标检测，可迁移至高光谱与LiDAR联合目标检测",
+      "canonical_evidence": "多模态自适应融合目标检测，可迁移至高光谱与LiDAR联合目标检测",
+      "llm_tldr_en": "EGM-Det presents an entropy-guided multimodal adaptive fusion framework for UAV RGB-IR object detection, using a dual-stream architecture and an Entropy Offset Gate Fusion module to adaptively aggregate reliable features, offering transferable ideas for HSI-LiDAR target detection.",
+      "llm_tldr_cn": "针对RGB与红外图像融合目标检测中静态权重无法适应空间可靠性变化的问题，提出熵引导的多模态自适应融合框架EGM-Det。采用双流结构保留各模态特征，通过熵偏移门控融合模块基于强度、局部熵和跨模态差异引导多尺度自适应融合。实验表明该方法能选择性聚合可靠模态信息，提升无人机视角目标检测性能。其熵引导融合思想可直接迁移至高光谱与LiDAR联合目标检测任务。",
+      "llm_tldr": "针对RGB与红外图像融合目标检测中静态权重无法适应空间可靠性变化的问题，提出熵引导的多模态自适应融合框架EGM-Det。采用双流结构保留各模态特征，通过熵偏移门控融合模块基于强度、局部熵和跨模态差异引导多尺度自适应融合。实验表明该方法能选择性聚合可靠模态信息，提升无人机视角目标检测性能。其熵引导融合思想可直接迁移至高光谱与LiDAR联合目标检测任务。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "hyperspectral and LiDAR fusion for target detection",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2608.06028v1",
+      "source": "arxiv",
+      "title": "Hyperspectral Calibration Detection: A Novel Concept For Change Detection With Unsupervised Incremental Safe Pseudo-Labeling Implementation",
+      "abstract": "Hyperspectral change detection (HCD) has found numerous key applications, such as land cover monitoring. The majority of benchmark HCD algorithms are semi-supervised methods, and some of them can even achieve very low sample labeling rates. However, in some practical scenarios, such as those requiring immediate detection responses for onboard edge computing, we need to achieve the zero-label requirement as ground-truth labeling would not be available onboard for newly acquired images. In this work, we propose a fully unsupervised HCD algorithm, together with a lightweight model, quite suitable for onboard detection missions. Based on an iteratively augmented training set that safely collects some unchanged pixel samples, we learn an iteratively refined spectrum calibration function that eventually compensates the variability of acquisition conditions (often observed in bitemporal images), thereby making the changed pixels easily detectable by analyzing the calibrated spectra. The proposed hyperspectral looping unsupervised calibration and incremental detection (HyperLUCID) algorithm is not only computationally efficient (around 1 to 2 orders of magnitude faster than most benchmark HCD methods), but has also achieved state-of-the-art results (around 93.6% to 97.9% overall accuracy) on several real benchmark HCD datasets. Source codes: https://github.com/IHCLab/HyperLUCID.",
+      "authors": [
+        "Chia-Hsiang Lin",
+        "Shih-Min Hsu",
+        "Ching-Yun Liang",
+        "Jocelyn Chanussot",
+        "Jhih-Yan Chen"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV"
+      ],
+      "published": "2026-08-06T13:35:33+00:00",
+      "link": "https://arxiv.org/pdf/2608.06028v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Hyperspectral change detection with unsupervised pseudo-labeling, transferable to HSI classification/detection",
+      "llm_evidence_cn": "高光谱变化检测与无监督伪标签方法，可迁移至高光谱分类/检测",
+      "llm_evidence": "高光谱变化检测与无监督伪标签方法，可迁移至高光谱分类/检测",
+      "canonical_evidence": "高光谱变化检测与无监督伪标签方法，可迁移至高光谱分类/检测",
+      "llm_tldr_en": "Proposes a fully unsupervised hyperspectral change detection algorithm with incremental safe pseudo-labeling and a lightweight model, enabling zero-label onboard detection. The method iteratively augments training sets, promising for land-cover monitoring and transferable to HSI tasks.",
+      "llm_tldr_cn": "针对星上边缘计算等实际场景中地面真值标签不可用的问题，现有高光谱变化检测算法难以满足零标签要求，本文提出一种完全无监督的高光谱变化检测算法。该方法基于迭代扩充的增量安全伪标签机制，并结合轻量级模型，适配星上实时检测任务。实验表明，该方法在零标签条件下仍能实现有效的土地覆盖变化检测，且保持较高精度，并验证了其在边缘场景的实用性与轻量化优势。该研究为高光谱分类与目标检测提供了可迁移的无监督训练策略。",
+      "llm_tldr": "针对星上边缘计算等实际场景中地面真值标签不可用的问题，现有高光谱变化检测算法难以满足零标签要求，本文提出一种完全无监督的高光谱变化检测算法。该方法基于迭代扩充的增量安全伪标签机制，并结合轻量级模型，适配星上实时检测任务。实验表明，该方法在零标签条件下仍能实现有效的土地覆盖变化检测，且保持较高精度，并验证了其在边缘场景的实用性与轻量化优势。该研究为高光谱分类与目标检测提供了可迁移的无监督训练策略。",
+      "llm_tags": [
+        "query:hsi:composite"
+      ],
+      "matched_query_tag": "query:hsi:composite",
+      "matched_query_text": "Papers central to 高光谱图像目标检测与分类, especially work that connects or combines: hyperspectral image classification methods; hyperspectral target detection algorithms; hyperspectral anomaly detection techniques; spectral-spatial feature extraction for hyperspectral data; hyperspectral image target detection.",
+      "matched_requirement_id": "req-composite-hsi",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.11142v1",
+      "source": "arxiv",
+      "title": "SAR2Agri: Learning SAR Intensity Representations for Agricultural Monitoring",
+      "abstract": "Agricultural monitoring faces unique challenges, arising from the landscape's complex temporal, phenological, and climate dynamics, yet monitoring them is critical for ensuring food security. Synthetic Aperture Radar (SAR) satellites offer all-weather day-night imaging capability supporting key monitoring tasks including crop type mapping, yield prediction and phenological event detection. Existing multimodal remote sensing foundation models including TerraMind and CopernicusFM learn SAR representations by grounding them in optical imagery using joint encoding and contrastive learning techniques, while SAR-specific foundation models such as SAR-JEPA, SARMAE, and SAR-W-MixMAE primarily focus on target detection, flood mapping, and land cover classification applications. Recent work has introduced phenology inspired temporal pretext tasks with optical imagery which has shown strong performance on agricultural downstream tasks. In this work, we propose the first self-supervised learning pipeline focused on using only SAR intensity imagery for agricultural applications. We improve the temporal pretext tasks through masking and curriculum learning to enhance the pretraining pipeline's ability to capture phenological features from SAR. On the SICKLE benchmark, our final model achieves 84.9% IoU on crop type mapping, outperforming optical baselines (by 15.3 pt) and existing SAR baselines (by 2.2 pt), demonstrating the effectiveness of our proposed pipeline for pretraining SAR intensity encoders for agricultural monitoring.",
+      "authors": [
+        "Moti Rattan Gupta",
+        "Anupam Sobti"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-11T17:01:26+00:00",
+      "link": "https://arxiv.org/pdf/2608.11142v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Multimodal remote sensing representation learning for crop classification, relevant to multimodal remote sensing image classification",
+      "llm_evidence_cn": "面向作物分类的多模态遥感表示学习，与多模态遥感图像分类相关",
+      "llm_evidence": "面向作物分类的多模态遥感表示学习，与多模态遥感图像分类相关",
+      "canonical_evidence": "面向作物分类的多模态遥感表示学习，与多模态遥感图像分类相关",
+      "llm_tldr_en": "SAR2Agri learns SAR intensity representations for agricultural monitoring, including crop type mapping and phenology detection, using joint encoding and contrastive learning, offering transferable methods for multimodal remote sensing classification.",
+      "llm_tldr_cn": "针对农业监测中SAR影像语义表征不足的问题，提出SAR2Agri方法，学习SAR强度表示以支持作物类型制图、产量预测和物候检测。方法利用多模态遥感基础模型与对比学习，将SAR与光学影像联合编码。实验表明其能有效提升农业监测任务性能。该方法为多模态遥感图像分类与表示学习提供了可借鉴的思路。",
+      "llm_tldr": "针对农业监测中SAR影像语义表征不足的问题，提出SAR2Agri方法，学习SAR强度表示以支持作物类型制图、产量预测和物候检测。方法利用多模态遥感基础模型与对比学习，将SAR与光学影像联合编码。实验表明其能有效提升农业监测任务性能。该方法为多模态遥感图像分类与表示学习提供了可借鉴的思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "multimodal remote sensing image classification",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.11595v1",
+      "source": "arxiv",
+      "title": "ProtoHGF-Net: Prototype HyperGraph Fusion with Intra-modal Calibration for RGBT Object Detection",
+      "abstract": "RGB-Thermal (RGBT) object detection enables robust perception in complex scenes by leveraging the complementary strengths of visible textures and thermal cues. However, existing methods mainly rely on dense cross-modal interactions over full-resolution features, which inevitably introduce background interference and hinder the learning of target-relevant representations. In this paper, we propose the Prototype HyperGraph Fusion Network (ProtoHGF-Net), a novel framework that redefines cross-modal fusion as prototype-level semantic interaction rather than the dense cross-modal interaction paradigm. Specifically, we design Prototype HyperGraph Fusion to perform cross-modal interaction in a compact prototype-level semantic space. This design enables more selective fusion among target-relevant prototypes. To support this prototype-level fusion, we propose Teacher-Mask Calibration Distillation, which calibrates modality features before fusion using modality-specific teachers and target-aware masks. This strategy suppresses backgrou- nd-dominant responses and produces more target-focused features. Extensive experiments on DroneVehicle, DVTOD, and FLIR demonstrate that ProtoHGF-Net achieves state-of-the-art performance with 85.9\\% $mAP_{50}$, 88.2\\% $mAP_{50}$, and 79.1\\% $mAP_{50}$, respectively. Our code is available at \\href{https://github.com/ZiMo-Chen/ProtoHGF}{GitHub}.",
+      "authors": [
+        "Xiangqi Chen",
+        "Xiuling Zhang",
+        "Chengzhuan Yang",
+        "Li Zhao",
+        "Dawei Zhang",
+        "Yanchao Wang",
+        "Liyuan Chen",
+        "Hua Wang",
+        "Hao Peng",
+        "Zhonglong Zheng"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-12T03:08:19+00:00",
+      "link": "https://arxiv.org/pdf/2608.11595v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Cross-modal fusion method for multimodal object detection, transferable to HSI and LiDAR fusion",
+      "llm_evidence_cn": "面向多模态目标检测的跨模态融合方法，可迁移至高光谱与激光雷达融合",
+      "llm_evidence": "面向多模态目标检测的跨模态融合方法，可迁移至高光谱与激光雷达融合",
+      "canonical_evidence": "面向多模态目标检测的跨模态融合方法，可迁移至高光谱与激光雷达融合",
+      "llm_tldr_en": "Presents a prototype hypergraph fusion network for RGB-thermal object detection, redefining cross-modal fusion as prototype-level semantic interaction to reduce background interference.",
+      "llm_tldr_cn": "RGBT目标检测利用可见光和热成像互补信息实现复杂场景下的鲁棒感知，但现有方法依赖全分辨率特征的密集交互，易引入背景干扰。该文提出原型超图融合网络ProtoHGF-Net，将跨模态交互转化为紧凑的原型级语义交互，并加入模态内校准。实验表明该方法在抑制背景干扰和学习目标相关表示方面优于传统密集交互方法，为多模态遥感分类与目标检测提供了可借鉴的融合范式。",
+      "llm_tldr": "RGBT目标检测利用可见光和热成像互补信息实现复杂场景下的鲁棒感知，但现有方法依赖全分辨率特征的密集交互，易引入背景干扰。该文提出原型超图融合网络ProtoHGF-Net，将跨模态交互转化为紧凑的原型级语义交互，并加入模态内校准。实验表明该方法在抑制背景干扰和学习目标相关表示方面优于传统密集交互方法，为多模态遥感分类与目标检测提供了可借鉴的融合范式。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}
