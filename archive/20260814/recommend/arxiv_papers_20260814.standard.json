@@ -1,0 +1,190 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-08-14T19:43:18.346248+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 2,
+    "deep_divecandidates": 0,
+    "deep_cap": 7,
+    "deep_selected": 0,
+    "quick_candidates": 4,
+    "quick_skim_target": 12,
+    "quick_selected": 4
+  },
+  "deep_dive": [],
+  "quick_skim": [
+    {
+      "id": "2608.06028v1",
+      "source": "arxiv",
+      "title": "Hyperspectral Calibration Detection: A Novel Concept For Change Detection With Unsupervised Incremental Safe Pseudo-Labeling Implementation",
+      "abstract": "Hyperspectral change detection (HCD) has found numerous key applications, such as land cover monitoring. The majority of benchmark HCD algorithms are semi-supervised methods, and some of them can even achieve very low sample labeling rates. However, in some practical scenarios, such as those requiring immediate detection responses for onboard edge computing, we need to achieve the zero-label requirement as ground-truth labeling would not be available onboard for newly acquired images. In this work, we propose a fully unsupervised HCD algorithm, together with a lightweight model, quite suitable for onboard detection missions. Based on an iteratively augmented training set that safely collects some unchanged pixel samples, we learn an iteratively refined spectrum calibration function that eventually compensates the variability of acquisition conditions (often observed in bitemporal images), thereby making the changed pixels easily detectable by analyzing the calibrated spectra. The proposed hyperspectral looping unsupervised calibration and incremental detection (HyperLUCID) algorithm is not only computationally efficient (around 1 to 2 orders of magnitude faster than most benchmark HCD methods), but has also achieved state-of-the-art results (around 93.6% to 97.9% overall accuracy) on several real benchmark HCD datasets. Source codes: https://github.com/IHCLab/HyperLUCID.",
+      "authors": [
+        "Chia-Hsiang Lin",
+        "Shih-Min Hsu",
+        "Ching-Yun Liang",
+        "Jocelyn Chanussot",
+        "Jhih-Yan Chen"
+      ],
+      "primary_category": "eess.IV",
+      "categories": [
+        "eess.IV"
+      ],
+      "published": "2026-08-06T13:35:33+00:00",
+      "link": "https://arxiv.org/pdf/2608.06028v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Hyperspectral change detection with unsupervised incremental safe pseudo-labeling; adjacent to HSI detection and classification",
+      "llm_evidence_cn": "高光谱变化检测结合无监督增量安全伪标签，与高光谱检测/分类方向相关",
+      "llm_evidence": "高光谱变化检测结合无监督增量安全伪标签，与高光谱检测/分类方向相关",
+      "canonical_evidence": "高光谱变化检测结合无监督增量安全伪标签，与高光谱检测/分类方向相关",
+      "llm_tldr_en": "Proposes a fully unsupervised hyperspectral change detection algorithm with a lightweight model, using iteratively augmented training sets and safe pseudo-labeling to meet zero-label onboard edge computing requirements.",
+      "llm_tldr_cn": "针对传统半监督高光谱变化检测依赖地面真值标签、难以在轨实时应用的问题，提出一种全无监督的高光谱变化检测算法，配合轻量级模型，基于迭代扩充的训练集和增量安全伪标签策略进行训练。该方法能在零标签条件下完成变化检测，适合机载边缘快速响应任务，为高光谱影像无监督检测与分类提供了可借鉴的伪标签方案。",
+      "llm_tldr": "针对传统半监督高光谱变化检测依赖地面真值标签、难以在轨实时应用的问题，提出一种全无监督的高光谱变化检测算法，配合轻量级模型，基于迭代扩充的训练集和增量安全伪标签策略进行训练。该方法能在零标签条件下完成变化检测，适合机载边缘快速响应任务，为高光谱影像无监督检测与分类提供了可借鉴的伪标签方案。",
+      "llm_tags": [
+        "query:hsi:composite"
+      ],
+      "matched_query_tag": "query:hsi:composite",
+      "matched_query_text": "Papers central to 高光谱图像目标检测与分类, especially work that connects or combines: hyperspectral image classification methods; hyperspectral target detection algorithms; hyperspectral anomaly detection techniques; spectral-spatial feature extraction for hyperspectral data; hyperspectral image target detection.",
+      "matched_requirement_id": "req-composite-hsi",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.11263v1",
+      "source": "arxiv",
+      "title": "GeoUniPR: A Geometry-Consistent Unified Framework for Cross-Modal Place Recognition",
+      "abstract": "Cross-modal place recognition (CMPR) aims to identify the same location across heterogeneous sensing modalities, such as vision and LiDAR. Existing methods commonly bridge the modality gap using complex alignment modules, multi-stage training, or full fine-tuning of pretrained backbones. In this work, we revisit CMPR from the perspective of geometric consistency and propose GeoUniPR, a unified and concise geometry-consistent framework. GeoUniPR reduces cross-modal discrepancy at the representation level by projecting LiDAR point clouds into the camera perspective to construct Geometry-Consistent depth image views (DIV), which establish direct RGB-LiDAR correspondence. We further augment DIV with native LiDAR cues, including intensity and surface-normal information, yielding a multi-channel geometric representation that improves structural consistency. Based on this representation, GeoUniPR learns a unified embedding space using two modality-specific ViT-based encoders with identical architectures, trained through parameter-efficient adaptation without auxiliary alignment modules, multi-stage training, or full backbone fine-tuning. In addition, we introduce Spatially-Consistent InfoNCE (SC-InfoNCE), a CMPR-specific contrastive objective that suppresses distance-induced false negatives under spatial continuity. Extensive experiments on KITTI and KITTI-360 demonstrate that GeoUniPR achieves state-of-the-art (SOTA) performance in both same-modal and cross-modal place recognition, with strong cross-dataset generalization.",
+      "authors": [
+        "Wonbong Kim",
+        "Jiatong Xiao",
+        "Rui Li",
+        "Xufei Wang",
+        "Qiwen Gu",
+        "Junqiao Zhao",
+        "Chen Ye",
+        "Guang Chen"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-10T03:52:01+00:00",
+      "link": "https://arxiv.org/pdf/2608.11263v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "cross-modal place recognition fusing LiDAR point clouds and camera images; transferable to LiDAR-image fusion for HSI+LiDAR classification",
+      "llm_evidence_cn": "融合LiDAR点云与相机图像的跨模态地点识别；其几何一致配准思路可用于高光谱+LiDAR联合分类",
+      "llm_evidence": "融合LiDAR点云与相机图像的跨模态地点识别；其几何一致配准思路可用于高光谱+LiDAR联合分类",
+      "canonical_evidence": "融合LiDAR点云与相机图像的跨模态地点识别；其几何一致配准思路可用于高光谱+LiDAR联合分类",
+      "llm_tldr_en": "GeoUniPR presents a geometry-consistent framework for cross-modal place recognition with vision and LiDAR, projecting LiDAR into camera view to align RGB-LiDAR features directly. This concise fusion approach is useful for multimodal remote sensing, though not hyperspectral classification.",
+      "llm_tldr_cn": "视觉与LiDAR的跨模态地点识别受模态差异影响，现有方法依赖复杂对齐模块或多阶段训练。该文提出GeoUniPR，将LiDAR点云投影到相机会景构建几何一致的深度图视图，并融合原生LiDAR强度与扫描线线索，在表示层直接建立RGB-LiDAR对应。该框架简洁统一，跨模态匹配精度高。其几何一致性视角对高光谱与LiDAR联合分类和融合检测具有重要借鉴意义，但不涉及高光谱分类本身。",
+      "llm_tldr": "视觉与LiDAR的跨模态地点识别受模态差异影响，现有方法依赖复杂对齐模块或多阶段训练。该文提出GeoUniPR，将LiDAR点云投影到相机会景构建几何一致的深度图视图，并融合原生LiDAR强度与扫描线线索，在表示层直接建立RGB-LiDAR对应。该框架简洁统一，跨模态匹配精度高。其几何一致性视角对高光谱与LiDAR联合分类和融合检测具有重要借鉴意义，但不涉及高光谱分类本身。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.12698v1",
+      "source": "arxiv",
+      "title": "Class Geometry as Supervision for Sample-Efficient Open-World Detection",
+      "abstract": "Open-world object detection requires models to recognize known categories, reject unfamiliar objects, and incorporate new classes over time. This is especially challenging in scarce-data settings such as biomedical and scientific imaging, where rare categories may have only a few annotated examples and fine-grained classes differ by subtle morphology. Prototype-based detectors are natural for this regime, but they typically learn class prototypes as independent anchors, ignoring relational structure among classes. We propose class-geometry supervision (CGS), a general framework that constrains learned prototype or class-representation spaces to preserve visual or semantic class dissimilarities estimated from training data. CGS introduces a dissimilarity-preserving objective that aligns pairwise distances among learned class representations with a target class-geometry matrix while retaining the standard task loss. We instantiate the same objective across prototype recognition, few-shot biomedical object detection, open-set detection, novel-class insertion, and OWOD adaptation on COCO. Experiments show that CGS improves sample efficiency in recognition and ova detection, substantially strengthens novel-class insertion, and improves unknown recall on COCO while retaining much of the known-class detection performance. Ablations show that meaningful visual geometry provides the most reliable gains, while random geometry can help novel separation but is less consistent for few-shot detection. These results suggest that relational class geometry is an effective supervisory signal for building calibrated and extensible open-world detectors under limited supervision.",
+      "authors": [
+        "Akash Rao",
+        "Zhou Chen",
+        "Revanth Reddy Palem",
+        "Udhav Ramachandran",
+        "Ruth Scimeca",
+        "Sathyanarayanan N. Aakur"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-13T01:20:47+00:00",
+      "link": "https://arxiv.org/pdf/2608.12698v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "General open-world detection with class-geometry supervision; transferable to hyperspectral object detection",
+      "llm_evidence_cn": "基于类几何监督的通用开放世界检测方法，可迁移至高光谱目标检测",
+      "llm_evidence": "基于类几何监督的通用开放世界检测方法，可迁移至高光谱目标检测",
+      "canonical_evidence": "基于类几何监督的通用开放世界检测方法，可迁移至高光谱目标检测",
+      "llm_tldr_en": "Proposes class-geometry supervision to constrain prototype or class-representation spaces using class dissimilarities, enabling sample-efficient open-world detection in scarce-data settings such as hyperspectral target detection.",
+      "llm_tldr_cn": "为解决开放世界检测中标注样本稀缺和类间关系被忽略的问题，本文提出类几何监督框架，利用视觉或语义类间差异约束原型表示空间。该方法在少样本条件下提升了对已知类别的识别能力和对新类别的适应性，对高光谱等科学图像中的目标检测具有迁移潜力。",
+      "llm_tldr": "为解决开放世界检测中标注样本稀缺和类间关系被忽略的问题，本文提出类几何监督框架，利用视觉或语义类间差异约束原型表示空间。该方法在少样本条件下提升了对已知类别的识别能力和对新类别的适应性，对高光谱等科学图像中的目标检测具有迁移潜力。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "object detection in hyperspectral images",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2608.13045v1",
+      "source": "arxiv",
+      "title": "P2Fusion: Prompt-based Progressive Infrared-Visible Image Fusion via Dual-Prior Distillation",
+      "abstract": "Infrared-visible image fusion (IVIF) is pivotal for multimodal perception, yet reconciling the inherent information disparity between thermal and textural features remains a fundamental challenge. Existing prior-guided methods often rely on static constraints that induce optimization conflicts or utilize extrinsic semantic priors from large-scale foundation models (e.g., CLIP/DINO), which frequently fail to exploit the intrinsic modality characteristics essential for high-fidelity fusion. To address these issues, we propose P2Fusion, a prior-guided distillation-based framework that reformulates IVIF via dual intrinsic prompts. Instead of imposing hard-coded penalties, we distill image-intrinsic priors, thermal saliency and spatial quality, into learnable dynamic regulators. Specifically, a Teach-to-Fuse mechanism provides dual-granularity progressive guidance, coupled with a Gated Dynamic Expert Recalibration (GDER) module for decoupled feature refinement. This design enables the network to adaptively mediate modal competition through expert specialization. Extensive experiments demonstrate that P2Fusion achieves state-of-the-art performance across five mainstream datasets. Notably, our framework demonstrates consistent performance advantages in fusion quality, achieving state-of-the-art results in 14 out of 20 key evaluation metrics across 5 benchmarks. Furthermore, it effectively contributes to the robustness of downstream perception, such as +3.2% mAP on MSRS, +0.5% mAP on M3FD and +0.9% mAP on DroneVehicle for object detection. Our code will be available at https://github.com/YiShi99/P2Fusion",
+      "authors": [
+        "Yi Shi",
+        "Huichao Xie",
+        "Yuqing Wang",
+        "Mingyu Wang",
+        "Kaihui Yang",
+        "Yu Liu",
+        "Ruitao Lu",
+        "Lizhe Li",
+        "Junwei Han",
+        "Dingwen Zhang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-08-13T10:09:49+00:00",
+      "link": "https://arxiv.org/pdf/2608.13045v1",
+      "tags": [
+        "keyword:HSI",
+        "keyword:hsi-lidar",
+        "query:HSI",
+        "query:hsi-lidar"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Multimodal image fusion via dual-prior distillation; transferable to HSI-LiDAR data fusion",
+      "llm_evidence_cn": "基于双先验蒸馏的多模态图像融合，可迁移至HSI-LiDAR数据融合",
+      "llm_evidence": "基于双先验蒸馏的多模态图像融合，可迁移至HSI-LiDAR数据融合",
+      "canonical_evidence": "基于双先验蒸馏的多模态图像融合，可迁移至HSI-LiDAR数据融合",
+      "llm_tldr_en": "Proposes P2Fusion, a prompt-based progressive infrared-visible image fusion framework with dual-prior distillation, distilling intrinsic thermal-saliency and spatial-structure priors for high-fidelity fusion; applicable to multimodal fusion.",
+      "llm_tldr_cn": "针对现有红外-可见光融合方法依赖静态约束或外部大模型先验、难以利用模态内在特征的问题，本文提出P2Fusion框架，通过双内在提示蒸馏热显著性和空间信息，实现渐进式融合。实验表明该方法在融合保真度和鲁棒性上优于当前主流方法，为包括高光谱与LiDAR在内的多模态融合提供了新思路。",
+      "llm_tldr": "针对现有红外-可见光融合方法依赖静态约束或外部大模型先验、难以利用模态内在特征的问题，本文提出P2Fusion框架，通过双内在提示蒸馏热显著性和空间信息，实现渐进式融合。实验表明该方法在融合保真度和鲁棒性上优于当前主流方法，为包括高光谱与LiDAR在内的多模态融合提供了新思路。",
+      "llm_tags": [
+        "query:hsi-lidar"
+      ],
+      "matched_query_tag": "query:hsi-lidar",
+      "matched_query_text": "fusion of hyperspectral and LiDAR data",
+      "matched_requirement_id": "req-6",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    }
+  ]
+}

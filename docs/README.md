@@ -6,38 +6,35 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-08-13
-- 运行时间：2026-08-13 21:13:18 UTC
+- 最新运行日期：2026-08-14
+- 运行时间：2026-08-14 19:45:12 UTC
 - 运行状态：成功
-- 本次总论文数：6
-- 精读区：2
+- 本次总论文数：4
+- 精读区：0
 - 速读区：4
 
 ### 今日简报（AI）
-今日荐读聚焦高光谱鱼类新鲜度判定，6篇中精读2篇为核心。最值得关注轻量级光谱分组卷积与少样本序数学习，分别以9.0/8.0分实现高效逐日鲜度分类。下一步可探索高光谱成像在便携水产检测设备中的落地应用。
-- 详情：[/202608/13/README](/202608/13/README)
+今日速读4篇论文，精读0篇，聚焦高光谱变化检测、跨模态位置识别与开放世界检测。  
+最值得关注的是《Hyperspectral Calibration Detection》的伪标签变化检测与《GeoUniPR》的几何一致跨模态定位，两者均获6.0分。  
+建议下一步针对这两篇精读，重点验证伪标签增量策略与几何约束的实际效果。
+- 详情：[/202608/14/README](/202608/14/README)
 
 ### 精读区论文标签
-1. [Domain-Aware Lightweight Spectral-Grouped Convolutions for Hyperspectral Fish Freshness Classification](/202608/13/2608.12227v1-domain-aware-lightweight-spectral-grouped-convolutions-for-hyperspectral-fish-freshness-classification)  
-   标签：评分：9.0/10、query:hsi-lidar
-   evidence：采用谱分组卷积与双注意力进行高光谱图像分类
-2. [Few-Shot Ordinal Learning for Day-Wise Freshness Estimation with Hyperspectral Fish Images](/202608/13/2608.12230v1-few-shot-ordinal-learning-for-day-wise-freshness-estimation-with-hyperspectral-fish-images)  
-   标签：评分：8.0/10、query:hsi
-   evidence：基于少样本排序学习的高光谱图像分类
+- 本次无精读推荐。
 
 ### 速读区论文标签
-1. [EGM-Det: Entropy-Guided Multimodal Adaptive Fusion for UAV RGB-IR Object Detection](/202608/13/2608.11685v1-egm-det-entropy-guided-multimodal-adaptive-fusion-for-uav-rgb-ir-object-detection)  
-   标签：评分：7.0/10、query:hsi-lidar
-   evidence：多模态自适应融合目标检测，可迁移至高光谱与LiDAR联合目标检测
-2. [Hyperspectral Calibration Detection: A Novel Concept For Change Detection With Unsupervised Incremental Safe Pseudo-Labeling Implementation](/202608/13/2608.06028v1-hyperspectral-calibration-detection-a-novel-concept-for-change-detection-with-unsupervised-incremental-safe-pseudo-labeling-implementation)  
+1. [Hyperspectral Calibration Detection: A Novel Concept For Change Detection With Unsupervised Incremental Safe Pseudo-Labeling Implementation](/202608/14/2608.06028v1-hyperspectral-calibration-detection-a-novel-concept-for-change-detection-with-unsupervised-incremental-safe-pseudo-labeling-implementation)  
    标签：评分：6.0/10、query:hsi
-   evidence：高光谱变化检测与无监督伪标签方法，可迁移至高光谱分类/检测
-3. [SAR2Agri: Learning SAR Intensity Representations for Agricultural Monitoring](/202608/13/2608.11142v1-sar2agri-learning-sar-intensity-representations-for-agricultural-monitoring)  
+   evidence：高光谱变化检测结合无监督增量安全伪标签，与高光谱检测/分类方向相关
+2. [GeoUniPR: A Geometry-Consistent Unified Framework for Cross-Modal Place Recognition](/202608/14/2608.11263v1-geounipr-a-geometry-consistent-unified-framework-for-cross-modal-place-recognition)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：面向作物分类的多模态遥感表示学习，与多模态遥感图像分类相关
-4. [ProtoHGF-Net: Prototype HyperGraph Fusion with Intra-modal Calibration for RGBT Object Detection](/202608/13/2608.11595v1-protohgf-net-prototype-hypergraph-fusion-with-intra-modal-calibration-for-rgbt-object-detection)  
+   evidence：融合LiDAR点云与相机图像的跨模态地点识别；其几何一致配准思路可用于高光谱+LiDAR联合分类
+3. [Class Geometry as Supervision for Sample-Efficient Open-World Detection](/202608/14/2608.12698v1-class-geometry-as-supervision-for-sample-efficient-open-world-detection)  
    标签：评分：6.0/10、query:hsi-lidar
-   evidence：面向多模态目标检测的跨模态融合方法，可迁移至高光谱与激光雷达融合
+   evidence：基于类几何监督的通用开放世界检测方法，可迁移至高光谱目标检测
+4. [P2Fusion: Prompt-based Progressive Infrared-Visible Image Fusion via Dual-Prior Distillation](/202608/14/2608.13045v1-p2fusion-prompt-based-progressive-infrared-visible-image-fusion-via-dual-prior-distillation)  
+   标签：评分：6.0/10、query:hsi-lidar
+   evidence：基于双先验蒸馏的多模态图像融合，可迁移至HSI-LiDAR数据融合
 
 
 <div class="dpr-home-promo-card">
