@@ -1,0 +1,3379 @@
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+1
+Dual-Space Modality Consistency Learning for
+Universal Cross-Modal Re-Identification
+Yujian Zhao, Yukang Zhao, Hankun Liu, Haoxuan Xu, Bo Li, Hanzi Wang, Senior Member, IEEE, Guanglin Niu
+Abstract—Cross-modal Re-Identification (ReID) aims to re-
+trieve the same identity across heterogeneous imaging modalities
+and has been widely studied in visible-infrared person ReID
+and cross-modal ship ReID. Existing methods have achieved
+promising performance by learning modality consistency in the
+spatial embedding space, yet often overlook frequency-domain
+modality discrepancy, particularly in high-frequency representa-
+tions that are both highly discriminative and modality-sensitive.
+In addition, most approaches are tailored to specific modality
+settings, limiting their applicability across diverse cross-modal
+scenarios. To address these challenges, we propose a Dual-
+Space Modality Consistency Learning (DSMCL) framework
+for universal cross-modal ReID. Specifically, DSMCL jointly
+models spatial feature distribution consistency and frequency-
+domain discriminative consistency. A Spatial Modality Consis-
+tency Learning (SMCL) branch performs Gaussian-based feature
+alignment, while a Frequency-aware Discriminative Consistency
+Learning (FDCL) strategy regularizes high-frequency representa-
+tions through identity-aware cross-modal contrastive learning. By
+jointly capturing modality-specific characteristics and modality-
+shared identity cues, DSMCL learns robust representations
+and establishes a unified framework capable of accommodating
+diverse heterogeneous modality settings. Moreover, DSMCL is a
+plug-and-play framework that can be readily integrated into ex-
+isting cross-modal ReID architectures. Extensive experiments on
+SYSU-MM01, RegDB, LLCM, HOSS-ReID, and CMShipReID
+across seventeen evaluation protocols show that DSMCL consis-
+tently improves multiple representative baselines. Specifically, it
+improves the Rank1 from 88.2% to 92.3% for IDKL on SYSU-
+MM01 under the Indoor-search Single-shot protocol and from
+31.3% to 38.8% for TransOSS on HOSS-ReID under the SAR-
+to-Optical protocol. It also improves the mAP of TransReID from
+66.8% to 73.9% on CMShipReID under the TIR-to-VIS protocol,
+demonstrating its effectiveness and generalizability across diverse
+cross-modal ReID scenarios.
+Index Terms—Cross-modal ReID, universal cross-modal ReID,
+spatial-domain consistency, frequency-domain consistency, con-
+trastive learning.
+I. INTRODUCTION
+C
+ROSS-MODAL Re-Identification (ReID) aims to match
+images of the same target captured by heterogeneous
+sensing modalities [1], [2], [3], [4], [5], [6], [7]. Owing to its
+Yujian Zhao, Haoxuan Xu, Bo Li and Guanglin Niu are with the School
+of Artificial Intelligence, Beihang University (E-mail: boli@buaa.edu.cn;
+beihangngl@buaa.edu.cn). Yuhang Zhao is with the School of Humanities
+and Social Sciences, Beihang University. Hankun Liu is with the School
+of Computer Science and Engineering, Beihang University. Hanzi Wang is
+with the Fujian Key Laboratory of Urban Intelligent Sensing and Computing,
+School of Informatics, Xiamen University, Xiamen 361005, China (E-mail:
+hanzi.wang@xmu.edu.cn).
+Corresponding author: Guanglin Niu.
+This work was partially supported by the National Natural Science Foun-
+dation of China (No. U25A20531 and No. 62376016).
+Fig. 1. Illustration of the limitations of existing cross-modal ReID methods.
+Existing approaches mainly focus on spatial embedding alignment while often
+neglecting frequency-domain modality discrepancy. Moreover, most methods
+are designed for specific modality configurations, hindering the establishment
+of a unified learning paradigm across diverse heterogeneous modality settings.
+These challenges motivate our DSMCL framework for addressing the problem
+of universal and robust cross-modal ReID.
+broad applications in intelligent surveillance, maritime moni-
+toring, and multi-sensor security systems, cross-modal ReID
+has attracted increasing attention in recent years. Compared
+with conventional single-modality ReID, cross-modal ReID
+must bridge substantial appearance discrepancies introduced
+by heterogeneous imaging mechanisms. Typical examples in-
+clude visible-infrared person ReID [8], [9], [10], [11], [12],
+[13], optical-SAR ship ReID [14], [15], [16], and multi-
+modal ship ReID involving visible, near-infrared, and thermal
+infrared imagery [17]. Despite the diversity of sensing modal-
+ities and application scenarios, all these tasks share a com-
+mon objective: learning identity-robust representations across
+heterogeneous modalities. However, the substantial modality
+discrepancy introduced by different sensing mechanisms often
+dominates identity-related variations, making robust cross-
+modal representation learning a fundamental challenge.
+Despite the remarkable progress achieved by existing cross-
+modal ReID methods, two important limitations remain, as
+arXiv:2608.06943v1  [cs.CV]  7 Aug 2026
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+2
+Fig. 2. Overview of the universal cross-modal ReID evaluation setting and
+the performance gains brought by DSMCL across five benchmark datasets
+and seventeen evaluation protocols.
+illustrated in Fig. 1. First, most existing approaches primarily
+model modality consistency in the spatial embedding space
+while overlooking frequency-domain discrepancy. Second, ex-
+isting methods are typically designed for specific modal-
+ity configurations, making it difficult to establish a unified
+learning paradigm that can effectively accommodate diverse
+heterogeneous modality settings.
+To mitigate modality discrepancy, existing methods have
+explored various strategies, including image translation [18],
+[19], [20], [21], [7], modality-invariant feature learning [22],
+[23], [24], [25], distribution alignment [26], [27], [28],
+[29], and contrastive representation learning [30], [31], [32],
+[33]. Despite their promising performance, most existing ap-
+proaches primarily focus on learning modality consistency
+in the spatial embedding space [9], [11], [34], [35]. Specif-
+ically, they typically model modality discrepancy as feature
+distribution shift and enforce cross-modal feature alignment
+through adversarial learning, distribution matching, or feature
+consistency constraints. Although these methods effectively
+reduce global distribution discrepancy across modalities, they
+implicitly assume that modality inconsistency can be suffi-
+ciently characterized within the spatial feature space.
+However, heterogeneous imaging mechanisms affect not
+only spatial feature distributions but also the inherent fre-
+quency responses of visual representations [36], [37]. For
+instance, infrared imaging tends to suppress high-frequency
+texture information due to thermal smoothing effects, whereas
+SAR imaging often introduces strong high-frequency pertur-
+bations caused by speckle noise. Such modality-specific fre-
+quency distortions are difficult to characterize solely through
+spatial-domain alignment. More importantly, modality discrep-
+ancy is not uniformly distributed across the frequency spec-
+trum [38]. While low-frequency components mainly preserve
+coarse structural semantics that can already be effectively op-
+timized by standard identity supervision, high-frequency com-
+ponents simultaneously contain modality-sensitive distortions
+and identity-discriminative details [39], [40]. Consequently,
+directly applying naive spatial-domain consistency learning
+may fail to fully and effectively model the most challenging
+cross-modal discrepancies.
+A straightforward solution is to perform frequency-domain
+alignment across heterogeneous modalities. However, indis-
+criminately minimizing spectral discrepancies may suppress
+identity-discriminative patterns alongside modality-specific
+distortions, leading to over-smoothed representations and de-
+graded retrieval. Therefore, an important question naturally
+arises: how can we effectively reduce high-frequency modality
+discrepancies while preserving discriminative identity cues.
+To address this issue, we propose a Dual-Space Modal-
+ity Consistency Learning (DSMCL) framework for univer-
+sal cross-modal ReID. Different from existing methods that
+model modality consistency solely in the spatial embedding
+space, DSMCL jointly explores modality consistency from
+both the spatial feature space and the frequency represen-
+tation space. Specifically, we first employ Spatial Modal-
+ity Consistency Learning (SMCL) to reduce class-wise fea-
+ture distribution discrepancy across heterogeneous modali-
+ties through Gaussian-based distribution alignment. Further-
+more, we introduce Frequency-aware Discriminative Con-
+sistency Learning (FDCL), which explicitly models high-
+frequency representations through identity-aware cross-modal
+contrastive consistency learning. By jointly optimizing spatial
+consistency and frequency-aware discriminative consistency,
+DSMCL learns identity-consistent yet modality-robust repre-
+sentations for cross-modal retrieval.
+The second challenge concerns the universality of existing
+cross-modal ReID paradigms. Most current approaches are de-
+veloped and validated under a specific modality configuration,
+while their applicability to substantially different cross-modal
+scenarios remains largely unexplored.
+For example, visible-infrared ReID methods are mainly
+designed for RGB-IR benchmarks such as SYSU-MM01
+[41], RegDB [42], and LLCM [9], while cross-modal ship
+ReID methods typically focus on optical-SAR [14] or visible-
+NIR-TIR maritime scenarios [17]. Owing to the substantial
+differences among sensing mechanisms, these methods are
+often built upon modality-specific observations, assumptions,
+or optimization strategies tailored to a particular cross-modal
+setting. Although such designs have achieved remarkable
+performance on their target benchmarks, whether the underly-
+ing modeling paradigms can consistently benefit substantially
+different cross-modal scenarios remains largely unexplored.
+In practical applications, however, cross-modal retrieval
+systems are increasingly deployed in heterogeneous sensing
+environments involving diverse sensor combinations. For in-
+stance, intelligent surveillance systems commonly integrate
+visible and infrared cameras to enable all-weather pedestrian
+retrieval, whereas maritime monitoring platforms often simul-
+taneously employ optical, SAR, near-infrared, and thermal
+infrared sensors to improve target perception under complex
+environmental conditions. Despite the diversity of sensing
+modalities and application scenarios, these tasks share a com-
+mon objective: learning identity-consistent representations that
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+3
+remain robust to modality variations. Therefore, developing a
+unified representation learning framework that can effectively
+accommodate different cross-modal settings has become an
+important yet underexplored research direction.
+To this end, the proposed DSMCL is designed as a universal
+cross-modal representation learning framework. Instead of
+relying on modality-specific assumptions, DSMCL explicitly
+models modality consistency from both the spatial feature
+space and the frequency representation space, thereby provid-
+ing a more general learning paradigm for heterogeneous sens-
+ing modalities. As illustrated in Fig. 2, aiming to comprehen-
+sively evaluate its effectiveness and applicability, we conduct
+extensive experiments on multiple cross-modal person ReID
+and ship ReID benchmarks, including SYSU-MM01 [41],
+RegDB [42], LLCM [9], HOSS-ReID [14], and CMShipReID
+[17]. Experimental results demonstrate that DSMCL con-
+sistently achieves superior performance across substantially
+different modality combinations, validating the effectiveness
+and superiority of dual-space modality consistency learning
+for robust universal cross-modal ReID.
+This paper substantially extends our previous conference
+work MOS [15] in three respects. First, we replace the
+diffusion-based cross-modal data generation and feature fusion
+modules in MOS with the training-only FDCL strategy to
+eliminate their substantial inference overhead and support
+practical deployment. Second, we extend the spatial-domain
+consistency learning in MOS to a dual-space formulation by
+introducing FDCL, which adaptively extracts high-frequency
+representations and enforces identity-aware cross-modal con-
+trastive regularization. Third, we generalize the framework
+from Optical-SAR ship ReID to universal cross-modal ReID
+scenarios, including visible-infrared person ReID and multi-
+modal ship ReID, demonstrating stronger robustness and gen-
+eralization capability across heterogeneous modalities.
+In summary, our main contributions are as follows:
+• We develop a Dual-Space Modality Consistency Learn-
+ing (DSMCL) framework that jointly regularizes class-
+wise spatial feature distributions and frequency-domain
+discriminative representations for cross-modal ReID. And
+DSMCL can be plugged into existing methods during
+training without introducing additional inference cost.
+• We introduce a Spatial Modality Consistency Learning
+(SMCL) method to align class-wise spatial feature distri-
+butions across modalities. By modeling identity-specific
+modality distributions with Gaussians and minimizing
+their Wasserstein-2 distance, SMCL aligns both the mean
+and variance of spatial representations.
+• We propose a Frequency-aware Discriminative Consis-
+tency Learning (FDCL) strategy that adaptively extracts
+high-frequency representations and enforces identity-
+aware cross-modal contrastive regularization, comple-
+menting spatial distribution alignment with modality-
+invariant discriminative details.
+• Extensive experiments on five cross-modal person and
+ship ReID benchmarks demonstrate that DSMCL con-
+sistently improves multiple baselines and achieves com-
+petitive or superior performance. Ablation studies further
+validate the effectiveness of each component.
+II. RELATED WORK
+A. Cross-modal ReID
+Cross-modal Re-Identification (ReID) aims to match images
+of the same target captured by heterogeneous sensing modali-
+ties. Compared with conventional single-modality ReID, cross-
+modal ReID faces additional challenges caused by substantial
+appearance discrepancy introduced by different sensing mech-
+anisms [5], [6], [43], [44]. Among existing research directions,
+visible-infrared person ReID (VI-ReID) is one of the most
+extensively studied topics [45]. Existing methods can generally
+be divided into two categories.
+The first category focuses on learning modality-invariant
+representations. These methods attempt to reduce modality
+discrepancy directly in the feature space by learning identity-
+discriminative yet modality-robust representations. For exam-
+ple, BIT [46] proposes a method named Bi-directional Interac-
+tion Transformation that adopts a matching-based strategy that
+explicitly models the interaction between visible and infrared
+image pairs. DEEN [9] proposes a diverse embedding expan-
+sion network that effectively generates diverse embeddings
+to learn the informative feature representations and reduce
+the modality discrepancy. HOH-Net [47] introduces a high-
+order structure learning method to explore the high-order
+relationships of the feature nodes and exploit a hierarchical
+middle-feature agent learning loss to reduce the modality
+discrepancy. ICSD [23] introduces identity-compensated style
+distillation network that enforces cross-modality style con-
+sistency and enhances the discriminative power of modality-
+invariant features. CMSD [48] proposes cross-layer semantic
+distillation and intra-layer alignment distillation method to
+guide low-level features in learning more reliable modality
+invariant representations. These methods have significantly
+improved visible-infrared retrieval performance by learning
+discriminative modality-invariant feature representations.
+The second category focuses on image translation and
+modality compensation. Instead of directly reducing the inher-
+ent modality discrepancy in the feature space, these methods
+attempt to narrow the appearance gap at the image level
+by generating modality-compensated samples. MTRL [18]
+proposes a novel framework via modality-transition represen-
+tation learning with a middle generated image as a transmit-
+ter from visible to infrared modals. DiVE [19] proposes a
+data generation framework that automatically obtains massive
+RGB-IR paired images while preserving identity information
+by decoupling identity and modality, thereby improving the
+performance of existing models. Pan et al. [21] adapts the
+conditional diffusion model for multi-modal image gener-
+ation and employs the adversarial training to measure the
+distance from the visible or infrared modality to the middle
+modality. AGPI2 [49] introduces an adaptive generation of
+privileged intermediate information training approach to adapt
+and generate a virtual domain that bridges discriminative
+information between the visible and infrared modalities. By
+translating visible images into infrared style or vice versa,
+these approaches can effectively alleviate potential appearance
+discrepancy caused by heterogeneous sensing mechanisms.
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+4
+However, they usually require additional generative models
+and introduce significant computational overhead.
+Beyond pedestrian retrieval, cross-modal ReID has recently
+been extended to maritime scenarios. Wang et al. [14] es-
+tablish the first optical-SAR ship ReID benchmark, termed
+HOSS-ReID, and propose a dedicated cross-modal ship ReID
+framework named TransOSS that incorporates a dual-head
+tokenizer and a modality-shared transformer encoder to bridge
+the substantial modality discrepancy between optical and SAR
+imagery. MOS [15] further extends TransOSS by introducing
+a modality consistency learning framework that mitigates
+the optical-SAR modality gap through robust representation
+learning during training and cross-modal feature fusion during
+inference. Xu et al. [17] introduces CMShipReID, a large-
+scale cross-modal ship ReID benchmark comprising visible,
+near-infrared, and thermal infrared images collected by an
+unmanned aerial vehicle, providing a challenging platform
+for multi-modal maritime retrieval. Fan et al. [16] introduce
+SMART-Ship, a multi-modal ship ReID benchmark compris-
+ing optical, SAR, and panchromatic (PAN) imagery, which
+provides a challenging benchmark for heterogeneous maritime
+target retrieval. More recently, several preliminary studies have
+further explored cross-modal ship retrieval under more com-
+plex sensing conditions [50], [51]. These studies demonstrate
+the growing interest in maritime cross-modal retrieval and
+highlight the necessity of developing more robust and uni-
+versally applicable representation learning frameworks across
+diverse modality configurations.
+Despite these advances, most existing cross-modal ReID
+methods are still developed and evaluated under specific
+modality settings. Person ReID methods are typically designed
+for RGB-IR scenarios, whereas ship ReID methods mainly
+focus on optical-SAR or visible-NIR-TIR settings. As a result,
+the generalization capability of current approaches across sub-
+stantially different sensing modalities remains insufficiently
+explored. In contrast, this work aims to develop a robust
+representation learning framework that can effectively accom-
+modate diverse heterogeneous modality settings and establish
+a unified learning paradigm for universal cross-modal ReID.
+B. Modality Alignment Learning
+Modality alignment learning aims to reduce the discrepancy
+between heterogeneous sensing modalities by encouraging
+modality-consistent representations. As one of the most widely
+adopted paradigms in cross-modal ReID, modality alignment
+has been extensively studied in both visible-infrared person
+retrieval and maritime cross-modal retrieval scenarios. Existing
+approaches generally perform modality alignment either at the
+image level or at the feature representation level.
+Image-level alignment methods attempt to narrow the
+modality gap by translating samples from one modality
+into another through generative models [18]. Early studies
+mainly relied on generative adversarial networks to synthesize
+modality-compensated samples, while more recent approaches
+employ diffusion-based generation frameworks to construct
+richer cross-modal supervision signals [19], [21]. Qi et al. [20]
+proposes a generative-based cross-modality image fusion strat-
+egy to generate high-quality cross-modality paired images
+and fuse the information of the two modalities. By reducing
+appearance discrepancy at the image level, these methods
+provide auxiliary training samples that facilitate subsequent
+representation learning. Nevertheless, image translation ap-
+proaches usually require additional generative networks and
+may suffer from semantic drift or inconsistency introduced
+during the generation process.
+Feature-level alignment methods directly reduce modality
+discrepancy in the embedding space without explicitly gener-
+ating additional samples. AMML [27] proposes an adaptive
+middle-modality alignment learning method that reduces the
+modality discrepancy via an adaptive middle modality learning
+strategy at both image level and feature level. MCJA [34]
+introduces a multi-level cross-modality joint alignment to
+bridge both the modality and the objective-level gap. DMA
+[26] proposes a dual modality-aware alignment model to
+simultaneously preserve discriminative identity information
+and suppress the misleading information within a uniform
+scheme. DSFAD [28] introduces a novel diverse semantics-
+guided feature alignment and decoupling network to effec-
+tively align identity-relevant features from different modalities.
+These methods generally enforce cross-modal consistency by
+aligning feature distributions or enhancing semantic corre-
+spondence between heterogeneous modalities. Compared with
+image-level alignment, feature-level methods are computa-
+tionally more efficient and have consequently become the
+dominant paradigm in recent cross-modal ReID research.
+Among feature-level alignment strategies, distribution align-
+ment has emerged as an effective solution for reducing
+modality discrepancy by matching heterogeneous feature
+distributions [26], [28]. However, existing methods mainly
+perform global distribution matching and seldom consider
+identity-aware class-wise consistency. In contrast, the pro-
+posed SMCL explicitly aligns class-wise Gaussian distribu-
+tions across modalities, thereby achieving more discriminative
+modality consistency learning.
+C. Frequency-domain Representation Learning
+Frequency-domain representation learning has recently at-
+tracted increasing attention in computer vision. Compared
+with conventional spatial-domain representations, frequency-
+domain representations provide complementary information
+for characterizing global image structures, fine-grained tex-
+tures, and spectral responses [52]. Existing studies have
+demonstrated that frequency information can effectively im-
+prove robustness, generalization capability, and representation
+quality in various vision tasks [53].
+Motivated by these observations, frequency-domain learning
+has consequently and increasingly been introduced into per-
+son ReID and cross-modal representation learning [40], [54].
+MFEN [55] proposes a multi-frequency expert network that
+enables multi-frequency modulation and combines different
+frequencies through a mixture-of-experts method. MFENet
+[40] introduces a novel multi-frequency embedding network,
+a feature-level method that operates in the frequency domain
+through multi-frequency decomposition to learn discriminative
+and modality-invariant features. FFD-Net [56] proposes a
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+5
+Fig. 3. Overview of the proposed Dual-Space Modality Consistency Learning (DSMCL) framework. As a unified and plug-and-play modality consistency
+learning framework, DSMCL can be readily integrated into different backbone architectures and cross-modal scenarios. Given heterogeneous cross-modal
+inputs, the proposed SMCL performs class-wise spatial distribution alignment across modalities, while FDCL enhances cross-modal discriminability through
+identity-aware high-frequency contrastive learning. The two complementary objectives are jointly optimized with identity classification and triplet losses for
+universal cross-modal re-identification.
+frequency-driven feature decoupling network that uses fre-
+quency domain supervision to further improve cross-modal
+matching. FDNM [57] introduces a frequency domain nu-
+ances mining method to effectively explore the cross-modality
+frequency domain information. By explicitly modeling fre-
+quency characteristics, these methods have demonstrated the
+effectiveness of frequency information for alleviating modality
+discrepancy and improving representation learning.
+Despite their effectiveness, existing frequency-based meth-
+ods primarily focus on frequency enhancement, spectral fea-
+ture modeling, or frequency-aware modality alignment. Rel-
+atively less attention has been paid to how high-frequency
+representations can be explicitly regularized to simultane-
+ously suppress modality-specific distortions and preserve
+identity-discriminative patterns. As a result, the potential of
+high-frequency representations for cross-modal discriminative
+learning remains insufficiently explored.
+III. METHOD
+A. Overview
+Given a cross-modal ReID dataset D = {(xi, yi, mi)}N
+i=1,
+where xi denotes an input image, yi denotes the identity label,
+and mi denotes the modality label, the primary objective of
+cross-modal ReID is formulated as learning a robust feature
+extractor fθ(·) that maps heterogeneous modality samples into
+a unified embedding space. In this space, samples belonging
+to the same identity should remain compact regardless of
+modality variations, while samples from different identities
+should be well separated.
+To achieve this objective, we propose a novel Dual-Space
+Modality Consistency Learning (DSMCL) framework, which
+comprehensively models modality consistency from both the
+spatial feature space and the frequency representation space.
+As illustrated in Fig. 3, the proposed DSMCL consists of
+two complementary components: Spatial Modality Consis-
+tency Learning (SMCL) and Frequency-aware Discriminative
+Consistency Learning (FDCL).
+Specifically, the SMCL branch reduces feature distribu-
+tion discrepancy across heterogeneous modalities through
+Gaussian-based class-wise distribution alignment, encouraging
+same-identity samples from different modalities to remain
+compact in the embedding space.
+Meanwhile, to further enhance robustness, DSMCL intro-
+duces the FDCL branch to explicitly model modality dis-
+crepancy in high-frequency representations. FDCL transforms
+intermediate feature maps into the frequency domain and se-
+lectively regularizes high-frequency components via identity-
+aware cross-modal contrastive consistency learning.
+Finally, the spatial consistency branch and the frequency-
+aware consistency branch are jointly optimized together with
+identity classification and triplet objectives, enabling DSMCL
+to learn robust and discriminative cross-modal representations
+for universal cross-modal ReID.
+B. Spatial Modality Consistency Learning
+Cross-modal ReID inevitably suffers from significant fea-
+ture distribution discrepancy across heterogeneous modalities,
+causing same-identity samples from different modalities to
+become scattered in the embedding space. To effectively
+alleviate this issue, we employ a Spatial Modality Consistency
+Learning (SMCL) strategy to explicitly reduce cross-modal
+feature distribution discrepancy.
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+6
+Specifically, given a mini-batch B = {(xi, yi, mi)}B
+i=1
+containing samples from multiple modalities, we first extract
+spatial features using a backbone network parameterized by θ:
+fi = fθ(xi),
+(1)
+where fi ∈Rd denotes the embedding feature of the i-
+th sample, and θ denotes the learnable parameters of the
+backbone network.
+For each identity class c under modality m, we define its
+feature set as:
+Sc
+m = {fi | yi = c, mi = m}.
+(2)
+Deep feature representations aggregate responses induced
+by multiple latent factors. Under the common assumption that
+these contributions are weakly dependent and have finite vari-
+ance, the central limit theorem motivates approximating each
+class-conditional feature distribution by a multivariate Gaus-
+sian. This approximation characterizes the central tendency
+and dispersion of each class-conditional feature distribution
+through its mean vector and covariance matrix, respectively.
+Accordingly, we model the feature distribution of identity c
+under modality m as:
+pc
+m(f) = N (µc
+m, Σc
+m) ,
+(3)
+where µc
+m ∈Rd and Σc
+m ∈Rd×d denote the class-wise mean
+vector and covariance matrix, respectively. They are estimated
+as:
+µc
+m =
+1
+|Scm|
+X
+fi∈Scm
+fi,
+(4)
+and
+Σc
+m =
+1
+|Scm|
+X
+fi∈Scm
+(fi −µc
+m) (fi −µc
+m)⊤.
+(5)
+The Gaussian representation characterizes each class-
+modality distribution through its first- and second-order statis-
+tics. We therefore measure the discrepancy between modalities
+using the Wasserstein-2 distance, which admits a closed-form
+expression between Gaussian distributions. Given
+pc
+ma = N
+ µc
+ma, Σc
+ma
+
+(6)
+and
+pc
+mb = N
+ µc
+mb, Σc
+mb
+
+,
+(7)
+their squared Wasserstein-2 distance is formulated as:
+W2
+2 = ∥µc
+ma −µc
+mb∥2
+2
++ Tr
+
+Σc
+ma + Σc
+mb −2
+
+(Σc
+ma)
+1
+2 Σc
+mb(Σc
+ma)
+1
+2
+ 1
+2 
+,
+(8)
+where Tr(·) denotes the trace operator.
+In mini-batch training, the number of class-specific samples
+|Sc
+m| is typically much smaller than the feature dimension
+d. Consequently, the empirical covariance matrix satisfies
+rank(Σc
+m) ≤|Sc
+m|−1 and is generally rank-deficient, making
+its estimation statistically unreliable. Moreover, evaluating
+the Wasserstein-2 distance between full covariance matrices
+requires costly and potentially unstable matrix square-root
+operations. We therefore retain the dimension-wise variances
+and approximate the full covariance matrix by a diagonal
+matrix:
+Σc
+m ≈Diag
+ (σc
+m)2
+,
+(9)
+where σc
+m ∈Rd denotes the class-wise standard deviation vec-
+tor, (σc
+m)2 is computed element-wise, and Diag(·) constructs a
+diagonal matrix from its vector argument. This approximation
+reduces the number of covariance statistics from O(d2) to
+O(d) while preserving the feature dispersion along each
+dimension. It therefore enables efficient and stable class-wise
+distribution alignment within each mini-batch. The diagonal
+approximation does not assume that the feature dimensions are
+strictly independent; instead, it provides a practical trade-off
+between distributional expressiveness, estimation reliability,
+and computational efficiency.
+Under the diagonal covariance assumption, the covariance
+interaction term in Eq. (8) can be simplified into the Euclidean
+distance between standard deviation vectors. The final spatial
+modality consistency objective is formulated as:
+LSMCL = 1
+|C|
+X
+c∈C
+X
+(ma,mb)
+ ∥µc
+ma −µc
+mb∥2
+2 + ∥σc
+ma −σc
+mb∥2
+2
+
+,
+(10)
+where C denotes the identity set within the current mini-batch.
+By aligning class-wise feature distributions across hetero-
+geneous modalities, SMCL encourages same-identity samples
+from different modalities to remain compact in the spatial em-
+bedding space, thereby reducing modality-induced distribution
+discrepancy for better generalization.
+C. Frequency-Aware Discriminative Consistency Learning
+To further model modality discrepancy in the frequency
+domain, we propose a Frequency-aware Discriminative Con-
+sistency Learning (FDCL) strategy that explicitly regularizes
+high-frequency representations. Different from conventional
+spatial feature alignment methods that optimize feature con-
+sistency only in the embedding space, FDCL additionally ana-
+lyzes modality discrepancy from the perspective of frequency-
+domain representation learning. The key idea of FDCL is
+that heterogeneous imaging mechanisms predominantly af-
+fect high-frequency responses while discriminative identity
+information is also mainly concentrated in high-frequency
+components. Therefore, directly aligning full-spectrum repre-
+sentations may suppress discriminative identity details together
+with modality-specific distortions, leading to over-smoothed
+feature representations.
+To address this issue, FDCL consists of three stages:
+frequency-domain
+feature
+decomposition,
+adaptive
+high-
+frequency representation extraction, and identity-aware con-
+trastive frequency learning. Specifically, FDCL first transforms
+spatial representations into the frequency domain to explic-
+itly characterize modality-dependent frequency responses. It
+then adaptively extracts informative high-frequency compo-
+nents through a learnable frequency mask generator. Finally,
+identity-aware contrastive optimization is performed in the
+high-frequency representation space to preserve discrimina-
+tive cross-modal identity patterns while alleviating modality-
+specific frequency distortions.
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+7
+1) Frequency-domain Feature Decomposition: Specifically,
+given an intermediate feature map extracted from the backbone
+network:
+Fi ∈RC×H×W ,
+(11)
+where C, H, and W denote the channel number, height, and
+width, respectively, we first transform the spatial represen-
+tation into the frequency domain through a two-dimensional
+discrete Fourier transform (2D-DFT):
+Si(c, u, v) =
+H−1
+X
+x=0
+W −1
+X
+y=0
+Fi(c, x, y)e−j2π( ux
+H + vy
+W ),
+(12)
+where (x, y) and (u, v) denote the spatial coordinates and
+frequency coordinates, respectively. Si(c, u, v) ∈C represents
+the complex-valued frequency-domain representation of the c-
+th channel.
+According to the polar representation of complex numbers,
+each complex-valued frequency coefficient can be represented
+by its magnitude and phase. Specifically, for a complex
+coefficient Si(c, u, v) = a + jb, it can be rewritten as:
+Si(c, u, v) = |Si(c, u, v)|ejϕi(c,u,v),
+(13)
+where
+|Si(c, u, v)| =
+p
+a2 + b2,
+(14)
+and ϕi(c, u, v) = arctan(b/a) denotes the phase angle. There-
+fore, the Fourier coefficient can be naturally decomposed into
+an amplitude component and a phase component. The am-
+plitude indicates the response strength of a specific frequency
+component, while the phase mainly preserves spatial structural
+information and details.
+Since heterogeneous imaging mechanisms primarily perturb
+the frequency response magnitude of different spatial frequen-
+cies, modality discrepancy is more directly reflected in the
+amplitude spectrum. Therefore, we compute the log-amplitude
+spectrum of the transformed frequency representation:
+Ai(c, u, v) = log(|Si(c, u, v)| + ϵ),
+(15)
+where Ai(c, u, v) denotes the logarithmic amplitude spectrum
+at frequency coordinate (u, v) and ϵ is a small constant for
+numerical stability. The logarithmic transformation performs
+dynamic range compression on Fourier amplitudes and avoids
+the dominance of extremely large low-frequency responses,
+thereby producing a more balanced frequency magnitude dis-
+tribution for subsequent high-frequency representation learn-
+ing and analysis in the frequency domain.
+To facilitate explicit frequency decomposition, we further
+apply FFTshift(·) to rearrange the frequency spectrum by
+moving low-frequency components to the center of the spec-
+trum:
+˜Ai = FFTshift(Ai).
+(16)
+After frequency rearrangement, the shifted spectrum ex-
+hibits an explicit frequency structure, with low-frequency
+components concentrated near the spectrum center and high-
+frequency components distributed in peripheral regions. How-
+ever, large variations in spectral magnitude across modalities
+and samples may lead to unstable optimization. We therefore
+standardize the shifted spectrum as
+ˆAi =
+˜Ai −Mean( ˜Ai)
+Std( ˜Ai) + ϵ
+,
+(17)
+where Mean(·) and Std(·) denote the mean and standard
+deviation operators, respectively, and ϵ is a small constant
+ensuring numerical stability.
+2) Adaptive High-frequency Representation Extraction:
+Different modalities may exhibit significantly different fre-
+quency response distributions. For example, infrared modal-
+ities often suppress high-frequency texture responses due to
+thermal smoothing, while SAR modalities introduce high-
+frequency perturbations caused by speckle noise. Therefore,
+manually designed frequency partitions may fail to capture
+modality-specific discriminative regions.
+To address this issue, instead of using a fixed frequency par-
+tition strategy, FDCL adopts a lightweight learnable mask gen-
+erator to adaptively determine discriminative high-frequency
+mask regions:
+Mhigh = Sigmoid
+
+G( ˆAi)
+
+,
+(18)
+where G(·) denotes a lightweight convolutional mask genera-
+tor and Sigmoid(·) denotes the sigmoid activation function.
+Accordingly, the high-frequency representation can be ob-
+tained by:
+Ahigh
+i
+= Mhigh ⊙ˆAi,
+(19)
+where ⊙denotes element-wise multiplication.
+Compared with manually designed radial frequency de-
+composition, the learnable mask generator enables FDCL to
+dynamically focus on informative high-frequency regions that
+are beneficial for cross-modal identity discrimination. Conse-
+quently, the extracted high-frequency representations become
+more adaptive to heterogeneous modality characteristics.
+3) Identity-aware Contrastive Frequency Learning: Based
+on the extracted high-frequency representations, FDCL fur-
+ther performs identity-aware cross-modal consistency learning
+in the frequency domain. From the perspective of repre-
+sentation learning, directly minimizing the distance between
+high-frequency spectra may suppress discriminative identity
+patterns together with modality-specific distortions, leading
+to over-smoothed representations with reduced discriminative
+capability. Therefore, FDCL adopts identity-aware contrastive
+learning instead of direct frequency distribution alignment.
+To facilitate contrastive similarity computation, the ex-
+tracted high-frequency representation is further flattened into
+a feature vector:
+hi = Vec(Ahigh
+i
+),
+(20)
+where Vec(·) denotes the vectorization operation.
+For each anchor sample i, we define the positive sample set
+P(i) as samples sharing the same identity but belonging to
+different modalities, while the negative sample set N(i) con-
+tains samples from different identities. Based on these cross-
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+8
+modal relationships, FDCL performs supervised contrastive
+optimization in the high-frequency representation space:
+LFDCL = −1
+|V|
+X
+i∈V
+log
+P
+p∈P (i) exp(Sim(hi, hp)/τ)
+P
+a∈P (i)∪N(i) exp(Sim(hi, ha)/τ),
+(21)
+where Sim(·, ·) denotes cosine similarity, τ is the temperature
+coefficient, and V denotes the valid anchor set.
+The objective of Eq. (21) is to maximize the similarity
+between cross-modal samples belonging to the same iden-
+tity while simultaneously separating samples from different
+identities in the high-frequency representation space. Conse-
+quently, the learned frequency representations are encouraged
+to preserve identity-consistent high-frequency patterns instead
+of modality-specific frequency distortions.
+Unlike direct frequency distribution matching, FDCL does
+not enforce strict equality between high-frequency spectra.
+Instead, it performs identity-aware discriminative consistency
+learning, which alleviates modality-induced high-frequency
+discrepancy while preserving discriminative identity details.
+Consequently, FDCL enables the model to learn identity-
+consistent yet modality-robust high-frequency representations,
+thereby improving cross-modal discriminative representation
+learning in the frequency domain.
+D. Dual-space Joint Optimization
+The proposed DSMCL framework jointly models modal-
+ity consistency from both the spatial feature space and the
+frequency representation space. Specifically, Spatial Modal-
+ity Consistency Learning (SMCL) reduces global feature
+distribution discrepancy across heterogeneous modalities,
+while Frequency-aware Discriminative Consistency Learning
+(FDCL) further regularizes identity-consistent high-frequency
+representations in the frequency domain. The two branches
+provide complementary constraints for universal cross-modal
+representation learning.
+In addition to the proposed modality consistency objectives,
+DSMCL is further supervised by standard identity classifica-
+tion loss and triplet loss to preserve discriminative identity
+information in the embedding space. The identity classification
+loss is formulated as:
+LID = −
+B
+X
+i=1
+yi log pi,
+(22)
+where pi denotes the predicted identity probability of the i-th
+sample.
+The triplet loss is formulated as:
+LTri =
+B
+X
+i=1
+[d(fi, f p
+i ) −d(fi, f n
+i ) + α]+ ,
+(23)
+where f p
+i
+and f n
+i
+denote the hardest positive and hardest
+negative samples of anchor feature fi, respectively, d(·, ·)
+denotes the Euclidean distance, and α is the margin parameter.
+Based on the spatial consistency objective in Eq. (10) and
+the frequency-aware discriminative objective in Eq. (21), the
+overall optimization objective of DSMCL is formulated as:
+L = λidLID + λtriLTri + λsLSMCL + λfLFDCL,
+(24)
+where λid and λtri denote the balancing coefficients of the iden-
+tity classification loss and triplet loss, respectively, while λs
+and λf are balancing coefficients for spatial consistency learn-
+ing and frequency-aware discriminative consistency learning.
+Specifically, LID supervises identity-level semantic discrim-
+ination in the embedding space, while LTri further con-
+strains the relative distance relationship among samples by
+pulling same-identity samples closer and pushing different
+identities farther apart. Built upon these standard ReID ob-
+jectives, SMCL explicitly aligns class-wise feature distribu-
+tions across heterogeneous modalities in the spatial embed-
+ding space, whereas FDCL further regularizes modality-robust
+high-frequency discriminative representations in the frequency
+domain for robust feature learning.
+Consequently, the proposed dual-space optimization frame-
+work simultaneously reduces modality-induced distribution
+discrepancy and preserves discriminative identity-aware fre-
+quency patterns. Through the joint optimization of spatial
+consistency and frequency-aware discriminative consistency,
+DSMCL learns robust representations that effectively adapt to
+diverse cross-modal scenarios.
+IV. EXPERIMENTS
+A. Experimental Setup
+1) Datasets and Evaluation Metrics: We evaluate the pro-
+posed DSMCL method on five cross-modal ReID benchmarks,
+including three visible-infrared person ReID datasets: SYSU-
+MM01 [41], RegDB [42], and LLCM [9], as well as two cross-
+modal ship ReID datasets: HOSS-ReID [14] and CMShipReID
+[17]. These datasets cover both person and ship retrieval
+scenarios with diverse modality combinations, enabling com-
+prehensive evaluation of the proposed universal cross-modal
+representation learning framework.
+SYSU-MM01 [41] is a widely used benchmark for visible-
+infrared person ReID, containing 30,071 visible images and
+15,792 infrared images captured by 4 RGB cameras and 2
+infrared cameras. The dataset includes 491 identities, where
+22,258 visible images and 11,909 infrared images from 395
+identities are used for training, while the remaining identities
+are reserved for testing. The dataset provides four evaluation
+protocols, including all-search and indoor-search settings, each
+evaluated under single-shot and multi-shot gallery modes,
+where infrared images are used as queries and visible images
+are used as galleries.
+RegDB [42] is a common benchmark for visible-infrared
+person ReID, containing 412 identities captured by paired visi-
+ble and infrared cameras. Each identity includes 10 visible im-
+ages and 10 infrared images, resulting in 4,120 visible images
+and 4,120 infrared images in total. The dataset is evenly split
+into 206 identities for training and 206 identities for testing.
+Following the standard protocol, two evaluation settings are
+provided: Visible-to-Infrared and Infrared-to-Visible.
+LLCM [9] is a large-scale benchmark for visible-infrared
+person ReID under low-light conditions, containing 46,767
+visible and infrared images of 1,064 identities captured by
+18 cameras across diverse indoor and outdoor environments.
+Following the standard protocol, 713 identities with 16,946
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+9
+TABLE I
+COMPARISON BETWEEN THE PROPOSED DSMCL AND SOME STATE-OF-THE-ART METHODS ON THE SYSU-MM01 DATASET. THE SYMBOL “*”
+DENOTES THE REPRODUCTION RESULTS BASED ON THE OFFICIAL CODE. THE SYMBOL “-” INDICATES THAT METRICS WERE NOT REPORTED IN THE
+SOURCE PAPER. BOLD VALUES INDICATE THE BEST PERFORMANCE.
+Methods
+Venue
+All-search
+Indoor-search
+Single-shot
+Multi-shot
+Single-shot
+Multi-shot
+Rank1
+Rank10
+mAP
+Rank1
+Rank10
+mAP
+Rank1
+Rank10
+mAP
+Rank1
+Rank10
+mAP
+AGW [45]
+TPAMI’21
+47.5
+84.4
+47.7
+-
+-
+-
+54.2
+91.1
+63.0
+-
+-
+-
+DEEN [9]
+CVPR’23
+74.7
+97.6
+71.8
+-
+-
+-
+80.3
+99.0
+83.3
+-
+-
+-
+PartMix [58]
+CVPR’23
+77.8
+-
+74.6
+80.5
+-
+69.8
+81.5
+-
+84.4
+88.0
+-
+89.0
+MUN [59]
+ICCV’23
+76.2
+97.8
+73.8
+-
+-
+-
+79.4
+98.1
+82.1
+-
+-
+-
+CAJ+ [60]
+TPAMI’23
+71.5
+96.2
+68.2
+-
+-
+-
+78.4
+98.4
+82.0
+-
+-
+-
+MV2D [61]
+TPAMI’23
+71.7
+96.3
+68.0
+-
+-
+-
+79.1
+99.0
+81.8
+-
+-
+-
+HOS-Net [62]
+AAAI’24
+75.6
+-
+74.2
+-
+-
+-
+84.2
+-
+86.7
+-
+-
+-
+WRIM-Net [63]
+ECCV’24
+77.4
+-
+75.4
+83.2
+-
+71.1
+86.2
+-
+88.1
+92.1
+-
+84.6
+DNS [64]
+ECCV’24
+72.3
+-
+74.4
+-
+-
+-
+84.2
+-
+86.8
+-
+-
+-
+RLE [65]
+NIPS’24
+75.4
+97.7
+72.4
+-
+-
+-
+84.7
+99.3
+87.0
+-
+-
+-
+CIIM [66]
+TPAMI’24
+57.2
+-
+56.1
+-
+-
+-
+61.7
+-
+69.8
+-
+-
+-
+MSSF [67]
+TMM’24
+70.6
+96.2
+67.5
+-
+-
+-
+76.0
+98.1
+80.2
+-
+-
+-
+DMA [26]
+TIFS’24
+74.6
+-
+70.4
+83.0
+-
+65.6
+82.9
+-
+85.1
+91.3
+-
+80.5
+DiVE [19]
+AAAI’25
+79.1
+-
+74.9
+-
+-
+-
+83.0
+-
+85.9
+-
+-
+-
+AGPI2 [49]
+TIFS’25
+72.2
+97.0
+70.6
+-
+-
+-
+83.5
+98.6
+84.3
+-
+-
+-
+DSFAD [28]
+TIFS’25
+78.4
+97.5
+74.7
+84.6
+98.5
+69.9
+85.1
+99.2
+87.2
+91.5
+99.7
+82.7
+STAR-ReID [68]
+TIFS’25
+82.9
+-
+80.5
+-
+-
+-
+88.0
+-
+89.6
+-
+-
+-
+FDNM [57]
+TIFS’25
+77.8
+97.8
+75.1
+82.7
+98.9
+70.9
+87.3
+99.4
+89.1
+92.2
+99.8
+83.8
+CSDN [33]
+TMM’25
+76.7
+97.2
+73.0
+83.5
+98.8
+67.9
+84.5
+99.2
+86.8
+91.3
+99.8
+82.2
+DSAF [29]
+TMM’25
+76.7
+97.7
+73.2
+-
+-
+-
+83.5
+99.3
+83.8
+-
+-
+-
+HTCR [69]
+TMM’25
+74.6
+-
+72.1
+-
+-
+-
+83.0
+-
+85.6
+-
+-
+-
+HOH-Net [47]
+TCSVT’25
+76.2
+-
+74.5
+-
+-
+-
+84.4
+-
+87.2
+-
+-
+-
+DMPF [70]
+TNNLS’25
+76.4
+96.4
+71.6
+-
+-
+-
+82.3
+98.6
+84.9
+-
+-
+-
+CycleTrans [71]
+TNNLS’25
+76.6
+97.2
+72.6
+82.8
+98.6
+68.5
+87.2
+99.6
+84.9
+91.2
+99.8
+81.4
+MHN [72]
+INFFUS’25
+75.1
+97.3
+71.8
+-
+-
+-
+81.6
+98.9
+85.1
+-
+-
+-
+MFEN [55]
+CVPR’26
+80.9
+97.1
+76.6
+-
+-
+-
+87.9
+99.4
+88.1
+-
+-
+-
+CMOI [73]
+CVPR’26
+75.6
+-
+73.2
+-
+-
+-
+84.6
+-
+86.3
+-
+-
+-
+ICSD [23]
+TIP’26
+77.9
+98.5
+74.7
+-
+-
+-
+85.7
+99.7
+87.8
+-
+-
+-
+CMSD [48]
+TGRS’26
+77.7
+98.1
+74.2
+-
+-
+-
+86.3
+99.3
+88.6
+-
+-
+-
+FFD-Net [56]
+EAAI’26
+73.7
+96.8
+68.2
+-
+-
+-
+75.6
+97.1
+78.5
+-
+-
+-
+IDKL* [74]
+CVPR’24
+80.9
+97.2
+78.5
+83.5
+98.4
+74.9
+88.2
+98.5
+89.6
+92.2
+99.7
+86.4
+IDKL + DSMCL
+This paper
+83.6
+97.7
+81.4
+86.1
+99.1
+77.8
+92.3
+99.2
+92.2
+95.2
+99.7
+88.9
+MFENet* [40]
+TCSVT’25
+77.7
+97.8
+75.9
+82.1
+98.2
+71.7
+87.2
+98.4
+89.2
+92.7
+99.7
+86.6
+MFENet + DSMCL
+This paper
+79.6
+99.0
+78.9
+84.6
+99.3
+74.2
+90.4
+99.5
+91.6
+94.9
+100.0
+89.2
+HSFLNet* [75]
+EAAI’25
+76.7
+96.1
+70.0
+81.9
+98.3
+71.8
+80.9
+98.9
+83.3
+89.7
+99.5
+77.7
+HSFLNet + DSMCL
+This paper
+79.2
+97.5
+74.6
+83.7
+99.6
+73.1
+83.4
+99.7
+85.7
+91.7
+99.8
+80.3
+visible images and 13,975 infrared images are used for train-
+ing, while the remaining 351 identities are used for testing.
+The dataset is evaluated under both Visible-to-Infrared and
+Infrared-to-Visible retrieval settings.
+HOSS-ReID [14] is the first benchmark for optical-SAR
+cross-modal ship ReID, containing 1,832 ship images from
+449 identities, including 1,065 optical images and 767 SAR
+images. Following the standard protocol, 361 identities with
+574 optical images and 489 SAR images are used for training,
+while the remaining identities are used for testing. The dataset
+provides three evaluation settings: ALL-to-ALL, Optical-to-
+SAR, and SAR-to-Optical retrieval.
+CMShipReID [17] is a cross-modal ship ReID benchmark
+containing visible (VIS), near-infrared (NIR), and thermal-
+infrared (TIR) ship images collected by unmanned aerial
+vehicle platforms. The dataset consists of 7,927 images from
+138 ship identities, including 3,071 VIS images, 2,530 NIR
+images, and 2,326 TIR images. Following the standard proto-
+col, 100 identities are used for training, while the remaining 38
+identities are used for testing. The dataset provides six cross-
+modal retrieval settings covering all possible bidirectional
+modality combinations, including VIS-to-NIR, NIR-to-VIS,
+VIS-to-TIR, TIR-to-VIS, NIR-to-TIR, and TIR-to-NIR.
+For the visible-infrared person ReID benchmarks, including
+SYSU-MM01 [41], RegDB [42], and LLCM [9], we adopt
+Rank1, Rank10, and mean Average Precision (mAP) as the
+evaluation metrics. For the cross-modal ship ReID bench-
+marks, including HOSS-ReID [14] and CMShipReID [17],
+we report Rank1, Rank5, Rank10, and mAP for performance
+evaluation on these benchmarks.
+B. Implementation Details
+DSMCL is a plug-and-play framework that can be integrated
+into existing cross-modal ReID models. To evaluate its effec-
+tiveness and generalization capability, DSMCL is incorporated
+into representative baselines across different cross-modal sce-
+narios. Specifically, for visible-infrared person ReID bench-
+marks, we adopt IDKL [74], MFENet [40], and HSFLNet
+[75] as baselines. For optical-SAR ship ReID, DSMCL is
+integrated into IDKL [74], TransOSS [14], and MOS [15].
+For the CMShipReID benchmark, we evaluate DSMCL on
+TransReID [77], IDKL [74], MFENet [40], and HSFLNet [75].
+Unless otherwise specified, all training configurations fol-
+low the official implementations of the corresponding base-
+lines to ensure fair comparisons. The proposed SMCL and
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+10
+TABLE II
+COMPARISON BETWEEN THE PROPOSED DSMCL AND SOME STATE-OF-THE-ART METHODS ON THE REGDB AND LLCM DATASET. THE SYMBOL “*”
+DENOTES THE REPRODUCTION RESULTS BASED ON THE OFFICIAL CODE. THE SYMBOL “-” INDICATES THAT METRICS WERE NOT REPORTED IN THE
+SOURCE PAPER. BOLD VALUES INDICATE THE BEST PERFORMANCE.
+Methods
+Venue
+RegDB
+LLCM
+Visible to Infrared
+Infrared to Visible
+Visible to Infrared
+Infrared to Visible
+Rank1
+Rank10
+mAP
+Rank1
+Rank10
+mAP
+Rank1
+Rank10
+mAP
+Rank1
+Rank10
+mAP
+AGW [45]
+TPAMI’21
+70.1
+86.2
+66.4
+70.5
+87.1
+65.9
+51.5
+81.5
+55.3
+40.3
+71.4
+48.4
+DEEN [9]
+CVPR’23
+91.1
+97.8
+85.1
+89.5
+96.8
+83.4
+62.5
+90.3
+65.8
+54.9
+84.9
+62.9
+PartMix [58]
+CVPR’23
+85.7
+-
+82.3
+84.9
+-
+82.5
+-
+-
+-
+-
+-
+-
+MUN [59]
+ICCV’23
+95.2
+98.9
+87.2
+91.9
+98.0
+85.0
+-
+-
+-
+-
+-
+-
+CAJ+ [60]
+TPAMI’23
+85.7
+95.5
+79.7
+84.9
+95.9
+78.6
+-
+-
+-
+-
+-
+-
+MV2D [61]
+TPAMI’23
+83.1
+-
+80.1
+81.2
+-
+78.4
+-
+-
+-
+-
+-
+-
+HOS-Net [62]
+AAAI’24
+94.7
+-
+90.4
+93.3
+-
+89.2
+64.9
+-
+67.9
+56.4
+-
+63.2
+WRIM-Net [63]
+ECCV’24
+94.5
+-
+90.5
+93.7
+-
+89.7
+67.0
+-
+69.2
+58.4
+-
+64.8
+DNS [64]
+ECCV’24
+93.0
+-
+88.6
+93.5
+-
+88.1
+66.0
+-
+68.6
+57.5
+-
+64.1
+RLE [65]
+NIPS’24
+92.8
+97.9
+88.6
+91.0
+97.5
+86.6
+-
+-
+-
+-
+-
+-
+CIIM [66]
+TPAMI’24
+76.5
+-
+71.0
+74.8
+-
+69.7
+-
+-
+-
+-
+-
+-
+DMA [26]
+TIFS’24
+93.3
+-
+83.3
+91.5
+-
+86.8
+-
+-
+-
+-
+-
+-
+MSSF [67]
+TMM’24
+85.3
+-
+76.4
+83.9
+-
+75.2
+-
+-
+-
+-
+-
+-
+MDANet [76]
+TMM’24
+94.0
+-
+83.7
+93.7
+-
+82.5
+-
+-
+-
+-
+-
+-
+AGPI2 [49]
+TIFS’25
+89.0
+98.2
+83.9
+87.9
+97.2
+83.0
+61.8
+-
+65.1
+56.5
+-
+62.8
+DSFAD [28]
+TIFS’25
+95.8
+99.6
+90.2
+94.3
+99.2
+89.4
+66.2
+91.5
+68.9
+57.5
+86.2
+64.1
+STAR-ReID [68]
+TIFS’25
+91.9
+-
+93.3
+90.5
+-
+91.8
+-
+-
+-
+-
+-
+-
+FDNM [57]
+TIFS’25
+95.5
+99.0
+90.0
+94.0
+98.5
+88.7
+70.2
+91.1
+55.8
+56.6
+84.1
+62.7
+CSDN [33]
+TMM’25
+95.4
+98.8
+87.7
+92.3
+98.0
+85.5
+63.7
+90.9
+66.5
+55.8
+85.6
+63.5
+DSAF [29]
+TMM’25
+93.3
+99.0
+87.2
+92.6
+98.2
+86.4
+65.4
+-
+68.2
+57.3
+-
+64.3
+HTCR [69]
+TMM’25
+92.6
+-
+87.9
+90.2
+-
+85.6
+63.9
+-
+66.6
+55.4
+-
+62.0
+HOH-Net [47]
+TCSVT’25
+95.1
+-
+90.7
+93.7
+-
+89.5
+65.7
+-
+68.3
+56.8
+-
+63.5
+DMPF [70]
+TNNLS’25
+88.8
+97.4
+81.0
+88.9
+97.6
+81.9
+-
+-
+-
+-
+-
+-
+CycleTrans [71]
+TNNLS’25
+91.5
+-
+87.0
+91.3
+-
+84.9
+-
+-
+-
+-
+-
+-
+MHN [72]
+INFFUS’25
+94.0
+98.6
+88.4
+93.0
+97.4
+86.5
+56.7
+83.7
+64.5
+69.8
+91.9
+55.2
+MFEN [55]
+CVPR’26
+94.9
+99.1
+90.1
+94.1
+98.8
+90.3
+67.9
+91.0
+69.8
+59.0
+85.6
+65.3
+BIT [46]
+CVPR’26
+96.1
+-
+92.4
+93.7
+-
+93.5
+73.1
+-
+69.2
+66.7
+-
+67.2
+CMOI [73]
+CVPR’26
+93.5
+-
+85.3
+92.4
+-
+83.8
+70.8
+-
+55.9
+58.5
+-
+64.5
+ICSD [23]
+TIP’26
+95.9
+98.5
+92.2
+95.4
+98.6
+91.0
+65.8
+92.0
+68.4
+58.4
+85.3
+64.8
+CMSD [48]
+TGRS’26
+94.8
+98.5
+90.7
+94.4
+98.5
+90.7
+66.7
+91.7
+69.1
+57.7
+85.1
+64.1
+FFD-Net [56]
+EAAI’26
+95.6
+99.0
+88.2
+93.6
+99.1
+86.0
+70.4
+86.2
+52.0
+62.8
+79.6
+45.9
+IDKL* [74]
+CVPR’24
+93.6
+99.8
+88.7
+93.2
+99.5
+87.6
+72.9
+94.7
+62.3
+70.0
+90.3
+61.3
+IDKL + DSMCL
+This paper
+95.4
+100.0
+90.1
+95.8
+100.0
+89.5
+74.8
+95.5
+64.2
+71.4
+92.2
+63.9
+MFENet* [40]
+TCSVT’25
+88.4
+96.5
+83.3
+90.5
+97.5
+84.4
+69.2
+92.8
+71.2
+61.2
+87.8
+67.6
+MFENet + DSMCL
+This paper
+90.5
+97.7
+84.9
+91.7
+97.6
+84.7
+71.6
+94.0
+73.7
+63.7
+90.2
+69.8
+HSFLNet* [75]
+EAAI’25
+96.1
+98.8
+92.3
+92.2
+96.8
+88.7
+56.6
+84.5
+58.5
+48.8
+77.2
+54.8
+HSFLNet + DSMCL
+This paper
+97.3
+99.5
+93.7
+96.1
+99.2
+93.9
+60.9
+88.2
+62.5
+51.7
+81.1
+57.8
+FDCL modules are jointly optimized together with the original
+objectives of each baseline. The balancing coefficients λid and
+λtri follow the official settings of the corresponding baseline
+models, while λs and λf are determined based on validation
+performance. The temperature coefficient in FDCL is fixed to
+τ = 0.2 for all experiments. This value is chosen empirically
+and kept constant to maintain consistent scaling of the logits
+across different datasets.
+To stabilize training, a progressive optimization strategy is
+adopted for the proposed consistency objectives. Specifically,
+in the spatial domain, SMCL employs a warm-up schedule
+and is activated after the first 20 epochs. Meanwhile, FDCL
+adopts a more conservative optimization strategy, remaining
+inactive during the first 40 epochs and then gradually increas-
+ing to its target weight through a linear ramp-up schedule
+over the subsequent 40 epochs. Such a progressive learning
+scheme allows the backbone network to first learn reliable
+identity-discriminative representations before introducing spa-
+tial distribution alignment and frequency-domain consistency
+constraints, thereby improving optimization stability and con-
+vergence. All experiments are implemented in PyTorch and
+conducted on a single NVIDIA A100-SXM4-80GB GPU.
+C. Comparison with State-of-the-Art Methods
+1) Results on Visible-Infrared Person ReID Benchmarks:
+Tables I and II report the comparison results on SYSU-MM01,
+RegDB, and LLCM. Overall, DSMCL consistently improves
+all baseline models across different datasets and evaluation
+protocols, demonstrating its effectiveness and strong general-
+ization capability for visible-infrared person ReID.
+On SYSU-MM01, DSMCL brings consistent performance
+gains when integrated into different baseline architectures. For
+example, IDKL+DSMCL improves the Rank-1 accuracy from
+80.9% to 83.6% and the mAP from 78.5% to 81.4% under
+the All-search Single-shot protocol. Similar improvements are
+also observed on MFENet and HSFLNet under both All-search
+and Indoor-search settings. Notably, IDKL+DSMCL achieves
+the best Rank-1 accuracy of 92.3% and 95.2% under Indoor-
+search Single-shot and Multi-shot protocols, respectively.
+On RegDB and LLCM, DSMCL also consistently improves
+all baseline models under different retrieval protocols. In
+particular, HSFLNet+DSMCL achieves the best overall perfor-
+mance on RegDB with 97.3% Rank-1 and 93.7% mAP under
+the Visible-to-Infrared protocol. Consistent gains are further
+observed on the more challenging LLCM benchmark, indi-
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+11
+TABLE III
+COMPARISON BETWEEN THE PROPOSED DSMCL AND SOME STATE-OF-THE-ART METHODS ON THE HOSS-REID DATASET. THE SYMBOL “*”
+DENOTES THE REPRODUCTION RESULTS BASED ON THE OFFICIAL CODE. THE SYMBOL “-” INDICATES THAT METRICS WERE NOT REPORTED IN THE
+SOURCE PAPER. BOLD VALUES INDICATE THE BEST PERFORMANCE.
+Methods
+Venue
+All to ALL
+Optical to SAR
+SAR to Optical
+Rank1
+Rank5
+Rank10
+mAP
+Rank1
+Rank5
+Rank10
+mAP
+Rank1
+Rank5
+Rank10
+mAP
+AGW [45]
+TPAMI’21
+57.4
+64.2
+68.8
+43.6
+7.7
+29.2
+38.5
+17.2
+14.9
+34.3
+46.3
+21.1
+TransReID [77]
+ICCV’21
+60.8
+69.3
+73.9
+48.1
+18.5
+40.0
+58.5
+27.3
+11.9
+34.3
+43.3
+20.9
+SOLIDER [78]
+CVPR’23
+50.6
+63.1
+69.9
+38.2
+12.3
+38.5
+52.3
+23.1
+10.4
+16.4
+31.3
+14.6
+DEEN [9]
+CVPR’23
+58.5
+64.2
+66.5
+43.8
+21.5
+44.6
+60.0
+31.3
+22.4
+40.3
+53.7
+27.4
+VersReID [44]
+TPAMI’24
+59.7
+70.5
+78.4
+49.3
+13.8
+40.0
+61.5
+25.7
+17.9
+44.8
+61.2
+27.7
+MCJA [34]
+TCSVT’24
+59.1
+67.9
+73.0
+47.1
+10.8
+27.7
+38.5
+18.6
+14.9
+28.3
+43.3
+19.7
+D2InterNet [79]
+SIGIR’25
+59.1
+71.6
+79.0
+50.2
+21.5
+41.5
+69.8
+33.0
+25.4
+38.8
+50.7
+28.8
+IDKL* [74]
+CVPR’24
+64.2
+76.1
+84.1
+55.1
+36.9
+64.6
+75.4
+51.2
+31.3
+61.2
+74.6
+35.6
+IDKL + DSMCL
+This paper
+66.5
+78.4
+85.2
+56.7
+40.0
+67.7
+76.9
+52.4
+38.8
+68.7
+79.1
+40.6
+TransOSS* [14]
+ICCV’25
+66.5
+77.3
+83.5
+56.1
+35.4
+58.5
+73.8
+47.4
+31.3
+56.7
+71.6
+38.4
+TransOSS + DSMCL
+This paper
+68.2
+79.0
+84.7
+58.5
+40.0
+63.1
+78.5
+50.3
+38.8
+64.2
+77.6
+42.2
+MOS* [15]
+CVPR’26
+68.8
+83.5
+88.6
+60.4
+40.0
+70.8
+75.4
+51.4
+46.3
+68.7
+79.1
+48.7
+MOS + DSMCL
+This paper
+70.4
+84.7
+89.8
+62.1
+41.5
+73.8
+76.9
+52.8
+47.8
+70.1
+82.1
+49.8
+TABLE IV
+COMPARISON BETWEEN THE PROPOSED DSMCL AND SOME STATE-OF-THE-ART METHODS ON THE CMSHIPREID DATASET UNDER TIR TO VIS, VIS
+TO TIR, AND NIR TO VIS EVALUATION PROTOCOLS. THE SYMBOL “*” DENOTES THE REPRODUCTION RESULTS BASED ON THE OFFICIAL CODE. THE
+SYMBOL “-” INDICATES THAT METRICS WERE NOT REPORTED IN THE SOURCE PAPER. BOLD VALUES INDICATE THE BEST PERFORMANCE.
+Methods
+Venue
+TIR to VIS
+VIS to TIR
+NIR to VIS
+Rank1
+Rank5
+Rank10
+mAP
+Rank1
+Rank5
+Rank10
+mAP
+Rank1
+Rank5
+Rank10
+mAP
+TransReID* [77]
+ICCV’21
+95.6
+97.9
+98.9
+66.8
+91.4
+96.0
+97.9
+73.4
+76.9
+91.7
+95.7
+57.0
+TransReID + DSMCL
+This paper
+96.6
+98.2
+99.0
+73.9
+94.0
+97.2
+98.1
+75.4
+83.8
+94.6
+97.3
+63.2
+IDKL* [74]
+CVPR’24
+94.4
+98.2
+99.5
+55.7
+82.5
+95.9
+99.1
+52.6
+68.2
+89.0
+95.0
+41.1
+IDKL + DSMCL
+This paper
+95.8
+98.9
+99.7
+58.5
+85.0
+96.7
+99.4
+54.5
+71.7
+91.5
+95.4
+44.7
+MFENet* [40]
+TCSVT’25
+96.9
+98.5
+99.0
+73.1
+90.6
+95.0
+96.3
+72.0
+79.5
+91.6
+94.7
+60.7
+MFENet + DSMCL
+This paper
+98.7
+99.7
+99.8
+74.3
+93.7
+96.9
+97.7
+74.4
+82.9
+91.5
+94.9
+62.5
+HSFLNet* [75]
+EAAI’25
+97.9
+98.9
+99.4
+64.0
+90.0
+95.2
+96.9
+62.9
+80.6
+93.6
+96.4
+46.1
+HSFLNet + DSMCL
+This paper
+98.4
+99.0
+99.5
+65.7
+91.8
+95.8
+97.3
+64.5
+83.2
+94.3
+96.7
+49.5
+TABLE V
+COMPARISON BETWEEN THE PROPOSED DSMCL AND SOME STATE-OF-THE-ART METHODS ON THE CMSHIPREID DATASET UNDER VIS TO NIR, NIR
+TO TIR, AND TIR TO NIR EVALUATION PROTOCOLS. THE SYMBOL “*” DENOTES THE REPRODUCTION RESULTS BASED ON THE OFFICIAL CODE. THE
+SYMBOL “-” INDICATES THAT METRICS WERE NOT REPORTED IN THE SOURCE PAPER. BOLD VALUES INDICATE THE BEST PERFORMANCE.
+Methods
+Venue
+VIS to NIR
+NIR to TIR
+TIR to NIR
+Rank1
+Rank5
+Rank10
+mAP
+Rank1
+Rank5
+Rank10
+mAP
+Rank1
+Rank5
+Rank10
+mAP
+TransReID* [77]
+ICCV’21
+72.7
+86.0
+91.2
+57.2
+75.1
+89.0
+92.6
+59.2
+73.2
+89.2
+95.0
+54.4
+TransReID + DSMCL
+This paper
+79.8
+92.8
+95.7
+60.9
+78.1
+90.3
+93.9
+61.4
+77.4
+92.1
+95.3
+60.2
+IDKL* [74]
+CVPR’24
+59.8
+87.9
+95.3
+35.7
+65.6
+90.6
+96.4
+38.6
+65.8
+89.8
+94.8
+37.9
+IDKL + DSMCL
+This paper
+62.3
+88.1
+95.8
+39.6
+68.5
+91.7
+96.9
+41.4
+66.1
+90.8
+95.0
+38.0
+MFENet* [40]
+TCSVT’25
+72.0
+85.1
+89.8
+56.8
+77.0
+90.3
+92.6
+64.4
+72.4
+89.4
+93.7
+58.7
+MFENet + DSMCL
+This paper
+74.1
+85.3
+90.0
+57.9
+81.4
+94.7
+95.1
+66.5
+76.0
+91.8
+94.4
+60.2
+HSFLNet* [75]
+EAAI’25
+71.2
+86.0
+91.4
+40.6
+60.1
+76.5
+83.7
+32.7
+66.6
+83.7
+89.7
+33.0
+HSFLNet + DSMCL
+This paper
+73.8
+87.6
+92.1
+42.5
+63.4
+81.1
+88.1
+35.2
+69.4
+86.0
+91.8
+35.2
+cating that DSMCL remains effective under severe modality
+discrepancies and low-light conditions, which further validates
+its robustness. Overall, the results on three visible-infrared
+person ReID benchmarks demonstrate that jointly modeling
+spatial consistency and frequency-aware discriminative con-
+sistency leads to more robust cross-modal representations.
+2) Results on Cross-modal Ship ReID Benchmarks: Ta-
+bles III, IV, and V report the comparison results on HOSS-
+ReID and CMShipReID. Compared with visible-infrared per-
+son ReID, cross-modal ship retrieval is considerably more
+challenging due to the larger appearance discrepancy intro-
+duced by heterogeneous sensing modalities, including optical,
+SAR, near-infrared, and thermal infrared imagery.
+On HOSS-ReID, DSMCL consistently improves all baseline
+models under the All-to-All, Optical-to-SAR, and SAR-to-
+Optical protocols. For example, IDKL+DSMCL improves the
+Rank-1 accuracy by 2.3%, 3.1%, and 7.5% under the three
+protocols, respectively. When incorporated into MOS, DSMCL
+achieves the best overall performance, reaching 70.4%, 41.5%,
+and 47.8% Rank-1 accuracy under the three evaluation set-
+tings. These results demonstrate the effectiveness of DSMCL
+in mitigating the substantial modality gap between optical
+and SAR imagery, further verifying its strong generalization
+capability across different sensor modalities.
+On CMShipReID, DSMCL also achieves consistent im-
+provements across all six cross-modal retrieval protocols.
+Significant gains are observed on TransReID, IDKL, MFENet,
+and HSFLNet, demonstrating that DSMCL is compatible
+with substantially different backbone architectures. Moreover,
+consistent performance gains are observed across all baseline
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+12
+TABLE VI
+COMPONENT-WISE ABLATION STUDY OF THE PROPOSED DSMCL ON THE SYSU-MM01 AND REGDB DATASETS UNDER ALL EVALUATION
+PROTOCOLS. BOLD VALUES INDICATE THE BEST PERFORMANCE.
+Method
+SMCL
+FDCL
+SYSU-MM01
+RegDB
+All-search
+Indoor-search
+Visible to Infrared
+Infrared to Visible
+Single-shot
+Multi-shot
+Single-shot
+Multi-shot
+Rank1
+mAP
+Rank1
+mAP
+Rank1
+mAP
+Rank1
+mAP
+Rank1
+mAP
+Rank1
+mAP
+IDKL
+✗
+✗
+80.9
+78.5
+83.5
+74.9
+88.2
+89.6
+92.2
+86.4
+93.6
+88.7
+93.2
+87.6
+IDKL + SMCL
+✓
+✗
+81.5
+79.6
+84.8
+75.3
+90.7
+90.9
+92.7
+87.3
+94.1
+89.5
+93.9
+88.1
+IDKL + FDCL
+✗
+✓
+82.9
+79.8
+85.4
+75.2
+89.6
+91.4
+94.3
+88.0
+95.0
+89.4
+95.2
+88.6
+IDKL + DSMCL
+✓
+✓
+83.6
+81.4
+86.1
+77.8
+92.3
+92.2
+95.2
+88.9
+95.4
+90.1
+95.8
+89.5
+TABLE VII
+COMPONENT-WISE ABLATION STUDY OF THE PROPOSED DSMCL ON THE CMSHIPREID DATASET UNDER SIX EVALUATION PROTOCOLS. BOLD
+VALUES INDICATE THE BEST PERFORMANCE.
+Method
+SMCL
+FDCL
+TIR to VIS
+VIS to TIR
+NIR to VIS
+VIS to NIR
+NIR to TIR
+TIR to NIR
+Rank1
+mAP
+Rank1
+mAP
+Rank1
+mAP
+Rank1
+mAP
+Rank1
+mAP
+Rank1
+mAP
+TransReID
+✗
+✗
+95.6
+66.8
+91.4
+73.4
+76.9
+57.0
+72.7
+57.2
+75.1
+59.2
+73.2
+54.4
+TransReID + SMCL
+✓
+✗
+96.5
+70.3
+92.5
+75.0
+80.2
+58.3
+76.2
+60.0
+79.8
+60.8
+74.2
+59.3
+TransReID + FDCL
+✗
+✓
+96.0
+72.6
+93.3
+75.6
+82.2
+61.4
+74.3
+58.1
+77.6
+60.0
+76.5
+58.8
+TransReID + DSMCL
+✓
+✓
+96.6
+73.9
+94.0
+75.4
+83.8
+63.2
+79.8
+60.9
+78.1
+61.4
+77.4
+60.2
+models, and several DSMCL-enhanced variants achieve state-
+of-the-art results under multiple evaluation protocols. This
+further validates the effectiveness of the proposed framework
+in complex multi-modal retrieval scenarios involving visible,
+near-infrared, and thermal infrared modalities.
+Overall, DSMCL consistently improves retrieval perfor-
+mance across five benchmark datasets, seventeen evaluation
+protocols, and multiple representative baseline architectures.
+These results demonstrate the universal applicability of the
+proposed framework across diverse cross-modal scenarios and
+verify its ability to automatically capture modality-specific
+characteristics and modality-shared identity cues for robust
+representation learning.
+D. Ablation Study
+1) Component Analysis on Visible-Infrared Person ReID:
+Table VI reports the component-wise ablation results on
+SYSU-MM01 and RegDB. Compared with the baseline IDKL,
+introducing SMCL alone consistently improves retrieval per-
+formance across all evaluation protocols, demonstrating the
+effectiveness of spatial modality consistency learning in re-
+ducing cross-modal feature distribution discrepancy. Similarly,
+incorporating FDCL alone also yields notable performance
+gains, indicating that explicitly modeling high-frequency dis-
+criminative representations provides complementary modality-
+invariant information beyond conventional spatial-domain
+learning for cross-modal retrieval tasks.
+When both SMCL and FDCL are jointly incorporated into
+the baseline model, the resulting DSMCL-enhanced variant
+consistently achieves the best performance under all evaluation
+protocols. For example, on SYSU-MM01 All-search Single-
+shot, the Rank-1 accuracy and mAP are improved from
+80.9% and 78.5% to 83.6% and 81.4%, respectively. Similar
+improvements are observed on RegDB, where IDKL enhanced
+by DSMCL achieves 95.4%/90.1% and 95.8%/89.5% Rank-
+1/mAP under the Visible-to-Infrared and Infrared-to-Visible
+settings, respectively. These results demonstrate that SMCL
+and FDCL provide complementary benefits, and jointly incor-
+porating both modules consistently yields the most discrimi-
+native and modality-robust representations.
+2) Component Analysis on Cross-modal Ship ReID: Ta-
+ble VII presents the ablation results on the CMShipReID
+benchmark in our study. Similar observations can be made
+across all six evaluation protocols. Both SMCL and FDCL
+individually improve the baseline performance, confirming the
+effectiveness of spatial consistency learning and frequency-
+aware discriminative consistency learning in multi-modal mar-
+itime retrieval scenarios.
+Furthermore, jointly incorporating SMCL and FDCL con-
+sistently yields the best performance under all evaluation
+protocols. For instance, introducing both modules improves
+the Rank-1 accuracy of TransReID from 91.4% to 94.0%
+under the VIS-to-TIR protocol and from 72.7% to 79.8%
+under the VIS-to-NIR protocol. Compared with introducing
+only SMCL or FDCL, incorporating both modules simulta-
+neously consistently achieves superior Rank-1 accuracy and
+mAP across all test settings. These results further confirm
+that spatial-domain modality alignment and frequency-domain
+discriminative consistency are complementary, and their joint
+optimization consistently leads to the best retrieval perfor-
+mance across diverse maritime sensing scenarios.
+E. Hyperparameter Sensitivity Analysis
+To investigate the influence of the proposed loss weights and
+contrastive temperature parameter, we conduct hyperparameter
+sensitivity experiments on the RegDB dataset under both
+Visible-to-Infrared and Infrared-to-Visible evaluation proto-
+cols. We select IDKL as baseline method.
+Fig. 4 illustrates the impact of the spatial consistency
+weight λs and frequency consistency weight λf. We vary both
+parameters from 0.01 to 0.09 while keeping τ = 0.2. It can
+be observed that the performance remains relatively stable
+across a broad range of parameter combinations, indicating
+the robustness of the proposed DSMCL framework. The best
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+13
+Fig. 4. Impact of the spatial consistency weight λs and frequency consistency
+weight λf on mAP under the Visible-to-Infrared and Infrared-to-Visible
+settings of RegDB.
+Fig. 5. Sensitivity analysis of the temperature parameter τ on RegDB under
+the Visible-to-Infrared and Infrared-to-Visible settings of RegDB.
+performance is consistently achieved when λs = 0.05 and
+λf = 0.03, yielding 90.1% and 89.5% mAP under the Visible-
+to-Infrared and Infrared-to-Visible settings, respectively. These
+results suggest that an appropriate balance between spatial
+modality alignment and frequency-aware discriminative learn-
+ing is beneficial for learning robust representations.
+Fig. 5 presents the sensitivity analysis of the temperature
+parameter τ used in the frequency-aware discriminative con-
+trastive learning objective. As τ increases from 0.1 to 0.2,
+the performance gradually improves and reaches its optimum
+at τ
+= 0.2. Further increasing τ leads to a noticeable
+performance decline under both evaluation protocols. This
+phenomenon can be attributed to the trade-off between sample
+discrimination and representation smoothness in the learned
+feature space. A small temperature may overly emphasize hard
+samples, while a large temperature weakens the discriminative
+capability of the contrastive objective. Therefore, τ = 0.2 is
+adopted in all experiments.
+Overall, the results demonstrate that DSMCL is not overly
+sensitive to hyperparameter selection and achieves consistently
+strong performance within a relatively wide parameter range.
+F. Visualization Analysis
+1) t-SNE and Distance Distribution Analysis: To further
+investigate the effectiveness of the proposed DSMCL, we
+conduct both qualitative and quantitative analyses on the
+Fig. 6.
+T-SNE visualization of feature embeddings for randomly selected
+identities from the RegDB dataset. Different colors denote different identities,
+while circles and triangles represent visible and infrared samples, respectively.
+learned feature representations. Specifically, ten identities are
+randomly selected from the RegDB test set for visualization.
+We select HSFLNet as baseline method.
+Fig. 6 presents the t-SNE visualization of the learned
+embeddings. Compared with the baseline model, DSMCL
+produces more compact intra-class distributions and clearer
+separation between different identities. As highlighted by the
+blue dashed ellipse, samples belonging to the same identity are
+clustered more closely after introducing DSMCL. Meanwhile,
+the red dashed ellipse demonstrates that DSMCL effectively
+alleviates the confusion between neighboring identity clusters,
+resulting in improved feature discrimination.
+To quantitatively validate these observations, Fig. 7 further
+illustrates the probability density distributions of intra-class
+and inter-class distances for the same identities. Compared
+with the baseline, DSMCL reduces the average intra-class
+distance from 0.243 to 0.175 while maintaining a relatively
+large inter-class distance. Consequently, the distance margin
+between inter-class and intra-class distributions increases from
+0.371 to 0.408, demonstrating a clear improvement in feature
+separability. This enlarged margin indicates that DSMCL
+learns more compact representations for samples of the same
+identity while preserving stronger discrimination between dif-
+ferent identities.
+Overall, the visualization results consistently demonstrate
+that the proposed dual-space modality consistency learning
+effectively enhances intra-class compactness and inter-class
+separability, leading to more discriminative and accurate fea-
+ture representations across diverse modalities.
+2) Frequency Spectrum Alignment Analysis: To further
+verify the effectiveness of FDCL in the frequency domain,
+we select MFENet as the baseline method and analyze cross-
+modal frequency spectrum alignment on the SYSU-MM01
+and CMShipReID datasets. Specifically, ten identities are
+randomly selected from the test set. For each identity, interme-
+diate feature maps are transformed into the frequency domain
+via FFT, and the averaged spectra of different modalities are
+computed. The absolute difference between paired spectra is
+then used to quantify cross-modal frequency discrepancy.
+As shown in Fig. 8, the frequency spectra are visualized
+after applying FFTshift(·), where low-frequency components
+are concentrated around the center and high-frequency com-
+ponents are distributed toward the periphery in the frequency
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+14
+Fig. 7. Probability density distributions of intra-class and inter-class feature
+distances computed from the same randomly selected RegDB samples used
+in Fig. 6. The blue and green regions denote the intra-class and inter-class
+distance distributions, respectively.
+Fig. 8. Cross-modal frequency spectrum alignment analysis for randomly se-
+lected identities from the SYSU-MM01 dataset. Lower spectrum discrepancy
+scores indicate better frequency-domain consistency across modalities.
+domain. Since the energy of most visual representations is pre-
+dominantly concentrated in low-frequency regions, the overall
+spectral structures of visible and infrared modalities appear
+visually similar for both MFENet and MFENet+FDCL. There-
+fore, the global spectrum distributions alone are insufficient to
+reveal subtle modality discrepancies.
+To better characterize frequency-domain consistency, we
+further analyze the difference maps, spectrum discrepancy
+scores, and frequency-difference curves. Here, the spectrum
+discrepancy score is defined as the mean value of the cor-
+responding difference map, where a lower value indicates
+better frequency-domain consistency across modalities . Com-
+pared with the MFENet baseline, MFENet+FDCL produces
+noticeably lower responses in the difference map, indicating
+reduced spectral discrepancy between visible and infrared
+modalities. Quantitatively, the discrepancy score decreases
+from 7.79×10−2 to 5.45×10−2, corresponding to a relative
+reduction of approximately 30.0%.
+Moreover, the frequency-difference curve reveals that the
+improvement is primarily concentrated in high-frequency re-
+gions, whereas the discrepancy in low-frequency components
+remains relatively stable. This observation is consistent with
+our motivation that high-frequency representations are both
+highly discriminative and highly modality-sensitive. While
+low-frequency components mainly preserve shared semantic
+Fig. 9.
+Cross-modal frequency spectrum alignment analysis for randomly
+selected identities from the CMShipReID dataset. Lower spectrum discrepancy
+scores indicate better frequency-domain consistency across modalities.
+structures across modalities, high-frequency components con-
+tain richer modality-specific variations and therefore contribute
+more substantially to cross-modal discrepancy. By explicitly
+enforcing high-frequency consistency across modalities, FDCL
+effectively suppresses modality-specific frequency variations
+while preserving identity-related discriminative information.
+To evaluate the effectiveness of FDCL under multi-modal
+settings, we conduct frequency spectrum alignment analysis on
+the CMShipReID dataset. As shown in Fig. 9, FDCL reduces
+spectral discrepancy across all modality pairs, including VIS-
+NIR, VIS-TIR, and NIR-TIR. Compared with the MFENet
+baseline, the difference maps exhibit lower responses with
+FDCL. The spectrum discrepancy scores are reduced from
+6.84×10−2 to 4.78×10−2 for VIS-NIR, from 7.68×10−2 to
+5.05×10−2 for VIS-TIR, and from 6.35×10−2 to 2.94×10−2
+for NIR-TIR, respectively.
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+15
+Fig. 10. Qualitative retrieval comparison between between the IDKL baseline
+and the baseline augmented with DSMCL for randomly selected queries
+from the LLCM and HOSS-ReID datasets. For each query image, the top-5
+retrieved gallery samples are presented. Blue and red boxes indicate correct
+and incorrect matches, respectively.
+More importantly, the frequency-difference curves demon-
+strate that the improvement is mainly concentrated in high-
+frequency regions. While low-frequency components preserve
+common semantic structures shared across modalities, high-
+frequency components contain richer modality-specific char-
+acteristics and therefore contribute more substantially to cross-
+modal discrepancy. The consistent reduction of high-frequency
+differences across all modality pairs indicates that FDCL
+effectively aligns modality-specific frequency representations
+and promotes frequency-domain consistency. This behavior
+suggests that FDCL selectively regularizes modality-sensitive
+spectral components without unnecessarily disturbing shared
+low-frequency structures. These results verify that FDCL
+consistently reduces cross-modal frequency discrepancy across
+both visible-infrared and multi-modal ReID scenarios.
+Notably, the observed improvements are achieved on top of
+the MFENet baseline, which already incorporates frequency-
+domain modeling for feature representation. This suggests that
+the performance gain of FDCL does not merely stem from ex-
+ploiting frequency information itself, but rather from explicitly
+enforcing cross-modal frequency consistency. In other words,
+frequency representation learning and cross-modal frequency
+consistency address distinct yet complementary objectives.
+These observations provide direct evidence for the effective-
+ness of the proposed frequency-aware discriminative consis-
+tency learning strategy and demonstrate its complementary
+benefits to existing frequency-aware ReID frameworks.
+3) Top-5 Retrieval Analysis: To provide a more intuitive
+evaluation of retrieval performance, Fig. 10 presents qualitative
+retrieval comparisons on the LLCM and HOSS-ReID datasets,
+where the IDKL baseline is compared with the baseline
+augmented by the proposed DSMCL.
+For the LLCM dataset, incorporating DSMCL consistently
+improves the retrieval quality of the baseline. In particular,
+all top-5 retrieved samples correspond to the same identity
+for the selected queries, demonstrating enhanced cross-modal
+discriminability compared with the original IDKL model.
+Moreover, LLCM contains significant low-light degradation
+and severe appearance ambiguity, which substantially increase
+the difficulty of cross-modal retrieval. Despite these chal-
+lenges, the baseline augmented with DSMCL still maintains
+highly accurate retrieval results. Compared with the base-
+line, DSMCL also reduces false matches involving visually
+similar identities. These observations indicate that dual-space
+modality consistency learning effectively separates identity-
+discriminative cues from modality-induced variations under
+adverse illumination conditions.
+For the HOSS-ReID dataset, the introduction of DSMCL
+also brings clear improvements over the baseline. All correct
+gallery samples belonging to the queried identity are suc-
+cessfully retrieved after incorporating DSMCL. Notably, the
+first query corresponds to a low-resolution ship sample under
+the ALL-to-ALL evaluation protocol, where the enhanced
+model still achieves accurate retrieval despite the limited
+visual details. Furthermore, during modality-mixed retrieval,
+the baseline augmented with DSMCL is able to simultaneously
+retrieve gallery samples from both modalities that belong to
+the same identity. This observation suggests that DSMCL
+effectively reduces modality discrepancy while preserving
+identity consistency, thereby bringing heterogeneous modality
+representations closer in the shared feature space.
+Overall, the qualitative retrieval results are consistent with
+the quantitative improvements reported in the benchmark eval-
+uations. In particular, DSMCL reduces mismatches caused by
+severe illumination variations, limited visual details, and het-
+erogeneous sensing characteristics while preserving identity-
+relevant cues. Its consistent benefits across person and ship
+retrieval further support its applicability to distinct target cat-
+egories and modality combinations. These results demonstrate
+that DSMCL serves as an effective plug-and-play enhancement
+for existing cross-modal ReID frameworks, improving cross-
+modal discriminability, retrieval robustness, and alignment
+between heterogeneous modalities.
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+16
+V. CONCLUSION
+In this paper, we proposed a novel Dual-Space Modal-
+ity Consistency Learning framework (DSMCL) for universal
+cross-modal re-identification. Unlike existing methods that
+are typically designed for specific modality combinations,
+DSMCL serves as a unified and plug-and-play modality con-
+sistency learning framework that can be readily integrated
+into different baseline architectures and cross-modal scenarios.
+Specifically, DSMCL jointly exploits spatial-domain modality
+consistency and frequency-domain discriminative consistency
+through the proposed SMCL and FDCL modules, thereby
+reducing modality discrepancy while preserving discriminative
+identity information.
+Extensive experiments on five benchmark datasets, in-
+cluding SYSU-MM01, RegDB, LLCM, HOSS-ReID, and
+CMShipReID, demonstrate the effectiveness of the proposed
+framework. DSMCL consistently improves multiple repre-
+sentative baseline models across seventeen evaluation proto-
+cols spanning visible-infrared person ReID, optical-SAR ship
+ReID, and multi-modal ship ReID scenarios. These results
+validate the strong versatility and generalization capability
+of DSMCL across substantially different sensing modalities
+without requiring modality-specific architectural designs.
+In future work, we will explore more adaptive modality-
+aware consistency learning strategies and extend the proposed
+framework to broader cross-modal retrieval tasks.
+REFERENCES
+[1] S. Li, L. Sun, and Q. Li, “Clip-reid: exploiting vision-language model
+for image re-identification without concrete text labels,” in Proc. Conf.
+Assoc. Adv. Artif. Intell., vol. 37, no. 1, 2023, pp. 1405–1413.
+[2] D. Li, X. Wei, X. Hong, and Y. Gong, “Infrared-visible cross-modal
+person re-identification with an x modality,” in Proc. Conf. Assoc. Adv.
+Artif. Intell., vol. 34, no. 4, 2020, pp. 4610–4617.
+[3] W. He et al., “Instruct-reid: A multi-purpose person re-identification task
+with instructions,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit.,
+2024, pp. 17 521–17 531.
+[4] X. Jin et al., “Cloth-changing person re-identification from a single
+image with gait prediction and regularization,” in Proc. IEEE Conf.
+Comput. Vis. Pattern Recognit., 2022, pp. 14 278–14 287.
+[5] H. Liu, Y. Zhao, and G. Niu, “Try harder: Hard sample generation
+and learning for cloth-changing person re-id,” in Proc. ACM Int. Conf.
+Multimedia, 2025, pp. 1704–1713.
+[6] Y. Zhao, C. Wu, Y. Xu, X. Du, R. Li, and G. Niu, “Ccup: A controllable
+synthetic data generation pipeline for pretraining cloth-changing person
+re-identification models,” in Proc. IEEE Int. Conf. on Multimedia and
+Expo, 2025, pp. 1–6.
+[7] C. Yuan, Y. Zhao, H. Xu, and G. Niu, “Towards robust text-to-image
+person retrieval: Multi-view reformulation for semantic compensation,”
+arXiv:2604.18376, 2026.
+[8] N. Huang, J. Liu, Y. Miao, Q. Zhang, and J. Han, “Deep learning for
+visible-infrared cross-modality person re-identification: A comprehen-
+sive review,” Information Fusion, vol. 91, pp. 396–411, 2023.
+[9] Y. Zhang and H. Wang, “Diverse embedding expansion network and
+low-light cross-modality benchmark for visible-infrared person re-
+identification,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit.,
+2023, pp. 2153–2162.
+[10] C. Yu, X. Liu, P. Zhang, and H. Lu, “X-reid: Multi-granularity informa-
+tion interaction for video-based visible-infrared person re-identification,”
+in Proc. Conf. Assoc. Adv. Artif. Intell., vol. 40, no. 14, 2026, pp. 12 117–
+12 125.
+[11] J. Feng, A. Wu, and W.-S. Zheng, “Shape-erased feature learning for
+visible-infrared person re-identification,” in Proc. IEEE Conf. Comput.
+Vis. Pattern Recognit., 2023, pp. 22 752–22 761.
+[12] X. Hao, S. Zhao, M. Ye, and J. Shen, “Cross-modality person re-
+identification via modality confusion and center aggregation,” in Proc.
+IEEE Int. Conf. Comput. Vis., 2021, pp. 16 403–16 412.
+[13] Y. Chen, L. Wan, Z. Li, Q. Jing, and Z. Sun, “Neural feature search for
+rgb-infrared person re-identification,” in Proc. IEEE Conf. Comput. Vis.
+Pattern Recognit., 2021, pp. 587–597.
+[14] H. Wang, S. Li, J. Yang, Y. Liu, Y. Lv, and Z. Zhou, “Cross-modal
+ship re-identification via optical and sar imagery: A novel dataset and
+method,” in Proc. IEEE Int. Conf. Comput. Vis., 2025, pp. 7873–7883.
+[15] Y. Zhao, H. Liu, and G. Niu, “Mos: Mitigating optical-sar modality gap
+for cross-modal ship re-identification,” in Proc. IEEE Conf. Comput. Vis.
+Pattern Recognit., 2026, pp. 30 335–30 345.
+[16] C.-C. Fan et al., “Smart-ship: A comprehensive synchronized multi-
+modal aligned remote sensing targets dataset and benchmark for berthed
+ships analysis,” arXiv:2508.02384, 2025.
+[17] C. Xu et al., “Cmshipreid: A cross-modality ship dataset for the re-
+identification task,” IEEE J. Sel. Top. Appl. Earth Observ. Remote Sens.,
+vol. 18, pp. 10 503–10 513, 2025.
+[18] C. Yuan et al., “Modality-transition representation learning for visible-
+infrared person re-identification,” arXiv:2511.02685, 2025.
+[19] W. Dai, L. Lu, and Z. Li, “Diffusion-based synthetic data generation
+for visible-infrared person re-identification,” in Proc. Conf. Assoc. Adv.
+Artif. Intell., vol. 39, no. 11, 2025, pp. 11 185–11 193.
+[20] J. Qi, T. Liang, W. Liu, Y. Li, and Y. Jin, “A generative-based image
+fusion strategy for visible-infrared person re-identification,” IEEE Trans.
+Circuits Syst. Video Technol., vol. 34, no. 1, pp. 518–533, 2023.
+[21] H. Pan, W. Pei, X. Li, and Z. He, “Unified conditional image generation
+for visible-infrared person re-identification,” IEEE Trans. Inf. Forensics
+Security, vol. 19, pp. 9026–9038, 2024.
+[22] Z. Feng, J. Lai, and X. Xie, “Learning modality-specific representa-
+tions for visible-infrared person re-identification,” IEEE Trans. Image
+Process., vol. 29, pp. 579–590, 2019.
+[23] Y. Ling, Z. Hu, N. Pu, Z. Zhong, and X. Jiang, “Identity-compensated
+style distillation for visible-infrared person re-identification,” IEEE
+Trans. Image Process., vol. 35, pp. 2941–2954, 2026.
+[24] H. Lu, X. Zou, and P. Zhang, “Learning progressive modality-shared
+transformers for effective visible-infrared person re-identification,” in
+Proc. Conf. Assoc. Adv. Artif. Intell., vol. 37, no. 2, 2023, pp. 1835–
+1843.
+[25] Y. Feng et al., “Visible-infrared person re-identification via cross-
+modality interaction transformer,” IEEE Trans. Multimedia, vol. 25, pp.
+7647–7659, 2022.
+[26] Z. Cui, J. Zhou, and Y. Peng, “Dma: Dual modality-aware alignment
+for visible-infrared person re-identification,” IEEE Trans. Inf. Forensics
+Security, vol. 19, pp. 2696–2708, 2024.
+[27] Y. Zhang, Y. Yan, Y. Lu, and H. Wang, “Adaptive middle modality
+alignment learning for visible-infrared person re-identification,” Int. J.
+Comput. Vis., vol. 133, no. 4, pp. 2176–2196, 2025.
+[28] N. Dong, S. Yan, L. Zhang, and J. Tang, “Diverse semantics-
+guided feature alignment and decoupling for visible-infrared person re-
+identification,” IEEE Trans. Inf. Forensics Security, vol. 20, pp. 12 245–
+12 259, 2025.
+[29] Y. Jiang, X. Cheng, H. Yu, X. Liu, H. Chen, and G. Zhao, “Dsaf: Dual
+space alignment framework for visible-infrared person re-identification,”
+IEEE Trans. Multimedia, vol. 27, pp. 5591–5603, 2025.
+[30] Y. Li, W. Tang, S. Wang, S. Qian, Q. Fang, and C. Xu, “Propagation
+based recycling contrastive learning for coupled noisy visible-infrared
+person re-identification,” IEEE Trans. Multimedia, vol. 27, pp. 9330–
+9341, 2025.
+[31] H. Sun et al., “Not all pixels are matched: Dense contrastive learning
+for cross-modality person re-identification,” in Proc. ACM Int. Conf.
+Multimedia, 2022, pp. 5333–5341.
+[32] S. Zhang, Y. Yang, P. Wang, G. Liang, X. Zhang, and Y. Zhang, “Attend
+to the difference: Cross-modality person re-identification via contrastive
+correlation,” IEEE Trans. Image Process., vol. 30, pp. 8861–8872, 2021.
+[33] X. Yu, N. Dong, L. Zhu, H. Peng, and D. Tao, “Clip-driven semantic
+discovery network for visible-infrared person re-identification,” IEEE
+Trans. Multimedia, vol. 27, pp. 4137–4150, 2025.
+[34] T. Liang, Y. Jin, W. Liu, T. Wang, S. Feng, and Y. Li, “Bridging the gap:
+Multi-level cross-modality joint alignment for visible-infrared person re-
+identification,” IEEE Trans. Circuits Syst. Video Technol., vol. 34, no. 8,
+pp. 7683–7698, 2024.
+[35] J. Pan, B. Zhang, and X. Cao, “Prototype-driven hierarchical skeleton
+modeling for visible-infrared person re-identification,” Eng. Appl. Artif.
+Intell., vol. 164, p. 113224, 2026.
+[36] M. Zhou et al., “A general spatial-frequency learning framework for
+multimodal image fusion,” IEEE Trans. Pattern Anal. Mach. Intell.,
+vol. 47, no. 7, pp. 5281–5298, 2024.
+
+
+JOURNAL OF LATEX CLASS FILES, VOL. 14, NO. 8, AUGUST 2021
+17
+[37] C. Zheng, J. Nie, B. Yin, X. Li, Y. Qian, and Z. Wei, “Frequency
+and spatial-domain saliency network for remote sensing cross-modal
+retrieval,” IEEE Trans. Geosci. Remote Sens., vol. 63, pp. 1–13, 2025.
+[38] G. Yang, “Freqcross: A multi-modal frequency-spatial fusion network
+for robust detection of stable diffusion 3.5 generated images,” in Proc.
+IEEE Conf. Comput. Vis. Pattern Recognit., 2025, pp. 6577–6584.
+[39] C. Li, S. Chen, and M. Ye, “Adaptive high-frequency transformer for
+diverse wildlife re-identification,” in Proc. Eur. Conf. Comput. Vis., 2024,
+pp. 296–313.
+[40] H. Gu, X. Yang, R. Lu, L. Pu, S. Han, and M. Wu, “Discovering multi-
+frequency embedding for visible-infrared person re-identification,” IEEE
+Trans. Circuits Syst. Video Technol., vol. 36, no. 2, pp. 1766–1780, 2025.
+[41] A. Wu, W.-S. Zheng, H.-X. Yu, S. Gong, and J. Lai, “Rgb-infrared cross-
+modality person re-identification,” in Proc. IEEE Int. Conf. Comput. Vis.,
+2017, pp. 5390–5399.
+[42] D. T. Nguyen, H. G. Hong, K. W. Kim, and K. R. Park, “Person
+recognition system based on a combination of body images from visible
+light and thermal cameras,” Sensors, vol. 17, no. 3, p. 605, 2017.
+[43] X. Fang, Y. Yang, and Y. Fu, “Visible-infrared person re-identification
+via semantic alignment and affinity inference,” in Proc. IEEE Conf.
+Comput. Vis. Pattern Recognit., 2023, pp. 11 270–11 279.
+[44] W.-S. Zheng, J. Yan, and Y.-X. Peng, “A versatile framework for multi-
+scene person re-identification,” IEEE Trans. Pattern Anal. Mach. Intell.,
+vol. 47, no. 3, pp. 1362–1380, 2024.
+[45] M. Ye, J. Shen, G. Lin, T. Xiang, L. Shao, and S. C. Hoi, “Deep learning
+for person re-identification: A survey and outlook,” IEEE Trans. Pattern
+Anal. Mach. Intell., vol. 44, no. 6, pp. 2872–2893, 2021.
+[46] H. Xu and G. Niu, “Bit: Matching-based bi-directional interaction
+transformation network for visible-infrared person re-identification,” in
+Proc. IEEE Conf. Comput. Vis. Pattern Recognit., 2026, pp. 40 386–
+40 396.
+[47] L. Qiu, S. Chen, J.-H. Xue, D.-H. Wang, S. Zhu, and Y. Yan, “Hoh-
+net: High-order hierarchical middle-feature learning network for visible-
+infrared person re-identification,” IEEE Trans. Circuits Syst. Video
+Technol., vol. 36, no. 2, pp. 2607–2622, 2025.
+[48] Z. Hu, Y. Ling, Z. Luo, W. Shao, S. Li, and Z. Zhong, “Cross-modality
+self-distillation for visible-infrared person re-identification,” IEEE Trans.
+Geosci. Remote Sens., 2026.
+[49] M. Alehdaghi, A. Josi, R. M. Cruz, P. Shamsolmoali, and E. Granger,
+“Adaptive generation of privileged intermediate information for visible-
+infrared person re-identification,” IEEE Trans. Inf. Forensics Security,
+vol. 20, pp. 3400–3413, 2025.
+[50] T. Xian, W. Zhou, Z. Zhou, and Z. Li, “Beyond weight adaptation:
+Feature-space domain injection for cross-modal ship re-identification,”
+arXiv:2512.20892, 2025.
+[51] F. Chen et al., “Sdf-net: Structure-aware disentangled feature learning
+for opticall-sar ship re-identification,” arXiv:2603.12588, 2026.
+[52] K. Xu, M. Qin, F. Sun, Y. Wang, Y.-K. Chen, and F. Ren, “Learning
+in the frequency domain,” in Proc. IEEE Conf. Comput. Vis. Pattern
+Recognit., 2020, pp. 1740–1749.
+[53] Y. Qian, G. Yin, L. Sheng, Z. Chen, and J. Shao, “Thinking in frequency:
+Face forgery detection by mining frequency-aware clues,” in Proc. Eur.
+Conf. Comput. Vis., 2020, pp. 86–103.
+[54] G. Zhang, Y. Zhang, T. Zhang, B. Li, and S. Pu, “Pha: Patch-wise high-
+frequency augmentation for transformer-based person re-identification,”
+in Proc. IEEE Conf. Comput. Vis. Pattern Recognit., 2023, pp. 14 133–
+14 142.
+[55] X. Li et al., “Mfen: Multi-frequency expert network for visible-infrared
+person re-id,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit., 2026,
+pp. 18 471–18 480.
+[56] X. Dong, Q. Tan, R. Wang, X. Liu, and P. Cao, “Frequency-driven
+feature decoupling network for visible–infrared person re-identification,”
+Eng. Appl. Artif. Intell., vol. 167, p. 113740, 2026.
+[57] Y. Zhang, H. Wang, Y. Lu, Y. Yan, and X. Li, “Frequency domain nu-
+ances mining for visible-infrared person re-identification,” IEEE Trans.
+Inf. Forensics Security, vol. 20, pp. 5411–5424, 2025.
+[58] M. Kim, S. Kim, J. Park, S. Park, and K. Sohn, “Partmix: Regular-
+ization strategy to learn part discovery for visible-infrared person re-
+identification,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit.,
+2023, pp. 18 621–18 632.
+[59] H. Yu, X. Cheng, W. Peng, W. Liu, and G. Zhao, “Modality unifying
+network for visible-infrared person re-identification,” in Proc. IEEE Int.
+Conf. Comput. Vis., 2023, pp. 11 185–11 195.
+[60] M. Ye, Z. Wu, C. Chen, and B. Du, “Channel augmentation for visible-
+infrared re-identification,” IEEE Trans. Pattern Anal. Mach. Intell.,
+vol. 46, no. 4, pp. 2299–2315, 2023.
+[61] X. Tian et al., “Variational distillation for multi-view learning,” IEEE
+Trans. Pattern Anal. Mach. Intell., vol. 46, no. 7, pp. 4551–4566, 2023.
+[62] L. Qiu, S. Chen, Y. Yan, J. Xue, D. Wang, and S. Zhu, “High-order
+structure based middle-feature learning for visible-infrared person re-
+identification,” in Proc. Conf. Assoc. Adv. Artif. Intell., vol. 38, no. 5,
+2024, pp. 4596–4604.
+[63] Y. Wu, L.-C. Meng, Y. Zichao, S. Chan, and H.-Q. Wang, “Wrim-net:
+Wide-ranging information mining network for visible-infrared person
+re-identification,” in Proc. Eur. Conf. Comput. Vis., 2024, pp. 55–72.
+[64] Y. Jiang, X. Cheng, H. Yu, X. Liu, H. Chen, and G. Zhao, “Domain
+shifting: A generalized solution for heterogeneous cross-modality person
+re-identification,” in Proc. Eur. Conf. Comput. Vis., 2024, pp. 289–306.
+[65] T. Lei et al., “Rle: A unified perspective of data augmentation for cross-
+spectral re-identification,” Proc. Adv. Conf. Neural Inf. Process. Syst.,
+vol. 37, pp. 126 977–126 996, 2024.
+[66] J. Yan, C. Deng, H. Huang, and W. Liu, “Causality-invariant interactive
+mining for cross-modal similarity learning,” IEEE Trans. Pattern Anal.
+Mach. Intell., vol. 46, no. 9, pp. 6216–6230, 2024.
+[67] X. Yang, W. Dong, M. Li, Z. Wei, N. Wang, and X. Gao, “Cooperative
+separation of modality shared-specific features for visible-infrared per-
+son re-identification,” IEEE Trans. Multimedia, vol. 26, pp. 8172–8183,
+2024.
+[68] Y. Qiu, L. Wang, W. Song, J. Liu, Z. Shi, and N. Jiang, “Advancing
+visible-infrared person re-identification: Synergizing visual-textual rea-
+soning and cross-modal feature alignment,” IEEE Trans. Inf. Forensics
+Security, vol. 20, pp. 2184–2196, 2025.
+[69] S. Chen, L. Qiu, D.-H. Wang, W. Zhu, Y. Hua, and Y. Yan, “Hierarchical
+token-aware cross-modality reconstruction for visible-infrared person re-
+identification,” IEEE Trans. Multimedia, vol. 27, pp. 7012–7027, 2025.
+[70] Z. Lu, R. Lin, and H. Hu, “Disentangling modality and posture factors:
+Memory-attention and orthogonal decomposition for visible-infrared
+person re-identification,” IEEE Trans. Neural Netw. Learn. Syst., vol. 36,
+no. 3, pp. 5494–5508, 2025.
+[71] Q. Wu, J. Xia, P. Dai, Y. Zhou, Y. Wu, and R. Ji, “Cycletrans: Learning
+neutral yet discriminative features via cycle construction for visible-
+infrared person re-identification,” IEEE Trans. Neural Netw. Learn. Syst.,
+vol. 36, no. 3, pp. 5469–5479, 2025.
+[72] X. Zuo, J. Peng, T. Cheng, and H. Wang, “Modality-perceptive harmo-
+nization network for visible-infrared person re-identification,” Informa-
+tion Fusion, vol. 118, p. 102979, 2025.
+[73] S. Shan, H. Liu, F. Shang, Q. Wang, and Y. Song, “Uncertainty-
+aware cross-modal opinion interaction: A general framework for visible-
+infrared vehicle and person re-identification,” in Proc. IEEE Conf.
+Comput. Vis. Pattern Recognit., 2026, pp. 6476–6485.
+[74] K. Ren and L. Zhang, “Implicit discriminative knowledge learning for
+visible-infrared person re-identification,” in Proc. IEEE Conf. Comput.
+Vis. Pattern Recognit., 2024, pp. 393–402.
+[75] J. Zhu, H. Ge, Y. Liu, C. Wu, and J. Fan, “Hypergraph-driven soft
+semantics flexible learning for visible–infrared person re-identification,”
+Eng. Appl. Artif. Intell., vol. 158, p. 111286, 2025.
+[76] X. Cheng, H. Yu, K. H. M. Cheng, Z. Yu, and G. Zhao, “Mdanet:
+Modality-aware domain alignment network for visible-infrared person
+re-identification,” IEEE Trans. Multimedia, vol. 27, pp. 2015–2027,
+2024.
+[77] S. He, H. Luo, P. Wang, F. Wang, H. Li, and W. Jiang, “Transreid:
+Transformer-based object re-identification,” in Proc. IEEE Int. Conf.
+Comput. Vis., 2021, pp. 15 013–15 022.
+[78] W. Chen et al., “Beyond appearance: a semantic controllable self-
+supervised learning framework for human-centric visual tasks,” in Proc.
+IEEE Conf. Comput. Vis. Pattern Recognit., 2023, pp. 15 050–15 061.
+[79] B. Liu et al., “Advancing ship re-identification in the wild: The shipreid-
+2400 benchmark dataset and d2internet baseline method,” in Proc. Int.
+ACM SIGIR Conf. Res. Develop. Inf. Retrieval, 2025, pp. 106–115.

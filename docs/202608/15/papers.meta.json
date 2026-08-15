@@ -1,0 +1,39 @@
+{
+  "label": "2026-08-15",
+  "date": "2026-08-15",
+  "generated_at": "2026-08-15T20:31:48",
+  "count": 2,
+  "papers": [
+    {
+      "paper_id": "202608/15/2608.11883v1-warping-earth-observations-for-better-ice-labeling-in-the-marginal-marginal-ice-zone",
+      "section": "deep",
+      "title_en": "Warping Earth Observations for better ice labeling in the Marginal Marginal Ice Zone",
+      "authors": "Tom Kelly, Martin S. J. Rogers",
+      "date": "2026-08-12",
+      "pdf": "https://arxiv.org/pdf/2608.11883v1",
+      "score": "8.0",
+      "evidence": "多模态卫星图像分类与空间对齐",
+      "tldr": "多模态卫星图像可互补，但南极边缘冰区海冰快速漂移导致图像间时空错配，破坏像素对应，阻碍多模态融合。针对此问题，本文提出基于互信息扭曲的架构对齐Sentinel-1与MODIS图像，并构建含两千零八十个像素标注和七千零四十六个专家点的稀疏数据集。实验结果显示，分割前空间对齐能提升分类精度，并可从稀疏点监督生成密集海冰分割。这为动态场景多模态感知提供新方法。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Multimodal satellite imagery provides complementary information for Earth Observation, but accurately combining heterogeneous sensors remains challenging in dynamic environments. Fast-changing regions, such as the Antarctic marginal ice zone, cannot fully exploit multimodal information from different satellite sensors because surface features move between image acquisitions. This spatial and temporal mismatch challenges effective perceptual grounding, violating the assumption of pixel-level correspondence that underpins most multimodal reasoning and downstream classification pipelines. Antarctic sea ice provides a challenging benchmark due to the rapid, heterogeneous drift of individual ice floes and the differing responses of sea ice to radar, visible and thermal sensing modalities. Accurate, dense supervision of sea ice remains scarce because generating pixel-wise labels requires time-consuming expert interpretation of noisy data, leading to historical reliance on coarse-resolution maritime ice charts for model training. This paper presents a novel architecture based on mutual information warping to align multi-satellite (Sentinel-1 and MODIS platforms) multimodal (visible, thermal, radar) satellite scenes. To demonstrate the approach, we introduce a sparse expert-labeled dataset of 2,088 pixel-wise annotations (7,046 expert point classifications) located at the ice-water margin interface across 43 scenes. Our results demonstrate that spatially grounding and aligning modalities prior to segmentation improves classification accuracy, and enables accurate, dense sea ice segmentation from sparse point-wise supervision.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "paper_id": "202608/15/2608.06943v1-dual-space-modality-consistency-learning-for-universal-cross-modal-re-identification",
+      "section": "quick",
+      "title_en": "Dual-Space Modality Consistency Learning for Universal Cross-Modal Re-Identification",
+      "authors": "Yujian Zhao, Yukang Zhao, Hankun Liu, Haoxuan Xu, Bo Li, Hanzi Wan, Guanglin Niu",
+      "date": "2026-08-07",
+      "pdf": "https://arxiv.org/pdf/2608.06943v1",
+      "score": "6.0",
+      "evidence": "面向通用跨模态重识别的双空间模态一致性学习，可迁移至高光谱与LiDAR融合",
+      "tldr": "跨模态重识别旨在跨异构成像模态检索同一目标，现有方法多在空间嵌入空间学习模态一致性，忽略了频域中既具判别性又对模态敏感的高频表示差异。本文提出双空间模态一致性学习（DSMCL）框架，同时利用空间和频域信息进行模态对齐，并面向多样跨模态场景设计通用策略。实验表明其在可见-红外行人重识别和跨模态船舶重识别等任务上有效。该方法提供了一种通用的跨模态一致性学习思路，可借鉴到高光谱与LiDAR数据融合任务中，而非特定于遥感分类。",
+      "tags": "query:hsi-lidar",
+      "abstract_en": "Cross-modal Re-Identification (ReID) aims to retrieve the same identity across heterogeneous imaging modalities and has been widely studied in visible-infrared person ReID and cross-modal ship ReID. Existing methods have achieved promising performance by learning modality consistency in the spatial embedding space, yet often overlook frequency-domain modality discrepancy, particularly in high-frequency representations that are both highly discriminative and modality-sensitive. In addition, most approaches are tailored to specific modality settings, limiting their applicability across diverse cross-modal scenarios. To address these challenges, we propose a Dual-Space Modality Consistency Learning (DSMCL) framework for universal cross-modal ReID. Specifically, DSMCL jointly models spatial feature distribution consistency and frequency-domain discriminative consistency. A Spatial Modality Consistency Learning (SMCL) branch performs Gaussian-based feature alignment, while a Frequency-aware Discriminative Consistency Learning (FDCL) strategy regularizes high-frequency representations through identity-aware cross-modal contrastive learning. By jointly capturing modality-specific characteristics and modality-shared identity cues, DSMCL learns robust representations and establishes a unified framework capable of accommodating diverse heterogeneous modality settings. Moreover, DSMCL is a plug-and-play framework that can be readily integrated into existing cross-modal ReID architectures. Extensive experiments on SYSU-MM01, RegDB, LLCM, HOSS-ReID, and CMShipReID across seventeen evaluation protocols show that DSMCL consistently improves multiple representative baselines.",
+      "source": "arxiv",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "errors": []
+}
