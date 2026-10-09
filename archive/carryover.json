@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-10-08T00:19:27.227161+00:00",
-  "updated_date": "20261007",
+  "generated_at": "2026-10-09T00:18:34.396295+00:00",
+  "updated_date": "20261008",
   "carryover_days": 9,
   "tag_states": {
     "hsi-lidar": {
-      "updated_date": "20261007",
+      "updated_date": "20261008",
       "carryover_days": 9,
       "items": []
     },
     "HSI": {
-      "updated_date": "20261007",
+      "updated_date": "20261008",
       "carryover_days": 9,
       "items": []
     }
